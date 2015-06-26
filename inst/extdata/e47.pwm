@@ -1,0 +1,78 @@
+AC  M00002
+XX
+ID  V$E47_01
+XX
+DT  19.10.1992 (created); ewi.
+DT  31.01.2012 (updated); sla.
+CO  Copyright (C), Biobase GmbH.
+XX
+NA  E47
+XX
+DE  E47
+XX
+TY  specific
+XX
+OS  Vertebrata
+OC  Eukaryota; Metazoa; Chordata; Craniata; Vertebrata
+XX
+HP  M00804; V$E2A_Q2;  (family).
+HP  M00929; V$MYOD_Q6_01;  (family).
+HP  M00973; V$E2A_Q6;  (family).
+HP  M01034; V$EBOX_Q6_01;  (family).
+XX
+BF  T05422; E12; Species: golden (Syrian) hamster, Mesocricetus auratus; site(s) included: yes.
+BF  T00204; E12; Species: human, Homo sapiens; site(s) included: yes.
+BF  T17415; E12; Species: Mammalia; site(s) included: no.
+BF  T01786; E12; Species: mouse, Mus musculus; site(s) included: yes.
+BF  T00675; E12; Species: rat, Rattus norvegicus; site(s) included: yes.
+BF  T19679; E2A; Species: Chinese hamster (Gray hamster), Cricetulus griseus; site(s) included: yes.
+BF  T17424; E2A; Species: golden (Syrian) hamster, Mesocricetus auratus; site(s) included: yes.
+BF  T15605; E2A; Species: human, Homo sapiens; site(s) included: yes.
+BF  T13855; E2A; Species: Mammalia; site(s) included: no.
+BF  T10541; E2A; Species: mouse, Mus musculus; site(s) included: yes.
+BF  T05421; E47; Species: golden (Syrian) hamster, Mesocricetus auratus; site(s) included: yes.
+BF  T00207; E47; Species: human, Homo sapiens; site(s) included: yes.
+BF  T10212; E47; Species: Mammalia; site(s) included: no.
+BF  T01788; E47; Species: mouse, Mus musculus; site(s) included: yes.
+BF  T00674; E47; Species: rat, Rattus norvegicus; site(s) included: yes.
+BF  T00432; ITF-1; Species: human, Homo sapiens; site(s) included: yes.
+BF  T09296; Tcfe2a; Species: rat, Rattus norvegicus; site(s) included: yes.
+XX
+P0      A      C      G      T
+01      4      4      3      0      V
+02      2      5      4      0      S
+03      3      2      4      2      N
+04      2      0      9      0      G
+05      0     11      0      0      C
+06     11      0      0      0      A
+07      0      0     11      0      G
+08      1      2      8      0      G
+09      0      0      0     11      T
+10      0      0     11      0      G
+11      0      0      4      7      K
+12      1      4      3      3      N
+13      1      6      2      2      C
+14      1      4      4      2      N
+15      1      4      2      3      N
+XX
+BA  11 sequences (compiled matrix imported from literature reference)
+XX
+BS  GCTGCAGGTGTTCT; R05108; 3; 15; 17; p.
+BS  AAGGCAGGTGGCCCA; R05109; 1; 15;; p.
+BS  GCAGCAGGTGTTCCC; R05110; 5; 15;; p.
+BS  AGGGCAGGTGTCCGG; R05111; 5; 15;; p.
+BS  GGGGCAGGTGGTGGT; R05112; 8; 15;; p.
+BS  CGTACAGATGTGGAT; R05113; 9; 15;; p.
+BS  ACCGCAGCTGGCCCT; R05114; 8; 15;; p.
+BS  CAAGCAGGTGTATCC; R05115; 7; 15;; p.
+BS  CCCACAGCTGGGATC; R05116; 11; 15;; p.
+BS  CCAGCAGGTGTGTGC; R05117; 5; 15;; p.
+BS  AGGGCAGGTGTCCGG; R05118; 5; 15;; p.
+XX
+RN  [1]; RE0000231.
+RX  PUBMED: 1846322.
+RA  Sun X.-H., Baltimore D.
+RT  An inhibitory domain of E12 transcription factor prevents DNA binding in E12 homodimers but not in E12 heterodimers
+RL  Cell 64:459-470 (1991).
+XX
+//

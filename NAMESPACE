@@ -1,0 +1,24 @@
+
+useDynLib(mdist)
+
+exportPattern(
+motif2matrix,
+matrix2motif,
+markov.prob,
+mdist.option,
+read.background,
+store.background,
+read.motif,
+sim.scores,
+score.dist,
+num.motifhits,
+sim.counts,
+sample.mc,
+overlap.prob,
+comp.pois,
+comp.pois.pape,
+comp.pois.test,
+posterior.count,
+posterior.test)
+
+#unloadNamespace( #mdist.unload)
