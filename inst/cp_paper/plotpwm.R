@@ -1,8 +1,8 @@
 
-Smat=matrix(0,ncol=maxhits,nrow=100)
-for (i in 1:100) {
+Smat=matrix(0,ncol=maxhits,nrow=1000)
+for (isim in 1:100) {
   simc=sim.counts(seqlen,numofseqs,maxhits,nsim=1000)
-  Smat[i,]=simc[[1]][1:(maxhits)]
+  Smat[isim,]=simc[[1]][1:(maxhits)]
 }
 mean_s=apply(Smat,2,median)
 q75_s=apply(Smat,2,quantile,.75)
@@ -41,10 +41,13 @@ pl<- pl+scale_colour_manual(values=c("gray", "blue", "red", "black"))
 pl=pl + ylab("P(# of hits)") + 
 xlab("# of hits") 
 if (addlegend==TRUE) {
-pl=pl+theme(legend.text=element_text(size=16), axis.text.x=element_text(size=16),
+pl=pl+theme(panel.background=element_rect(fill='white', colour="white"),
+						legend.text=element_text(size=16), axis.text.x=element_text(size=16),
 			axis.text.y=element_text(size=16), text=element_text(size=16))
 } else {
-pl=pl+theme(legend.position="none")
+pl=pl+theme_bw()+ 
+ theme(panel.background=element_rect(fill='white', colour="black"), 
+						legend.position="none")
 }
 print(pl)
 dev.off()
@@ -55,11 +58,15 @@ write(
 paste(paste(alpha,seqlen, 
 signif(sum(abs(df2$prob-df2$cpnew)),digits=r),
 signif(sum(abs(df2$prob-df2$cppape)), digits=r),
-signif(sum(abs(df2$prob-df2$bin)),digits=r),
+signif(sum(abs(df2$prob-df2$bin)),digits=r), sep=" & "), "\\\\"),
+file=sprintf("%s/%s_10-%d_m%d_tv.tabpart", figdir,pwmname,lalpha,markov))
+
+write(
+paste(paste(alpha,seqlen, 
 signif(sum(abs(df2$prob[qsig]-df2$cpnew[qsig])),digits=r),
 signif(sum(abs(df2$prob[qsig]-df2$cppape[qsig])),digits=r),
 signif(sum(abs(df2$prob[qsig]-df2$bin[qsig])),digits=r),sep=" & "), "\\\\"),
-file=sprintf("%s/%s_10-%d_m%d.tabpart", figdir,pwmname,lalpha,markov))
+file=sprintf("%s/%s_10-%d_m%d_5p.tabpart", figdir,pwmname,lalpha,markov))
 
 average=function(x) { return(seq(0,length(x)-1)%*% x)}
 variance=function(x) { return(sum(x*(seq(0,length(x)-1)-average(x))^2))}

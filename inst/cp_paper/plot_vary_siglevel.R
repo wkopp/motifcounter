@@ -35,6 +35,7 @@ for (i in 1:nrow(variants)) {
 
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 read.background(seqfile,markov)
+read.background.sampling(seqfile,markov)
 
 #pwmname="x32"
 pwmfile=system.file("extdata",paste(pwmname,".pwm",sep="",collapse=""),

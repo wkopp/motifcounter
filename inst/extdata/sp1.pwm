@@ -1,0 +1,56 @@
+AC  M00008
+XX
+ID  V$SP1_01
+XX
+DT  27.10.1992 (created); ewi.
+DT  10.02.2012 (updated); mkl.
+CO  Copyright (C), Biobase GmbH.
+XX
+NA  Sp1
+XX
+DE  stimulating protein 1
+XX
+TY  specific
+XX
+OS  Vertebrata
+OC  Eukaryota; Metazoa; Chordata; Craniata; Vertebrata
+XX
+HP  M00931; V$SP1_Q6_01;  (family).
+HP  M00932; V$SP1_Q4_01;  (family).
+HP  M00933; V$SP1_Q2_01;  (family).
+XX
+BF  T05998; Sp1; Species: cattle, Bos taurus; site(s) included: no.
+BF  T10962; Sp1; Species: cattle, Bos taurus; site(s) included: no.
+BF  T00755; Sp1; Species: chick, Gallus gallus; site(s) included: no.
+BF  T10284; Sp1; Species: chick, Gallus gallus; site(s) included: no.
+BF  T14185; Sp1; Species: Chinese hamster (Gray hamster), Cricetulus griseus; site(s) included: no.
+BF  T00758; Sp1; Species: clawed frog, Xenopus; site(s) included: no.
+BF  T10533; Sp1; Species: dog, Canis familiaris (Canis canis); site(s) included: no.
+BF  T00753; Sp1; Species: domestic pig, Sus scrofa; site(s) included: no.
+BF  T16552; Sp1; Species: golden (Syrian) hamster, Mesocricetus auratus; site(s) included: yes.
+BF  T01228; Sp1; Species: hamster, Cricetulus sp.; site(s) included: no.
+BF  T00759; Sp1; Species: human, Homo sapiens; site(s) included: yes.
+BF  T08484; Sp1; Species: human, Homo sapiens; site(s) included: yes.
+BF  T08326; Sp1; Species: Mammalia; site(s) included: no.
+BF  T10324; Sp1; Species: mink, Mustela vison; site(s) included: no.
+BF  T00757; Sp1; Species: monkey, Cercopithecus aethiops; site(s) included: no.
+BF  T00752; Sp1; Species: mouse, Mus musculus; site(s) included: no.
+BF  T05704; Sp1; Species: rabbit, Oryctolagus cuniculus; site(s) included: no.
+BF  T00754; Sp1; Species: rat, Rattus norvegicus; site(s) included: no.
+BF  T09431; Sp1; Species: rat, Rattus norvegicus; site(s) included: no.
+BF  T18600; Sp1; Species: sheep, Ovis aries; site(s) included: yes.
+BF  T09118; Sp1-isoform1; Species: mouse, Mus musculus; site(s) included: no.
+BF  T11472; Sp1-isoform2; Species: mouse, Mus musculus; site(s) included: no.
+XX
+P0      A      C      G      T
+01      2      1      6      2      G
+02      3      1      6      1      G
+03      0      0     11      0      G
+04      0      0     11      0      G
+05      0      8      2      1      C
+06      3      0      6      2      G
+07      0      1      7      3      G
+08      1      0      8      2      G
+09      1      2      7      1      G
+10      3      2      0      6      T
+XX
