@@ -13,10 +13,11 @@ int getSeqen(FILE *f) {
   char dig;
   int writeseq=0, writeheader=0, i=0;
 
+	writeheader=1;
   while((dig=fgetc(f))!=EOF) {
-    if (dig=='>') {
-      writeheader=1;
-    }
+    //if (dig=='>') {
+    //  writeheader=1;
+    //}
     if (writeseq==1 && dig=='\n') break;
     if (writeheader==1 && dig=='\n') {
       writeheader=0;
@@ -24,30 +25,35 @@ int getSeqen(FILE *f) {
       continue;
     }
     if (writeseq==1) {
+    	//Rprintf("%c",dig);
       i++;
     }
   }
+  //Rprintf("len=%d\n", i);
   return i;
 }
 
 int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order) {
-  char *buffer, dig;
+  char *buffer=NULL, dig;
   int writeseq=0, writeheader=0, i=0;
   int seqlen;
+  int jumpto;
 
   double ret=0;
-  seqlen=getSeqen(f);
+  //seqlen=getSeqen(f);
 
-  if (seqlen<100) seqlen=100;
-#ifdef IN_R
-    buffer=Calloc(seqlen+1, char);
-    #else
-    buffer=calloc(seqlen+1, sizeof(char));
-    #endif
-
-  rewind(f);
+  //  	Rprintf("seqlen=%d\n", seqlen);
+  //rewind(f);
   while((dig=fgetc(f))!=EOF) {
     if (dig=='>') {
+    	jumpto=ftell(f);
+
+    	seqlen=getSeqen(f);
+    	//Rprintf("seqlen=%d\n", seqlen);
+      if (buffer) Free(buffer);
+      buffer=Calloc(seqlen+1, char);
+      fseek(f,jumpto,SEEK_SET);
+
       writeheader=1;
       writeseq=0;
       i=0;
@@ -65,19 +71,14 @@ int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order) {
 
     if (writeseq==1) {
       
-      if (i<seqlen) {
-        buffer[i]=dig;
-      } else {
-        memmove(buffer, &buffer[i+1-order], order);
-        i=order;
-        buffer[i]=dig;
-      }
+      buffer[i]=dig;
+
       // the background model is trained in a way to force the forward
       // and reverse transition probabilities to be symmetric
-      if (i>=order && i<seqlen) {
+
+      if (i>=order) {
         if (skipAssignment(&buffer[i-order], order+1)==1) continue;
 
-    //printf("%c",dig);
         di[getIndexFromAssignment(&buffer[i-order], order+1)]+=1.0;
         di[getIndexFromReverseAssignment(&buffer[i-order], order+1)]+=1.0;
         di[getIndexFromComplementaryAssignment(&buffer[i-order],order+1)]+=1.0;
