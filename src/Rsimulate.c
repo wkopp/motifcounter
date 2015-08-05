@@ -7,13 +7,15 @@
 #include "score1d.h"
 
 extern int Rorder;
+extern int RorderForSampling;
 extern DMatrix *Rpwm, *Rcpwm;
 extern double *Rstation, *Rtrans;
+extern double *RstationForSampling, *RtransForSampling;
 extern double Rsiglevel, Rgran;
 
 void RsimulateCountDistribution( double *distribution, int* perm, 
    int *slen, int *mxhit, int *snos) {
-  int Nhits,seqlen,maxhits,Nperm, intervalsize;
+  int seqlen,maxhits,Nperm, intervalsize;
   int *_nh;
   ExtremalScore escore;
   MotifScore1d null;
@@ -23,7 +25,7 @@ void RsimulateCountDistribution( double *distribution, int* perm,
 
   int threshold;
 
-  if (!Rpwm||!Rcpwm||!Rstation) {
+  if (!Rpwm||!Rcpwm||!Rstation||!RstationForSampling) {
     error("load forground and background properly");
     return;
   }
@@ -75,7 +77,7 @@ void RsimulateCountDistribution( double *distribution, int* perm,
   for (n=0; n<Nperm; n++) {
     _nh[n]=0;
     for (s=0;s<nos; s++) {
-      generateRandomSequence(Rstation, Rtrans, seq[n], seqlen, Rorder);
+      generateRandomSequence(RstationForSampling, RtransForSampling, seq[n], seqlen, RorderForSampling);
       _nh[n]+=countOccurances(Rstation, Rtrans, Rpwm, Rcpwm, seq[n], seqlen, threshold, dx, Rorder);
 
     }
@@ -98,8 +100,6 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
   int *perm) {
   int i, n;
   char *seq;
-  char nuc[]="acgt";
-  int j;
   ExtremalScore escore;
   ExtremalScore fescore, rescore;
   int fmins,fmaxs, rmins,rmaxs;
@@ -154,7 +154,7 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
 
     for (n=0; n<Nperm; n++) {
 //      Rprintf("iteration %d\n",n);
-      generateRandomSequence(Rstation, Rtrans, seq, seqlen, Rorder);
+      generateRandomSequence(RstationForSampling, RtransForSampling, seq, seqlen, RorderForSampling);
       scoreOccurances(Rstation, Rtrans, Rpwm, seq, seqlen, distribution, dx, mins,Rorder);
     }
     for (n=0; n<maxs-mins+1; n++) {
