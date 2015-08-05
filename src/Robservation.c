@@ -14,7 +14,6 @@ extern double Rsiglevel, Rgran;
 int numNucleotides(FILE *f) {
 	int cnt=0, stop=0;
 	char dig;
-	int fposition=ftell(f);
 	fseek(f,ftell(f)-1,SEEK_SET);
   while((dig=fgetc(f))) {
   	if (dig==EOF || dig=='>') break;
