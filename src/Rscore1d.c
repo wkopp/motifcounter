@@ -21,6 +21,7 @@ void Rscoredist( double *score, double *prob) {
     error("parameters are null");
     return;
   }
+  if (Rgran<=1e-10) { error("set granularity first! E.g. 0.1"); }
   dx=Rgran;
   p=Rsiglevel;
 
