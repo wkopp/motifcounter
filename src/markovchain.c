@@ -384,10 +384,9 @@ void sampling_markovchain(double *a,
 SEXP sample_mc( 
 		SEXP alpha, SEXP beta, SEXP beta3p, SEXP beta5p, SEXP seqlen, SEXP nos, SEXP nperm) {
 
-	int i, n;
 	double _alpha;
 	double *_beta,*_beta3p,*_beta5p;
-	int nrow, _slen,_nos,_nperm;
+	int _slen,_nos,_nperm;
 
   //alpha = PROTECT(REAL(alpha));
   _slen=INTEGER(seqlen)[0];

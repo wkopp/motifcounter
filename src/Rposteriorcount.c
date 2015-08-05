@@ -41,11 +41,11 @@ void RPosteriorProbability(double *alpha, double *beta,
   double *singlehitdistribution;
   double *delta, *deltap;
   double a0, aN;
-  double psucc,dispersion;
+  //double psucc,dispersion;
   double abstol=1e-30, intol=1e-30;//, pbio=0.0;
   int trace=0, fail,fncount, type=2, gncount;//, restricted_length;
   double *extra=NULL;
-  double zold, znew, eold, enew;
+  //double zold, znew, eold, enew;
   double sum, res;
 
   if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
@@ -85,12 +85,10 @@ void RPosteriorProbability(double *alpha, double *beta,
 
   cgmin(1, &a0, &aN, &res, minmc, dmc, &fail, abstol, intol,
        (void*)extra, type, trace, &fncount, &gncount, 100);
-  Rprintf("alpha=%e alpha'=%e\n",a0,aN);
+  //Rprintf("alpha=%e alpha'=%e\n",a0,aN);
 
   Free(extra);
   removeDist();
-#ifdef SHIFT
-#endif
 
   allocPosteriorProbability(&prob, seqlen, Rpwm->nrow, maxsinglehits);
   initPosteriorProbability(&prob, alpha[0], &beta, &beta3p, &beta5p, 
@@ -99,35 +97,9 @@ void RPosteriorProbability(double *alpha, double *beta,
   computePosteriorProbability(&prob);
 
   prior=Calloc(maxsinglehits+1, double);
-#ifdef DEBUG
-  if (strcmp(sprior[0],"poisson")==0) {
-  	// use poisson from R dist
-		for (i=0; i<=maxsinglehits; i++) {
-	    prior[i]=dpois((double)i, (double)2*alpha[0]*(seqlen-Rpwm->nrow+1), 0);
-		}
-  } else if (strcmp(sprior[0],"nbinom")==0) {
-  	// use negative binomial
-  	dispersion=2;
-  	psucc=1/(1+2*alpha[0]*(seqlen-Rpwm->nrow+1)*nos/dispersion);
-		for (i=0; i<=maxsinglehits; i++) {
-	    prior[i]=dnbinom((double)i, dispersion, psucc, 0);
-		}
-  } else if (strcmp(sprior[0],"uniform")==0) {
-  	// use uniform distribution
-    for (i=0; i<=maxsinglehits; i++) {
-  	  prior[i]=1.0;
-	  }
-  } else if (strcmp(sprior[0],"truncunif")==0) {
-  	// use truncated uniform distribution
-    for (i=0; i<=maxsinglehits; i++) {
-  	  prior[i]=1.0;
-	  }
-  }
-#else
   for (i=0; i<=maxsinglehits; i++) {
     prior[i]=1.0;
 	}
-#endif
 
   singlehitdistribution=Calloc(maxsinglehits+1, double);
 
@@ -141,9 +113,9 @@ void RPosteriorProbability(double *alpha, double *beta,
     Zpartition=singlehitdistribution[0];
     Rprintf("P(X|%d)=%1.3e\n",0,singlehitdistribution[0]);
 
-    enew=0.0;
-    eold=0.0;
-    zold=singlehitdistribution[0];
+    //enew=0.0;
+    //eold=0.0;
+    //zold=singlehitdistribution[0];
     for (k=1; k<=maxsinglehits; k++) {
       finishPosteriorProbability(&prob, singlehitdistribution, k);
 
