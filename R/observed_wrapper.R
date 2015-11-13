@@ -8,3 +8,13 @@ num.motifhits=function(seqfile) {
       numofhits=res[[2]]))
 }
 
+num.motifhits.singlestranded=function(seqfile) {
+  noh=integer(1)
+  seqlen=integer(1)
+  numofseqs=integer(1)
+  res=.C("RnumberOfHitsSingleStranded",as.character(seqfile),as.integer(noh),
+    as.integer(seqlen), as.integer(numofseqs))
+    return (list(seqlen=res[[3]], numofseqs=res[[4]],
+      numofhits=res[[2]]))
+}
+

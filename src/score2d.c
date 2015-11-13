@@ -1,7 +1,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 #include <limits.h>
 #include <float.h>
 #include <math.h>
@@ -113,7 +115,9 @@ void addScore2d(Score2d *a, Score2d *b, ScoreMetaInfo *meta) {
 
   for (f=a->start1; f<=a->end1;f++) {
     #ifdef PARALLEL_WK
+    #ifdef _OPENMP
     #pragma omp parallel for default(none) shared(a, b, meta, f) private(r)
+    #endif
     #endif
     //fprintf(stdout, "f=%d\n",f);
     for (r=a->start2; r<=a->end2;r++) {
@@ -224,7 +228,9 @@ void ShiftMultiplyScoreIndex2d(Score2d *dest, Score2d *src,
   #endif
   #endif
   #ifdef PARALLEL_WK
+  #ifdef _OPENMP
   #pragma omp parallel for default(none) shared(dest, src,srange, p, frestinterval, leftshift1, leftshift2) private(f,r) collapse(2)
+  #endif
   #endif
   for (r=dest->start2; r<=dest->end2;r++) {
     for (f=dest->start1; f<=dest->end1;f++) {
@@ -234,7 +240,9 @@ void ShiftMultiplyScoreIndex2d(Score2d *dest, Score2d *src,
   }
 
   #ifdef PARALLEL_WK
+  #ifdef _OPENMP
   #pragma omp parallel for default(none) shared(dest, src,srange, p, frestinterval,leftshift1,leftshift2) private(f,r)
+  #endif
   #endif
   for (r=dest->start2; r<=dest->end2;r++) {
     for (f=0; f<frestinterval; f++) {
@@ -244,7 +252,9 @@ void ShiftMultiplyScoreIndex2d(Score2d *dest, Score2d *src,
   }
 
   #ifdef PARALLEL_WK
+  #ifdef _OPENMP
   #pragma omp parallel for default(none) shared(dest,p,src,srange,rrestinterval, leftshift1,leftshift2) private(f, r)
+  #endif
   #endif
   for (f=dest->start1; f<=dest->end1; f++) {
     for (r=0; r<rrestinterval; r++) {
@@ -445,7 +455,9 @@ int computeScoreDistribution2DDP_init(DMatrix *pwm1, DMatrix *pwm2,
           mscore->ScoreBuffer1[i].end2 =0;
 
           #ifdef PARALLEL_WK
+          #ifdef _OPENMP
           #pragma omp parallel for default(none) shared(mscore, init1d, i, order, pos) private(s1)
+          #endif
           #endif
           for (s1=init1d->ScoreBuffer1[pos*power(ALPHABETSIZE, order)+i].start;
             s1<=init1d->ScoreBuffer1[pos*power(ALPHABETSIZE, order)+i].end;s1++) {
@@ -469,7 +481,9 @@ int computeScoreDistribution2DDP_init(DMatrix *pwm1, DMatrix *pwm2,
        mscore->ScoreBuffer1[i].end2 =init2d->ScoreBuffer1[i].end2;
 
        #ifdef PARALLEL_WK
+       #ifdef _OPENMP
        #pragma omp parallel for default(none) shared(mscore, init2d, i) private(s1,s2) collapse(2)
+       #endif
        #endif
        for (s1=mscore->ScoreBuffer1[i].start1;s1<=mscore->ScoreBuffer1[i].end1;s1++) {
          for (s2= mscore->ScoreBuffer1[i].start2;s2<=mscore->ScoreBuffer1[i].end2;s2++) {

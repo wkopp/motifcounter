@@ -10,11 +10,38 @@ overlap.prob=function() {
   return (list(alpha=res[[1]],beta=res[[2]],beta3p=res[[3]],beta5p=res[[4]],
   						 gamma=res[[5]]))
 }
+overlap.prob.singlestranded=function() {
+  mlen=motif.length()
+  alpha=numeric(1)
+  beta=numeric(mlen)
+  beta3p=numeric(mlen)
+  beta5p=numeric(mlen)
+  gamma=numeric(3*mlen)
+  res=.C("RoverlapSingleStranded", alpha, beta, beta3p, beta5p, gamma)
+  #beta[1]=gamma[1]
+  
+  #beta[2]=gamma[2]
+  #for (i in 3:mlen) {
+ # 	beta[i]=gamma[i]-
+	#}
+  return (list(alpha=res[[1]],beta=res[[2]],beta3p=res[[3]],beta5p=res[[4]],
+  						 gamma=res[[5]]))
+}
 
 comp.pois=function(seqlen, numofseqs, 
   maxhits, maxclumpsize, overlap) {
   dist=numeric(maxhits+1)
   res=.C("Rcompoundpoisson_useBeta", overlap$alpha,
+    overlap$beta, overlap$beta3p, overlap$beta5p,
+    as.numeric(dist), as.integer(seqlen),as.integer(numofseqs),
+    as.integer(maxhits), as.integer(maxclumpsize))
+  return (list(dist=res[[5]]))
+}
+
+comp.pois.singlestranded=function(seqlen, numofseqs, 
+  maxhits, maxclumpsize, overlap) {
+  dist=numeric(maxhits+1)
+  res=.C("Rcompoundpoisson_useBetaSingleStranded", overlap$alpha,
     overlap$beta, overlap$beta3p, overlap$beta5p,
     as.numeric(dist), as.integer(seqlen),as.integer(numofseqs),
     as.integer(maxhits), as.integer(maxclumpsize))

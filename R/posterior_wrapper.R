@@ -1,5 +1,5 @@
 
-posterior.count=function(seqlen, numofseqs, maxhits, overlap) {
+dynprog.count=function(seqlen, numofseqs, maxhits, overlap) {
   dist=numeric(maxhits+1)
   #numofseq=integer(1)
   ret=.C("RPosteriorProbability", 
@@ -8,7 +8,7 @@ posterior.count=function(seqlen, numofseqs, maxhits, overlap) {
    as.integer(maxhits), as.integer(numofseqs),"truncunif")
   return(list(dist=ret[[5]]))
 }
-posterior.count.debug=function(seqlen, numofseqs, maxhits, overlap,prior) {
+dynprog.count.debug=function(seqlen, numofseqs, maxhits, overlap,prior) {
   dist=numeric(maxhits+1)
   #numofseq=integer(1)
   ret=.C("RPosteriorProbability", 
@@ -17,7 +17,7 @@ posterior.count.debug=function(seqlen, numofseqs, maxhits, overlap,prior) {
    as.integer(maxhits), as.integer(numofseqs),as.character(prior))
   return(list(dist=ret[[5]]))
 }
-posterior.test=function(obs, overlap, maxhits) {
+dynprog.count.test=function(obs, overlap, maxhits) {
   dist=posterior.count(obs$seqlen, obs$numofseqs, maxhits, overlap)
   if (obs$numofhits>maxhits) {
     p=0.0;

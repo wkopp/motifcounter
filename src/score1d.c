@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 #include <ctype.h>
 #include <float.h>
 #include <limits.h>
@@ -155,7 +157,9 @@ void addScore1d(Score1d *a, Score1d *b, ScoreMetaInfo *meta) {
   a->start=(a->start<b->start) ? a->start : b->start;
   a->end=(a->end>b->end) ? a->end : b->end;
   #ifdef PARALLEL_WK
+  #ifdef _OPENMP
   #pragma omp parallel for default(none) shared(a,b) private(i)
+  #endif
   #endif
   for (i=b->start; i<=b->end;i++) {
     a->y[i]+=b->y[i];
@@ -232,7 +236,9 @@ static void ShiftMultiplyScoreIndex1d(Score1d *dest, Score1d *src,
   memmove(&dest->y[dest->start],&src->y[src->start], (dest->end-dest->start+1)*sizeof(double));
 
   #ifdef PARALLEL_WK
+  #ifdef _OPENMP
   #pragma omp parallel for default(none) shared(p,dest) private(i)
+  #endif
   #endif
   for (i=dest->start; i<=dest->end;i++) {
     dest->y[i]*=p;
@@ -259,7 +265,9 @@ int computeTotalScoreDistribution1d(MotifScore1d *mscore, ExtremalScore *tm, int
     a->start=(a->start<b->start+lbound[i]-lmin) ? a->start : b->start+lbound[i]-lmin;
     a->end=(a->end>b->end+lbound[i]-lmin) ? a->end : b->end+lbound[i]-lmin;
   #ifdef PARALLEL_WK
+  #ifdef _OPENMP
     #pragma omp parallel for default(none) shared(a,b,lbound,lmin, i) private(k)
+  #endif
     #endif
     for (k=b->start; k<=b->end;k++) {
       a->y[k+lbound[i]-lmin]+=b->y[k];

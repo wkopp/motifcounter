@@ -29,7 +29,7 @@ int numNucleotides(FILE *f) {
 		case 'n':
 		case 'N':
       cnt++;
-      Rprintf("%c",dig);
+      //Rprintf("%c",dig);
       break;
     case '\n':
 			break;
@@ -47,7 +47,7 @@ int numNucleotides(FILE *f) {
   	}
   	if(stop==1) break;
   }
-  Rprintf("\n");
+  //Rprintf("\n");
 
   fseek(f,ftell(f)-1,SEEK_SET);
   return cnt;
@@ -81,7 +81,7 @@ void getSeqlen(FILE *f, int *seqlen, int *numofseq) {
       break;
     }
   }
-  Rprintf("reflen=%d\n",refslen);
+  //Rprintf("reflen=%d\n",refslen);
 
   rewind(f);
 
@@ -211,6 +211,89 @@ void RnumberOfHits(char **inputfile, int *numofhits, int *slen, int *nos) {
 
   for (s=0, Nhits=0;s<numofseq; s++) {
     Nhits+=countOccurances(Rstation, Rtrans, Rpwm, Rcpwm, seq[s], seqlen, threshold, dx, Rorder);
+  }
+
+#ifdef IN_R
+  for (i=0; i<numofseq; i++) Free(seq[i]);
+  Free(seq);
+  #else
+  for (i=0; i<numofseq; i++) free(seq[i]);
+  free(seq);
+  #endif
+  numofhits[0]=Nhits;
+}
+
+void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *slen, int *nos) {
+  int Nhits,seqlen, numofseq, intervalsize;
+  ExtremalScore escore;
+  MotifScore1d null;
+  double dx, quantile,pvalue;
+  int s, i;
+  char **seq;
+  int threshold;
+  FILE *f;
+
+  if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
+    error("load forground and background properly");
+    return;
+  }
+  if (!numofhits||!inputfile||!slen||!nos) {
+    error("parameters are null");
+    return;
+  }
+  if (Rsiglevel==0.0 || Rgran==0.0) {
+    error ("call mdist.option first");
+    return;
+  }
+
+  pvalue=Rsiglevel;
+  dx=Rgran;
+
+  // compute significance threshold
+  initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
+
+  loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
+  loadIntervalSize(&escore, NULL);
+  intervalsize=maxScoreIntervalSize(&escore);
+
+  initScoreMetaInfo(getTotalScoreLowerBound(&escore),
+           getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
+  null.meta.prob=&ProbBg;
+  null.meta.probinit=&ProbinitBg;
+  initScoreDistribution1d(Rpwm,Rtrans,&null, Rorder);
+
+  computeScoreDistribution1d(Rpwm, Rtrans,  Rstation, &null, &escore, Rorder);
+
+  quantile=getQuantileWithIndex1d(&null,getQuantileIndex1d(&null.totalScore,pvalue));
+  threshold=(int)(quantile/dx);
+  deleteExtremalScore(&escore);
+  deleteScoreDistribution1d(&null, Rorder);
+
+  f=fopen(inputfile[0], "r");
+  if (!f) {
+    error("no such file: %s\n", inputfile[0]);
+    return;
+  }
+  getSeqlen(f, &seqlen, &numofseq);
+  slen[0]=seqlen;
+  nos[0]=numofseq;
+  #ifdef IN_R
+  seq=Calloc(numofseq, char*);
+  for (i=0; i<numofseq; i++) {
+    seq[i]=Calloc(seqlen+1, char);
+  }
+  #else
+  seq=calloc(numofseq, sizeof(char*));
+  for (i=0; i<numofseq; i++) {
+    seq[i]=calloc(seqlen+1, sizeof(char));
+  }
+  #endif
+  getNucleotideSequence(f, seq, seqlen, numofseq);
+  fclose(f);
+  //Rprintf("numofseq=%d, seqlen=%d\n", numofseq, seqlen);
+
+  for (s=0, Nhits=0;s<numofseq; s++) {
+    Nhits+=countOccurancesSingleStranded(Rstation, Rtrans, Rpwm, Rcpwm, seq[s], seqlen, threshold, dx, Rorder);
   }
 
 #ifdef IN_R

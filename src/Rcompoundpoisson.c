@@ -203,6 +203,69 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
   #endif
 }
 
+void Rcompoundpoisson_useBetaSingleStranded(double *alpha, double *beta, 
+  double *beta3p, double *beta5p,
+  double *hitdistribution, int *slen, int *nos, int * mhit, int *mclump) {
+  int seqlen;
+  int maxclumpsize, maxhits;
+  double lambda;
+  double *theta, extention[3];
+  double *delta, *deltap;
+
+  if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
+    error("load forground and background properly");
+    return;
+  }
+  if (!alpha||!beta||!beta3p||!beta5p||!hitdistribution||!slen||!nos||!mhit||!mclump) {
+    error("parameters are null");
+    return;
+  }
+  if (Rgran==0.0 || Rsiglevel==0.0) {
+    error("call mdist.option  first");
+    return;
+  }
+
+  seqlen=(slen[0]-Rpwm->nrow+1)*nos[0];
+  maxclumpsize=(double)mclump[0];
+  maxhits=(double)mhit[0];
+
+#ifdef IN_R
+  delta=Calloc(Rpwm->nrow,double);
+  deltap=Calloc(Rpwm->nrow,double);
+#else
+  delta=calloc(Rpwm->nrow,sizeof(double));
+  deltap=calloc(Rpwm->nrow,sizeof(double));
+#endif
+
+  memset(extention, 0, 3*sizeof(double));
+
+  computeDeltas(delta, deltap, beta, beta3p,beta5p,Rpwm->nrow);
+
+
+  computeExtentionFactorsKopp(extention, delta, deltap, beta, 
+      beta3p, beta5p, Rpwm->nrow);
+  theta=initTheta(maxclumpsize);
+
+  computeInitialClumpKopp(theta, beta3p,delta, deltap, Rpwm->nrow);
+  computeTheta(maxclumpsize, theta, extention, Rpwm->nrow);
+
+  lambda=computePoissonParameter(seqlen, Rpwm->nrow, maxclumpsize, 
+      alpha[0]/2.0,theta);
+
+  computeCompoundPoissonDistribution(lambda, maxhits, maxclumpsize, 
+      theta, hitdistribution);
+
+
+  deleteTheta(theta);
+  #ifdef IN_R
+  Free(delta);
+  Free(deltap);
+  #else
+  free(delta);
+  free(deltap);
+  #endif
+}
+
 void Rcompoundpoisson_kopp(
    double *hitdistribution, int *slen, int *nos, int * mhit, int *mclump) {
 

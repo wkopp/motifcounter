@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 #include <math.h>
 #include <string.h>
 #ifdef IN_R
@@ -280,7 +282,9 @@ void computePosteriorProbability(PosteriorCount *prob) {
   #endif
   	//Rprintf("R_pow_di(0.1,0)=%e\n",R_pow_di(0.1,0));
   #ifdef PARALLEL_WK
+  #ifdef _OPENMP
    #pragma omp parallel for default(none) shared(k,prob) private(i,j, mc,mp)
+  #endif
   #endif
     for (i=0; i<prob->seqlen; i++) {
       R_CheckUserInterrupt();

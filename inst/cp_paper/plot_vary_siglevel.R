@@ -1,7 +1,8 @@
 library(mdist)
 library(seqLogo)
 library(ggplot2)
-figdir="/project/Tf2motif/home/comppois_man/figures"
+paperdir=Sys.getenv("CPPAPER")
+figdir=sprintf("%s/figures", paperdir)
 variants=data.frame(alpha=c(rep(.01,3),rep(0.001,3*3)),
 										seqlen=c(rep(1000,3),rep(10000,3*3)),
 										markov=c(rep(1,3),rep(1,3),rep(0,3),rep(2,3)),

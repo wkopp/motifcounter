@@ -68,3 +68,37 @@ void computeBetas(double *beta, double *beta3p, double *beta5p,
   #endif
 }
 
+void computeBetasSingleStranded(double *beta, double *beta3p, double *beta5p,
+  double *gamma, int mlen, double eps) {
+  int i,k;
+  
+  //beta3p[0]=0.0;
+
+  //forward-forward
+  for (k=1;k<mlen;k++) {
+    beta[k]=gamma[k];
+    //beta3p[k]=0.0;
+    //beta5p[k]=0.0;
+    for (i=0; i<k; i++) {
+      beta[k]-=(beta[i]*gamma[k-i]);
+      if (beta[k]<0.0) beta[k]=0;
+      //beta3p[k]-=(beta[i]*gamma[mlen+k-i] +beta3p[i]*gamma[k-i]);
+      //if (beta3p[k]<0.0) beta3p[k]=0;
+      //beta5p[k]-=(beta[i]*gamma[mlen*2+k-i] +beta5p[i]*gamma[k-i]);
+      //if (beta5p[k]<0.0) beta5p[k]=0;
+
+    }
+  }
+  #ifdef DEBUG
+  #ifdef IN_R
+  for (k=0; k<mlen;k++) Rprintf("beta%d=%f\n",k,beta[k]);
+  for (k=0; k<mlen;k++) Rprintf("beta3p%d=%f\n",k,beta3p[k]);
+  for (k=0; k<mlen;k++) Rprintf("beta5p%d=%f\n",k,beta5p[k]);
+  #else
+  for (k=0; k<mlen;k++) printf("beta%d=%f\n",k,beta[k]);
+  for (k=0; k<mlen;k++) printf("beta3p%d=%f\n",k,beta3p[k]);
+  for (k=0; k<mlen;k++) printf("beta5p%d=%f\n",k,beta5p[k]);
+  #endif
+  #endif
+}
+

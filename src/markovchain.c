@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 #include <math.h>
 #include <string.h>
 #ifdef IN_R

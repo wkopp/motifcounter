@@ -14,13 +14,16 @@ read.motif,
 sim.scores,
 score.dist,
 num.motifhits,
+num.motifhits.singlestranded,
 sim.counts,
 sample.mc,
 overlap.prob,
+overlap.prob.singlestranded,
 comp.pois,
+comp.pois.singlestranded,
 comp.pois.pape,
 comp.pois.test,
-posterior.count,
-posterior.test)
+dynprog.count,
+dynprog.count.test)
 
 #unloadNamespace( #mdist.unload)

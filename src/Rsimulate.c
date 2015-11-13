@@ -1,6 +1,8 @@
 #include <time.h>
 #include <R.h>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 #include "matrix.h"
 #include "simulate.h"
 #include "minmaxscore.h"
