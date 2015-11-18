@@ -11,21 +11,20 @@
 
 int getSeqen(FILE *f) {
   char dig;
-  int writeseq=0, writeheader=0, i=0;
+  int writeseq=0, writeheader=1, i=0;
 
-	writeheader=1;
   while((dig=fgetc(f))!=EOF) {
+//Rprintf("%c",dig);
     //if (dig=='>') {
     //  writeheader=1;
     //}
-    if (writeseq==1 && dig=='\n') break;
+    if (writeseq==1 && dig=='\n') continue;
     if (writeheader==1 && dig=='\n') {
       writeheader=0;
       writeseq=1;
       continue;
     }
     if (writeseq==1) {
-    	//Rprintf("%c",dig);
       i++;
     }
   }
@@ -45,8 +44,10 @@ int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order) {
   //  	Rprintf("seqlen=%d\n", seqlen);
   //rewind(f);
   while((dig=fgetc(f))!=EOF) {
+ // 	Rprintf("%c",dig);
     if (dig=='>') {
     	jumpto=ftell(f);
+    	//Rprintf("jumpto=%d\n",jumpto);
 
     	seqlen=getSeqen(f);
     	//Rprintf("seqlen=%d\n", seqlen);
