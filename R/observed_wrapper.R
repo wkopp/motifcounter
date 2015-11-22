@@ -1,3 +1,16 @@
+num.sequences=function(seqfile) {
+  nseq=integer(1)
+  res=.C("RnumSeqs",as.character(seqfile),as.integer(nseq))
+    return (res[[2]])
+}
+
+len.sequences=function(seqfile) {
+  nseq=num.sequences(seqfile)
+  lseq=integer(nseq)
+  res=.C("RlenSeqs",as.character(seqfile),as.integer(nseq),as.integer(lseq))
+    return (res[[3]])
+}
+
 num.motifhits=function(seqfile) {
   noh=integer(1)
   seqlen=integer(1)

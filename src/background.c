@@ -9,6 +9,7 @@
 #include "background.h"
 #include "sequence.h"
 
+#ifdef WK
 int getSeqen(FILE *f) {
   char dig;
   int writeseq=0, writeheader=1, i=0;
@@ -31,27 +32,75 @@ int getSeqen(FILE *f) {
   //Rprintf("len=%d\n", i);
   return i;
 }
+#endif
 
-int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order) {
-  char *buffer=NULL, dig;
+int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order, int *nseq, int *lseq) {
+  char *buffer=NULL, *seq=NULL;
   int writeseq=0, writeheader=0, i=0;
-  int seqlen;
-  int jumpto;
+  int iseq;
+  int lmax=-1;
 
   double ret=0;
-  //seqlen=getSeqen(f);
+ 
+  for (i=0; i< *nseq; i++) {
+    if (lmax<lseq[i]) {
+      lmax=lseq[i];
+    }
+  }
+  buffer=Calloc(lmax+1, char);
+  seq=Calloc(lmax+1, char);
+  memset(seq,0,(lmax+1)*sizeof(char));
 
-  //  	Rprintf("seqlen=%d\n", seqlen);
-  //rewind(f);
-  while((dig=fgetc(f))!=EOF) {
+  while(fgets(buffer, sizeof(buffer), f)!=NULL) {
+    for (i=0; i<strlen(buffer); i++) {
+      if (buffer[i]=='>') {
+        if (writeseq==1) {
+      
+          skip=0;
+          for (j=0; j<strlen(seq); j++) {
+            if (isNucleotide(buffer[i])<0) {
+              skip=1;
+              break;
+            }
+          }
+          if(skip==1) break;
+            //if (isNucleotide(buffer[i])==1) lseq[iseq-1]++;
+
+            if (j>=order && isNucleotide(seq[j])==1) {
+              //if (skipAssignment(&seq[j-order], order+1)==1) continue;
+
+              di[getIndexFromAssignment(&seq[j-order], order+1)]+=1.0;
+              di[getIndexFromReverseAssignment(&seq[j-order], order+1)]+=1.0;
+              di[getIndexFromComplementaryAssignment(&seq[j-order],order+1)]+=1.0;
+              di[getIndexFromReverseComplementaryAssignment(&seq[j-order],order+1)]+=1.0;
+            }
+          }
+        }
+        lseq[iseq]=0;
+        iseq++;
+        writeheader=1;
+        writeseq=0;
+      }
+      if (writeseq==1 && buffer[i]=='\n') break;
+      if (writeseq==1 && isNucleotide(buffer[i])==1) seq[iseq++]=buffer[i];
+      if (writeseq==1 && isNucleotide(buffer[i])<0) {
+        lseq[iseq-1]=0;
+        warning("Sequence number %d contains 'n' or 'N' and is discarded.",iseq);
+        writeseq=0;
+        break;
+      }
+      if (writeheader==1 && buffer[i]=='\n') { writeheader=0; writeseq=1; iseq=0; break; }
+    }
+  }
+#ifdef WK
+  while(fgets(buffer, sizeof(buffer),f)!=NULL) {
  // 	Rprintf("%c",dig);
-    if (dig=='>') {
+    if (buffer[0]=='>') {
     	jumpto=ftell(f);
     	//Rprintf("jumpto=%d\n",jumpto);
 
     	seqlen=getSeqen(f);
     	//Rprintf("seqlen=%d\n", seqlen);
-      if (buffer) Free(buffer);
       buffer=Calloc(seqlen+1, char);
       fseek(f,jumpto,SEEK_SET);
 
@@ -70,30 +119,11 @@ int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order) {
       continue;
     }
 
-    if (writeseq==1) {
-      
-      buffer[i]=dig;
-
-      // the background model is trained in a way to force the forward
-      // and reverse transition probabilities to be symmetric
-
-      if (i>=order) {
-        if (skipAssignment(&buffer[i-order], order+1)==1) continue;
-
-        di[getIndexFromAssignment(&buffer[i-order], order+1)]+=1.0;
-        di[getIndexFromReverseAssignment(&buffer[i-order], order+1)]+=1.0;
-        di[getIndexFromComplementaryAssignment(&buffer[i-order],order+1)]+=1.0;
-        di[getIndexFromReverseComplementaryAssignment(&buffer[i-order],order+1)]+=1.0;
-      }
-      i++;
-    }
   }
+#endif
 
-  #ifdef IN_R
-  Free(buffer);
-  #else
-  free(buffer);
-  #endif
+  if (buffer) Free(buffer);
+  if (seq) Free(seq);
 
   return ret;
 }

@@ -26,5 +26,6 @@ int getIndexFromComplementaryAssignment(char *ass, int length);
 int getIndexFromAssignment(char *ass, int length);
 int getIndexFromReverseComplementaryAssignment(char *ass, int length);
 int skipAssignment(char *ass, int len);
+int isNucleotide(char c);
 
 #endif

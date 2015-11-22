@@ -2,6 +2,27 @@
 #include "sequence.h"
 #include "matrix.h"
 
+int isNucleotide(char c) {
+  int r=0;
+  switch (c) {
+    case 'a':
+    case 'A':
+    case 'c':
+    case 'C':
+    case 'g':
+    case 'G':
+    case 't':
+    case 'T':
+      r=1;
+     break;
+    case 'N':
+    case 'n':
+     r=-1;
+     break;
+  }
+  return r;
+}
+
 int getNucIndex(char c) {
   int r=-1;
   switch (c) {
