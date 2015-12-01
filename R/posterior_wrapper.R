@@ -18,7 +18,7 @@ dynprog.count.debug=function(seqlen, numofseqs, maxhits, overlap,prior) {
   return(list(dist=ret[[5]]))
 }
 dynprog.count.test=function(obs, overlap, maxhits) {
-  dist=posterior.count(obs$seqlen, obs$numofseqs, maxhits, overlap)
+  dist=dynprog.count(obs$seqlen, obs$numofseqs, maxhits, overlap)
   if (obs$numofhits>maxhits) {
     p=0.0;
   } else {

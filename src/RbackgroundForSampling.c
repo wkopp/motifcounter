@@ -32,7 +32,7 @@ void RstorebgForSampling(char **file) {
   writeBackground (f, RstationForSampling, RtransForSampling, RorderForSampling);
 }
 
-void RmakebgForSampling(char **infasta, int *order) {
+void RmakebgForSampling(char **infasta, int *order, int *nseq, int *lseq) {
   FILE *f;
   double *count;
 
@@ -55,7 +55,8 @@ void RmakebgForSampling(char **infasta, int *order) {
     RtransForSampling=calloc(power(ALPHABETSIZE, order[0]+1),sizeof(double));
   #endif
 
-    getNucleotideFrequencyFromSequence(f,count, order[0]);
+    //getNucleotideFrequencyFromSequence(f,count, order[0]);
+    getNucleotideFrequencyFromSequence(f,count, order[0], nseq, lseq);
     #ifdef WK
     for(i=0;i<power(ALPHABETSIZE, order[0]+1); i++) {
       Rprintf("c[%d]=%e\n",i,count[i]);
@@ -80,7 +81,8 @@ void RmakebgForSampling(char **infasta, int *order) {
     RtransForSampling=calloc(power(ALPHABETSIZE,order[0]+1),sizeof(double));
     count=calloc(power(ALPHABETSIZE,order[0]+1),sizeof(double));
   #endif
-    getNucleotideFrequencyFromSequence(f,count, order[0]);
+    getNucleotideFrequencyFromSequence(f,count, order[0], nseq, lseq);
+    //getNucleotideFrequencyFromSequence(f,count, order[0]);
     getForwardTransition(count, RstationForSampling, order[0]);
     getForwardTransition(count, RtransForSampling, order[0]);
   }

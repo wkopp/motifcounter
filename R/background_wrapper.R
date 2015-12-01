@@ -1,7 +1,10 @@
 
 #interface functions for motif representation
 read.background=function(file, order=1) {
-    dummy=.C("Rmakebg", as.character(file), as.integer(order))
+	 nseq=num.sequences(seqfile)
+   lseq=len.sequences(seqfile)
+    dummy=.C("Rmakebg", as.character(file), as.integer(order),
+    				 as.integer(nseq),as.integer(lseq))
   #if (regexpr(pattern=".fasta$",file)>=0) {
   #} else {
   #  dummy=.C("RreloadBackground", as.character(file))
@@ -21,11 +24,10 @@ delete.background=function() {
 }
 
 read.background.sampling=function(file, order=1) {
-  #if (regexpr(pattern=".fasta$",file)>=0) {
-    dummy=.C("RmakebgForSampling", as.character(file), as.integer(order))
-  #} else {
-  #  dummy=.C("RreloadBackgroundForSampling", as.character(file))
-  #}
+	 nseq=num.sequences(seqfile)
+   lseq=len.sequences(seqfile)
+  dummy=.C("RmakebgForSampling", as.character(file), as.integer(order),
+  				 as.integer(nseq),as.integer(lseq))
 }
 
 store.background.sampling=function(file) {

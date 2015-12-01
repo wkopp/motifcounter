@@ -12,22 +12,22 @@ len.sequences=function(seqfile) {
 }
 
 num.motifhits=function(seqfile) {
+  nseq=num.sequences(seqfile)
+  lseq=len.sequences(seqfile)
   noh=integer(1)
-  seqlen=integer(1)
-  numofseqs=integer(1)
   res=.C("RnumberOfHits",as.character(seqfile),as.integer(noh),
-    as.integer(seqlen), as.integer(numofseqs))
-    return (list(seqlen=res[[3]], numofseqs=res[[4]],
+    as.integer(nseq), as.integer(lseq))
+    return (list(seqlen=res[[3]], lseq=lseq,
       numofhits=res[[2]]))
 }
 
 num.motifhits.singlestranded=function(seqfile) {
+  nseq=num.sequences(seqfile)
+  lseq=len.sequences(seqfile)
   noh=integer(1)
-  seqlen=integer(1)
-  numofseqs=integer(1)
   res=.C("RnumberOfHitsSingleStranded",as.character(seqfile),as.integer(noh),
-    as.integer(seqlen), as.integer(numofseqs))
-    return (list(seqlen=res[[3]], numofseqs=res[[4]],
+    as.integer(nseq), as.integer(lseq))
+    return (list(seqlen=res[[3]], lseq=lseq,
       numofhits=res[[2]]))
 }
 

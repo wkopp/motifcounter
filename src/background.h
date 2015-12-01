@@ -7,7 +7,8 @@
 //void getBackgroundFromSequence(FILE *f, DMatrix *m);
 //int getBackgroundFromSequence(FILE *f,DMatrix *mono, DMatrix *di);
 //int getOrder1BackgroundFromSequence(FILE *f, DMatrix *di);
-int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order);
+//int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order);
+int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order, int *nseq, int *lseq);
 int getForwardTransition(double *di, double *forwardtrans, int order);
 //int getReverseTransition(DMatrix *di, DMatrix *forwardtrans);
 //int getReverseTransition(DMatrix *di, DMatrix *stationary, DMatrix *reversetrans);

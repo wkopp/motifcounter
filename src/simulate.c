@@ -381,6 +381,7 @@ void simulateCountDistribution(char *bgfile, char *pwmfile,
     Nhits=0;
     for (s=0;s<nos; s++) {
       generateRandomSequence(station, trans, seq, seqlen, order);
+      Rprintf("%s\n",seq);
       Nhits+=countOccurances(station, trans, &pwm, &cpwm, seq, seqlen, threshold, dx, order);
 
     }

@@ -16,17 +16,17 @@ read.motif(pwmfile,"tab", 0.01)
 
 op=overlap.prob()
 
-dist=posterior.count(seqlen, numofseqs, maxhits, op)
+dist=dynprog.count(seqlen, numofseqs, maxhits, op)
 
-dist2=posterior.count.debug(seqlen, numofseqs, maxhits, op,"poisson")
-dist3=posterior.count.debug(seqlen, numofseqs, maxhits, op,"nbinom")
-dist4=posterior.count.debug(seqlen, numofseqs, maxhits, op,"uniform")
-dist5=posterior.count.debug(seqlen, numofseqs, maxhits, op,"truncunif")
+#dist2=posterior.count.debug(seqlen, numofseqs, maxhits, op,"poisson")
+#dist3=posterior.count.debug(seqlen, numofseqs, maxhits, op,"nbinom")
+#dist4=posterior.count.debug(seqlen, numofseqs, maxhits, op,"uniform")
+#dist5=posterior.count.debug(seqlen, numofseqs, maxhits, op,"truncunif")
 
 plot(dist$dist)
-points(dist2$dist,col="blue")
-points(dist3$dist,col="green")
+#points(dist2$dist,col="blue")
+#points(dist3$dist,col="green")
 #points(dist4$dist,col="red")
-points(dist5$dist,col="yellow")
+#points(dist5$dist,col="yellow")
 
-p.value=comp.pois.test(num.motifhits(seqfile), op, maxhit=150)
+#p.value=comp.pois.test(num.motifhits(seqfile), op, maxhit=150)

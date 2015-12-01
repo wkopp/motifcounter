@@ -7,7 +7,8 @@ numofseqs=100
 maxhits=200
 mdist.option(alpha, gran)
 
-pwmname="x31.pwm"
+#pwmname="x31.pwm"
+for ( pwmname in c("x31.pwm","x32.pwm")) {
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 pwmfile=system.file("extdata",pwmname, package="mdist")
 
@@ -24,3 +25,4 @@ p.value=comp.pois.test(nom, op, maxhits)
 
 cppape=comp.pois.pape(seqlen, numofseqs, maxhits,maxclumpsize=30, op)
 p.value=comp.pois.test(num.motifhits(seqfile), op, maxhits)
+}

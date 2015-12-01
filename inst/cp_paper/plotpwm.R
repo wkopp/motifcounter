@@ -1,5 +1,5 @@
 
-Smat=matrix(0,ncol=maxhits,nrow=1000)
+Smat=matrix(0,ncol=maxhits,nrow=100)
 for (isim in 1:100) {
   simc=sim.counts(seqlen,numofseqs,maxhits,nsim=1000)
   Smat[isim,]=simc[[1]][1:(maxhits)]

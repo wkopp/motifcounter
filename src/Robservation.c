@@ -11,137 +11,57 @@ extern DMatrix *Rpwm, *Rcpwm;
 extern double *Rstation, *Rtrans;
 extern double Rsiglevel, Rgran;
 
-int numNucleotides(FILE *f) {
-	int cnt=0, stop=0;
-	char dig;
-	fseek(f,ftell(f)-1,SEEK_SET);
-  while((dig=fgetc(f))) {
-  	if (dig==EOF || dig=='>') break;
-  	switch (dig) {
-		case 'a':
-		case 'c':
-		case 'g':
-		case 't':
-		case 'A':
-		case 'C':
-		case 'G':
-		case 'T':
-		case 'n':
-		case 'N':
-      cnt++;
-      //Rprintf("%c",dig);
-      break;
-    case '\n':
-			break;
-		case '>':
-			stop=1;
-  	default:
-  		
-  		if (dig==EOF) {
-  			Rprintf("eof should have stopped!\n");
-  		} else {
-  		  Rprintf("something more: %c\n",dig==EOF);
-  		}
-  		stop=1;
-  		break;
-  	}
-  	if(stop==1) break;
-  }
-  //Rprintf("\n");
+void getNucleotideSequence(FILE *f, char **seq, int *nseq, int *lseq) {
+  char *buffer=NULL;
+  int writeseq=0, writeheader=0, i=0;
+  int iseq;
+  int ipos;
+  int lmax=-1;
 
-  fseek(f,ftell(f)-1,SEEK_SET);
-  return cnt;
+	//Rprintf("nseq=%d,lseq=%d",nseq[0],lseq[0]);
+  for (i=0; i< *nseq; i++) {
+    if (lmax<lseq[i]) {
+      lmax=lseq[i];
+    }
+  }
+	//Rprintf("lmax=%d\n",lmax);
+  buffer=Calloc(lmax+1, char);
+
+  iseq=0;
+  ipos=0;
+  while(fgets(buffer, (lmax+1)*sizeof(char), f)!=NULL) {
+
+    //Rprintf(".%s.",buffer);
+    for (i=0; i<strlen(buffer); i++) {
+      if (buffer[i]=='>') {
+        iseq++;
+        ipos=0;
+        writeheader=1;
+        writeseq=0;
+      }
+      if (writeheader==1 && buffer[i]=='\n') { 
+      	writeheader=0; writeseq=1; break; 
+      }
+      if (writeseq==1 && buffer[i]=='\n') break;
+      if (writeseq==1 && isNucleotide(buffer[i])==1) {
+      	//Rprintf("iseq=%d, ipos=%d, '%c'",iseq, ipos, buffer[i]);
+      	seq[iseq-1][ipos++]= buffer[i];
+      	//Rprintf("-->%c",buffer[i]);
+			}
+      if (writeseq==1 && isNucleotide(buffer[i])<0) {
+      	seq[iseq-1][0]= 0;
+        warning("Sequence number %d contains 'n' or 'N' and is discarded.",iseq);
+        writeseq=0;
+        break;
+      }
+    }
+  }
+
+  if (buffer) Free(buffer);
 }
 
-void getSeqlen(FILE *f, int *seqlen, int *numofseq) {
-  char dig;
-  int writeheader=0;
-  int refslen=0;
-  seqlen[0]=0;numofseq[0]=0;
-
-  if (fgetc(f)!='>') {
-  	error("This is not a fasta file!");
-  	return;
-  }
-
-  rewind(f);
-
-	// get the length of the first sequence
-  while((dig=fgetc(f))!=EOF) {
-    if (dig=='>') {
-      writeheader=1;
-      continue;
-    }
-    if (writeheader==1 && dig=='\n') {
-      writeheader=0;
-      continue;
-    }
-    if (writeheader==0) {
-      refslen=numNucleotides(f);
-      break;
-    }
-  }
-  //Rprintf("reflen=%d\n",refslen);
-
-  rewind(f);
-
-	// compare all sequences in the multiple fasta file against the
-	// length of the first sequence. They must be equally long.
-  while((dig=fgetc(f))) {
-  	if(dig==EOF) break;
-    if (dig=='>') {
-      numofseq[0]++;
-      writeheader=1;
-    }
-    if (writeheader==1 && dig=='\n') {
-      writeheader=0;
-      continue;
-    }
-    if (writeheader==0) {
-    	seqlen[0]=numNucleotides(f);
-    	writeheader=1;
-    	if (refslen!=seqlen[0]) {
-    		if (dig==EOF) Rprintf("eof observed!: ");
-    		if (dig=='\n') Rprintf("\\n observed!: ");
-    		error("For multiple fasta files, the individual sequences must be of"
-    				" equal length. %d!=%d:dig=%c",refslen,seqlen[0],dig);
-    	}
-    }
-  }
-}
-
-void getNucleotideSequence(FILE *f, char **seq, int seqlen, int numofseq) {
-  char dig;
-  int writeseq=0, writeheader=0;
-  int iseqlen=0, inos=-1;
-
-
-
-  rewind(f);
-  while((dig=fgetc(f))!=EOF && inos<numofseq) {
-    if (dig=='>') {
-      writeheader=1;
-      writeseq=0;
-      inos++;
-      iseqlen=0;
-    }
-
-    if (writeseq==1 && dig=='\n')  continue;
-
-    if (writeheader==1 && dig=='\n') {
-      writeheader=0;
-      writeseq=1;
-      continue;
-    }
-
-    if (writeseq==1 && iseqlen<seqlen) {
-      seq[inos][iseqlen++]=dig;
-    }
-  }
-}
-
-void RnumberOfHits(char **inputfile, int *numofhits, int *slen, int *nos) {
-  int Nhits,seqlen, numofseq, intervalsize;
+void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq) {
+  int Nhits,  intervalsize;
   ExtremalScore escore;
   MotifScore1d null;
   double dx, quantile,pvalue;
@@ -154,7 +74,7 @@ void RnumberOfHits(char **inputfile, int *numofhits, int *slen, int *nos) {
     error("load forground and background properly");
     return;
   }
-  if (!numofhits||!inputfile||!slen||!nos) {
+  if (!numofhits||!inputfile||!nseq||!lseq) {
     error("parameters are null");
     return;
   }
@@ -191,40 +111,31 @@ void RnumberOfHits(char **inputfile, int *numofhits, int *slen, int *nos) {
     error("no such file: %s\n", inputfile[0]);
     return;
   }
-  getSeqlen(f, &seqlen, &numofseq);
-  slen[0]=seqlen;
-  nos[0]=numofseq;
-  #ifdef IN_R
-  seq=Calloc(numofseq, char*);
-  for (i=0; i<numofseq; i++) {
-    seq[i]=Calloc(seqlen+1, char);
+  //getSeqlen(f, &seqlen, &numofseq);
+  //slen[0]=seqlen;
+  //nos[0]=numofseq;
+  seq=Calloc(*nseq, char*);
+  for (i=0; i<*nseq; i++) {
+    seq[i]=Calloc(lseq[i]+1, char);
   }
-  #else
-  seq=calloc(numofseq, sizeof(char*));
-  for (i=0; i<numofseq; i++) {
-    seq[i]=calloc(seqlen+1, sizeof(char));
-  }
-  #endif
-  getNucleotideSequence(f, seq, seqlen, numofseq);
+  //Rprintf("until here alright!\n");
+
+  getNucleotideSequence(f, seq, nseq, lseq);
   fclose(f);
+  //Rprintf("until here alright!\n");
   //Rprintf("numofseq=%d, seqlen=%d\n", numofseq, seqlen);
 
-  for (s=0, Nhits=0;s<numofseq; s++) {
-    Nhits+=countOccurances(Rstation, Rtrans, Rpwm, Rcpwm, seq[s], seqlen, threshold, dx, Rorder);
+  for (s=0, Nhits=0;s<*nseq; s++) {
+    Nhits+=countOccurances(Rstation, Rtrans, Rpwm, Rcpwm, seq[s], lseq[s], threshold, dx, Rorder);
   }
 
-#ifdef IN_R
-  for (i=0; i<numofseq; i++) Free(seq[i]);
+  for (i=0; i<*nseq; i++) Free(seq[i]);
   Free(seq);
-  #else
-  for (i=0; i<numofseq; i++) free(seq[i]);
-  free(seq);
-  #endif
   numofhits[0]=Nhits;
 }
 
-void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *slen, int *nos) {
-  int Nhits,seqlen, numofseq, intervalsize;
+void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *nseq, int *lseq) {
+  int Nhits,  intervalsize;
   ExtremalScore escore;
   MotifScore1d null;
   double dx, quantile,pvalue;
@@ -237,7 +148,7 @@ void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *slen, in
     error("load forground and background properly");
     return;
   }
-  if (!numofhits||!inputfile||!slen||!nos) {
+  if (!numofhits||!inputfile||!nseq||!lseq) {
     error("parameters are null");
     return;
   }
@@ -274,35 +185,22 @@ void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *slen, in
     error("no such file: %s\n", inputfile[0]);
     return;
   }
-  getSeqlen(f, &seqlen, &numofseq);
-  slen[0]=seqlen;
-  nos[0]=numofseq;
-  #ifdef IN_R
-  seq=Calloc(numofseq, char*);
-  for (i=0; i<numofseq; i++) {
-    seq[i]=Calloc(seqlen+1, char);
+  seq=Calloc(*nseq, char*);
+  for (i=0; i<*nseq; i++) {
+    seq[i]=Calloc(lseq[i]+1, char);
   }
-  #else
-  seq=calloc(numofseq, sizeof(char*));
-  for (i=0; i<numofseq; i++) {
-    seq[i]=calloc(seqlen+1, sizeof(char));
-  }
-  #endif
-  getNucleotideSequence(f, seq, seqlen, numofseq);
+
+  getNucleotideSequence(f, seq, nseq, lseq);
   fclose(f);
   //Rprintf("numofseq=%d, seqlen=%d\n", numofseq, seqlen);
 
-  for (s=0, Nhits=0;s<numofseq; s++) {
-    Nhits+=countOccurancesSingleStranded(Rstation, Rtrans, Rpwm, Rcpwm, seq[s], seqlen, threshold, dx, Rorder);
+  for (s=0, Nhits=0;s<*nseq; s++) {
+    Nhits+=countOccurancesSingleStranded(Rstation, 
+    		Rtrans, Rpwm, Rcpwm, seq[s], lseq[s], threshold, dx, Rorder);
   }
 
-#ifdef IN_R
-  for (i=0; i<numofseq; i++) Free(seq[i]);
+  for (i=0; i<*nseq; i++) Free(seq[i]);
   Free(seq);
-  #else
-  for (i=0; i<numofseq; i++) free(seq[i]);
-  free(seq);
-  #endif
   numofhits[0]=Nhits;
 }
 

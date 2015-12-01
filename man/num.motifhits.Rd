@@ -2,8 +2,11 @@
 \alias{num.motifhits}
 \title{Number of motif hits in a given DNA sequence}
 \description{
-The function scans a given DNA sequence and counts the number of
+The function scans a given DNA sequence or a set of sequences
+and counts the number of
 motif hits on both, the forward and the reverse strand.
+It returns the length of each sequence supplied in the fasta file
+and the number of hits observed across all sequences.
 }
 \usage{
 num.motifhits(seqfile)

@@ -55,8 +55,8 @@ read.background(seqfile,1)
 read.motif(pwmfile,"tab", 0.01)
 
 # simulate score distribution
-sims=sim.scores(seqlen,1000)
-plot(sims[[1]],sims[[2]])
+#sims=sim.scores(seqlen,1000)
+#plot(sims[[1]],sims[[2]])
 
 # compute score distribution by dynamic programming
 dp=score.dist()
@@ -71,7 +71,7 @@ op=overlap.prob()
 # compute a compound poisson approximation of the motif hits distribution
 cpdist=comp.pois(seqlen, numofseqs, maxhits,maxclumpsize=30, op)
 
-pdist=posterior.count(seqlen, numofseqs, maxhits, op)
+pdist=dynprog.count(seqlen, numofseqs, maxhits, op)
 
 # plot the probability distributions
 plot(simc[[1]], main="Distribution of the number of motif hits",
