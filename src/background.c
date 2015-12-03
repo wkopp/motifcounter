@@ -9,94 +9,31 @@
 #include "background.h"
 #include "sequence.h"
 
-#ifdef WK
-int getSeqen(FILE *f) {
-  char dig;
-  int writeseq=0, writeheader=1, i=0;
-
-  while((dig=fgetc(f))!=EOF) {
-//Rprintf("%c",dig);
-    //if (dig=='>') {
-    //  writeheader=1;
-    //}
-    if (writeseq==1 && dig=='\n') continue;
-    if (writeheader==1 && dig=='\n') {
-      writeheader=0;
-      writeseq=1;
-      continue;
-    }
-    if (writeseq==1) {
-      i++;
-    }
-  }
-  //Rprintf("len=%d\n", i);
-  return i;
-}
-#endif
-
 int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order, int *nseq, int *lseq) {
-  char *buffer=NULL, *seq=NULL;
-  int writeseq=0, writeheader=0, i=0, j;
-  int iseq;
-  int lmax=-1;
+  char *buffer=NULL;
+  Sequence seq;
+  int i=0, j;
 
   double ret=0;
  
-  for (i=0; i< *nseq; i++) {
-    if (lmax<lseq[i]) {
-      lmax=lseq[i];
-    }
-  }
-  buffer=Calloc(lmax+1, char);
-  seq=Calloc(lmax+1, char);
+ 	allocSequence(&seq, *nseq, lseq);
+ 	getSequence(f, &seq);
   //memset(seq,0,(lmax+1)*sizeof(char));
 
-  while(fgets(buffer, sizeof(buffer), f)!=NULL) {
-    for (i=0; i<strlen(buffer); i++) {
-      if (buffer[i]=='>') {
-        memset(seq,0,(lmax+1)*sizeof(char));
-        //lseq[iseq]=0;
-        iseq=0;
-        //iseq++;
-        writeheader=1;
-        writeseq=0;
-      }
-      if (writeheader==1 && buffer[i]=='\n') { writeheader=0; writeseq=1; iseq=0; break; }
-      if (writeseq==1 && buffer[i]=='\n') break;
-      if (writeseq==1 && isNucleotide(buffer[i])==1) seq[iseq++]=buffer[i];
-      if (writeseq==1 && isNucleotide(buffer[i])<0) {
-        //lseq[iseq-1]=0;
-        warning("Sequence number %d contains 'n' or 'N' and is discarded.",iseq);
-        memset(seq,0,(lmax+1)*sizeof(char));
-        writeseq=0;
-        break;
-      }
-      if (buffer[i]=='>' && writeseq==1) {
-      
-        for (j=0; j<strlen(seq); j++) {
-          if (j>=order && isNucleotide(seq[j])==1) {
-            di[getIndexFromAssignment(&seq[j-order], order+1)]+=1.0;
-            di[getIndexFromReverseAssignment(&seq[j-order], order+1)]+=1.0;
-            di[getIndexFromComplementaryAssignment(&seq[j-order],order+1)]+=1.0;
-            di[getIndexFromReverseComplementaryAssignment(&seq[j-order],order+1)]+=1.0;
-          }
-        }
+  for (i=0; i<seq.nseq; i++) {
+   	//if (seq.lseq[i]==0) break;
+    for (j=0; j<seq.lseq[i]; j++) {
+      if (j>=order) {
+        di[getIndexFromAssignment(&seq.seq[i][j-order], order+1)]+=1.0;
+        di[getIndexFromReverseAssignment(&seq.seq[i][j-order], order+1)]+=1.0;
+        di[getIndexFromComplementaryAssignment(&seq.seq[i][j-order],order+1)]+=1.0;
+        di[getIndexFromReverseComplementaryAssignment(&seq.seq[i][j-order],order+1)]+=1.0;
       }
     }
   }
-  if (feof(f) && writeseq==1) {
-    for (j=0; j<strlen(seq); j++) {
-      if (j>=order && isNucleotide(seq[j])==1) {
-        di[getIndexFromAssignment(&seq[j-order], order+1)]+=1.0;
-        di[getIndexFromReverseAssignment(&seq[j-order], order+1)]+=1.0;
-        di[getIndexFromComplementaryAssignment(&seq[j-order],order+1)]+=1.0;
-        di[getIndexFromReverseComplementaryAssignment(&seq[j-order],order+1)]+=1.0;
-      }
-    }
-	}
 
   if (buffer) Free(buffer);
-  if (seq) Free(seq);
+  destroySequence(&seq);
 
   return ret;
 }
@@ -118,13 +55,8 @@ int getStationaryDistribution(double *trans, double *station, int order) {
     return 1;
   }
 
-#ifdef IN_R
   tmp1=Calloc(power(ALPHABETSIZE, order), double);
   tmp2=Calloc(power(ALPHABETSIZE, order), double);
-  #else
-  tmp1=calloc(power(ALPHABETSIZE, order), sizeof(double));
-  tmp2=calloc(power(ALPHABETSIZE, order), sizeof(double));
-  #endif
   tmpres=tmp1;
   tmpstart=tmp2;
 
@@ -159,13 +91,8 @@ int getStationaryDistribution(double *trans, double *station, int order) {
   }
 
   memmove(station,tmpstart, power(ALPHABETSIZE, order)* sizeof(double));
-  #ifdef IN_R
   Free(tmp1);
   Free(tmp2);
-  #else
-  free(tmp1);
-  free(tmp2);
-  #endif
   return 0;
 }
 
@@ -237,102 +164,3 @@ void readBackground (FILE *f, double **station, double **trans, int *order) {
   }
 }
 
-#ifndef IN_R
-int makebg(char *infasta, char *outmodel, char *outseq, char *order) {
-  FILE *f;
-  double *stationary,*count, *trans=NULL;
-  int iorder;
-  #ifdef DEBUG
-  int i,j;
-  #endif
-  //int seqlen;
-  //Sequence seq;
-
-    if (order==NULL) {
-      iorder=1;
-    } else {
-      iorder=atol(order);
-    }
-    f =fopen(infasta,"r");
-    if (f==NULL) {
-      fprintf(stderr, "error during file opening");
-      return 1;
-    }
-
-
-    if (iorder>0) {
-    #ifdef IN_R
-      stationary=Calloc(power(ALPHABETSIZE,iorder),double);
-      count=Calloc(power(ALPHABETSIZE,iorder+1),double);
-      trans=Calloc(power(ALPHABETSIZE, iorder+1),double);
-      #else
-      stationary=calloc(power(ALPHABETSIZE,iorder),sizeof(double));
-      count=calloc(power(ALPHABETSIZE,iorder+1),sizeof(double));
-      trans=calloc(power(ALPHABETSIZE, iorder+1),sizeof(double));
-      #endif
-
-      getNucleotideFrequencyFromSequence(f,count, iorder);
-
-      getForwardTransition(count, trans, iorder);
-      getStationaryDistribution(trans, stationary, iorder);
-
-    } else {
-
-    #ifdef IN_R
-      stationary=Calloc(power(ALPHABETSIZE,iorder+1),double);
-      count=Calloc(power(ALPHABETSIZE,iorder+1),double);
-      #else
-      stationary=calloc(power(ALPHABETSIZE,iorder+1),sizeof(double));
-      count=calloc(power(ALPHABETSIZE,iorder+1),sizeof(double));
-      #endif
-      getNucleotideFrequencyFromSequence(f,count, iorder);
-      getForwardTransition(count, stationary, iorder);
-    }
-    fclose(f);
-
-#ifdef DEBUG
-    printf(stdout,"Counts:\n");
-    for (j=0; j < power(ALPHABETSIZE, iorder+1); j++) {
-      printf("%1.5e ", count[j]);
-      printf("\n");
-    }
-    if (iorder>0) {
-      printf("Stationary distribution\n");
-      for (i=0; i < power(ALPHABETSIZE, iorder); i++) {
-        printf( "%1.7e ", stationary[i]);
-        printf("\n");
-      }
-      printf("Transition-Probabilities:\n");
-      for (j=0; j < power(ALPHABETSIZE, iorder+1); j++) {
-        printf( "%1.7e ", trans[j]);
-        printf("\n");
-      }
-    } else {
-      printf("Stationary distribution\n");
-      for (i=0; i < power(ALPHABETSIZE, iorder+1); i++) {
-        printf( "%1.7e ", stationary[i]);
-        printf("\n");
-      }
-    }
-    #endif
-    #ifdef IN_R
-    Free(count);
-    #else
-    free(count);
-    #endif
-    f =fopen(outmodel,"ab");
-    if (f==NULL) {
-      deleteBackground(stationary, trans);
-      fprintf(stderr, "error during file opening");
-      return 1;
-    }
-    //Write the length of the DHS into the file before
-    // the background parameters
-    //fwrite(&seqlen, sizeof(int),1,f);
-    writeBackground(f, stationary, trans, iorder);
-    deleteBackground(stationary, trans);
-    fclose(f);
-
-    return 0;
-}
-#endif

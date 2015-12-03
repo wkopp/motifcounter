@@ -11,11 +11,34 @@ pwmfile=system.file("extdata",pwmname, package="mdist")
 
 pwm=read.table(pwmfile)
 
-read.background(seqfile)
+read.background(seqfile, 1)
+read.background.sampling(seqfile,1)
 #load motif model from file
 read.motif(pwmfile,"tab", 0.1)
 #simluate score distribution
-sims=sim.scores(seqlen,1000)
+sims=sim.scores(seqlen,10000)
+plot(sims[[1]],sims[[2]])
+#compute exact score distribution
+dp=score.dist()
+points(dp[[1]],dp[[2]], col="green")
+
+read.background(seqfile, 0)
+read.background.sampling(seqfile,0)
+#load motif model from file
+read.motif(pwmfile,"tab", 0.1)
+#simluate score distribution
+sims=sim.scores(seqlen,10000)
+plot(sims[[1]],sims[[2]])
+#compute exact score distribution
+dp=score.dist()
+points(dp[[1]],dp[[2]], col="green")
+
+read.background(seqfile, 2)
+read.background.sampling(seqfile,2)
+#load motif model from file
+read.motif(pwmfile,"tab", 0.1)
+#simluate score distribution
+sims=sim.scores(seqlen,10000)
 plot(sims[[1]],sims[[2]])
 #compute exact score distribution
 dp=score.dist()

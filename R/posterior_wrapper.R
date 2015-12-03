@@ -1,24 +1,30 @@
 
-dynprog.count=function(seqlen, numofseqs, maxhits, overlap) {
+dynprog.count=function(seqlen, maxhits, overlap) {
+	if (!all(seqlen==seqlen[1])) {
+			stop("The sequences must be of equal length for dynamic programming!");
+	}
   dist=numeric(maxhits+1)
-  #numofseq=integer(1)
   ret=.C("RPosteriorProbability", 
   overlap$alpha, overlap$beta, overlap$beta3p, overlap$beta5p,
-  as.numeric(dist), as.integer(seqlen),
-   as.integer(maxhits), as.integer(numofseqs),"truncunif")
+  as.numeric(dist), as.integer(seqlen[1]),
+   as.integer(maxhits), as.integer(length(seqlen)))
   return(list(dist=ret[[5]]))
 }
-dynprog.count.debug=function(seqlen, numofseqs, maxhits, overlap,prior) {
-  dist=numeric(maxhits+1)
+#
+#dynprog.count.debug=function(seqlen, numofseqs, maxhits, overlap,prior) {
+#  dist=numeric(maxhits+1)
   #numofseq=integer(1)
-  ret=.C("RPosteriorProbability", 
-  overlap$alpha, overlap$beta, overlap$beta3p, overlap$beta5p,
-  as.numeric(dist), as.integer(seqlen),
-   as.integer(maxhits), as.integer(numofseqs),as.character(prior))
-  return(list(dist=ret[[5]]))
-}
+#  ret=.C("RPosteriorProbability", 
+#  overlap$alpha, overlap$beta, overlap$beta3p, overlap$beta5p,
+#  as.numeric(dist), as.integer(seqlen),
+#   as.integer(maxhits), as.integer(numofseqs),as.character(prior))
+#  return(list(dist=ret[[5]]))
+#}
 dynprog.count.test=function(obs, overlap, maxhits) {
-  dist=dynprog.count(obs$seqlen, obs$numofseqs, maxhits, overlap)
+	if (!all(obs$lseq==obs$lseq[1])) {
+			stop("The sequences must be of equal length for dynamic programming!");
+	}
+  dist=dynprog.count(obs$lseq, maxhits, overlap)
   if (obs$numofhits>maxhits) {
     p=0.0;
   } else {

@@ -9,9 +9,12 @@ sim.scores=function(seqlen, nsim) {
     as.integer(nsim))
 }
 
-sim.counts=function(seqlen, numofseqs, maxhits, nsim) {
+sim.counts=function(seqlen, maxhits, nsim) {
+	if (length(seqlen)<=0) {
+		stop("seqlen must be non-empty")
+	}
   dist=numeric(maxhits+1);
   .C("RsimulateCountDistribution", as.numeric(dist), 
-    as.integer(nsim), as.integer(seqlen),as.integer(maxhits),as.integer(numofseqs))
+    as.integer(nsim), as.integer(length(seqlen)),as.integer(seqlen), as.integer(maxhits))
 }
 

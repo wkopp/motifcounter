@@ -16,7 +16,7 @@ read.motif(pwmfile,"tab", 0.01)
 
 op=overlap.prob()
 
-dist=dynprog.count(seqlen, numofseqs, maxhits, op)
+dist=dynprog.count(seqlen, maxhits, op)
 
 #dist2=posterior.count.debug(seqlen, numofseqs, maxhits, op,"poisson")
 #dist3=posterior.count.debug(seqlen, numofseqs, maxhits, op,"nbinom")

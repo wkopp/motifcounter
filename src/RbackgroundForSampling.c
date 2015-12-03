@@ -7,6 +7,7 @@ double *RstationForSampling=NULL, *RtransForSampling=NULL;
 int RorderForSampling;
 void RdestroyBackgroundForSampling();
 
+#ifdef WK
 void RreloadBackgroundForSampling(char **file) {
   FILE *f;
   RdestroyBackgroundForSampling();
@@ -31,6 +32,7 @@ void RstorebgForSampling(char **file) {
 
   writeBackground (f, RstationForSampling, RtransForSampling, RorderForSampling);
 }
+#endif
 
 void RmakebgForSampling(char **infasta, int *order, int *nseq, int *lseq) {
   FILE *f;

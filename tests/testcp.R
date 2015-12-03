@@ -16,13 +16,14 @@ read.background(seqfile,1)
 read.motif(pwmfile,"tab")
 
 op=overlap.prob()
+len.sequences(seqfile)
 
-cpdist=comp.pois(seqlen, numofseqs, maxhits,maxclumpsize=30, op)
+cpdist=comp.pois(seqlen,  maxhits,maxclumpsize=30, op)
 
 nom=num.motifhits(seqfile)
 
 p.value=comp.pois.test(nom, op, maxhits)
 
-cppape=comp.pois.pape(seqlen, numofseqs, maxhits,maxclumpsize=30, op)
+cppape=comp.pois.pape(seqlen,  maxhits,maxclumpsize=30, op)
 p.value=comp.pois.test(num.motifhits(seqfile), op, maxhits)
 }

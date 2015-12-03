@@ -18,21 +18,12 @@ extern DMatrix *Rcpwm, *Rpwm;
 extern double Rgran, Rsiglevel;
 //extern double *Rbeta, *Rbeta3p, *Rbeta5p, *Rdelta, *Rdeltap;
 
-#ifdef WK
-void dquadratic(int n, double *par, double *gr, void *extra) {
-  gr[0]=2*par[0];
-}
-double quadratic(int n, double *par, void *extra) {
-  Rprintf("f=%e\n",par[0]*par[0]);
-  return par[0]*par[0];
-}
-#endif
 #define DEBUG
 #undef DEBUG
 void RPosteriorProbability(double *alpha, double *beta, 
   double *beta3p, double *beta5p,
   double *hitdistribution, int *sseqlen,
-  int *smaxhits, int *snos, char **sprior) {
+  int *smaxhits, int *snos) {
   PosteriorCount prob;
   int seqlen;
   int i, maxhits, k, nos;
@@ -53,7 +44,7 @@ void RPosteriorProbability(double *alpha, double *beta,
     return;
   }
   if (!beta||!beta3p||!beta5p||!hitdistribution||
-  		!sseqlen||!smaxhits||!snos||!sprior) {
+  		!sseqlen||!smaxhits||!snos) {
     error("parameters are null");
     return;
   }
@@ -123,21 +114,6 @@ void RPosteriorProbability(double *alpha, double *beta,
       singlehitdistribution[k]*=prior[k];
       Zpartition+=singlehitdistribution[k];
 
-#ifdef DEBUG
-      znew=zold+singlehitdistribution[k];
-      enew=zold/znew*eold+(double)k*singlehitdistribution[k]/znew;
-
-			if (strcmp(sprior[0],"truncunif")==0) {
-      	if (fabs(enew-(double)2*seqlen*alpha[0]) >
-        	 fabs(eold-(double)2*seqlen*alpha[0])) {
-//Rprintf("--%d",k);
-        	singlehitdistribution[k]=0;
-        	break;
-      	}
-			}
-      eold=enew;
-      zold=znew;
-#endif
     }
     for (k=0; k<=maxsinglehits; k++) {
       singlehitdistribution[k]/=Zpartition;

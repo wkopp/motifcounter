@@ -1,12 +1,12 @@
-\name{comp.pois}
-\alias{comp.pois}
+\name{comp.pois.singlestranded}
+\alias{comp.pois.singlestranded}
 \title{Compound Poisson Approximation}
 \description{
 This function computes the compound Poisson approximation for the chosen
-PWM and background model.
+PWM and background model assuming a single stranded DNA or RNA sequence.
 }
 \usage{
-comp.pois(seqlen, maxhits,maxclumpsize, overlap)
+comp.pois.singlestranded(seqlen, maxhits,maxclumpsize, overlap)
 }
 \arguments{
 \item{seqlen}{Is an integer-valued vector where the i^th element determines
@@ -33,10 +33,10 @@ read.background(seqfile,1)
 read.motif(pwmfile,"tab", 0.01)
 
 #Compute overlapping probabilities
-op=overlap.prob()
+op=overlap.prob.singlestranded()
 
 # Computes the distribution of the number of motif hits
 seqlen=rep(150,100)
-dist=comp.pois(seqlen, maxhits=1000,maxclumpsize=30, op)
+dist=comp.pois.singlestranded(seqlen, maxhits=1000,maxclumpsize=30, op)
 }
 

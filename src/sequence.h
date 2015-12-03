@@ -8,10 +8,13 @@
 #define WSIZE 150
 
 typedef struct {
-  char seq[NUMSEQ][WSIZE];
-  int  numseq;
+  char **seq;
+  int  nseq;
+  int  *lseq;
 } Sequence;
 
+void allocSequence(Sequence *seq, int nseq, int *lseq);
+void destroySequence(Sequence *seq);
 int getSequence(FILE *f,Sequence *);
 int getNucIndex(char c);
 char getNuc(int i);

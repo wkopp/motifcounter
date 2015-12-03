@@ -7,12 +7,11 @@ et al. 2008) for the chosen
 PWM and background model.
 }
 \usage{
-comp.pois.pape(seqlen, numofseqs, maxhits,maxclumpsize, overlap)
+comp.pois.pape(seqlen, maxhits,maxclumpsize, overlap)
 }
 \arguments{
-\item{seqlen}{Is an integer that defines the length of DNA to be scanned.}
-\item{numofseqs}{Is an integer that defines how many DNA sequences of size seqlen
-shall be considered.}
+\item{seqlen}{Is an integer-valued vector where the i^th element determines
+the length of i^th sequence to be scanned.}
 \item{maxhits}{Integer that sets the maximal number of motif hits.}
 \item{maxclumpsize}{Integer that defines the maximal size of a clump.}
 \item{overlap}{Is a list that contains the overlap probabilities for the 
@@ -38,6 +37,7 @@ read.motif(pwmfile,"tab", 0.01)
 op=overlap.prob()
 
 # Computes the distribution of the number of motif hits
-dist=comp.pois.pape(seqlen=150, numofseqs=100, maxhits=1000,maxclumpsize=30, op)
+seqlen=rep(150,100)
+dist=comp.pois.pape(seqlen, maxhits=1000,maxclumpsize=30, op)
 }
 

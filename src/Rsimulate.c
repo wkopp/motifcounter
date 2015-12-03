@@ -16,14 +16,15 @@ extern double *RstationForSampling, *RtransForSampling;
 extern double Rsiglevel, Rgran;
 
 void RsimulateCountDistribution( double *distribution, int* perm, 
-   int *slen, int *mxhit, int *snos) {
+   int *nseq, int *lseq, int *mxhit, int *snos) {
   int seqlen,maxhits,Nperm, intervalsize;
   int *_nh;
   ExtremalScore escore;
   MotifScore1d null;
   double dx, quantile,pvalue;
-  int n, nos, s;
-  char **seq;
+  int n, s;
+  int i;
+  char *seq;
 
   int threshold;
 
@@ -31,7 +32,7 @@ void RsimulateCountDistribution( double *distribution, int* perm,
     error("load forground and background properly");
     return;
   }
-  if (!distribution||!perm||!slen||!mxhit||!snos) {
+  if (!distribution||!perm||!nseq||!lseq||!mxhit||!snos) {
     error("parameters are null");
     return;
   }
@@ -41,12 +42,12 @@ void RsimulateCountDistribution( double *distribution, int* perm,
   }
   GetRNGstate();
 
-  seqlen=slen[0];
+  //seqlen=slen[0];
   maxhits=mxhit[0];
   Nperm=perm[0];
   pvalue=Rsiglevel;
   dx=Rgran;
-  nos=snos[0];
+  //nos=snos[0];
 
   // compute significance threshold
   initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
@@ -69,39 +70,43 @@ void RsimulateCountDistribution( double *distribution, int* perm,
   deleteScoreDistribution1d(&null, Rorder);
   // end  of significance threshold computation
 
-  seq=calloc(Nperm,sizeof(char*));
-  for(n=0; n<Nperm; n++) {
-    seq[n]=calloc(seqlen, sizeof(char));
-  }
-  _nh=calloc(Nperm,sizeof(int));
+	seqlen=0;
+	for (i=0; i<*nseq; i++) {
+		if(seqlen<lseq[i]) {
+			seqlen=lseq[i];
+		}
+	}
+  seq=Calloc(seqlen+1,char);
+  //for(n=0; n<Nperm; n++) {
+   // seq[n]=Calloc(seqlen, char);
+  //}
+  _nh=Calloc(Nperm,int);
 
-  //#pragma omp parallel for default(none) shared(Rstation,Rtrans,Rorder,Rpwm,Rcpwm,seqlen,Nperm,nos,threshold,dx,maxhits,distribution,_nh,seq) private(n,s)
   for (n=0; n<Nperm; n++) {
     _nh[n]=0;
-    for (s=0;s<nos; s++) {
-      generateRandomSequence(RstationForSampling, RtransForSampling, seq[n], seqlen, RorderForSampling);
-      _nh[n]+=countOccurances(Rstation, Rtrans, Rpwm, Rcpwm, seq[n], seqlen, threshold, dx, Rorder);
+    for (s=0;s<*nseq; s++) {
+      generateRandomSequence(RstationForSampling, RtransForSampling, seq, lseq[s], RorderForSampling);
+      _nh[n]+=countOccurances(Rstation, Rtrans, Rpwm, Rcpwm, seq, lseq[s], threshold, dx, Rorder);
 
     }
-    //Rprintf("it=%d: seq=%s\n",Nhits, seq);
     if (_nh[n]>maxhits) _nh[n]=maxhits;
   }
   for (n=0; n<Nperm; n++) {
     distribution[_nh[n]]+=1.0/(double)Nperm;
   }
 
-	free(_nh);
-	for (n=0; n<Nperm;n++) {
-		free(seq[n]);
-	}
-  free(seq);
+	Free(_nh);
+	//for (n=0; n<Nperm;n++) {
+	//	Free(seq[n]);
+	//}
+  Free(seq);
   PutRNGstate();
 }
 
 void RsimulateScores(double *scores, double *distribution, int *slen, 
   int *perm) {
   int i, n;
-  char *seq;
+  char *seq=NULL;
   ExtremalScore escore;
   ExtremalScore fescore, rescore;
   int fmins,fmaxs, rmins,rmaxs;
@@ -113,6 +118,11 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
     error("call mdist.option  first");
     return;
   }
+  if (RstationForSampling==NULL || RtransForSampling==NULL) {
+    error("Background model uninitialized! Use ead.background.sampling()");
+    return;
+	}
+
   //srand(time(0));
   GetRNGstate();
 
@@ -120,9 +130,12 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
   Nperm=perm[0];
 
    dx=Rgran;
-   //Rprintf("len=%d, perm=%d, gran=%e\n", seqlen, Nperm, dx);
+   Rprintf("len=%d, perm=%d, gran=%e\n", seqlen, Nperm, dx);
 
-    seq=Calloc(seqlen, char);
+    seq=Calloc(seqlen+1, char);
+    if(seq==NULL) {
+    	error("Allocation for sequence failed");
+    }
 
     initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
 
@@ -150,12 +163,9 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
   maxs=(fmaxs>rmaxs) ? fmaxs : rmaxs;
   mins=(fmins>rmins) ? fmins : rmins;
 
-  //Rprintf("min=%d, max=%d, range=%d\n",mins, maxs, maxs-mins+1);
-
-        //dist=calloc(maxs-mins+1, sizeof(double));
-
     for (n=0; n<Nperm; n++) {
 //      Rprintf("iteration %d\n",n);
+	//error("until here");
       generateRandomSequence(RstationForSampling, RtransForSampling, seq, seqlen, RorderForSampling);
       scoreOccurances(Rstation, Rtrans, Rpwm, seq, seqlen, distribution, dx, mins,Rorder);
     }

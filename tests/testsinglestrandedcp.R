@@ -29,9 +29,11 @@ op=overlap.prob.singlestranded()
 
 # compute the compound Poisson distribution for the number of hits
 cpdist=comp.pois.singlestranded(seqlen, 
-																numofseqs, 
 																maxhits,maxclumpsize=30, op)
 
 # observed number of motif hits
 nom=num.motifhits.singlestranded(seqfile)
+
+p.value=comp.pois.singlestranded.test(
+					num.motifhits.singlestranded(seqfile), op, maxhits)
 

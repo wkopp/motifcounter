@@ -9,12 +9,11 @@ in a given sequence. The summation is done by employing
 dynamic programming.
 }
 \usage{
-dynprog.count(seqlen, numofseqs, maxhits, overlap)
+dynprog.count(seqlen, maxhits, overlap)
 }
 \arguments{
-\item{seqlen}{Is an integer that defines the length of DNA to be scanned.}
-\item{numofseqs}{Is an integer that defines the number of DNA sequences of size seqlen
-that shall be considered.}
+\item{seqlen}{Is an integer-valued vector that 
+defines the lengths of the individual sequences.}
 \item{maxhits}{Integer that sets the maximal number of motif hits.}
 \item{overlap}{Is a list that contains the overlap probabilities for the 
 motif. It is computed by overlap.prob(). }
@@ -37,8 +36,8 @@ read.motif(pwmfile,"tab", 0.01)
 
 # Compute overlap probabilies
 op=overlap.prob()
-
+seqlen=rep(100,1)
 # Computes the distribution of the number of motif hits
-dist=dynprog.count(seqlen=10, numofseqs=1, maxhits=10, op)
+dist=dynprog.count(seqlen, maxhits=10, op)
 }
 

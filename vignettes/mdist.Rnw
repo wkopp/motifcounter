@@ -25,8 +25,11 @@
 \maketitle
 \section{Introduction}
 \Rpackage{mdist} offers methods to estimate enrichment of PWMs in 
-DNA sequences based on an advanced compound Poisson approximation and a Bayesian approach.
-In this vignette we describe how to conduct a simple enrichment analysis for a motif of interest.
+double stranded DNA sequences or single stranded RNA/DNA sequences
+based on an improved compound Poisson approximation or alternatively
+a combinatorial model.
+In this vignette we describe how to conduct 
+a simple enrichment analysis for a given motif in a sequence of interest.
 
 \section{Loading the background model}
 
@@ -35,39 +38,36 @@ Load the package
 library(mdist)
 @
 
-An order-\(d\) Markov model is estimated directly from a given DNA sequence in
-fasta format, where \(d\) must be specified by the user.
-If input.fasta contains multiple sequences, they must be of equal length.
-
+The background model is meant to model the sequence composition
+outside of transcription factor binding sites. It can also
+be thought of a sequence generating process, in which we would like
+to determine the number of motif hits.
+The background model is captured by an order-\(d\) Markov model
+which is directly estimated from a given DNA sequence in
+fasta format. The parameter \(d\) is specified by the user. By default it
+will be set to $d=1$. The sequences provided in the fasta file can be of
+variable length, however, sequences containing N's will be discarded.
 \begin{Sinput}
 > file=system.file("extdata/seq.fasta", package="mdist)
 > read.background(file, order=1)
 \end{Sinput}
 
-It is also possible to store the background model in binary format in a file for later
-reuse
-\begin{Sinput}
-> read.background(file, order=1)
-> store.background("background.bgbin")
-> read.background("background.bgbin")
-\end{Sinput}
-\Rfunction{read.background} can then be utilized again to reload the background model.
-Importantly, the file suffix (.fasta) determines which action to take.
-
 \section{Loading a motif}
-The motif can be loaded from a file via \Rfunction{read.motif} for various motif file formats. 
-Additionally, \Rfunction{matrix2motif} loads an R matrix as a motif used in the anaysis.
-In the former case, tab format and transfac format are supported. Each file is expected to hold
-one motif. It is required to have strictly positive probabilities for each element of the PWM,
-thus pseudocount adds a small pseudo-probability mass and renormalizes the columns.
+The motif can be loaded from a file via \Rfunction{read.motif} for various motif file formats,
+including TAB-format or TRANSFAC format.
+Each file is expected to hold
+one motif. 
+It is required to have strictly positive probabilities for each element of the PWM,
+thus by default pseudocounts are added to the PWM.
 \begin{Sinput}
 > file=system.file("extdata/x1.pwm", package="mdist")
 > read.motif("motif.pwm", format="tab", pseudocount=0.01)
 \end{Sinput}
 
-Alternatively, one can load an R matrix so as to use it as a motif.
-In this case, the R matrix dimension has to be \(4\times M\) with the columns already summarized
-to 1 and strictly positive probabilities in each element.
+Alternatively, \Rfunction{matrix2motif} loads an R matrix as a PWM motif.
+In this case, the R matrix dimension has to 
+be \(4\times M\) with the columns summing to one and 
+ strictly positive probabilities for all  element in the matrix.
 
 \begin{Sinput}
 > file=system.file("extdata/x1.pwm", package="mdist")
@@ -76,66 +76,88 @@ to 1 and strictly positive probabilities in each element.
 \end{Sinput}
 
 \section{Compute overlap probability}
-Before processing the overlapping probabilities, the user needs to specify certain 
-parameters by calling \Rfunction{mdist.option}. 
+Prior to running the analysis, \Rfunction{mdist.option} must be called, 
+which specifies the significance level for calling motif hits, the granularity
+of the score range for discretization and how many cores shall be used for
+parallel processing.
+%Before processing the overlapping probabilities, the user needs to specify certain 
+%parameters by calling \Rfunction{mdist.option}. 
 
 \begin{Sinput}
 > mdist.option(alpha=0.01, gran=0.01,ncores=10)
 \end{Sinput}
-The first argument determines the significance level for calling motif hits in the random 
-sequence, the second determines the granularity of the score range and the third sets
-the number of threads used in parallel. In general, the computation will run faster
-for smaller alpha, bigger granularity and by running many parallel threads.\par
-Now the set of overlapping probabilities are computed via
+Rules of thumb: The smaller alpha is chosen the faster the algorithm will be
+and the smaller gran is chosen the slower it will be.\par
+The overlapping hit probabilities are computed via
 \begin{Sinput}
 > op=overlap.prob()
 \end{Sinput}
-This is the computationally most expensive step. It may take a while, in particular,
-for long and fuzzy motif structures.
-
-The resulting a list of overlapping hit probabilities serve
-as an input for \Rfunction{comp.pois} or \Rfunction{posterior.count}.
-
-\section{Run Posterior Probability Approximation}
-
-Having already determined the overlapping probabilities, the posterior distribution over
-the number of motif hits is determined by
+Alternatively, for single stranded sequences (e.g. RNAs) use
 \begin{Sinput}
-> dist=posterior.count(seqlen=100,numofseqs=1,maxhits=100,op)
+> op=overlap.prob.singlestranded()
 \end{Sinput}
-The distribution is computed for \textit{numofseqs} independent DNA sequences, each of which of length
-\textit{seqlen}. Overall, the maximum number of motif hits is set to be \textit{maxhits}.\par
+
+The resulting a list of overlapping hit probabilities are used
+as  input for \Rfunction{comp.pois}, \Rfunction{comp.pois.test}, 
+\Rfunction{comp.pois.singlestranded}, \Rfunction{comp.pois.singlestranded.test},
+ \Rfunction{dynprog.count} or \Rfunction{dynprog.count.test}
+
+\section{Run combinatorial model for modeling the number of motif hits}
+
+After having determined the overlapping probabilities, 
+the combinatorial distribution over
+the number of motif hits can be  determined by
+\begin{Sinput}
+> seqlen=rep(100,10)
+> dist=dynprog.count(seqlen,maxhits=100,op)
+\end{Sinput}
+
+The distribution is computed across 10 sub-sequences of length 100bp each in the 
+example above.
+The maximum number of motif hits is set to be \textit{maxhits}.\par
 One can directly test for statistical overrepresentation of the motif in a given DNA sequence
 as follows
 \begin{Sinput}
 > seqfile=system.file("extdata","seq.fasta", package="mdist")
 > numofhits=num.motifhits(seqfile)
-> p_value=comp.pois.test(numofhits, op, maxhit=100)
+> pvalue=dynprog.count.test(numofhits, op, maxhit=100)
 \end{Sinput}
 
-\section{Run the Compound Poisson Approximiation}
+\section{Run the Compound Poisson Approximiation for the number of motif hits}
 
 Alternatively, the enrichment of motif hits in a DNA sequence can be tested by an
-underlying compound Poisson model by invoking \Rfunction{comp.pois}, 
-which the length of a DNA sequence, 
-the number of sequences, the number of maximal hits,
-the maximal clump size and the overlapping hit probabilities as input
-and returns the distribution over the number of motif hits 
+underlying compound Poisson model by invoking \Rfunction{comp.pois} or
+\Rfunction{comp.pois.singlestranded}.
+This model can be used for searching for motif hits in relatively long sequences
+and if variable sequences need to be scanned.
+In the following example, the compound Poisson approximation is computed for 
+100 sequences each of length 150bp with a maximal number of hits of 50
+and a maximal clump size of 20.
+The functions can be used as follows
 \begin{Sinput}
-> dist <- comp.pois(seqlen=150, numofseqs=100, maxhits=50, maxclumpsize=20, overlap=op)
+> seqlen=rep(150,100)
+> dist <- comp.pois(seqlen, maxhits=50, maxclumpsize=20, overlap=op)
+\end{Sinput}
+or alternatively for single stranded sequences
+\begin{Sinput}
+> seqlen=rep(150,100)
+> dist <- comp.pois.singlestranded(seqlen, maxhits=50, maxclumpsize=20, overlap=op)
 \end{Sinput}
 
-You may want to visualize the resulting distribution via
+The resulting distribution can be inspected and visualized by
 \begin{Sinput}
-plot(dist$dist)
+plot(dist\$dist)
 \end{Sinput}
 
 In order to test for an enrichment of motif hits
-in a given DNA sequence invoke
+in a given DNA sequence use
 \begin{Sinput}
-> p_value <- comp.pois.test(seqlen=150, numofseqs=100, maxhits=50, maxclumpsize=20)
+> seqlen=rep(150,100)
+> pvalue <- comp.pois.test(seqlen, maxhits=50, maxclumpsize=20)
 \end{Sinput}
-In the this example the compound Poisson approximation is computed for 
-100 sequences each of length 150bp with a maximal number of hits of 50
-and a maximal clump size of 20.
+or
+\begin{Sinput}
+> seqlen=rep(150,100)
+> pvalue <- comp.pois.singlestranded.test(seqlen, maxhits=50, maxclumpsize=20)
+\end{Sinput}
 \end{document}

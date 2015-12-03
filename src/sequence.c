@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <R.h>
 #include "sequence.h"
 #include "matrix.h"
 
@@ -120,6 +121,7 @@ int getComplementFromIndex(int i) {
   return r;
 }
 
+#ifdef WK
 void writeSequenceBinary(FILE *f, Sequence *s, int dhs) {
   int i=0;
   //int dhs=DHSSIZE;
@@ -143,31 +145,67 @@ int getSequenceFromBinary(FILE *f,Sequence *s) {
   }
   return 0;
 }
+#endif
 
 int getSequence(FILE *f, Sequence *s) {
-  char dig;
   int writeseq=0, writeheader=0, i=0;
+  int iseq=-1, ipos=0;
+  int lmax=0;
+  char *buffer;
   double ret=0;
-  while((dig=fgetc(f))!=EOF) {
-    if (dig=='>') {
-      s->numseq++;
-      writeheader=1;
-      i=0;
+
+  for (i=0; i< s->nseq; i++) {
+    if (lmax<s->lseq[i]) {
+      lmax=s->lseq[i];
     }
-    if (writeseq==1 && dig=='\n') writeseq=0;
-    if (writeheader==1 && dig=='\n') {
-      writeheader=0;
-      writeseq=1;
-      i=0;
-      continue;
-    }
-    if (writeseq==1) {
-      s->seq[s->numseq-1][i++]=dig;
+      //Rprintf("seq-%d: %d\n",i,s->lseq[i]);
+  }
+  buffer=Calloc(lmax+1, char);
+
+  while(fgets(buffer, sizeof(buffer), f)!=NULL) {
+    for (i=0; i<strlen(buffer); i++) {
+      if (buffer[i]=='>') {
+        iseq++;
+        if (s->lseq[iseq]>0) {
+          writeheader=1;
+				}  else {
+					writeheader=0;
+				}
+        writeseq=0;
+      }
+      if (writeheader==1 && buffer[i]=='\n') { writeheader=0; writeseq=1; ipos=0; break; }
+      //if (writeheader==1 && buffer[i]=='\n' && s->lseq[iseq]<=0) { writeheader=0; writeseq=0; ipos=0; break; }
+
+      if (writeseq==1 && buffer[i]=='\n') break;
+      if (writeseq==1 && isNucleotide(buffer[i])==1) {
+      	s->seq[iseq][ipos++]=buffer[i];
+			}
     }
   }
 
   return ret;
 }
+
+void allocSequence(Sequence *seq, int nseq, int *lseq) {
+	int i;
+  seq->seq=Calloc(nseq, char*);
+  seq->lseq=Calloc(nseq, int);
+  for (i=0; i<nseq; i++) {
+  	seq->seq[i]=Calloc(lseq[i]+1,char);
+  	seq->lseq[i]=lseq[i];
+	}
+	seq->nseq=nseq;
+}
+
+void destroySequence(Sequence *seq) {
+	int i;
+  for (i=0; i<seq->nseq; i++) {
+  	Free(seq->seq[i]);
+	}
+ 	Free(seq->lseq);
+ 	Free(seq->seq);
+}
+
 
 int skipAssignment(char *ass, int len) {
   int i;
