@@ -62,7 +62,7 @@ dev.off()
 # 434 was determined as the 0.01 significance threshold
 # for order 3
 # r=434:529
-sum(abs(result[[2]][r]-simres[[2]][r]))/sum(abs(result[[2]][r]))
+sum(result[[2]][r]-simres[[2]][r])/sum(result[[2]][r])
 
 #sample counts
 sc=sim.counts(seqlen, numofseqs, maxhits, 10000)
