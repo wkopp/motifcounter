@@ -12,11 +12,7 @@ int writeMatrix(FILE *f, DMatrix *m) {
 
 void deleteMatrix(DMatrix *m) {
   if (m->data!=NULL) {
-  #ifdef IN_R
     Free(m->data);
-    #else
-    free(m->data);
-    #endif
     m->data=NULL;
   }
 }
@@ -27,11 +23,10 @@ int readMatrix(FILE *f,DMatrix *m) {
   if (ret<1) return -1;
   ret=fread(&m->ncol,sizeof(int),1,f);
   if (ret<1) return -1;
-  #ifdef IN_R
   m->data=Calloc(m->nrow*m->ncol, double);
-  #else
-  m->data=calloc(m->nrow*m->ncol, sizeof(double));
-  #endif
+  if(m->data==NULL) {
+  	error("Memory-allocation in readMatrix failed");
+	}
   ret=fread(m->data,sizeof(double),(m->nrow)*(m->ncol),f);
   if (ret<(m->nrow)*(m->ncol)) return -1;
   return 0;

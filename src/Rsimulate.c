@@ -77,10 +77,13 @@ void RsimulateCountDistribution( double *distribution, int* perm,
 		}
 	}
   seq=Calloc(seqlen+1,char);
-  //for(n=0; n<Nperm; n++) {
-   // seq[n]=Calloc(seqlen, char);
-  //}
+  if (seq==NULL) {
+  	error("Memory-allocation in RsimulateCountDistribution failed");
+	}
   _nh=Calloc(Nperm,int);
+  if (_nh==NULL) {
+  	error("Memory-allocation in RsimulateCountDistribution failed");
+	}
 
   for (n=0; n<Nperm; n++) {
     _nh[n]=0;
@@ -129,24 +132,21 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
   seqlen=slen[0];
   Nperm=perm[0];
 
-   dx=Rgran;
-   Rprintf("len=%d, perm=%d, gran=%e\n", seqlen, Nperm, dx);
+  dx=Rgran;
+  Rprintf("len=%d, perm=%d, gran=%e\n", seqlen, Nperm, dx);
 
-    seq=Calloc(seqlen+1, char);
-    if(seq==NULL) {
-    	error("Allocation for sequence failed");
-    }
+  seq=Calloc(seqlen+1, char);
+  if(seq==NULL) {
+   	error("Allocation for sequence failed");
+  }
 
-    initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
+  initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
 
-    loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
-    loadIntervalSize(&escore, NULL);
+  loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
+  loadIntervalSize(&escore, NULL);
 
-    mins=getTotalScoreLowerBound(&escore);
-    maxs=getTotalScoreUpperBound(&escore);
-        //initScoreMetaInfo(maxs,mins,dx, &alterbf.meta);
-        //initScoreMetaInfo(maxs,mins,dx, &nullbf.meta);
-   // Rprintf("range=%d\n",maxs-mins+1);
+  mins=getTotalScoreLowerBound(&escore);
+  maxs=getTotalScoreUpperBound(&escore);
 
   initExtremalScore(&fescore, dx, Rpwm->nrow, Rorder);
   initExtremalScore(&rescore, dx, Rcpwm->nrow, Rorder);
@@ -164,8 +164,6 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
   mins=(fmins>rmins) ? fmins : rmins;
 
     for (n=0; n<Nperm; n++) {
-//      Rprintf("iteration %d\n",n);
-	//error("until here");
       generateRandomSequence(RstationForSampling, RtransForSampling, seq, seqlen, RorderForSampling);
       scoreOccurances(Rstation, Rtrans, Rpwm, seq, seqlen, distribution, dx, mins,Rorder);
     }

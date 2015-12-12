@@ -14,20 +14,13 @@
 #include "score1d.h"
 
 char sampleNucleotide(double *prob) {
-#ifndef IN_R
-  int ip=rand();
-#else
   double ip=unif_rand();
-#endif
   double p;
   double cumprob=0.0;
   char n;
   int i;
 
   p=(double)(ip);
-  #ifndef IN_R
-  p/=(double)RAND_MAX;
-  #endif
   for (i=0; i<ALPHABETSIZE; i++) {
     cumprob+=prob[i];
     if(p<=cumprob) {
@@ -42,19 +35,12 @@ char sampleNucleotide(double *prob) {
 }
 
 void sampleInitialNucleotide(double *prob, char *seq, int order) {
-#ifndef IN_R
-  int ip=rand();
-#else
   double ip=unif_rand();
-#endif
   double p;
   double cumprob=0.0;
   int i, ass[order];
 
   p=(double)(ip);
-  #ifndef IN_R
-  p/=(double)RAND_MAX;
-  #endif
   for (i=0; i<power(ALPHABETSIZE, order); i++) {
     cumprob+=prob[i];
     if(p<=cumprob) {

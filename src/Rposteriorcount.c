@@ -56,16 +56,15 @@ void RPosteriorProbability(double *alpha, double *beta,
 
   delta=Calloc(Rpwm->nrow,double);
   deltap=Calloc(Rpwm->nrow,double);
-  if (!delta||!deltap) error("failed to allocate betas");
+  if (!delta||!deltap) error("failed to allocate delta");
 
   computeDeltas(delta, deltap, beta, beta3p,beta5p,Rpwm->nrow);
 
   // correct bias
-  #ifdef IN_R
   extra=Calloc(3*Rpwm->nrow+1, double);
-  #else
-  extra=calloc(3*Rpwm->nrow+1, sizeof(double));
-  #endif
+  if (extra==NULL) {
+  	error("Memory-allocation in RPosteriorProbability failed");
+	}
   extra[0]=alpha[0];
   a0=alpha[0];
   for (i=0; i<Rpwm->nrow; i++) {
@@ -76,7 +75,6 @@ void RPosteriorProbability(double *alpha, double *beta,
 
   cgmin(1, &a0, &aN, &res, minmc, dmc, &fail, abstol, intol,
        (void*)extra, type, trace, &fncount, &gncount, 100);
-  //Rprintf("alpha=%e alpha'=%e\n",a0,aN);
 
   Free(extra);
   removeDist();
@@ -88,11 +86,17 @@ void RPosteriorProbability(double *alpha, double *beta,
   computePosteriorProbability(&prob);
 
   prior=Calloc(maxsinglehits+1, double);
+  if (prior==NULL) {
+  	error("Memory-allocation in RPosteriorProbability failed");
+	}
   for (i=0; i<=maxsinglehits; i++) {
     prior[i]=1.0;
 	}
 
   singlehitdistribution=Calloc(maxsinglehits+1, double);
+  if (singlehitdistribution==NULL) {
+  	error("Memory-allocation in RPosteriorProbability failed");
+	}
 
 #ifdef DEBUG
     Rprintf("omega=%e, alpha=%e\n", prob.omega, prob.alpha);
@@ -126,17 +130,10 @@ void RPosteriorProbability(double *alpha, double *beta,
     }
 
     deletePosteriorProbability(&prob);
-    #ifdef IN_R
     Free(singlehitdistribution);
     Free(delta);
     Free(deltap);
     Free(prior);
-    #else
-    free(singlehitdistribution);
-    free(delta);
-    free(deltap);
-    free(prior);
-    #endif
 
     return;
 }

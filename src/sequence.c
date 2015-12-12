@@ -121,32 +121,6 @@ int getComplementFromIndex(int i) {
   return r;
 }
 
-#ifdef WK
-void writeSequenceBinary(FILE *f, Sequence *s, int dhs) {
-  int i=0;
-  //int dhs=DHSSIZE;
-  fwrite(&s->numseq,sizeof(int),1,f);
-  fwrite(&dhs,sizeof(int),1,f);
-  for (i=0; i<s->numseq;i++) {
-    fwrite(&s->seq[i][0], sizeof(char),dhs, f);
-  }
-}
-
-int getSequenceFromBinary(FILE *f,Sequence *s) {
-  int ret=0,dhs, i;
-  ret=fread(&s->numseq,sizeof(int),1,f);
-  if (ret<1) return -1;
-  ret=fread(&dhs,sizeof(int),1,f);
-  if (ret<1) return -1;
-  //m->data=malloc(sizeof(double)*m->nrow*m->ncol);
-  for (i=0; i<s->numseq; i++) {
-    ret=fread(&s->seq[i][0],sizeof(char),dhs,f);
-    if (ret<dhs) return -1;
-  }
-  return 0;
-}
-#endif
-
 int getSequence(FILE *f, Sequence *s) {
   int writeseq=0, writeheader=0, i=0;
   int iseq=-1, ipos=0;
@@ -158,9 +132,11 @@ int getSequence(FILE *f, Sequence *s) {
     if (lmax<s->lseq[i]) {
       lmax=s->lseq[i];
     }
-      //Rprintf("seq-%d: %d\n",i,s->lseq[i]);
   }
   buffer=Calloc(lmax+1, char);
+  if(buffer==NULL) {
+  	error("Memory-allocation in getSequence failed");
+	}
 
   while(fgets(buffer, sizeof(buffer), f)!=NULL) {
     for (i=0; i<strlen(buffer); i++) {
@@ -174,7 +150,6 @@ int getSequence(FILE *f, Sequence *s) {
         writeseq=0;
       }
       if (writeheader==1 && buffer[i]=='\n') { writeheader=0; writeseq=1; ipos=0; break; }
-      //if (writeheader==1 && buffer[i]=='\n' && s->lseq[iseq]<=0) { writeheader=0; writeseq=0; ipos=0; break; }
 
       if (writeseq==1 && buffer[i]=='\n') break;
       if (writeseq==1 && isNucleotide(buffer[i])==1) {
@@ -182,6 +157,7 @@ int getSequence(FILE *f, Sequence *s) {
 			}
     }
   }
+  Free(buffer);
 
   return ret;
 }
@@ -190,8 +166,14 @@ void allocSequence(Sequence *seq, int nseq, int *lseq) {
 	int i;
   seq->seq=Calloc(nseq, char*);
   seq->lseq=Calloc(nseq, int);
+  if (seq->seq==NULL||seq->lseq==NULL) {
+  	error("Memory-allocation in allocSequence failed");
+	}
   for (i=0; i<nseq; i++) {
   	seq->seq[i]=Calloc(lseq[i]+1,char);
+    if (seq->seq[i]==NULL) {
+  	  error("Memory-allocation in allocSequence failed");
+	  }
   	seq->lseq[i]=lseq[i];
 	}
 	seq->nseq=nseq;
@@ -220,10 +202,8 @@ void getAssignmentFromIndex(int index, int length, int *ret) {
   int i;
 
   for (i=0; i<length; i++) {
-   // if (rest <powl(ALPHABETSIZE,length-1-i)) {
-      ret[i]=rest/power(ALPHABETSIZE,length-1-i);
-      rest-=ret[i]*power(ALPHABETSIZE,length-1-i);
-  //  }
+    ret[i]=rest/power(ALPHABETSIZE,length-1-i);
+    rest-=ret[i]*power(ALPHABETSIZE,length-1-i);
   }
   return;
 }

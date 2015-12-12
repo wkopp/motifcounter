@@ -23,11 +23,7 @@ void computeDeltas(double *delta, double *deltap,
       deltap[k]-=(beta[i] + beta5p[i]);
     }
     #ifdef DEBUG
-    #ifdef IN_R
     Rprintf("d%d=%f, d%d'=%f\n",k,delta[k],k,deltap[k]);
-    #else
-    printf("d%d=%f, d%d'=%f\n",k,delta[k],k,deltap[k]);
-    #endif
     #endif
   }
 }
@@ -56,15 +52,9 @@ void computeBetas(double *beta, double *beta3p, double *beta5p,
     }
   }
   #ifdef DEBUG
-  #ifdef IN_R
   for (k=0; k<mlen;k++) Rprintf("beta%d=%f\n",k,beta[k]);
   for (k=0; k<mlen;k++) Rprintf("beta3p%d=%f\n",k,beta3p[k]);
   for (k=0; k<mlen;k++) Rprintf("beta5p%d=%f\n",k,beta5p[k]);
-  #else
-  for (k=0; k<mlen;k++) printf("beta%d=%f\n",k,beta[k]);
-  for (k=0; k<mlen;k++) printf("beta3p%d=%f\n",k,beta3p[k]);
-  for (k=0; k<mlen;k++) printf("beta5p%d=%f\n",k,beta5p[k]);
-  #endif
   #endif
 }
 
@@ -90,15 +80,9 @@ void computeBetasSingleStranded(double *beta, double *beta3p, double *beta5p,
     }
   }
   #ifdef DEBUG
-  #ifdef IN_R
   for (k=0; k<mlen;k++) Rprintf("beta%d=%f\n",k,beta[k]);
   for (k=0; k<mlen;k++) Rprintf("beta3p%d=%f\n",k,beta3p[k]);
   for (k=0; k<mlen;k++) Rprintf("beta5p%d=%f\n",k,beta5p[k]);
-  #else
-  for (k=0; k<mlen;k++) printf("beta%d=%f\n",k,beta[k]);
-  for (k=0; k<mlen;k++) printf("beta3p%d=%f\n",k,beta3p[k]);
-  for (k=0; k<mlen;k++) printf("beta5p%d=%f\n",k,beta5p[k]);
-  #endif
   #endif
 }
 

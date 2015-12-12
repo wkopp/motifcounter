@@ -10,11 +10,15 @@ read.motif=function(pwmfile, format, pseudocount=0.01) {
 }
 
 matrix2motif=function(data) {
-  if (is.matrix(data) && all(apply(data,2,sum)==rep(1,ncol(data)))) {
-    dummy=.C("Rloadmotif", as.numeric(data), nrow(data), ncol(data))
-  } else {
-    warning("provided data must be a 4xM matrix, with the columns summing to 1.")
-  }
+	if (!is.matrix(data)) {
+		stop("data must be a matrix")
+	}
+	data=data/apply(data,2,sum)
+  dummy=.C("Rloadmotif", as.numeric(data), nrow(data), ncol(data))
+  #if (is.matrix(data) && all(apply(data,2,sum)==rep(1,ncol(data)))) {
+  #} else {
+  #  warning("provided data must be a 4xM matrix, with the columns summing to 1.")
+  #}
 }
 
 delete.motif=function() {

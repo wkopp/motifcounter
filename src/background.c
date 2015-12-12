@@ -47,16 +47,15 @@ int getStationaryDistribution(double *trans, double *station, int order) {
   int nextindex, previndex;
 
   if (order <1) {
-  #ifdef IN_R
     error("no stationary distribution needed");
-  #else
-    fprintf(stderr, "no stationary distribution needed");
-  #endif
     return 1;
   }
 
   tmp1=Calloc(power(ALPHABETSIZE, order), double);
   tmp2=Calloc(power(ALPHABETSIZE, order), double);
+  if (tmp1==NULL||tmp2==NULL) {
+  	error("Memory-allocation in getStationaryDistribution failed");
+	}
   tmpres=tmp1;
   tmpstart=tmp2;
 
@@ -125,40 +124,29 @@ void writeBackground(FILE *f, double * station, double * trans, int order) {
 }
 
 void deleteBackground(double * station, double *trans) {
-#ifdef IN_R
   Free(station);
   if (trans!=NULL) {
     Free(trans);
   }
-  #else
-  free(station);
-  if (trans!=NULL) {
-    free(trans);
-  }
-  #endif
 }
 
 void readBackground (FILE *f, double **station, double **trans, int *order) {
   fread(order, sizeof(int),1, f);
 
   if (*order>0) {
-  #ifdef IN_R
     *station=Calloc(power(ALPHABETSIZE, *order), double);
     *trans=Calloc(power(ALPHABETSIZE, *order+1), double);
-    #else
-    *station=calloc(power(ALPHABETSIZE, *order), sizeof(double));
-    *trans=calloc(power(ALPHABETSIZE, *order+1), sizeof(double));
-    #endif
+    if (*station==NULL||*trans==NULL) {
+  	  error("Memory-allocation in readBackground failed");
+	  }
     fread(*station, sizeof(double),power(ALPHABETSIZE, *order),f );
     fread(*trans, sizeof(double),power(ALPHABETSIZE, *order+1),f );
   } else {
-  #ifdef IN_R
     *station=Calloc(ALPHABETSIZE, double);
     *trans=Calloc(ALPHABETSIZE, double);
-    #else
-    *station=calloc(ALPHABETSIZE, sizeof(double));
-    *trans=calloc(ALPHABETSIZE, sizeof(double));
-    #endif
+    if (*station==NULL||*trans==NULL) {
+  	  error("Memory-allocation in readBackground failed");
+	  }
     fread(*station, sizeof(double),ALPHABETSIZE,f );
     memcpy(*trans, *station, sizeof(double)*ALPHABETSIZE);
   }

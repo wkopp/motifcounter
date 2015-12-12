@@ -31,50 +31,21 @@ int allocPosteriorProbability(PosteriorCount *p, int seqlen, int mlen, int maxhi
   p->seqlen=seqlen;
   p->mlen=mlen;
   p->maxhits=maxhits;
-  #ifdef IN_R
-  Rprintf("slen=%d, mlen=%d, maxhit=%d\n", p->seqlen, p->mlen, p->maxhits);
   p->value=Calloc(maxhits, double**);
-  #else
-  p->value=calloc(maxhits, sizeof(double**));
-  #endif
+  if (p->value==NULL) {
+  	error("Memory-allocation in allocPosteriorProbability failed");
+	}
 
-  //p->alpha=Calloc(seqlen,double);
-  //p->omega=Calloc(seqlen,double);
-
-  if (!p->value) { 
-  #ifdef IN_R
-    error( "allocPosteriorProbability: error with value calloc\n");
-    #else
-    fprintf(stderr, "allocPosteriorProbability: error with value calloc\n");
-    #endif
-    return 1;
-  }
   for (i=0; i<maxhits; i++) {
-  #ifdef IN_R
     p->value[i]=Calloc(seqlen, double*);
-    #else
-    p->value[i]=calloc(seqlen, sizeof(double*));
-    #endif
     if (!p->value[i]) { 
-    #ifdef IN_R
-      error("allocPosteriorProbability: error with calloc\n");
-      #else
-      fprintf(stderr, "allocPosteriorProbability: error with calloc\n");
-      #endif
+  	  error("Memory-allocation in allocPosteriorProbability failed");
       return 1;
     }
     for (j=0; j<seqlen; j++) {
-    #ifdef IN_R
       p->value[i][j]=Calloc(2*mlen, double);
-      #else
-      p->value[i][j]=calloc(2*mlen, sizeof(double));
-      #endif
       if (!p->value[i][j]) {
-      #ifdef IN_R
-        error("allocPosteriorProbability: error with calloc\n");
-        #else
-        fprintf(stderr, "allocPosteriorProbability: error with calloc\n");
-        #endif
+  	    error("Memory-allocation in allocPosteriorProbability failed");
         return 1;
       }
     }
@@ -82,21 +53,12 @@ int allocPosteriorProbability(PosteriorCount *p, int seqlen, int mlen, int maxhi
   return 0;
 }
 void deletePosteriorProbability(PosteriorCount *p) {
-#ifdef IN_R
   int i, j;
   for (i=0; i<p->maxhits; i++) {
     for (j=0; j<p->seqlen; j++) Free(p->value[i][j]);
     Free(p->value[i]);
   }
   Free(p->value);
-  #else
-  int i, j;
-  for (i=0; i<p->maxhits; i++) {
-    for (j=0; j<p->seqlen; j++) free(p->value[i][j]);
-    free(p->value[i]);
-  }
-  free(p->value);
-  #endif
 }
 
 double addomegas(double *omega, int start, int end) {
@@ -160,7 +122,7 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
 
 		cgmin(1, &a0, &aN, &res, minmc, dmc, &fail, abstol, intol,
 				(void*)extra, type, trace, &fncount, &gncount, 100);
-		Rprintf("alpha=%e alpha'=%e\n",alpha,aN);
+	//	Rprintf("alpha=%e alpha'=%e\n",alpha,aN);
 
 		_alpha[i]=aN;
 		a0=aN;
@@ -213,17 +175,10 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
 
   //#define DEBUG
     #ifdef DEBUG
-    #ifndef IN_R
-    for (i=0; i<2*p->mlen; i++) {
-      printf( "%1.2e\t",p->value[0][j][i]);
-    }
-    printf( "\n");
-    #else
     for (i=0; i<2*p->mlen; i++) {
       Rprintf( "%1.2e\t",p->value[0][j][i]);
     }
     Rprintf( "\n");
-    #endif
     #endif
   }
   Free(_alpha);
@@ -404,12 +359,6 @@ void finishPosteriorProbability(PosteriorCount *prob, double *final, int nhits) 
   for (m=1; m<prob->mlen; m++) {
     final[nhits]+=prob->value[nhits-1][prob->seqlen-1][prob->mlen+m]*(prob->deltap[prob->mlen-m-1]);
   }
-#ifdef WK
-	for (m=0; m<prob->mlen; m++) {
-		final[nhits]+=prob->value[nhits-1][prob->seqlen-1][m]*(prob->delta[prob->mlen-m]);
-		final[nhits]+=prob->value[nhits-1][prob->seqlen-1][prob->mlen+m]*(prob->deltap[prob->mlen-m]);
-	}
-#endif
 }
 
 #undef DEBUG
@@ -448,11 +397,10 @@ void computeResultRecursive(double ** part, int nos, int klen) {
 #ifdef DEBUG
   Rprintf("merge l1=%d l2=%d\n", l1, l2);
   #endif
-  #ifdef IN_R
   part[nos-1]=Calloc(klen+1, double);
-  #else
-  part[nos-1]=calloc(klen+1, sizeof(double));
-  #endif
+  if (part[nos-1]==NULL)  {
+  	error("Memory-allocation in computeResultRecursive failed");
+	}
   convolute(part[nos-1], part[l1-1], part[l2-1], klen);
   #ifdef DEBUG
   for (i=0, sum=0.0;i<=klen; i++) {
@@ -468,13 +416,11 @@ void multipleShortSequenceProbability(double *simple, double *aggregated,
   double sum;
   double **part_results;
 
-#ifdef IN_R
   part_results=Calloc(numofseqs, double*);
   part_results[0]=Calloc(maxagghits+1, double);
-  #else
-  part_results=calloc(numofseqs, sizeof(double*));
-  part_results[0]=calloc(maxagghits+1, sizeof(double));
-  #endif
+  if (part_results==NULL||part_results[0]) {
+  	error("Memory-allocation in multipleShortSequenceProbability failed");
+	}
   memcpy(part_results[0],simple, (maxagghits+1)*sizeof(double));
 
   computeResultRecursive(part_results, numofseqs, maxagghits);
@@ -488,16 +434,9 @@ void multipleShortSequenceProbability(double *simple, double *aggregated,
   #ifdef DEBUG
   Rprintf("P[%d]=%1.3e\n ",numofseqs, sum);
   #endif
-  #ifdef IN_R
   for (i=0; i<numofseqs; i++) {
     if (part_results[i]) Free(part_results[i]);
   }
   Free(part_results);
-  #else
-  for (i=0; i<numofseqs; i++) {
-    if (part_results[i]) free(part_results[i]);
-  }
-  free(part_results);
-  #endif
 }
 

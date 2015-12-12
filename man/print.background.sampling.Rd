@@ -3,6 +3,7 @@
 \title{Prints the current background model for sampling}
 \description{
 This function prints the currently loaded background model.
+It is only used for sampling, but not for the analytic models.
 }
 \usage{
 print.background.sampling()

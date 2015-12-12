@@ -10,10 +10,10 @@ a PWM is enriched in a single stranded sequence of interest.
 comp.pois.singlestranded.test(obs, overlap, maxhits, maxclumpsize=20)
 }
 \arguments{
-\item{obs}{Is a list containing obs$seqlen, obs$numofseqs and obs$numofhits
-which correspond to the length of each sequence fragment of interest, 
-the number of sequence and the number of hits on the forward and reverse strand.
-obs is returned by the function num.motifhits.}
+\item{obs}{Is a list containing obs$nseq, obs$lseq and obs$numofhits
+which correspond to the number of sequences to be scanned,
+the length of each individual sequence and
+the number of identified hits, respectively.}
 
 \item{overlap}{Is a list that contains the overlap probabilities for the 
 motif. It is computed by overlap.prob(). }

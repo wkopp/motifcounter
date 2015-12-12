@@ -39,5 +39,6 @@ op=overlap.prob()
 # Computes the distribution of the number of motif hits
 seqlen=rep(150,100)
 dist=comp.pois.pape(seqlen, maxhits=1000,maxclumpsize=30, op)
+plot(0:maxhits, dist$dist)
 }
 

@@ -80,11 +80,10 @@ void storeScoreDist1d (FILE *f, MotifScore1d *s, int withhead) {
 
 
 void initScore1d(Score1d *s, int l) {
-#ifdef IN_R
   s->y=Calloc(l, double);
-  #else
-  s->y=calloc(l, sizeof(double));
-  #endif
+  if (s->y==NULL) {
+  	error("Memory-allocation in initScore1d failed");
+	}
   s->end=0;
   s->merged=0;
   s->start=l;
@@ -96,13 +95,11 @@ int initScoreDistribution1d (DMatrix *theta, double *bg1, MotifScore1d *result, 
   initScore1d(&result->totalScore, result->meta.xmax-result->meta.xmin+1);
 
   result->mlen=theta->nrow;
-  #ifdef IN_R
   result->ScoreBuffer1=Calloc(power(ALPHABETSIZE, order)*theta->nrow, Score1d);
   result->tmpScore=Calloc(power(ALPHABETSIZE, order+1), Score1d);
-  #else
-  result->ScoreBuffer1=calloc(power(ALPHABETSIZE, order)*theta->nrow, sizeof(Score1d));
-  result->tmpScore=calloc(power(ALPHABETSIZE, order+1), sizeof(Score1d));
-  #endif
+  if (result->ScoreBuffer1==NULL||result->tmpScore==NULL) {
+  	error("Memory-allocation in initScoreDistribution1d failed");
+	}
 
   for (i=0; i < power(ALPHABETSIZE, order)*theta->nrow; i++) {
     initScore1d(&result->ScoreBuffer1[i], result->meta.length);
@@ -117,7 +114,6 @@ int initScoreDistribution1d (DMatrix *theta, double *bg1, MotifScore1d *result, 
 int deleteScoreDistribution1d(MotifScore1d *m, int order) {
   int j;
 
-#ifdef IN_R
   for (j=0; j < power(ALPHABETSIZE, order)*m->mlen; j++) {
     Free(m->ScoreBuffer1[j].y);
   }
@@ -129,19 +125,6 @@ int deleteScoreDistribution1d(MotifScore1d *m, int order) {
   Free(m->tmpScore);
 
   Free(m->totalScore.y);
-  #else
-  for (j=0; j < power(ALPHABETSIZE, order)*m->mlen; j++) {
-    free(m->ScoreBuffer1[j].y);
-  }
-  for (j=0; j < power(ALPHABETSIZE, order+1); j++) {
-    free(m->tmpScore[j].y);
-  }
-
-  free(m->ScoreBuffer1);
-  free(m->tmpScore);
-
-  free(m->totalScore.y);
-  #endif
   return 0;
 }
 
@@ -344,11 +327,7 @@ int computeScoreDistribution1d(DMatrix *pwm, double *trans,
   int score[power(ALPHABETSIZE, order+1)];
 
   if (order > pwm->nrow) {
-    #ifdef IN_R
     error("Background order cannot be longer than the motif.\n");
-    #else
-    fprintf(stderr, "Background order cannot be longer than the motif.\n");
-    #endif
     return 1;
   }
   corder=((order==0) ? (order+1) : order);
@@ -430,11 +409,7 @@ int computeMarginalScoreDistribution1dBruteForce(DMatrix *pwm, double *trans,
   if (corder==0) corder++;
 
   if (order > pwm->nrow) {
-    #ifdef IN_R
     error("Background order cannot be longer than the motif.\n");
-    #else
-    fprintf(stderr, "Background order cannot be longer than the motif.\n");
-    #endif
     return 1;
   }
   getScoresInitialIndex(pwm->data,station, score, &mscore->meta.dx, order);

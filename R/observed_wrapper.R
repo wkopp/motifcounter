@@ -17,7 +17,7 @@ num.motifhits=function(seqfile) {
   noh=integer(1)
   res=.C("RnumberOfHits",as.character(seqfile),as.integer(noh),
     as.integer(nseq), as.integer(lseq))
-    return (list(seqlen=res[[3]], lseq=lseq,
+    return (list(nseq=nseq, lseq=lseq,
       numofhits=res[[2]]))
 }
 
@@ -27,7 +27,7 @@ num.motifhits.singlestranded=function(seqfile) {
   noh=integer(1)
   res=.C("RnumberOfHitsSingleStranded",as.character(seqfile),as.integer(noh),
     as.integer(nseq), as.integer(lseq))
-    return (list(seqlen=res[[3]], lseq=lseq,
+    return (list(nseq=nseq, lseq=lseq,
       numofhits=res[[2]]))
 }
 

@@ -25,24 +25,16 @@ double computePoissonParameter(int seqlen, int mlen,
     ec+=(theta[i*DSTRANDED] + theta[i*DSTRANDED+1])*(double)(i+1);
   }
 //  ec=2.15;
-  Rprintf("slen=%d, mlen=%d, alpha=%e, ec=%e, lambda=%e\n", seqlen,mlen,alpha,ec, ((double)2*(seqlen-mlen+1)*(alpha))/(ec));
+  //Rprintf("slen=%d, mlen=%d, alpha=%e, ec=%e, lambda=%e\n", seqlen,mlen,alpha,ec, ((double)2*(seqlen-mlen+1)*(alpha))/(ec));
   return ((double)2*(seqlen-mlen+1)*(alpha))/(ec);
 }
 
 double *initTheta(int maxclump) {
-#ifdef IN_R
   return Calloc(maxclump*DSTRANDED, double);
-  #else
-  return calloc(maxclump*DSTRANDED, sizeof(double));
-  #endif
 }
 
 void deleteTheta(double *theta) {
-  #ifdef IN_R
   Free(theta);
-  #else
-  free(theta);
-  #endif
 }
 
 void computeInitialClump(double *theta, double *gamma, int mlen) {
@@ -70,11 +62,7 @@ void computeExtentionFactorsPape(double *xi, double *gamma, int mlen) {
       xik*=(1-gamma[j])*(1-gamma[mlen+j]);
     }
     #ifdef DEBUG
-    #ifdef IN_R
     Rprintf( "xi%d=%f\n", k, xik);
-    #else
-    printf( "xi%d=%f\n", k, xik);
-    #endif
     #endif
     xi[0]+=xik;
   }
@@ -93,11 +81,7 @@ void computeExtentionFactorsPape(double *xi, double *gamma, int mlen) {
       xik*=(1-gamma[j])*(1-gamma[mlen*2+j]);
     }
     #ifdef DEBUG
-    #ifdef IN_R
     Rprintf( "xi%d'=%f\n", k, xik);
-    #else
-    printf( "xi%d'=%f\n", k, xik);
-    #endif
     #endif
     xi[1]+=xik;
   }
@@ -113,20 +97,12 @@ void computeExtentionFactorsPape(double *xi, double *gamma, int mlen) {
       xik*=(1-gamma[j])*(1-gamma[mlen+j]);
     }
     #ifdef DEBUG
-    #ifdef IN_R
     Rprintf ("xi%d,5'=%f\n", k,xik);
-    #else
-    printf ("xi%d,5'=%f\n", k,xik);
-    #endif
     #endif
     xi[2]+=xik;
   }
   #ifdef DEBUG
-  #ifdef IN_R
   Rprintf("Extention factors: xi=%e, xi3'=%e, xi5'=%e\n",xi[0],xi[1],xi[2]);
-  #else
-  printf("Extention factors: xi=%e, xi3'=%e, xi5'=%e\n",xi[0],xi[1],xi[2]);
-  #endif
   #endif
 }
 
@@ -137,11 +113,7 @@ void computeCompoundPoissonDistribution(double lambda,
   double normalize=0.0;
 
   #ifdef DEBUG
-  #ifdef IN_R
   Rprintf( "lambda=%f\n",lambda);
-  #else
-  printf( "lambda=%f\n",lambda);
-  #endif
   #endif
   cp[0]=exp(-lambda);
 
@@ -182,11 +154,7 @@ void computeExtentionFactorsKopp(double *xi,
   xi[1]*=deltap[mlen-1]/(delta[mlen-1]+EPSILON);
   xi[2]*=(delta[mlen-1]+EPSILON)/deltap[mlen-1];
   #ifdef DEBUG
-  #ifdef IN_R
   Rprintf("Extention factors: xi=%e, xi3'=%e, xi5'=%e\n",xi[0],xi[1],xi[2]);
-  #else
-  printf("Extention factors: xi=%e, xi3'=%e, xi5'=%e\n",xi[0],xi[1],xi[2]);
-  #endif
   #endif
 
 }
@@ -207,13 +175,8 @@ void computeTheta(int maxclump, double *theta,
 
     total+=(theta[i*DSTRANDED]+theta[i*DSTRANDED+1]);
     #ifdef DEBUG
-    #ifdef IN_R
   Rprintf("total=%e, theta=%e, theta'=%e\n",total, theta[i*DSTRANDED], 
   theta[i*DSTRANDED+1]);
-  #else
-  printf("total=%e, theta=%e, theta'=%e\n",total, theta[i*DSTRANDED], 
-  theta[i*DSTRANDED+1]);
-  #endif
   #endif
   }
 
@@ -222,13 +185,8 @@ void computeTheta(int maxclump, double *theta,
     theta[i*DSTRANDED+1]/=total;
     //#define DEBUG
     #ifdef DEBUG
-    #ifdef IN_R
     Rprintf( "theta%d=%e, theta%d'=%e\n",i+1,
       theta[i*DSTRANDED], i+1,theta[i*DSTRANDED+1]);
-    #else
-    printf( "theta%d=%e, theta%d'=%e\n",i+1,
-      theta[i*DSTRANDED], i+1,theta[i*DSTRANDED+1]);
-    #endif
     #endif
   }
 }

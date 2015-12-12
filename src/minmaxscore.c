@@ -79,21 +79,16 @@ int whichIsMax(int *v, int N) {
 int initExtremalScore(ExtremalScore *s, double dx, int length, int order) {
   s->dx=dx;
 
-  #ifdef IN_R
   s->maxforward=Calloc((length)*power(ALPHABETSIZE, order), int);
   s->maxbackward=Calloc((length)*power(ALPHABETSIZE, order), int);
   s->minforward=Calloc((length)*power(ALPHABETSIZE, order), int);
   s->minbackward=Calloc((length)*power(ALPHABETSIZE, order), int);
   s->intervalstart=Calloc((length)*power(ALPHABETSIZE, order), int);
   s->intervalend=Calloc((length)*power(ALPHABETSIZE, order), int);
-  #else
-  s->maxforward=calloc((length)*power(ALPHABETSIZE, order), sizeof(int));
-  s->maxbackward=calloc((length)*power(ALPHABETSIZE, order), sizeof(int));
-  s->minforward=calloc((length)*power(ALPHABETSIZE, order), sizeof(int));
-  s->minbackward=calloc((length)*power(ALPHABETSIZE, order), sizeof(int));
-  s->intervalstart=calloc((length)*power(ALPHABETSIZE, order), sizeof(int));
-  s->intervalend=calloc((length)*power(ALPHABETSIZE, order), sizeof(int));
-  #endif
+  if(s->maxforward==NULL||s->maxbackward==NULL||s->minforward==NULL||
+  		s->minbackward==NULL||s->intervalstart==NULL||s->intervalend==NULL) {
+  	error("Memory-allocation in initExtremalScore failed");
+	}
 
   s->len=length;
   s->order=order;
@@ -101,21 +96,12 @@ int initExtremalScore(ExtremalScore *s, double dx, int length, int order) {
 }
 
 int deleteExtremalScore(ExtremalScore *s) {
-#ifdef IN_R
   Free(s->maxforward);
   Free(s->maxbackward);
   Free(s->minforward);
   Free(s->minbackward);
   Free(s->intervalstart);
   Free(s->intervalend);
-  #else
-  free(s->maxforward);
-  free(s->maxbackward);
-  free(s->minforward);
-  free(s->minbackward);
-  free(s->intervalstart);
-  free(s->intervalend);
-  #endif
   return 0;
 }
 
@@ -165,11 +151,7 @@ void extremScoresPerPositionBack(int max, DMatrix *theta, double *trans,
   int k;
 
   if (order>theta->nrow) {
-    #ifdef IN_R
     error("Order is cannot be higher than the motif length!\n");
-    #else
-    fprintf(stderr,"Order is cannot be higher than the motif length!\n");
-    #endif
     return;
   }
   for (m1=0; m1<power(ALPHABETSIZE, order); m1++) {
@@ -197,13 +179,6 @@ void extremScoresPerPositionBack(int max, DMatrix *theta, double *trans,
 }
 
 void printValues(int *v, int len) {
-  #ifndef IN_R
-  int i;
-  for (i=0; i<len; i++) {
-    printf("%d ", v[i]);
-  }
-  printf( "\n");
-  #endif
 }
 
 void maxScoresPerPositionBack(DMatrix *theta, double *trans, 
@@ -231,26 +206,17 @@ void extremScoresPerPositionForward(int max, DMatrix *theta,
   // the results of the function are used to compute the actual memory requirements
   // for the current motif, background, and chosen threshold
    if (order>theta->nrow) {
-     #ifdef IN_R
      error("Background order cannot be longer than the motif.\n");
-     #else
-     fprintf(stderr, "Background order cannot be longer than the motif.\n");
-     #endif
      return;
    }
-   #ifdef IN_R
   if (order>1) {
     s=Calloc(power(ALPHABETSIZE,order), int);
   } else {
     s=Calloc(ALPHABETSIZE, int);
   }
-  #else
-  if (order>1) {
-    s=calloc(power(ALPHABETSIZE,order), sizeof(int));
-  } else {
-    s=calloc(ALPHABETSIZE, sizeof(int));
-  }
-  #endif
+  if(s==NULL) {
+  	error("Memory-allocation in extremScoresPerPositionForward failed");
+	}
 
   getScoresInitialIndex(&theta->data[0], station,s, dx, order );
 
@@ -272,25 +238,17 @@ void extremScoresPerPositionForward(int max, DMatrix *theta,
 
   for (;i<theta->nrow; i++) {
     for (m1=0; m1<power(ALPHABETSIZE, order); m1++) {
-      //getAssignmentFromIndex(m1, order+1, ass);
       index=m1/ALPHABETSIZE;
       index=m1-index*ALPHABETSIZE;
       if (order>0) {
         for (k=0; k<ALPHABETSIZE;k++) {
           s[k]=getScoreIndex(theta->data[ALPHABETSIZE*i+index],
             trans[m1+k*power(ALPHABETSIZE, order)], *dx);
-     //     fprintf(stderr, "%d\n", s[k]);
         }
       } else {
         getScoresIndex(&theta->data[ALPHABETSIZE*i],
           trans,s,dx);
       }
-  //    printValues(s,4);
-      //getScoresIndex(&theta->data[ALPHABETSIZE*i], 
-      //    &trans[m1*ALPHABETSIZE],s, dx);
-
-      //m2=m1*ALPHABETSIZE;
-      //m2-=(m2/power(ALPHABETSIZE, order))*power(ALPHABETSIZE, order);
       m2=m1/ALPHABETSIZE;
       for (k=0; k<ALPHABETSIZE;k++) {
         if (order==0) {
@@ -299,16 +257,10 @@ void extremScoresPerPositionForward(int max, DMatrix *theta,
           s[k]+=extrema[(i-1)*power(ALPHABETSIZE, order)+m2+power(ALPHABETSIZE,order-1)*k];
         }
       }
-     // printValues(s,4);
-     // fprintf(stdout,"\n");
       extrema[i*power(ALPHABETSIZE, order)+m1]=getExtrem(s, ALPHABETSIZE, max);
     }
   }
-  #ifdef IN_R
   Free(s);
-  #else
-  free(s);
-  #endif
 }
 
 void maxScoresPerPositionForward(DMatrix *theta, double *station, double *trans, 
@@ -481,11 +433,7 @@ void printExtremValues(int *e, int len, int order) {
 void loadMinMaxScores(DMatrix *pwm, double *station, double *trans, ExtremalScore *e) {
    int min, max;
    if (e->order>pwm->nrow) {
-     #ifdef IN_R
      error("Background order cannot be longer than the motif.\n");
-     #else
-     fprintf(stderr, "Background order cannot be longer than the motif.\n");
-     #endif
      return;
    }
     minScoresPerPositionForward(pwm,station, trans,e->minforward, &e->dx, e->order);

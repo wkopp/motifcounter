@@ -85,6 +85,9 @@ void markovchain(double *dist, double *a,
   // dist[3+M, ..., 3+M+M-2] ... p(n1'), ..., p(nL')
   //
   post=Calloc(2*Rpwm->nrow+2, double);
+  if(post==NULL) {
+  	error("Memory-allocation in markovchain failed");
+	}
   //prior=calloc(2*Rpwm->nrow+2, sizeof(double));
   prior=dist;
   alphacond=a[0];
@@ -167,21 +170,17 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
   len=(int) extra[3*Rpwm->nrow+1];
 
   if (!Rdist) {
-  #ifdef IN_R
     Rdist=Calloc(2*Rpwm->nrow+2, double);
-    #else
-    Rdist=calloc(2*Rpwm->nrow+2, sizeof(double));
-    #endif
+    if(Rdist==NULL) {
+  	  error("Memory-allocation in dmc failed");
+	  }
   }
 
-//	palpha=exp(log(alphacond[0])+.01);
-//	malpha=exp(log(alphacond[0])-.01);
 	epsilon=alphacond[0]/1000;
 	pa=*alphacond + epsilon;
 	ma=*alphacond - epsilon;
   markovchain(Rdist, &pa, beta, beta3p, beta5p, len);
 
-  // determine the gradient numerically
   val=Rdist[1]+Rdist[2];
   markovchain(Rdist, &ma, beta, beta3p, beta5p, len);
 
@@ -191,35 +190,26 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
   markovchain(Rdist, alphacond, beta, beta3p, beta5p, len);
 
   *gradient=-2*(2*extra[0]-Rdist[1]-Rdist[2])*val;
-//  Rprintf("grad=%e\n",*gradient);
-  //*gradient=val;
 }
 double minmc(int n, double *alpha, void *ex) {
 
   double *extra=(double*)ex;
   double *beta, *beta3p, *beta5p;
   int len;
- // alpha=par[0];
- // alpha_expected=(double)ex[0];
   beta=&extra[1];
   beta3p=&extra[Rpwm->nrow+1];
   beta5p=&extra[2*Rpwm->nrow+1];
   len=(int) extra[3*Rpwm->nrow+1];
 
   if (!Rdist) {
-    #ifdef IN_R
     Rdist=Calloc(2*Rpwm->nrow+2, double);
-    #else
-    Rdist=calloc(2*Rpwm->nrow+2, sizeof(double));
-    #endif
+    if(Rdist==NULL) {
+  	  error("Memory-allocation in minmc failed");
+	  }
   }
 
   markovchain(Rdist, alpha, beta, beta3p, beta5p,len);
 
-  //Rprintf("minmc: alpha_in=%e, alpha_exp=%e\n", alpha[0], extra[0]);
-  //Rprintf("Diff=%e, d^2=%e\n", 2*extra[0]-Rdist[1]-Rdist[2],
-//  Rprintf("alpha=%e, alpha'=%e, target=%e\n",2*extra[0], Rdist[1]+Rdist[2],
-//  		R_pow_di(extra[0]-Rdist[1], 2));
   return R_pow_di(2*extra[0]-Rdist[1]-Rdist[2], 2);
 }
 
@@ -233,7 +223,6 @@ SEXP getMarkovProb(SEXP niter,
 	int nrow;
   SEXP retMatrix;
 
-  //alpha = PROTECT(REAL(alpha));
   _niter=INTEGER(niter)[0];
   _alpha=REAL(alpha)[0];
   beta = PROTECT(coerceVector(beta,REALSXP));
@@ -251,6 +240,9 @@ SEXP getMarkovProb(SEXP niter,
 
 	if (!Rdist) {
 		Rdist=Calloc(nrow, double);
+    if(Rdist==NULL) {
+  	  error("Memory-allocation in minmc failed");
+	  }
 	}
 	for (i=0;i<_niter;i++) {
 	  markovchain(Rdist, &_alpha, _beta, _beta3p, _beta5p,i);
@@ -264,11 +256,7 @@ SEXP getMarkovProb(SEXP niter,
 }
 
 void removeDist() {
-#ifdef IN_R
   if(Rdist) Free(Rdist);
-  #else
-  if(Rdist) free(Rdist);
-  #endif
   Rdist=NULL;
 }
 
@@ -278,8 +266,12 @@ void sampling_markovchain(double *a,
   int i;
   int *cnt, perm,seq,pos;
   int state=0;
-  cnt=Calloc(nperm, int);
   double mcnt, vcnt, val, pa;
+
+  cnt=Calloc(nperm, int);
+  if(cnt==NULL) {
+    error("Memory-allocation in sampling_markovchain failed");
+  }
 
   if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
     error("load forground and background properly");
@@ -290,8 +282,8 @@ void sampling_markovchain(double *a,
   // state=2 is reverse strand hit
   GetRNGstate();
 
-  Rprintf("MC-samping:\n");
-  Rprintf("alpha=%e, slen=%d, nos=%d, nperm=%d\n", a[0],slen,nos,nperm);
+  //Rprintf("MC-samping:\n");
+  //Rprintf("alpha=%e, slen=%d, nos=%d, nperm=%d\n", a[0],slen,nos,nperm);
 
 	for (perm=0; perm<nperm; perm++) {
 		cnt[perm]=0;
@@ -377,8 +369,8 @@ void sampling_markovchain(double *a,
   // dist[3 ... 3+M-1] ... p(n0), ... , p(nL)
   // dist[3+M, ..., 3+M+M-2] ... p(n1'), ..., p(nL')
   //
-  Rprintf("mean(count)=%e\n", mcnt);
-  Rprintf("var(count)=%e\n",vcnt);
+  //Rprintf("mean(count)=%e\n", mcnt);
+  //Rprintf("var(count)=%e\n",vcnt);
 
 	PutRNGstate();
 }

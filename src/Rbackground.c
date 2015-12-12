@@ -7,33 +7,6 @@ double *Rstation=NULL, *Rtrans=NULL;
 int Rorder;
 void RdestroyBackground();
 
-#ifdef WK
-void RreloadBackground(char **file) {
-  FILE *f;
-  RdestroyBackground();
-  f=fopen(file[0],"rb");
-  if(f== NULL) {
-    error("Cannot open file %s",file[0]);
-  }
-
-  readBackground (f, &Rstation, &Rtrans, &Rorder);
-  fclose(f);
-}
-
-void Rstorebg(char **file) {
-	FILE *f;
-  f=fopen(file[0],"wb");
-  if (f==NULL) {
-    error("Cannot open file %s",file[0]);
-  }
-  if (Rstation==NULL||Rtrans==NULL) {
-    error("First a background model needs to be loaded");
-  }
-
-  writeBackground (f, Rstation, Rtrans, Rorder);
-}
-#endif
-
 void Rmakebg(char **infasta, int *order, int *nseq, int *lseq) {
   FILE *f;
   double *count;
@@ -44,12 +17,14 @@ void Rmakebg(char **infasta, int *order, int *nseq, int *lseq) {
     error("%s not found!",infasta[0]);
     return;
   }
-  Rprintf("makebg: order=%d\n",order[0]);
 
   if (order[0]>0) {
     Rstation=Calloc(power(ALPHABETSIZE,order[0]),double);
     count=Calloc(power(ALPHABETSIZE,order[0]+1),double);
     Rtrans=Calloc(power(ALPHABETSIZE, order[0]+1),double);
+    if (Rstation==NULL || count==NULL || Rtrans==NULL) {
+    	error("Memory allocation in Rmakebg failed");
+		}
 
     getNucleotideFrequencyFromSequence(f,count, order[0], nseq, lseq);
 
@@ -60,6 +35,9 @@ void Rmakebg(char **infasta, int *order, int *nseq, int *lseq) {
     Rstation=Calloc(power(ALPHABETSIZE,order[0]+1),double);
     Rtrans=Calloc(power(ALPHABETSIZE,order[0]+1),double);
     count=Calloc(power(ALPHABETSIZE,order[0]+1),double);
+    if (Rstation==NULL || count==NULL || Rtrans==NULL) {
+    	error("Memory allocation in Rmakebg failed");
+		}
     getNucleotideFrequencyFromSequence(f,count, order[0], nseq,lseq);
     getForwardTransition(count, Rstation, order[0]);
     getForwardTransition(count, Rtrans, order[0]);
@@ -67,11 +45,6 @@ void Rmakebg(char **infasta, int *order, int *nseq, int *lseq) {
   fclose(f);
   Rorder=order[0];
 
-#ifdef WK
-  for(i=0;i<power(ALPHABETSIZE, order[0]); i++) {
-    Rprintf("mu[%d]=%e\n",i,Rstation[i]);
-  }
-  #endif
   Free(count);
 }
 

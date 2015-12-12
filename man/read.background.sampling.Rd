@@ -2,7 +2,7 @@
 \alias{read.background.sampling}
 \title{Estimates the background model for sampling}
 \description{
-This function reads the a DNA sequence in fasta format and estimates
+This function reads a DNA sequence in fasta format and estimates
 and order m Markov model.
 }
 \usage{

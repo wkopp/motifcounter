@@ -42,9 +42,12 @@ void RcompoundpoissonPape_useGamma(double *gamma,
 
   memset(extention, 0, 3*sizeof(double));
   computeExtentionFactorsPape(extention, gamma, Rpwm->nrow);
-  Rprintf("ext1=%e, ext2=%e, ext3=%d\n", extention[0],extention[1],
-  		extention[2]);
+  //Rprintf("ext1=%e, ext2=%e, ext3=%d\n", extention[0],extention[1],
+  //		extention[2]);
   theta=initTheta(maxclumpsize);
+  if (theta==NULL) {
+  	error("Memory-allocation in initTheta failed");
+	}
 
   computeInitialClump(theta, gamma,Rpwm->nrow);
   computeTheta(maxclumpsize, theta, extention, Rpwm->nrow);
@@ -86,13 +89,11 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
   maxclumpsize=(double)mclump[0];
   maxhits=(double)mhit[0];
 
-#ifdef IN_R
   delta=Calloc(Rpwm->nrow,double);
   deltap=Calloc(Rpwm->nrow,double);
-#else
-  delta=calloc(Rpwm->nrow,sizeof(double));
-  deltap=calloc(Rpwm->nrow,sizeof(double));
-#endif
+	if (delta==NULL||deltap==NULL) {
+		error("Memory-allocation in Rcompoundpoisson_useBeta failed");
+	}
 
   memset(extention, 0, 3*sizeof(double));
 
@@ -102,6 +103,9 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
   computeExtentionFactorsKopp(extention, delta, deltap, beta, 
       beta3p, beta5p, Rpwm->nrow);
   theta=initTheta(maxclumpsize);
+  if (theta==NULL) {
+  	error("Memory-allocation in initTheta failed");
+	}
 
   computeInitialClumpKopp(theta, beta3p,delta, deltap, Rpwm->nrow);
   computeTheta(maxclumpsize, theta, extention, Rpwm->nrow);
@@ -114,13 +118,8 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
 
 
   deleteTheta(theta);
-  #ifdef IN_R
   Free(delta);
   Free(deltap);
-  #else
-  free(delta);
-  free(deltap);
-  #endif
 }
 
 void Rcompoundpoisson_useBetaSingleStranded(double *alpha, double *beta, 
@@ -153,13 +152,11 @@ void Rcompoundpoisson_useBetaSingleStranded(double *alpha, double *beta,
   maxclumpsize=(double)mclump[0];
   maxhits=(double)mhit[0];
 
-#ifdef IN_R
   delta=Calloc(Rpwm->nrow,double);
   deltap=Calloc(Rpwm->nrow,double);
-#else
-  delta=calloc(Rpwm->nrow,sizeof(double));
-  deltap=calloc(Rpwm->nrow,sizeof(double));
-#endif
+	if (delta==NULL||deltap==NULL) {
+		error("Memory-allocation in Rcompoundpoisson_useBetaSingleStranded failed");
+	}
 
   memset(extention, 0, 3*sizeof(double));
 
@@ -169,6 +166,9 @@ void Rcompoundpoisson_useBetaSingleStranded(double *alpha, double *beta,
   computeExtentionFactorsKopp(extention, delta, deltap, beta, 
       beta3p, beta5p, Rpwm->nrow);
   theta=initTheta(maxclumpsize);
+  if (theta==NULL) {
+  	error("Memory-allocation in initTheta failed");
+	}
 
   computeInitialClumpKopp(theta, beta3p,delta, deltap, Rpwm->nrow);
   computeTheta(maxclumpsize, theta, extention, Rpwm->nrow);
@@ -181,12 +181,7 @@ void Rcompoundpoisson_useBetaSingleStranded(double *alpha, double *beta,
 
 
   deleteTheta(theta);
-  #ifdef IN_R
   Free(delta);
   Free(deltap);
-  #else
-  free(delta);
-  free(deltap);
-  #endif
 }
 

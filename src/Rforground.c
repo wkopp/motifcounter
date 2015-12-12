@@ -45,71 +45,52 @@ void Rmotiffromfile(char **fmotif, double *pseudocount, char **format) {
 
     f=freopen(fmotif[0],"r",f);
 
-#ifdef IN_R
     Rpwm=Calloc(1,DMatrix);
+    if (Rpwm==NULL) {
+    	error("Memory-allocation in Rmotiffromfile failed");
+    	return;
+    }
     Rpwm->data=Calloc(4*mwidth,double);
-    #else
-    Rpwm=calloc(1,sizeof(DMatrix));
-    Rpwm->data=calloc(4*mwidth,sizeof(double));
-    #endif
+    if (Rpwm->data==NULL) {
+    	error("Memory-allocation in Rmotiffromfile failed");
+    	return;
+    }
     Rpwm->ncol=4;Rpwm->nrow=mwidth;
 
-#ifdef IN_R
     Rcpwm=Calloc(1,DMatrix);
-    #else
-    Rcpwm=calloc(1,sizeof(DMatrix));
-    #endif
-    //cpwm->data=calloc(4*mwidth,sizeof(double));
+    if (Rcpwm==NULL) {
+    	error("Memory-allocation in Rmotiffromfile failed");
+    	return;
+    }
     Rcpwm->ncol=4;Rcpwm->nrow=mwidth;
 
     ps=(double)pseudocount[0];
 
-    //f=fopen(argv[1],"r");
     if (strcmp(format[0], "tab")==0) {
       getTableMotif(f, Rpwm, ps);
       getComplementaryMotif(Rpwm, Rcpwm);
-    //  Rprintf("Loaded tab-format motif\n");
     } else if (strcmp(format[0], "transfac")==0){
       getTransfacMotif(f, Rpwm, ps);
       getComplementaryMotif(Rpwm, Rcpwm);
-    //  Rprintf("Loaded transfac-format motif\n");
     } else if (strcmp(format[0], "jaspar")==0){
       getJasparMotif(f, Rpwm, ps);
       getComplementaryMotif(Rpwm, Rcpwm);
-    //  Rprintf("Loaded jaspar-format motif\n");
     } else {
-    #ifdef IN_R
       Free(Rpwm->data);Free(Rpwm);
       Free(Rcpwm->data);Free(Rcpwm);
-      #else
-      free(Rpwm->data);free(Rpwm);
-      free(Rcpwm->data);free(Rcpwm);
-      #endif
       error("this format is unknown\n");
     }
     fclose(f);
     if (checkPositivity(Rpwm)!=0) {
       Rdestroymotif();
       error("All elements of the motif must be strictly positive!");
+    	return;
     }
     //printMotif(Rpwm);
     //printMotif(Rcpwm);
 
   return;
 }
-
-#ifdef WK
-SEXP Rgetmotif() {
-  int i;
-  SEXP pwm;
-  if (Rpwm) return R_NilValue;
-  pwm = PROTECT(allocMatrix(REALSXP, LENGTH(Rpwm->nrow), LENGTH(Rpwm->ncol)));
-  for (i=0; i<pwm->nrow*Rpwm->ncol; i++) {
-    REAL(pwm)[i]=asReal(pwm->data[i]);
-  }
-  U
-}
-#endif
 
 void Rmotiflength(int *mlen) {
   if (!Rpwm) error("No motif loaded. Use read.motif");
@@ -124,15 +105,17 @@ void Rloadmotif(double *data, int *nrow, int *ncol) {
     return;
   }
   Rdestroymotif();
-  #ifdef IN_R
   Rpwm=Calloc(1,DMatrix);
   Rcpwm=Calloc(1,DMatrix);
+  if (Rpwm==NULL||Rcpwm==NULL) {
+  	error("Memory-allocation in Rloadmotif failed");
+    return;
+  }
   Rpwm->data=Calloc(nrow[0]*ncol[0],double);
-  #else
-  Rpwm=calloc(1,sizeof(DMatrix));
-  Rcpwm=calloc(1,sizeof(DMatrix));
-  Rpwm->data=calloc(nrow[0]*ncol[0],sizeof(double));
-  #endif
+  if (Rpwm->data==NULL) {
+  	error("Memory-allocation in Rloadmotif failed");
+  	return;
+  }
   Rpwm->ncol=nrow[0];Rpwm->nrow=ncol[0];
   Rcpwm->ncol=nrow[0];Rcpwm->nrow=ncol[0];
   for (i=0; i<nrow[0]*ncol[0]; i++) {
@@ -148,21 +131,12 @@ void Rloadmotif(double *data, int *nrow, int *ncol) {
 
 
 void Rdestroymotif() {
-#ifdef IN_R
-  if (Rpwm) Free(Rpwm->data);
-  if (Rcpwm) Free(Rcpwm->data);
+  if (Rpwm && Rpwm->data) Free(Rpwm->data);
+  if (Rcpwm && Rcpwm->data) Free(Rcpwm->data);
   if (Rpwm) Free(Rpwm);
   if (Rcpwm) Free(Rcpwm);
-#else
-  if (Rpwm) free(Rpwm->data);
-  if (Rcpwm) free(Rcpwm->data);
-  if (Rpwm) free(Rpwm);
-  if (Rcpwm) free(Rcpwm);
-#endif
   Rpwm=NULL;
   Rcpwm=NULL;
-//  RdeleteBeta();
-//  RdeleteDelta();
 }
 
 SEXP fetchMotif() {

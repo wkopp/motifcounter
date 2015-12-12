@@ -10,7 +10,14 @@
 int getTableMotifWidth(FILE *f) {
   float a,c,g,t;
   int mwidth=0;
-  while(fscanf(f,"%f\t%f\t%f\t%f\n",&a,&c,&g,&t)!=EOF) { mwidth++; }
+  while(1) { 
+  	fscanf(f,"%f\t%f\t%f\t%f\n",&a,&c,&g,&t);
+  	if (feof(f)) { break;}
+  	if (ferror(f)) {
+  		error("The motif does not seem to be in tab format");
+		}
+  	mwidth++; 
+  }
   return mwidth;
 }
 
@@ -31,34 +38,25 @@ int getTransfacMotifWidth(FILE *f) {
       mwidth++;
     }
   }
+  if(ferror(f)) {
+  	error("The motif does not appear to be in Transfac format");
+	}
   return mwidth;
 }
 
 int getJasparMotifWidth(FILE *f) {
-  #ifdef IN_R
   error("getJasparMotifWidth ... to be implemented\n");
-  #else
-  fprintf(stderr, "getJasparMotifWidth ... to be implemented\n");
-  #endif
   return -1;
 }
 
 void printMotif(DMatrix *pwm) {
   int i=0;
   for (i=0; i<pwm->nrow; i++) {
-  #ifdef IN_R
     Rprintf("%f\t%f\t%f\t%f\n", 
     pwm->data[i*ALPHABETSIZE],
     pwm->data[i*ALPHABETSIZE+1],
     pwm->data[i*ALPHABETSIZE+2],
     pwm->data[i*ALPHABETSIZE+3]);
-    #else
-    printf("%f\t%f\t%f\t%f\n", 
-    pwm->data[i*ALPHABETSIZE],
-    pwm->data[i*ALPHABETSIZE+1],
-    pwm->data[i*ALPHABETSIZE+2],
-    pwm->data[i*ALPHABETSIZE+3]);
-    #endif
   }
 }
 
@@ -66,11 +64,10 @@ void getComplementaryMotif(DMatrix *pwm, DMatrix *cpwm) {
   int i=0, j=0;
   cpwm->nrow=pwm->nrow;
   cpwm->ncol=pwm->ncol;
-  #ifdef IN_R
   cpwm->data=Calloc(pwm->nrow*pwm->ncol,double);
-  #else
-  cpwm->data=calloc(pwm->nrow*pwm->ncol,sizeof(double));
-  #endif
+  if(cpwm->data==NULL) {
+  	error("Memory-allocation in getComplementaryMotif failed");
+	}
   for (i=0; i<pwm->ncol; i++) {
     for (j=0; j<pwm->nrow; j++) {
       cpwm->data[(pwm->nrow-j-1)*ALPHABETSIZE +getComplementFromIndex(i)]=
@@ -91,7 +88,12 @@ float posmin(float a, float b) {
 void getTableMotif(FILE *f, DMatrix *m, double pseudocount) {
   int i=0;
   float a,c,g,t, min=1, n;
-  while(fscanf(f,"%f\t%f\t%f\t%f\n",&a, &c,&g,&t)!=EOF) { 
+  while(1) {
+  	fscanf(f,"%f\t%f\t%f\t%f\n",&a, &c,&g,&t);
+  	if (feof(f)) { break;}
+  	if (ferror(f)) {
+  		error("The motif does not seem to be in tab format");
+		}
    n=a+c+g+t+4*pseudocount;
    m->data[i*4]=((double)a + pseudocount)/(n);
    m->data[i*4+1]=((double)c + pseudocount)/(n);
@@ -139,11 +141,7 @@ void getTransfacMotif(FILE *f, DMatrix *m, double pseudocount) {
 }
 
 void getJasparMotif(FILE *f, DMatrix *m, double pseudocount) {
-#ifdef IN_R
  error("getJasparMotif ...  to be implemented!\n");
- #else
- fprintf(stderr, "getJasparMotif ...  to be implemented!\n");
- #endif
  return;
 }
 
