@@ -859,72 +859,50 @@ void computeConditionalOverlappingProbabilities(DMatrix *pwm1, DMatrix *pwm2, do
 
 
     // 1D score
-    if (pvalue!= NULL) {
-      initExtremalScore(&uescore1, *dx, pwm1->nrow, order);
-      initExtremalScore(&uescore2, *dx, pwm1->nrow, order);
-      loadMinMaxScores(pwm1, station, trans, &uescore1);
-      loadMinMaxScores(pwm2, station, trans, &uescore2);
-      loadIntervalSize(&uescore1,NULL);
-      loadIntervalSize(&uescore2,NULL);
-      size1=maxScoreIntervalSize(&uescore1);
-      size2=maxScoreIntervalSize(&uescore2);
+    initExtremalScore(&uescore1, *dx, pwm1->nrow, order);
+    initExtremalScore(&uescore2, *dx, pwm1->nrow, order);
+    loadMinMaxScores(pwm1, station, trans, &uescore1);
+    loadMinMaxScores(pwm2, station, trans, &uescore2);
+    loadIntervalSize(&uescore1,NULL);
+    loadIntervalSize(&uescore2,NULL);
+    size1=maxScoreIntervalSize(&uescore1);
+    size2=maxScoreIntervalSize(&uescore2);
 
-      intervalsize=(size1>size2) ? size1 : size2;
+    intervalsize=(size1>size2) ? size1 : size2;
 
-      initScoreMetaInfo(getTotalScoreLowerBound(&uescore1),getTotalScoreUpperBound(&uescore1),
+    initScoreMetaInfo(getTotalScoreLowerBound(&uescore1),
+    		getTotalScoreUpperBound(&uescore1),
         intervalsize, *dx, &init1d1.meta);
 
-      initScoreMetaInfo(getTotalScoreLowerBound(&uescore2),
-        getTotalScoreUpperBound(&uescore2),intervalsize, *dx, &init1d2.meta);
+    initScoreMetaInfo(getTotalScoreLowerBound(&uescore2),
+        getTotalScoreUpperBound(&uescore2),
+        intervalsize, *dx, &init1d2.meta);
 
-      initScoreDistribution1d(pwm1,trans,&init1d1, order);
-      initScoreDistribution1d(pwm2,trans,&init1d2, order);
+    initScoreDistribution1d(pwm1,trans,&init1d1, order);
+    initScoreDistribution1d(pwm2,trans,&init1d2, order);
 
-      computeScoreDistribution1d(pwm1, trans,  station, &init1d1, &uescore1, order);
-      computeScoreDistribution1d(pwm2, trans,  station, &init1d2, &uescore2, order);
+    computeScoreDistribution1d(pwm1, trans, 
+    		station, &init1d1, &uescore1, order);
+    computeScoreDistribution1d(pwm2, trans, 
+    		station, &init1d2, &uescore2, order);
 
-      quantile=getQuantileWithIndex1d(&init1d1,getQuantileIndex1d(&init1d1.totalScore,*pvalue));
-      threshold=(int)(quantile/(*dx));
-      alpha1=getProbWithIndex1d(&init1d1, threshold);
-      alpha2=getProbWithIndex1d(&init1d2, threshold);
+    quantile=getQuantileWithIndex1d(&init1d1,
+    		getQuantileIndex1d(&init1d1.totalScore,*pvalue));
+    threshold=(int)(quantile/(*dx));
+    alpha1=getProbWithIndex1d(&init1d1, threshold);
+    alpha2=getProbWithIndex1d(&init1d2, threshold);
 //      Rprintf("Probability mass-null: %f\n",
  //       getProbability1d(&init1d1.totalScore, &init1d1.meta));
-  //    Rprintf("pval=%f, th=%f th=%d pvalf=%f pvalr=%f\n", *pvalue, quantile,threshold,
-   //     alpha1, alpha2);
+    //  Rprintf("pval=%f, th=%f th=%d pvalf=%f pvalr=%f\n", 
+    //  		*pvalue, quantile,threshold,
+    //    alpha1, alpha2);
 
-      loadIntervalSize(&uescore1, &threshold);
-      loadIntervalSize(&uescore2, &threshold);
-      cutScoreRangeWithThreshold(&init1d1, &uescore1, order);
-      cutScoreRangeWithThreshold(&init1d2, &uescore2, order);
-    } else if (inth!=NULL) {
-      threshold=*inth;
-      initExtremalScore(&uescore1, *dx, pwm1->nrow, order);
-      initExtremalScore(&uescore2, *dx, pwm1->nrow, order);
-      loadMinMaxScores(pwm1, station, trans, &uescore1);
-      loadMinMaxScores(pwm2, station, trans, &uescore2);
-      loadIntervalSize(&uescore1,&threshold);
-      loadIntervalSize(&uescore2,&threshold);
-      size1=maxScoreIntervalSize(&uescore1);
-      size2=maxScoreIntervalSize(&uescore2);
-
-      intervalsize=(size1>size2) ? size1 : size2;
-
-      initScoreMetaInfo(getTotalScoreLowerBound(&uescore1),getTotalScoreUpperBound(&uescore1),
-        intervalsize, *dx, &init1d1.meta);
-
-      initScoreMetaInfo(getTotalScoreLowerBound(&uescore2),
-        getTotalScoreUpperBound(&uescore2),intervalsize, *dx, &init1d2.meta);
-
-      initScoreDistribution1d(pwm1,trans,&init1d1, order);
-      initScoreDistribution1d(pwm2,trans,&init1d2, order);
-
-      computeScoreDistribution1d(pwm1, trans,  station, &init1d1, &uescore1, order);
-      computeScoreDistribution1d(pwm2, trans,  station, &init1d2, &uescore2, order);
-
-    } else {
-      error("either threshold or p-value must be specified!\n");
-      return;
-    }
+    loadIntervalSize(&uescore1, &threshold);
+    loadIntervalSize(&uescore2, &threshold);
+    cutScoreRangeWithThreshold(&init1d1, &uescore1, order);
+    cutScoreRangeWithThreshold(&init1d2, &uescore2, order);
+    //Rprintf("Computation score1d finished\n");
+    //return;
 
     initExtremalScore(&escore1, *dx, pwm1->nrow, order);
     initExtremalScore(&escore2, *dx, pwm1->nrow, order);

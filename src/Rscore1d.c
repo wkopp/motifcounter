@@ -54,7 +54,7 @@ void Rscoredist( double *score, double *prob) {
   Rprintf("%1.3e-siglevel: pcomp=%1.3e, iq=%d, q=%2.2f\n",p, pcomp,
         getQuantileIndex1d(&null.totalScore,p),quantile);
 
-  for (i=0; i<=null.meta.xmax-null.meta.xmin; i++) {
+  for (i=0; i<=null.meta.xmax-null.meta.xmin&& i<null.meta.length; i++) {
     score[i]=(double)(null.meta.xmin+i)*null.meta.dx;
     prob[i]=null.totalScore.y[i];
   }
@@ -125,7 +125,7 @@ void Rscoredist_bf( double *score, double *prob) {
    getQuantileIndex1d(&null.totalScore,p),quantile);
 
 
-  for (i=0; i<=null.meta.xmax-null.meta.xmin; i++) {
+  for (i=0; i<=null.meta.xmax-null.meta.xmin&& i<null.meta.length; i++) {
     score[i]=(double)(null.meta.xmin+i)*null.meta.dx;
     prob[i]=null.totalScore.y[i];
   }

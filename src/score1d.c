@@ -66,7 +66,7 @@ double getProb1d(MotifScore1d *s, double quantile) {
 void storeScoreDist1d (FILE *f, MotifScore1d *s, int withhead) {
   int i;
   if (withhead==1) {
-  for (i=0; i<=s->meta.xmax-s->meta.xmin; i++) {
+  for (i=0; i<=s->meta.xmax-s->meta.xmin&&i<s->meta.length; i++) {
     fprintf(f, "%e ", (double)(s->meta.xmin+i)*s->meta.dx);
   }
   fprintf(f, "\n");
@@ -92,7 +92,9 @@ void initScore1d(Score1d *s, int l) {
 int initScoreDistribution1d (DMatrix *theta, double *bg1, MotifScore1d *result, int order) {
   int i;
 
-  initScore1d(&result->totalScore, result->meta.xmax-result->meta.xmin+1);
+  initScore1d(&result->totalScore, result->meta.length+1);
+//	Rprintf("initScore-total: %x len %d\n",result->totalScore.y,
+//			result->meta.length+1);
 
   result->mlen=theta->nrow;
   result->ScoreBuffer1=Calloc(power(ALPHABETSIZE, order)*theta->nrow, Score1d);
@@ -311,10 +313,13 @@ void cutScoreRangeWithThreshold(MotifScore1d *mscore, ExtremalScore *tm, int ord
     }
   }
   resetScore1d(&mscore->totalScore, &mscore->meta);
+	//Rprintf("resetScore-total: %x len %d\n",mscore->totalScore.y,
+	//		mscore->meta.length);
   for (i=0; i<power(ALPHABETSIZE, order); i++) {
     //fprintf(stdout,"p(%d)=%f\n",i,
     //  mscore->ScoreBuffer1[(tm->len-1)*power(ALPHABETSIZE, order) +i].y[0]);
-    mscore->totalScore.y[0]+=mscore->ScoreBuffer1[(tm->len-1)*power(ALPHABETSIZE, order) +i].y[0];
+    mscore->totalScore.y[0]+=mscore->ScoreBuffer1[
+    	(tm->len-1)*power(ALPHABETSIZE, order) +i].y[0];
   }
   mscore->totalScore.start=0;
   mscore->totalScore.end=0;
