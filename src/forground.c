@@ -9,11 +9,19 @@
 
 int getTableMotifWidth(FILE *f) {
   float a,c,g,t;
-  int mwidth=0;
+  int i, mwidth=0;
   while(1) { 
-  	fscanf(f,"%f\t%f\t%f\t%f\n",&a,&c,&g,&t);
+  	i=fscanf(f,"%f\t%f\t%f\t%f",&a,&c,&g,&t);
+	  //Rprintf("read tab format i=%d: a=%f,c=%f,g=%f,t=%f\n",
+	  //		i,a,c,g,t);
   	if (feof(f)) { break;}
+	  if (i<=0) { 
+  		fclose(f);
+  		error("The motif does not seem to be in tab format");
+		}
+
   	if (ferror(f)) {
+  		fclose(f);
   		error("The motif does not seem to be in tab format");
 		}
   	mwidth++; 
@@ -39,6 +47,9 @@ int getTransfacMotifWidth(FILE *f) {
     }
   }
   if(ferror(f)) {
+  	error("The motif does not appear to be in Transfac format");
+	}
+	if (mwidth==0) {
   	error("The motif does not appear to be in Transfac format");
 	}
   return mwidth;
@@ -89,7 +100,7 @@ void getTableMotif(FILE *f, DMatrix *m, double pseudocount) {
   int i=0;
   float a,c,g,t, min=1, n;
   while(1) {
-  	fscanf(f,"%f\t%f\t%f\t%f\n",&a, &c,&g,&t);
+  	fscanf(f,"%f\t%f\t%f\t%f",&a, &c,&g,&t);
   	if (feof(f)) { break;}
   	if (ferror(f)) {
   		error("The motif does not seem to be in tab format");
