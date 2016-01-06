@@ -81,6 +81,8 @@ int initScoreMetaInfo (int smin, int smax, int intervalsize, double dx, ScoreMet
   meta->dx=dx;
   meta->xmax=smax;
   meta->xmin=smin;
+  if (smax-smin>meta->length) {error("score range length error, len=%d, xmax=%d, xmin=%d",
+  		intervalsize+1,smax,smin);}
   meta->zero=0;
 
   meta->prob=&ProbBg;
