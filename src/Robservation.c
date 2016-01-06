@@ -43,7 +43,9 @@ void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq) {
 
   loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
   loadIntervalSize(&escore, NULL);
-  intervalsize=maxScoreIntervalSize(&escore);
+  //intervalsize=maxScoreIntervalSize(&escore);
+  intervalsize=getTotalScoreUpperBound(&escore)-
+  		getTotalScoreLowerBound(&escore)+1;
 
   initScoreMetaInfo(getTotalScoreLowerBound(&escore),
            getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
@@ -68,11 +70,11 @@ void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq) {
   fclose(f);
 
   for (s=0, Nhits=0;s<*nseq; s++) {
-    Nhits+=countOccurances(Rstation, Rtrans, Rpwm, Rcpwm, seq.seq[s], seq.lseq[s], threshold, dx, Rorder);
+    numofhits[s]+=countOccurances(Rstation, Rtrans, Rpwm, Rcpwm, seq.seq[s], seq.lseq[s], threshold, dx, Rorder);
   }
 
   destroySequence(&seq);
-  numofhits[0]=Nhits;
+  //numofhits[0]=Nhits;
 }
 
 void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *nseq, int *lseq) {
@@ -106,7 +108,9 @@ void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *nseq, in
 
   loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
   loadIntervalSize(&escore, NULL);
-  intervalsize=maxScoreIntervalSize(&escore);
+  //intervalsize=maxScoreIntervalSize(&escore);
+  intervalsize=getTotalScoreUpperBound(&escore)-
+  		getTotalScoreLowerBound(&escore)+1;
 
   initScoreMetaInfo(getTotalScoreLowerBound(&escore),
            getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
@@ -135,11 +139,11 @@ void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *nseq, in
   //Rprintf("numofseq=%d, seqlen=%d\n", numofseq, seqlen);
 
   for (s=0, Nhits=0;s<*nseq; s++) {
-    Nhits+=countOccurancesSingleStranded(Rstation, 
+    numofhits[s]+=countOccurancesSingleStranded(Rstation, 
     		Rtrans, Rpwm, Rcpwm, seq.seq[s], seq.lseq[s], threshold, dx, Rorder);
   }
 
   destroySequence(&seq);
-  numofhits[0]=Nhits;
+  //numofhits[0]=Nhits;
 }
 

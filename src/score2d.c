@@ -868,7 +868,14 @@ void computeConditionalOverlappingProbabilities(DMatrix *pwm1, DMatrix *pwm2, do
     size1=maxScoreIntervalSize(&uescore1);
     size2=maxScoreIntervalSize(&uescore2);
 
+		Rprintf("maxScoreIntervalSize: %d, %d\n",size1,size2);
+		size1=getTotalScoreUpperBound(&uescore1)-
+			getTotalScoreLowerBound(&uescore1)+1;
+		size2=getTotalScoreUpperBound(&uescore2)-
+			getTotalScoreLowerBound(&uescore2)+1;
+		Rprintf("getTotalScore: %d, %d\n",size1,size2);
     intervalsize=(size1>size2) ? size1 : size2;
+		Rprintf("intervalsize:  %d\n",intervalsize);
 
     initScoreMetaInfo(getTotalScoreLowerBound(&uescore1),
     		getTotalScoreUpperBound(&uescore1),

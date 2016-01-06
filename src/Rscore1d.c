@@ -29,7 +29,9 @@ void Rscoredist( double *score, double *prob) {
 
   loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
   loadIntervalSize(&escore, NULL);
-  intervalsize=maxScoreIntervalSize(&escore);
+  //intervalsize=maxScoreIntervalSize(&escore);
+  intervalsize=getTotalScoreUpperBound(&escore)-
+  		getTotalScoreLowerBound(&escore)+1;
 
   initScoreMetaInfo(getTotalScoreLowerBound(&escore),
            getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
@@ -99,7 +101,9 @@ void Rscoredist_bf( double *score, double *prob) {
 
    loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
    loadIntervalSize(&escore, NULL);
-   intervalsize=maxScoreIntervalSize(&escore);
+ //  intervalsize=maxScoreIntervalSize(&escore);
+  intervalsize=getTotalScoreUpperBound(&escore)-
+  		getTotalScoreLowerBound(&escore)+1;
 
    initScoreMetaInfo(getTotalScoreLowerBound(&escore),
    getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);

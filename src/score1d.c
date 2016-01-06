@@ -104,11 +104,11 @@ int initScoreDistribution1d (DMatrix *theta, double *bg1, MotifScore1d *result, 
 	}
 
   for (i=0; i < power(ALPHABETSIZE, order)*theta->nrow; i++) {
-    initScore1d(&result->ScoreBuffer1[i], result->meta.length);
+    initScore1d(&result->ScoreBuffer1[i], result->meta.length+1);
   }
 
   for (i=0; i < power(ALPHABETSIZE, order+1); i++) {
-    initScore1d(&result->tmpScore[i], result->meta.length);
+    initScore1d(&result->tmpScore[i], result->meta.length+1);
   }
   return 0;
 }
