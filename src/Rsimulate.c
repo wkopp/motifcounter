@@ -54,7 +54,12 @@ void RsimulateCountDistribution( double *distribution, int* perm,
 
   loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
   loadIntervalSize(&escore, NULL);
-  intervalsize=maxScoreIntervalSize(&escore);
+//  intervalsize=maxScoreIntervalSize(&escore);
+    //size1=maxScoreIntervalSize(&uescore1);
+    //size2=maxScoreIntervalSize(&uescore2);
+
+		intervalsize=getTotalScoreUpperBound(&escore)-
+			getTotalScoreLowerBound(&escore)+1;
 
   initScoreMetaInfo(getTotalScoreLowerBound(&escore),
            getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
