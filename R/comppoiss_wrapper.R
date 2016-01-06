@@ -58,7 +58,7 @@ comp.pois.pape=function(seqlen,
 
 comp.pois.test=function(obs, overlap, maxhits, maxclumpsize=20) {
   dist=comp.pois(obs$lseq, maxhits, maxclumpsize, overlap)
-  if (obs$numofhits>maxhits) {
+  if (sum(obs$numofhits)>maxhits) {
     p=0.0;
   } else {
     p=1-sum(dist$dist[1:obs$numofhits])
@@ -67,7 +67,7 @@ comp.pois.test=function(obs, overlap, maxhits, maxclumpsize=20) {
 }
 comp.pois.singlestranded.test=function(obs, overlap, maxhits, maxclumpsize=20) {
   dist=comp.pois.singlestranded(obs$lseq, maxhits, maxclumpsize, overlap)
-  if (obs$numofhits>maxhits) {
+  if (sum(obs$numofhits)>maxhits) {
     p=0.0;
   } else {
     p=1-sum(dist$dist[1:obs$numofhits])
