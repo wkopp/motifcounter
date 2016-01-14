@@ -418,7 +418,7 @@ void multipleShortSequenceProbability(double *simple, double *aggregated,
 
   part_results=Calloc(numofseqs, double*);
   part_results[0]=Calloc(maxagghits+1, double);
-  if (part_results==NULL||part_results[0]) {
+  if (part_results==NULL||part_results[0]==NULL) {
   	error("Memory-allocation in multipleShortSequenceProbability failed");
 	}
   memcpy(part_results[0],simple, (maxagghits+1)*sizeof(double));
