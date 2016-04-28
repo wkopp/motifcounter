@@ -7,6 +7,7 @@
 #include "overlap.h"
 #include "compoundpoisson.h"
 
+#define EPSILON 1e-10
 extern double *Rstation, *Rtrans;
 extern int Rorder;
 extern DMatrix *Rpwm, *Rcpwm;
@@ -41,6 +42,7 @@ void RcompoundpoissonPape_useGamma(double *gamma,
   maxhits=(double)mhit[0];
 
   memset(extention, 0, 3*sizeof(double));
+	gamma[Rpwm->nrow]=(gamma[Rpwm->nrow]+EPSILON)/(1+2*EPSILON);
   computeExtentionFactorsPape(extention, gamma, Rpwm->nrow);
   //Rprintf("ext1=%e, ext2=%e, ext3=%d\n", extention[0],extention[1],
   //		extention[2]);
@@ -97,6 +99,7 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
 
   memset(extention, 0, 3*sizeof(double));
 
+	beta3p[0]=(beta3p[0]+EPSILON)/(1+2*EPSILON);
   computeDeltas(delta, deltap, beta, beta3p,beta5p,Rpwm->nrow);
 
 
@@ -160,6 +163,7 @@ void Rcompoundpoisson_useBetaSingleStranded(double *alpha, double *beta,
 
   memset(extention, 0, 3*sizeof(double));
 
+	//beta3p[0]=(beta3p[0]+EPSILON)/(1+2*EPSILON);
   computeDeltas(delta, deltap, beta, beta3p,beta5p,Rpwm->nrow);
 
 

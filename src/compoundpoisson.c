@@ -3,6 +3,7 @@
 #include <string.h>
 #ifdef IN_R
 #include <R.h>
+#include <Rmath.h>
 #endif
 #include "score1d.h"
 #include "score2d.h"
@@ -15,7 +16,6 @@
 //#include "countdist.h"
 //#include "overlap.h"
 
-#define EPSILON 1e-20
 #define DSTRANDED 2
 double computePoissonParameter(int seqlen, int mlen, 
    int maxclump, double alpha,double *theta) {
@@ -39,8 +39,8 @@ void deleteTheta(double *theta) {
 
 void computeInitialClump(double *theta, double *gamma, int mlen) {
   int i;
-  theta[0]=1-gamma[mlen]+EPSILON;
-  theta[1]=1-gamma[mlen]+EPSILON;
+  theta[0]=1-gamma[mlen];
+  theta[1]=1-gamma[mlen];
 
   for (i=1; i<mlen; i++) {
     theta[0]*=(1-gamma[i])*(1-gamma[mlen+i]);
@@ -70,7 +70,7 @@ void computeExtentionFactorsPape(double *xi, double *gamma, int mlen) {
   // xi',3'
   for (k=0; k<mlen; k++) {
     if (k==0) {
-      xik=(gamma[mlen+k]-EPSILON)/(1-gamma[mlen+k]+EPSILON);
+      xik=(gamma[mlen+k])/(1-gamma[mlen+k]);
     } else {
       xik=gamma[mlen+k]/(1-gamma[mlen+k]);
     }
@@ -106,7 +106,49 @@ void computeExtentionFactorsPape(double *xi, double *gamma, int mlen) {
   #endif
 }
 
-void computeCompoundPoissonDistribution(double lambda, 
+// Implementation based on separating the clumps
+// and convolving individual poisson distributions
+#ifdef for_later_use
+static void computeCompoundPoissonDistributionKopp(double lambda, 
+  int maxhit, int maxclump, double *theta, double *cp) {
+  int i, k;
+  double normalize=0.0;
+  double *pin1, *pin2;
+	
+	pin1=Calloc(maxhit+1, double);
+  if (pin1==NULL) {
+  	error("Memory-allocation in computeCompoundPoissonDistributionKopp failed");
+	}
+	pin2=Calloc(maxhit+1, double);
+  if (pin2==NULL) {
+  	error("Memory-allocation in computeCompoundPoissonDistributionKopp failed");
+	}
+
+	// init
+  for (k=0;k<=maxhit;k++) {
+    pin1[k]=dpois((double)k,
+    		lambda*(theta[0]+theta[1]), 0);
+	}
+
+	for (i=1; i<maxclump;i++) {
+    for (k=0;k*(i+1)<=maxhit;k++) {
+      pin2[k*(i+1)]=dpois((double)k,
+    		lambda*(theta[(i)*DSTRANDED]+theta[i*DSTRANDED+1]), 0);
+	  }
+	  convolute(cp, pin1,pin2,maxhit);
+	  memcpy(cp,pin1,(maxhit+1)*sizeof(double));
+	}
+  for (i=0; i<=maxhit; i++) normalize+=cp[i];
+  for (i=0; i<=maxhit; i++) cp[i]/=normalize;
+  
+  Free(pin1);
+  Free(pin2);
+}
+#endif
+
+// Implementation of Kemp et al., which was also used 
+// in Pape et al.
+static void computeCompoundPoissonDistributionKemp(double lambda, 
   int maxhit, int maxclump, double *theta, double *cp) {
   int i, j;
   double p;
@@ -132,9 +174,15 @@ void computeCompoundPoissonDistribution(double lambda,
 
 }
 
+void computeCompoundPoissonDistribution(double lambda, 
+  int maxhit, int maxclump, double *theta, double *cp) {
+  computeCompoundPoissonDistributionKemp(lambda,
+  		maxhit,maxclump, theta,cp);
+}
+
 void computeInitialClumpKopp(double *theta, double *beta3p, 
   double *delta, double *deltap, int mlen) {
-  theta[0]=delta[mlen-1]+EPSILON;
+  theta[0]=delta[mlen-1];
   theta[1]=deltap[mlen-1]*(1-beta3p[0]);
 }
 
@@ -151,8 +199,8 @@ void computeExtentionFactorsKopp(double *xi,
     xi[1]+=beta3p[k];
     xi[2]+=beta5p[k];
   }
-  xi[1]*=deltap[mlen-1]/(delta[mlen-1]+EPSILON);
-  xi[2]*=(delta[mlen-1]+EPSILON)/deltap[mlen-1];
+  xi[1]*=deltap[mlen-1]/(delta[mlen-1]);
+  xi[2]*=(delta[mlen-1])/deltap[mlen-1];
   #ifdef DEBUG
   Rprintf("Extention factors: xi=%e, xi3'=%e, xi5'=%e\n",xi[0],xi[1],xi[2]);
   #endif
