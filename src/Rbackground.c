@@ -53,6 +53,7 @@ void RgetOrder(int *o) {
 }
 void RgetBackground(double *station, double *trans) {
   int i;
+	if (Rstation==NULL) return;
   for (i=0; i<4; i++) {
     Rprintf("%e\n", Rstation[i]);
   }
@@ -63,6 +64,7 @@ void RgetBackground(double *station, double *trans) {
 
 void RprintBackground() {
   int i;
+	if (Rstation==NULL) return;
 
   if (Rorder>0) {
     for (i=0; i<power(ALPHABETSIZE, Rorder); i++) {
