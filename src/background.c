@@ -152,3 +152,25 @@ void readBackground (FILE *f, double **station, double **trans, int *order) {
   }
 }
 
+void printBackground(double *stat, double *trans, int order) {
+  int i;
+	if (stat==NULL) return;
+
+  if (order>0) {
+    for (i=0; i<power(ALPHABETSIZE, order); i++) {
+      Rprintf("mu(i=%d)=%e\n", i, stat[i]);
+    }
+    for (i=0; i<power(ALPHABETSIZE, order+1); i++) {
+      Rprintf("T(i=%d)=%e\n", i, trans[i]);
+    }
+	} else {
+
+    for (i=0; i<power(ALPHABETSIZE, 1); i++) {
+      Rprintf("mu(i=%d)=%e\n", i, stat[i]);
+    }
+    for (i=0; i<power(ALPHABETSIZE, 1); i++) {
+      Rprintf("T(i=%d)=%e\n", i, trans[i]);
+    }
+	}
+}
+
