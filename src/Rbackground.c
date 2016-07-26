@@ -63,25 +63,7 @@ void RgetBackground(double *station, double *trans) {
 }
 
 void RprintBackground() {
-  int i;
-	if (Rstation==NULL) return;
-
-  if (Rorder>0) {
-    for (i=0; i<power(ALPHABETSIZE, Rorder); i++) {
-      Rprintf("mu(i=%d)=%e\n", i, Rstation[i]);
-    }
-    for (i=0; i<power(ALPHABETSIZE, Rorder+1); i++) {
-      Rprintf("T(i=%d)=%e\n", i, Rtrans[i]);
-    }
-	} else {
-
-    for (i=0; i<power(ALPHABETSIZE, 1); i++) {
-      Rprintf("mu(i=%d)=%e\n", i, Rstation[i]);
-    }
-    for (i=0; i<power(ALPHABETSIZE, 1); i++) {
-      Rprintf("T(i=%d)=%e\n", i, Rtrans[i]);
-    }
-	}
+	printBackground(Rstation,Rtrans,Rorder);
 }
 
 void RdestroyBackground() {
