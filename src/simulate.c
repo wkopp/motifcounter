@@ -66,7 +66,7 @@ void generateRandomSequence(double *station, double *trans, char *seq, int seqle
 void randomStatistics(char *seq, int seqlen, double *stat, double *trans) {
   int i;
 
-  stat[getNucIndex(seq[0])]++;
+  stat[getNucIndex(seq[0])]+=1.;
   for (i=1; i<seqlen; i++) {
     stat[getNucIndex(seq[i])]++;
     trans[getNucIndex(seq[i-1])*ALPHABETSIZE+getNucIndex(seq[i])]++;

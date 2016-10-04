@@ -6,6 +6,7 @@
 #include "matrix.h"
 #include "simulate.h"
 #include "minmaxscore.h"
+#include "background.h"
 #include "score1d.h"
 
 extern int Rorder;
@@ -121,6 +122,7 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
   int mins, maxs;
   int seqlen, Nperm;
   double dx;
+	double *rstat, *rtrans;
 
   if (Rgran==0.0) {
     error("call mdist.option  first");
@@ -168,17 +170,24 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
   maxs=(fmaxs>rmaxs) ? fmaxs : rmaxs;
   mins=(fmins>rmins) ? fmins : rmins;
 
-    for (n=0; n<Nperm; n++) {
-      generateRandomSequence(RstationForSampling, RtransForSampling, seq, seqlen, RorderForSampling);
-      scoreOccurances(Rstation, Rtrans, Rpwm, seq, seqlen, distribution, dx, mins,Rorder);
-    }
-    for (n=0; n<maxs-mins+1; n++) {
-      distribution[n]/=(double)Nperm*(seqlen-Rpwm->nrow+1);
-    }
+	if (Rorder>0) {
+   // rstat=Calloc(Rorder, double);
+   // rtrans=Calloc(Rorder+1, double);
+	}
+  for (n=0; n<Nperm; n++) {
+    generateRandomSequence(RstationForSampling, RtransForSampling, seq, seqlen, RorderForSampling);
+		//if (Rorder>0) randomStatistics(seq, seqlen, rstat, rtrans);
+    scoreOccurances(Rstation, Rtrans, Rpwm, seq, seqlen, distribution, dx, mins,Rorder);
+  }
+	//if (Rorder>0) normalizeStatistics(rstat, rtrans);
+	//if(Rorder>0) printBackground(rstat,rtrans,Rorder);
+  for (n=0; n<maxs-mins+1; n++) {
+    distribution[n]/=(double)Nperm*(seqlen-Rpwm->nrow+1);
+  }
 
-    for (i=0; i<maxs-mins+1; i++) {
-      scores[i]= (double)(mins+i)*dx;
-    }
+  for (i=0; i<maxs-mins+1; i++) {
+    scores[i]= (double)(mins+i)*dx;
+  }
   deleteExtremalScore(&escore);
   PutRNGstate();
   Free(seq);

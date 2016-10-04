@@ -2,7 +2,7 @@ library(mdist)
 library(seqLogo)
 library(ggplot2)
 paperdir=Sys.getenv("CPPAPER")
-paperdir="/project/Tf2motif/home/thesis"
+#paperdir="/project/Tf2motif/home/thesis"
 figdir=sprintf("%s/figures", paperdir)
 variants=data.frame(alpha=c(rep(.01,3),rep(0.001,3*3)),
 										seqlen=c(rep(1000,3),rep(10000,3*3)),
@@ -11,7 +11,7 @@ variants=data.frame(alpha=c(rep(.01,3),rep(0.001,3*3)),
 										type=rep(c("tab","tab","transfac"),4))
 gran=0.1
 maxhits=100
-
+noplot=TRUE
 for (i in 1:nrow(variants)) {
 	alpha=variants$alpha[i]
   lalpha=-log10(alpha)
@@ -32,7 +32,39 @@ for (i in 1:nrow(variants)) {
   read.motif(pwmfile,variants$type[i], 0.01)
   pwm=motif2matrix()
 
+	# generate results
+  source(system.file("cp_paper","compare_methods.R", package="mdist"))
+
+pl=ggplot(df,aes(x=hits,y=prob, col=model, shape=model))+
+  labs(y=expression("P(X)"),x="Num. of hits")+ geom_point()+
+  scale_colour_manual(name="Models",
+  	 limits=c("emp","cpk","cpp","bin"), values=c("black", "blue", "red", "grey"),
+  										labels=c(expression('P'["E"]*"(X)"),
+  														 expression('P'["CP"]^"N"*"(X)"),
+  														 expression('P'["CP"]^"I"*"(X)"),
+  														 expression('P'["Bin"]*"(X)")))+
+  scale_shape_manual(name="Models",
+  	 limits=c("emp","cpk","cpp","bin"), values=c(20,19,17,3),
+  										labels=c(expression('P'["E"]*"(X)"),
+  														 expression('P'["CP"]^"N"*"(X)"),
+  														 expression('P'["CP"]^"I"*"(X)"),
+  														 expression('P'["Bin"]*"(X)")))+
+  geom_errorbar(aes(ymin=q25,ymax=q75),width=.1)+ theme_bw()+
+  theme(text=element_text(size=20),
+  			legend.position=c(0.7,.7),
+  			legend.text=element_text(size=18),
+  			legend.key.size=unit(.4,"inches"))
+print(pl)
+  if (noplot==TRUE) next;
+  # produce plots
+  figdir="/project/Tf2motif/home/thesis/figures"
   source(system.file("cp_paper","plotpwm.R", package="mdist"))
+  paperdir=Sys.getenv("CPPAPER"); figdir=sprintf("%s/figures", paperdir)
+  source(system.file("cp_paper","plotpwm.R", package="mdist"))
+
+	#produce table row entries
+  source(system.file("cp_paper","gentab_paper.R", package="mdist"))
+  source(system.file("cp_paper","gentab_thesis.R", package="mdist"))
 }
 
 pwmname="x32"
