@@ -36,3 +36,5 @@ install.packages("devtools")
 library(devtools)
 install_github("wkopp/mdist")
 ```
+
+The package contains a vignette that explains the main functionality.
