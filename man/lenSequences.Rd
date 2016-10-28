@@ -1,5 +1,5 @@
-\name{len.sequences}
-\alias{len.sequences}
+\name{lenSequences}
+\alias{lenSequences}
 \title{Length of sequences provided in fasta file}
 \description{
 The function parses a fasta file and returns a vector containing
@@ -7,7 +7,7 @@ the length of each individual sequence contained in the fasta file.
 Sequences containing 'N' or 'n' are skipped and set to length zero.
 }
 \usage{
-len.sequences(seqfile)
+lenSequences(seqfile)
 }
 \arguments{
 \item{seqfile}{Name of the sequence file in fasta format.}
@@ -21,7 +21,7 @@ library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 
 # scan the given sequence for the motif occurances
-lseq=len.sequences(seqfile)
+lseq=lenSequences(seqfile)
 lseq
 }
 

@@ -1,22 +1,25 @@
-\name{dynprog.count}
-\alias{dynprog.count}
-\title{Count distribution according to dynamic programming}
+\name{combinatorialDist}
+\alias{combinatorialDist}
+\title{Combinatrial distribution for the number of motif hits}
 \description{
-This function computes an approxmiation of the 
+This function approxmiates  the
 distribution of the number of motif hits
 by summing over all combinations of obtaining k hits
 in a given sequence. The summation is done by employing
 dynamic programming.
 }
 \usage{
-dynprog.count(seqlen, maxhits, overlap)
+combinatorialDist(seqlen, overlap, singlestranded=TRUE, maxhits=100)
 }
 \arguments{
 \item{seqlen}{Is an integer-valued vector that 
 defines the lengths of the individual sequences.}
-\item{maxhits}{Integer that sets the maximal number of motif hits.}
 \item{overlap}{Is a list that contains the overlap probabilities for the 
 motif. It is computed by overlap.prob(). }
+\item{maxhits}{Boolian value that indicates if only a single DNA strand is scanned
+for motif hits or if both DNA strands are scanned.
+Integer that sets the maximal number of motif hits.}
+\item{maxhits}{Integer that sets the maximal number of motif hits.}
 }
 
 \examples{
@@ -25,19 +28,18 @@ library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 pwmfile=system.file("extdata","x31.pwm", package="mdist")
 alpha=0.001
-gran=0.01
-mdist.option(alpha, gran)
+mdistOption(alpha)
 
 # estimate background model from seqfile
-read.background(seqfile,1)
+readBackground(seqfile,1)
 
 # load motif model from pwmfile
-read.motif(pwmfile,"tab", 0.01)
+readMotif(pwmfile,"tab", 0.01)
 
 # Compute overlap probabilies
-op=overlap.prob()
+op=probOverlapHit(singlestranded=TRUE)
 seqlen=rep(100,1)
 # Computes the distribution of the number of motif hits
-dist=dynprog.count(seqlen, maxhits=10, op)
+dist=combinatorialDist(seqlen, op, singlestranded=TRUE)
 }
 

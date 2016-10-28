@@ -1,15 +1,15 @@
-\name{read.background.sampling}
-\alias{read.background.sampling}
-\title{Estimates the background model for sampling}
+\name{readBackground}
+\alias{readBackground}
+\title{Estimates the background model}
 \description{
 This function reads a DNA sequence in fasta format and estimates
 and order m Markov model.
 }
 \usage{
-read.background.sampling(file,order=1)
+readBackground(file,order=1)
 }
 \arguments{
-\item{file}{Name of the sequence file in fasta format.}
+\item{file}{Filename where the sequence is stored in. The file must be in fasta format.}
 
 \item{order}{Defines the order of the Markov models used for the background.
 Default: order=1.}
@@ -20,6 +20,6 @@ Default: order=1.}
 
 library(mdist)
 file=system.file("extdata","seq.fasta", package="mdist")
-read.background.sampling(file,1)
+readBackground(file,1)
 
 }

@@ -1,11 +1,11 @@
-\name{print.background}
-\alias{print.background}
+\name{printBackground}
+\alias{printBackground}
 \title{Prints the current background model}
 \description{
-This function prints the currently loaded background model.
+This function prints the currently loaded background model. 
 }
 \usage{
-print.background()
+printBackground()
 }
 \examples{
 # Estimate first order Markov model based on the sequence provided
@@ -13,7 +13,7 @@ print.background()
 
 library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
-read.background(file=seqfile,1)
-print.background()
+readBackground(file=seqfile,1)
+printBackground()
 
 }

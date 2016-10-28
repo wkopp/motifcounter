@@ -1,5 +1,5 @@
-\name{num.motifhits}
-\alias{num.motifhits}
+\name{numMotifHits}
+\alias{numMotifHits}
 \title{Number of motif hits in a given DNA sequence}
 \description{
 The function scans a given DNA sequence or a set of sequences
@@ -9,7 +9,7 @@ It returns the length of each sequence supplied in the fasta file
 and the number of hits observed across all sequences.
 }
 \usage{
-num.motifhits(seqfile)
+numMotifHits(seqfile)
 }
 \arguments{
 \item{seqfile}{Name of the sequence file in fasta format.}
@@ -23,14 +23,13 @@ library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 pwmfile=system.file("extdata","x31.pwm", package="mdist")
 alpha=0.001
-gran=0.01
-mdist.option(alpha, gran)
+mdistOption(alpha)
 
-read.background(seqfile,1)
-read.motif(pwmfile,"tab",0.01)
+readBackground(seqfile,1)
+readMotif(pwmfile,0.01)
 
 # scan the given sequence for the motif occurances
-noc=num.motifhits(seqfile)
+noc=numMotifHits(seqfile)
 noc
 }
 

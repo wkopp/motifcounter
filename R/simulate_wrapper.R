@@ -1,5 +1,5 @@
 
-sim.scores=function(seqlen, nsim) {
+simulateScoreDist=function(seqlen, nsim) {
   scorerange=integer(1)
   scorerange=.C("Rscorerange",as.integer(scorerange))[[1]]
   scores=numeric(scorerange); dist=numeric(scorerange)
@@ -9,10 +9,10 @@ sim.scores=function(seqlen, nsim) {
     as.integer(nsim))
 }
 
-sim.counts=function(seqlen, maxhits, nsim) {
-	if (length(seqlen)<=0) {
-		stop("seqlen must be non-empty")
-	}
+simulateNumHitsDist=function(seqlen, maxhits, nsim) {
+  if (length(seqlen)<=0) {
+    stop("seqlen must be non-empty")
+  }
   dist=numeric(maxhits+1);
   .C("RsimulateCountDistribution", as.numeric(dist), 
     as.integer(nsim), as.integer(length(seqlen)),as.integer(seqlen), as.integer(maxhits))

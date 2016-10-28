@@ -1,12 +1,12 @@
-\name{num.sequences}
-\alias{num.sequences}
+\name{numSequences}
+\alias{numSequences}
 \title{Number of sequence in a provided fasta file}
 \description{
 The function parses a fasta file and returns the number of individual
 sequence in it.
 }
 \usage{
-num.sequences(seqfile)
+numSequences(seqfile)
 }
 \arguments{
 \item{seqfile}{Name of the sequence file in fasta format.}
@@ -20,7 +20,7 @@ library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 
 # scan the given sequence for the motif occurances
-nseq=num.sequences(seqfile)
+nseq=numSequences(seqfile)
 nseq
 }
 

@@ -10,8 +10,8 @@ motif2matrix()
 \examples{
 
 library(mdist)
-pwmfile=system.file("extdata","x31.pwm", package="mdist")
-read.motif(pwmfile,"tab")
+pwmfile=system.file("extdata","x31.tab", package="mdist")
+readMotif(pwmfile)
 x=motif2matrix()
 }
 

@@ -1,31 +1,37 @@
 
 #interface functions for motif representation
-read.background=function(file, order=1) {
-	 nseq=num.sequences(file)
-   lseq=len.sequences(file)
-    dummy=.C("Rmakebg", as.character(file), as.integer(order),
+readBackground=function(file, order=1) {
+   nseq=numSequences(file)
+   lseq=lenSequences(file)
+   dummy=.C("Rmakebg", as.character(file), as.integer(order),
     				 as.integer(nseq),as.integer(lseq))
 }
 
-print.background=function() {
+fetchBackground=function() {
+    stat=.Call("fetchStationBackground");
+    trans=.Call("fetchTransBackground");
+    return(list(stat,trans))
+}
+
+printBackground=function() {
   dummy=.C("RprintBackground");
 }
 
-delete.background=function() {
+deleteBackground=function() {
   dummy=.C("RdestroyBackground")
 }
 
-read.background.sampling=function(file, order=1) {
+readBackgroundForSamplingampling=function(file, order=1) {
 	 nseq=num.sequences(file)
    lseq=len.sequences(file)
   dummy=.C("RmakebgForSampling", as.character(file), as.integer(order),
   				 as.integer(nseq),as.integer(lseq))
 }
 
-print.background.sampling=function() {
+printBackgroundForSampling=function() {
   dummy=.C("RprintBackgroundForSampling");
 }
 
-delete.background.sampling=function() {
+deleteBackgroundSampling=function() {
   dummy=.C("RdestroyBackgroundForSampling")
 }

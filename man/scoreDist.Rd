@@ -1,0 +1,31 @@
+\name{scoreDist}
+\alias{scoreDist}
+\title{Score distribution}
+\description{
+This function computes the score distribution for the provided PFM and
+order m background. The Score distribution is computed based on dynamic programming.
+}
+\usage{
+scoreDist()
+}
+%\arguments{ }
+\examples{
+
+library(mdist)
+# Set the significance level and granularity for the score computation
+mdistOption(alpha=0.01,gran=0.1)
+
+# Load the DNA sequence and a Motif
+seqfile=system.file("extdata","seq.fasta", package="mdist")
+pwmfile=system.file("extdata","x31.tab",package="mdist")
+
+# Load the order-1 background model from the DNA sequence
+readBackground(seqfile,1)
+
+# Load the motif from the pwmfile
+readMotif(pwmfile)
+
+# Compute the score distribution
+dp=scoreDist()
+}
+

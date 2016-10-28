@@ -1,12 +1,15 @@
-\name{read.background}
-\alias{read.background}
-\title{Estimates the background model}
+\name{readBackgroundForSampling}
+\alias{readBackgroundForSampling}
+\title{Estimates the background model for sampling}
 \description{
 This function reads a DNA sequence in fasta format and estimates
-and order m Markov model.
+and order m Markov model. This function is only used when simulated 
+DNA sequences are scanned by the model.
+ The compound Poisson model and the combinatorial model do not
+use this backgroud model.
 }
 \usage{
-read.background(file,order=1)
+readBackgroundForSampling(file,order=1)
 }
 \arguments{
 \item{file}{Name of the sequence file in fasta format.}
@@ -20,6 +23,6 @@ Default: order=1.}
 
 library(mdist)
 file=system.file("extdata","seq.fasta", package="mdist")
-read.background(file,1)
+readBackgroundForSampling(file,1)
 
 }
