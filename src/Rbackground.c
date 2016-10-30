@@ -1,4 +1,5 @@
 #include <R.h>
+#include <Rinternals.h>
 #include "sequence.h"
 #include "overlap.h"
 #include "background.h"
@@ -10,6 +11,7 @@ void RdestroyBackground();
 void Rmakebg(char **infasta, int *order, int *nseq, int *lseq) {
   FILE *f;
   double *count;
+  int i;
 
   RdestroyBackground();
   f =fopen(infasta[0],"r");
@@ -30,6 +32,9 @@ void Rmakebg(char **infasta, int *order, int *nseq, int *lseq) {
 
     getForwardTransition(count, Rtrans, order[0]);
     getStationaryDistribution(Rtrans, Rstation, order[0]);
+    //Rprintf("Nucleotide-counts\n");
+    //for (i=0; i<power(ALPHABETSIZE,order[0]+1);i++)
+    //    Rprintf("%e\n",count[i]);
 
   } else {
     Rstation=Calloc(power(ALPHABETSIZE,order[0]+1),double);
@@ -41,7 +46,25 @@ void Rmakebg(char **infasta, int *order, int *nseq, int *lseq) {
     getNucleotideFrequencyFromSequence(f,count, order[0], nseq,lseq);
     getForwardTransition(count, Rstation, order[0]);
     getForwardTransition(count, Rtrans, order[0]);
+    //Rprintf("Nucleotide-counts\n");
+    //for (i=0; i<power(ALPHABETSIZE,order[0]+1);i++)
+    //    Rprintf("%e\n",count[i]);
+
   }
+  // check if all transition probabilities are greater than zero
+  for (i=0; i<power(ALPHABETSIZE,order[0]+1);i++) {
+      if (count[i]<=0) {
+          RdestroyBackground();
+          fclose(f);
+          Free(count);
+          error("All transition probabilities must be greater than zero:"
+                  "Either reduce the order of the Markov model or use a DNA "
+                  "sequence that is more heterogeneous");
+          return;
+      }
+  }
+
+  
   fclose(f);
   Rorder=order[0];
 
@@ -74,3 +97,32 @@ void RdestroyBackground() {
   Rtrans=NULL;
 }
 
+SEXP fetchStationBackground() {
+  int i,or_;
+  SEXP station;
+  if (!Rstation) return R_NilValue;
+
+  or_=(Rorder==0) ? 1 : Rorder;
+
+  PROTECT(station=allocVector(REALSXP,power(ALPHABETSIZE,or_)));
+  for (i=0; i<power(ALPHABETSIZE,or_); i++) {
+    REAL(station)[i]=Rstation[i];
+  }
+  UNPROTECT(1);
+  return station;
+}
+
+SEXP fetchTransBackground() {
+  int i,or_;
+  SEXP trans;
+  if (!Rtrans) return R_NilValue;
+
+  or_=Rorder+1;
+
+  PROTECT(trans=allocVector(REALSXP,power(ALPHABETSIZE,or_)));
+  for (i=0; i<power(ALPHABETSIZE,or_); i++) {
+    REAL(trans)[i]=Rtrans[i];
+  }
+  UNPROTECT(1);
+  return trans;
+}
