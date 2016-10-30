@@ -43,24 +43,18 @@ void RsimulateCountDistribution( double *distribution, int* perm,
   }
   GetRNGstate();
 
-  //seqlen=slen[0];
   maxhits=mxhit[0];
   Nperm=perm[0];
   pvalue=Rsiglevel;
   dx=Rgran;
-  //nos=snos[0];
 
   // compute significance threshold
   initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
-
   loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
   loadIntervalSize(&escore, NULL);
-//  intervalsize=maxScoreIntervalSize(&escore);
-    //size1=maxScoreIntervalSize(&uescore1);
-    //size2=maxScoreIntervalSize(&uescore2);
 
-		intervalsize=getTotalScoreUpperBound(&escore)-
-			getTotalScoreLowerBound(&escore)+1;
+  intervalsize=getTotalScoreUpperBound(&escore)-
+		getTotalScoreLowerBound(&escore)+1;
 
   initScoreMetaInfo(getTotalScoreLowerBound(&escore),
            getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
@@ -147,14 +141,6 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
    	error("Allocation for sequence failed");
   }
 
-  initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
-
-  loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
-  loadIntervalSize(&escore, NULL);
-
-  mins=getTotalScoreLowerBound(&escore);
-  maxs=getTotalScoreUpperBound(&escore);
-
   initExtremalScore(&fescore, dx, Rpwm->nrow, Rorder);
   initExtremalScore(&rescore, dx, Rcpwm->nrow, Rorder);
 
@@ -180,10 +166,12 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
     distribution[n]/=(double)Nperm*(seqlen-Rpwm->nrow+1);
   }
 
+  Rprintf("min:%d, max:%d\n",mins,maxs);
   for (i=0; i<maxs-mins+1; i++) {
     scores[i]= (double)(mins+i)*dx;
   }
-  deleteExtremalScore(&escore);
+  deleteExtremalScore(&fescore);
+  deleteExtremalScore(&rescore);
   PutRNGstate();
   Free(seq);
 }

@@ -12,6 +12,7 @@ deleteMotif,
 readMotif,
 simulateScoreDist,
 scoreDist,
+scoreDistBf, # only for debugging
 numMotifhits,
 simulateNumHitsDist,
 probOverlapHit,
