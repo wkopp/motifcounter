@@ -6,11 +6,14 @@ readMotif=function(pwm, pseudocount=0.01) {
     if (nrow(pwm)!=4) {
         stop("The number of rows must be 4, representing the number nucleotides.")
     }
+    pwm=pwm+pseudocount
     pwm=pwm/apply(pwm,2,sum)
     dummy=.C("Rloadmotif", as.numeric(pwm), nrow(pwm), ncol(pwm))
-  } else {
+  } else if (is.character(pwm)) {
     sdummy=.C("Rmotiffromfile", as.character(pwm),
         as.numeric(pseudocount))
+  } else {
+      stop("pwm must be a filename pointing that contains a PFM or a PFM matrix")
   }
 }
 
