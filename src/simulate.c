@@ -173,21 +173,18 @@ int countOccurancesSingleStranded(double *station, double *trans,
  int qalpha, double granularity, int order) {
  int count=0, palhits=0;
  //int f=0; 
- int jump;
  int index;
  int s, i,j;
  int score[power(ALPHABETSIZE, order+1)];
 
- for (i=0; i< seqlen-pwm->nrow+1; i++) {
-   // do not calculate the score if there are non-nucleotides in the sequence
-   jump=0;
-   for (j=0; j<pwm->nrow; j++) {
-     if (getNucIndex(seq[i+j])<0) {
-       jump=1; break;
-     }
-   }
-   if(jump>0) continue;
+  // if the sequence contains any N's, do not process the scores
+  for (i=0; i<seqlen;i++) {
+    if (getNucIndex(seq[i])<0) {
+        return;
+    }
+  }
 
+ for (i=0; i< seqlen-pwm->nrow+1; i++) {
 
    s=0;
    index=0;
@@ -224,44 +221,38 @@ int countOccurancesSingleStranded(double *station, double *trans,
 void scoreOccurances(double *station, double *trans, 
   DMatrix *pwm, char *seq, int seqlen,
  double *dist, double granularity, int smin, int order) {
- int i, j;
- int is, index, jump;
- double s;
+  int i, j;
+  int is, index;
+  int s=0;
+  int score[power(ALPHABETSIZE, order+1)];
 
+  // if the sequence contains any N's, do not process the scores
+  for (i=0; i<seqlen;i++) {
+    if (getNucIndex(seq[i])<0) {
+        return;
+    }
+  }
 
  for (i=0; i< seqlen-pwm->nrow+1; i++) {
-   s=0.0;
    index=0;
-   // jump section has the purpose of avoiding
-   // to process any non-nucleotide letters
-   jump=0;
-   for (j=0; j<pwm->nrow; j++) {
-     if (getNucIndex(seq[i+j])<0) {
-       jump=1; break;
-      }
-    }
-    if(jump>0) continue;
 
-   if (order>0)  {
-     for (j=0; j<order; j++) {
-       s+=log(pwm->data[getNucIndex(seq[i+j])]);
-       index+=getNucIndex(seq[j+i])*power(ALPHABETSIZE, order-j-1);
-     }
-     s-=log(station[index]);
+   if (order>0) {
+     getScoresInitialIndex(pwm->data, station, score, &granularity, order);
+     index=getIndexFromAssignment(&seq[i], order);
+     s=score[index];
    }
 
-   is=(int)roundl(s/granularity);
    for (j=order; j<pwm->nrow; j++) {
 
      index=index*ALPHABETSIZE + getNucIndex(seq[i+j]);
 
-     is+=getScoreIndex(pwm->data[j*ALPHABETSIZE +getNucIndex(seq[i+j])],
+     s+=getScoreIndex(pwm->data[j*ALPHABETSIZE +getNucIndex(seq[i+j])],
      trans[index],granularity);
 
      index-=(index/power(ALPHABETSIZE,order))*power(ALPHABETSIZE,order);
    }
-   //is=s;
-   dist[is-smin]++;
+   //Rprintf("s=%d\n",s-smin);
+   dist[s-smin]++;
  }
 }
 
