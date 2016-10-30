@@ -122,16 +122,16 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
   int mins, maxs;
   int seqlen, Nperm;
   double dx;
-	double *rstat, *rtrans;
+  //double *rstat, *rtrans;
 
   if (Rgran==0.0) {
-    error("call mdist.option  first");
+    error("call mdistOption  first");
     return;
   }
   if (RstationForSampling==NULL || RtransForSampling==NULL) {
-    error("Background model uninitialized! Use ead.background.sampling()");
+    error("Background model uninitialized! Use readBackgroundForSampling()");
     return;
-	}
+  }
 
   //srand(time(0));
   GetRNGstate();
@@ -170,17 +170,12 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
   maxs=(fmaxs>rmaxs) ? fmaxs : rmaxs;
   mins=(fmins>rmins) ? fmins : rmins;
 
-	if (Rorder>0) {
-   // rstat=Calloc(Rorder, double);
-   // rtrans=Calloc(Rorder+1, double);
-	}
   for (n=0; n<Nperm; n++) {
-    generateRandomSequence(RstationForSampling, RtransForSampling, seq, seqlen, RorderForSampling);
-		//if (Rorder>0) randomStatistics(seq, seqlen, rstat, rtrans);
-    scoreOccurances(Rstation, Rtrans, Rpwm, seq, seqlen, distribution, dx, mins,Rorder);
+    generateRandomSequence(RstationForSampling, 
+            RtransForSampling, seq, seqlen, RorderForSampling);
+    scoreOccurances(Rstation, Rtrans, 
+            Rpwm, seq, seqlen, distribution, dx, mins,Rorder);
   }
-	//if (Rorder>0) normalizeStatistics(rstat, rtrans);
-	//if(Rorder>0) printBackground(rstat,rtrans,Rorder);
   for (n=0; n<maxs-mins+1; n++) {
     distribution[n]/=(double)Nperm*(seqlen-Rpwm->nrow+1);
   }
