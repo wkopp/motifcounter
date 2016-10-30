@@ -21,9 +21,9 @@ deleteBackground=function() {
   dummy=.C("RdestroyBackground")
 }
 
-readBackgroundForSamplingampling=function(file, order=1) {
-	 nseq=num.sequences(file)
-   lseq=len.sequences(file)
+readBackgroundForSampling=function(file, order=1) {
+	 nseq=numSequences(file)
+   lseq=lenSequences(file)
   dummy=.C("RmakebgForSampling", as.character(file), as.integer(order),
   				 as.integer(nseq),as.integer(lseq))
 }
