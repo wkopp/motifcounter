@@ -17,7 +17,7 @@
 #include "score2d.h"
 #include "overlap.h"
 #include "countdist.h"
-#include "posteriorcount.h"
+#include "combinatorial.h"
 #include "markovchain.h"
 
 extern DMatrix *Rpwm, *Rcpwm;
