@@ -8,7 +8,7 @@
 
 #include "overlap.h"
 //#include "matrix.h"
-#include "posteriorcount.h"
+#include "combinatorial.h"
 #include "score2d.h"
 #include "markovchain.h"
 
