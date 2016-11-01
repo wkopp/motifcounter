@@ -10,6 +10,7 @@ void RdestroyBackgroundForSampling();
 void RmakebgForSampling(char **infasta, int *order, int *nseq, int *lseq) {
   FILE *f;
   double *count;
+  int i;
 
   RdestroyBackgroundForSampling();
   f =fopen(infasta[0],"r");
