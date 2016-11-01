@@ -3,9 +3,7 @@
 
 void generateRandomSequence(double *station, double *trans, char *seq, int seqlen, int order);
 void randomStatistics(char *seq, int seqlen, double *stat, double *trans);
-int countOccurances(double *station, double *trans, DMatrix *pwm, DMatrix *cpwm, char *seq, int seqlen,
- int qalpha, double granularity, int order);
-int countOccurancesSingleStranded(double *station, double *trans, DMatrix *pwm, DMatrix *cpwm, char *seq, int seqlen,
+int countOccurances(double *station, double *trans, DMatrix *pwm, char *seq, int seqlen,
  int qalpha, double granularity, int order);
 void scoreOccurances(double *station, double *trans, 
   DMatrix *pwm, char *seq, int seqlen,

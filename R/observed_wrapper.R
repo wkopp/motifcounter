@@ -15,13 +15,8 @@ numMotifHits=function(seqfile, singlestraned=TRUE) {
   nseq=numSequences(seqfile)
   lseq=lenSequences(seqfile)
   noh=vector(mode="integer",length=nseq)
-  if (singlestranded==TRUE) {
-    res=.C("RnumberOfHitsSingleStranded",as.character(seqfile),as.integer(noh),
-      as.integer(nseq), as.integer(lseq))
-  } else {
-    res=.C("RnumberOfHits",as.character(seqfile),as.integer(noh),
-      as.integer(nseq), as.integer(lseq))
-  }
+  res=.C("RnumberOfHits",as.character(seqfile),as.integer(noh),
+      as.integer(nseq), as.integer(lseq),as.integer(singlestranded))
   return (list(nseq=nseq, lseq=lseq,
       numofhits=res[[2]]))
 }

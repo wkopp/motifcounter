@@ -9,13 +9,11 @@ in a given sequence. The summation is done by employing
 dynamic programming.
 }
 \usage{
-combinatorialDist(seqlen, overlap, singlestranded=TRUE, maxhits=100)
+combinatorialDist(seqlen, overlap, maxhits=100)
 }
 \arguments{
 \item{seqlen}{Is an integer-valued vector that 
 defines the lengths of the individual sequences.}
-\item{overlap}{Is a list that contains the overlap probabilities for the 
-motif. It is computed by overlap.prob(). }
 \item{maxhits}{Boolian value that indicates if only a single DNA strand is scanned
 for motif hits or if both DNA strands are scanned.
 Integer that sets the maximal number of motif hits.}
@@ -40,6 +38,6 @@ readMotif(pwmfile,"tab", 0.01)
 op=probOverlapHit(singlestranded=TRUE)
 seqlen=rep(100,1)
 # Computes the distribution of the number of motif hits
-dist=combinatorialDist(seqlen, op, singlestranded=TRUE)
+dist=combinatorialDist(seqlen, op)
 }
 

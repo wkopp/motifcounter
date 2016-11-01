@@ -9,10 +9,12 @@ It returns the length of each sequence supplied in the fasta file
 and the number of hits observed across all sequences.
 }
 \usage{
-numMotifHits(seqfile)
+numMotifHits(seqfile,singlestranded=F)
 }
 \arguments{
 \item{seqfile}{Name of the sequence file in fasta format.}
+\item{singlestranded}{Boolian flag that indicates whether a single strand or both strands
+shall be scanned for motif hits}
 
 }
 \examples{
@@ -28,8 +30,12 @@ mdistOption(alpha)
 readBackground(seqfile,1)
 readMotif(pwmfile,0.01)
 
-# scan the given sequence for the motif occurances
+# scan the given sequence on both strands for the motif occurances
 noc=numMotifHits(seqfile)
+noc
+
+# scan the given sequence on a single strand for the motif occurances
+noc=numMotifHits(seqfile,singlestraned=T)
 noc
 }
 

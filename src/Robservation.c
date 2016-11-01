@@ -12,8 +12,9 @@ extern DMatrix *Rpwm, *Rcpwm;
 extern double *Rstation, *Rtrans;
 extern double Rsiglevel, Rgran;
 
-void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq) {
-  int Nhits,  intervalsize;
+void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq,  
+        int *singlestranded) {
+  int intervalsize;
   ExtremalScore escore;
   MotifScore1d null;
   Sequence seq;
@@ -69,14 +70,18 @@ void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq) {
   getSequence(f,&seq);
   fclose(f);
 
-  for (s=0, Nhits=0;s<*nseq; s++) {
-    numofhits[s]+=countOccurances(Rstation, Rtrans, Rpwm, Rcpwm, seq.seq[s], seq.lseq[s], threshold, dx, Rorder);
+  for (s=0;s<*nseq; s++) {
+    numofhits[s]+=countOccurances(Rstation, Rtrans, Rpwm, seq.seq[s], seq.lseq[s], threshold, dx, Rorder);
+    if (*singlestranded==0) {
+        numofhits[s]+=countOccurances(Rstation, Rtrans, Rcpwm, seq.seq[s], seq.lseq[s], threshold, dx, Rorder);
+    }
   }
 
   destroySequence(&seq);
   //numofhits[0]=Nhits;
 }
 
+#ifdef WKO
 void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *nseq, int *lseq) {
   int Nhits,  intervalsize;
   ExtremalScore escore;
@@ -147,3 +152,4 @@ void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *nseq, in
   //numofhits[0]=Nhits;
 }
 
+#endif

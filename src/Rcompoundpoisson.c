@@ -33,10 +33,10 @@ void RcompoundpoissonPape_useGamma(double *gamma,
     return;
   }
 
-	seqlen=0;
-	for (i=0; i<*nseq; i++) {
-		seqlen+=lseq[i]-Rpwm->nrow+1;
-	}
+  seqlen=0;
+  for (i=0; i<*nseq; i++) {
+    seqlen+=lseq[i]-Rpwm->nrow+1;
+  }
   //seqlen=(slen[0]-Rpwm->nrow+1)*nos[0];
   maxclumpsize=(double)mclump[0];
   maxhits=(double)mhit[0];
@@ -56,16 +56,16 @@ void RcompoundpoissonPape_useGamma(double *gamma,
 
   lambda=computePoissonParameter(seqlen, Rpwm->nrow, 
       maxclumpsize, gamma[0],theta);
-  computeCompoundPoissonDistribution(lambda, maxhits, 
+  computeCompoundPoissonDistributionKemp(lambda, maxhits, 
       maxclumpsize, theta, hitdistribution);
   deleteTheta(theta);
 }
 
 void Rcompoundpoisson_useBeta(double *alpha, double *beta, 
   double *beta3p, double *beta5p,
-  double *hitdistribution, int *nseq, int *lseq, int * mhit, int *mclump) {
+  double *hitdistribution, int *nseq, int *lseq, int * mhit, int *mclump, int *sstrand) {
   int seqlen, i;
-  int maxclumpsize, maxhits;
+  int maxclumpsize, maxhits, singlestranded;
   double lambda;
   double *theta, extention[3];
   double *delta, *deltap;
@@ -83,41 +83,66 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
     return;
   }
 
-  //seqlen=(slen[0]-Rpwm->nrow+1)*nos[0];
-	seqlen=0;
-	for (i=0; i<*nseq; i++) {
-		seqlen+=lseq[i]-Rpwm->nrow+1;
-	}
+  //compute the total length of the sequence
+  seqlen=0;
+  for (i=0; i<*nseq; i++) {
+    seqlen+=lseq[i]-Rpwm->nrow+1;
+  }
+  //init the maximal clump size and the max number of hits
   maxclumpsize=(double)mclump[0];
   maxhits=(double)mhit[0];
+  singlestranded=*sstrand;
 
   delta=Calloc(Rpwm->nrow,double);
   deltap=Calloc(Rpwm->nrow,double);
-	if (delta==NULL||deltap==NULL) {
-		error("Memory-allocation in Rcompoundpoisson_useBeta failed");
-	}
+  if (delta==NULL||deltap==NULL) {
+    error("Memory-allocation in Rcompoundpoisson_useBeta failed");
+  }
 
+  // initialize the extention factors
   memset(extention, 0, 3*sizeof(double));
 
-	beta3p[0]=(beta3p[0]+EPSILON)/(1+2*EPSILON);
-  computeDeltas(delta, deltap, beta, beta3p,beta5p,Rpwm->nrow);
+  if (singlestranded==1) {
+    computeDeltasSingleStranded(delta, beta, Rpwm->nrow);
+
+    computeExtentionFactorsKoppSingleStranded(extention, beta, Rpwm->nrow);
+    Rprintf("extension=%e\n",extention[0]);
+    theta=initThetaSingleStranded(maxclumpsize);
+    if (theta==NULL) {
+      error("Memory-allocation in initTheta failed");
+    }
+
+    computeInitialClumpKoppSingleStranded(theta, delta, Rpwm->nrow);
+    computeThetaSingleStranded(maxclumpsize, theta, extention, Rpwm->nrow);
+
+    lambda=computePoissonParameterSingleStranded(seqlen, Rpwm->nrow, maxclumpsize, 
+        alpha[0],theta);
+    Rprintf("lambda=%e\n",lambda);
+
+    computeCompoundPoissonDistributionKempSingleStranded(lambda, maxhits, maxclumpsize, 
+      theta, hitdistribution);
+  } else {
+    beta3p[0]=(beta3p[0]+EPSILON)/(1+2*EPSILON);
+    computeDeltas(delta, deltap, beta, beta3p,beta5p,Rpwm->nrow);
 
 
-  computeExtentionFactorsKopp(extention, delta, deltap, beta, 
+    computeExtentionFactorsKopp(extention, delta, deltap, beta, 
       beta3p, beta5p, Rpwm->nrow);
-  theta=initTheta(maxclumpsize);
-  if (theta==NULL) {
-  	error("Memory-allocation in initTheta failed");
-	}
+    theta=initTheta(maxclumpsize);
+    if (theta==NULL) {
+      error("Memory-allocation in initTheta failed");
+    }
 
-  computeInitialClumpKopp(theta, beta3p,delta, deltap, Rpwm->nrow);
-  computeTheta(maxclumpsize, theta, extention, Rpwm->nrow);
+    computeInitialClumpKopp(theta, beta3p,delta, deltap, Rpwm->nrow);
+    computeTheta(maxclumpsize, theta, extention, Rpwm->nrow);
 
-  lambda=computePoissonParameter(seqlen, Rpwm->nrow, maxclumpsize, 
+    lambda=computePoissonParameter(seqlen, Rpwm->nrow, maxclumpsize, 
       alpha[0],theta);
 
-  computeCompoundPoissonDistribution(lambda, maxhits, maxclumpsize, 
+    computeCompoundPoissonDistributionKemp(lambda, maxhits, maxclumpsize, 
       theta, hitdistribution);
+  }
+
 
 
   deleteTheta(theta);
@@ -125,67 +150,4 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
   Free(deltap);
 }
 
-void Rcompoundpoisson_useBetaSingleStranded(double *alpha, double *beta, 
-  double *beta3p, double *beta5p,
-  double *hitdistribution, int *nseq, int *lseq, int * mhit, int *mclump) {
-  int i, seqlen;
-  int maxclumpsize, maxhits;
-  double lambda;
-  double *theta, extention[3];
-  double *delta, *deltap;
-
-  if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
-    error("load forground and background properly");
-    return;
-  }
-  if (!alpha||!beta||!beta3p||!beta5p||!hitdistribution||!nseq||!lseq||!mhit||!mclump) {
-    error("parameters are null");
-    return;
-  }
-  if (Rgran==0.0 || Rsiglevel==0.0) {
-    error("call mdist.option  first");
-    return;
-  }
-
-  //seqlen=(slen[0]-Rpwm->nrow+1)*nos[0];
-	seqlen=0;
-	for (i=0; i<*nseq; i++) {
-		seqlen+=lseq[i]-Rpwm->nrow+1;
-	}
-  maxclumpsize=(double)mclump[0];
-  maxhits=(double)mhit[0];
-
-  delta=Calloc(Rpwm->nrow,double);
-  deltap=Calloc(Rpwm->nrow,double);
-	if (delta==NULL||deltap==NULL) {
-		error("Memory-allocation in Rcompoundpoisson_useBetaSingleStranded failed");
-	}
-
-  memset(extention, 0, 3*sizeof(double));
-
-	//beta3p[0]=(beta3p[0]+EPSILON)/(1+2*EPSILON);
-  computeDeltas(delta, deltap, beta, beta3p,beta5p,Rpwm->nrow);
-
-
-  computeExtentionFactorsKopp(extention, delta, deltap, beta, 
-      beta3p, beta5p, Rpwm->nrow);
-  theta=initTheta(maxclumpsize);
-  if (theta==NULL) {
-  	error("Memory-allocation in initTheta failed");
-	}
-
-  computeInitialClumpKopp(theta, beta3p,delta, deltap, Rpwm->nrow);
-  computeTheta(maxclumpsize, theta, extention, Rpwm->nrow);
-
-  lambda=computePoissonParameter(seqlen, Rpwm->nrow, maxclumpsize, 
-      alpha[0]/2.0,theta);
-
-  computeCompoundPoissonDistribution(lambda, maxhits, maxclumpsize, 
-      theta, hitdistribution);
-
-
-  deleteTheta(theta);
-  Free(delta);
-  Free(deltap);
-}
 

@@ -17,7 +17,7 @@ extern double *RstationForSampling, *RtransForSampling;
 extern double Rsiglevel, Rgran;
 
 void RsimulateCountDistribution( double *distribution, int* perm, 
-   int *nseq, int *lseq, int *mxhit, int *snos) {
+   int *nseq, int *lseq, int *mxhit, int *singlestranded) {
   int seqlen,maxhits,Nperm, intervalsize;
   int *_nh;
   ExtremalScore escore;
@@ -33,7 +33,7 @@ void RsimulateCountDistribution( double *distribution, int* perm,
     error("load forground and background properly");
     return;
   }
-  if (!distribution||!perm||!nseq||!lseq||!mxhit||!snos) {
+  if (!distribution||!perm||!nseq||!lseq||!mxhit) {
     error("parameters are null");
     return;
   }
@@ -41,6 +41,8 @@ void RsimulateCountDistribution( double *distribution, int* perm,
     error("call mdist.option  first");
     return;
   }
+  Rprintf("perm=%d, nseq=%d, lseq=%d,maxhits=%d,singlestranded=%d\n",
+          perm[0],nseq[0],lseq[0],mxhit[0],singlestranded[0]);
   GetRNGstate();
 
   maxhits=mxhit[0];
@@ -70,12 +72,12 @@ void RsimulateCountDistribution( double *distribution, int* perm,
   deleteScoreDistribution1d(&null, Rorder);
   // end  of significance threshold computation
 
-	seqlen=0;
-	for (i=0; i<*nseq; i++) {
-		if(seqlen<lseq[i]) {
-			seqlen=lseq[i];
-		}
-	}
+  seqlen=0;
+  for (i=0; i<*nseq; i++) {
+    if(seqlen<lseq[i]) {
+      seqlen=lseq[i];
+    }
+  }
   seq=Calloc(seqlen+1,char);
   if (seq==NULL) {
   	error("Memory-allocation in RsimulateCountDistribution failed");
@@ -85,11 +87,21 @@ void RsimulateCountDistribution( double *distribution, int* perm,
   	error("Memory-allocation in RsimulateCountDistribution failed");
 	}
 
+  Rprintf("singlestranded=%d\n",*singlestranded);
+  if (*singlestranded==0) {
+      Rprintf("count in both strands\n");
+  }else{
+      Rprintf("count single  strands\n");
+  }
+
   for (n=0; n<Nperm; n++) {
     _nh[n]=0;
     for (s=0;s<*nseq; s++) {
       generateRandomSequence(RstationForSampling, RtransForSampling, seq, lseq[s], RorderForSampling);
-      _nh[n]+=countOccurances(Rstation, Rtrans, Rpwm, Rcpwm, seq, lseq[s], threshold, dx, Rorder);
+      _nh[n]+=countOccurances(Rstation, Rtrans, Rpwm, seq, lseq[s], threshold, dx, Rorder);
+      if (*singlestranded==0) {
+        _nh[n]+=countOccurances(Rstation, Rtrans, Rcpwm, seq, lseq[s], threshold, dx, Rorder);
+      }
 
     }
     if (_nh[n]>maxhits) _nh[n]=maxhits;
@@ -98,10 +110,7 @@ void RsimulateCountDistribution( double *distribution, int* perm,
     distribution[_nh[n]]+=1.0/(double)Nperm;
   }
 
-	Free(_nh);
-	//for (n=0; n<Nperm;n++) {
-	//	Free(seq[n]);
-	//}
+  Free(_nh);
   Free(seq);
   PutRNGstate();
 }
@@ -110,7 +119,6 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
   int *perm) {
   int i, n;
   char *seq=NULL;
-  ExtremalScore escore;
   ExtremalScore fescore, rescore;
   int fmins,fmaxs, rmins,rmaxs;
   int mins, maxs;

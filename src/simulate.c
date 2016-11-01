@@ -89,90 +89,9 @@ void normalizeStatistics(double *stat, double *trans) {
 }
 
 int countOccurances(double *station, double *trans, 
-  DMatrix *pwm, DMatrix *cpwm, char *seq, int seqlen,
+  DMatrix *pwm, char *seq, int seqlen,
  int qalpha, double granularity, int order) {
- int count=0, palhits=0;
- int f=0, jump;
- int index;
- int s, i,j;
- int score[power(ALPHABETSIZE, order+1)];
-
- for (i=0; i< seqlen-pwm->nrow+1; i++) {
-   // do not calculate the score if there are non-nucleotides in the sequence
-   jump=0;
-   for (j=0; j<pwm->nrow; j++) {
-     if (getNucIndex(seq[i+j])<0) {
-       jump=1; break;
-     }
-   }
-   if(jump>0) continue;
-
-
-   s=0;
-   index=0;
-   if (order>0) {
-     getScoresInitialIndex(pwm->data, station, score, &granularity, order);
-     index=getIndexFromAssignment(&seq[i], order);
-     s+=score[index];
-   }
-   for (j=order; j<pwm->nrow; j++) {
-
-     index*=ALPHABETSIZE;
-     index+=getNucIndex(seq[i+j]);
-
-     s+=getScoreIndex(pwm->data[j*ALPHABETSIZE +getNucIndex(seq[i+j])],
-     trans[index], granularity);
-
-     index-=(index/power(ALPHABETSIZE, order))*power(ALPHABETSIZE, order);
-   }
-   if (s>=qalpha) {
-     count++;
-     f=1;
-   }
-
-
-   s=0;
-   index=0;
-   if (order>0) {
-     getScoresInitialIndex(cpwm->data, station, score, &granularity, order);
-     index=getIndexFromAssignment(&seq[i], order);
-     s+=score[index];
-   }
-
-   for (j=order; j<pwm->nrow; j++) {
-
-     index*=ALPHABETSIZE;
-     index+=getNucIndex(seq[i+j]);
-
-     s+=getScoreIndex(cpwm->data[j*ALPHABETSIZE +getNucIndex(seq[i+j])],
-     trans[index], granularity);
-
-     index-=(index/power(ALPHABETSIZE, order))*power(ALPHABETSIZE, order);
-   }
-
-   if (f==0&&s>=qalpha) {
-     count++;
-   }
-   if (f==1&&s>=qalpha) {
-     palhits++;
-   }
-   f=0;
- }
- #ifdef DEBUG
- #ifdef IN_R
- Rprintf("%d\n", count+ palhits);
- #else
- printf("%d\n", count+ palhits);
- #endif
- #endif
- return count+palhits;
-}
-
-int countOccurancesSingleStranded(double *station, double *trans, 
-  DMatrix *pwm, DMatrix *cpwm, char *seq, int seqlen,
- int qalpha, double granularity, int order) {
- int count=0, palhits=0;
- //int f=0; 
+ int count=0;
  int index;
  int s, i,j;
  int score[power(ALPHABETSIZE, order+1)];
@@ -180,7 +99,7 @@ int countOccurancesSingleStranded(double *station, double *trans,
   // if the sequence contains any N's, do not process the scores
   for (i=0; i<seqlen;i++) {
     if (getNucIndex(seq[i])<0) {
-        return;
+        return 0;
     }
   }
 
@@ -205,25 +124,16 @@ int countOccurancesSingleStranded(double *station, double *trans,
    }
    if (s>=qalpha) {
      count++;
-     //f=1;
    }
  }
- #ifdef DEBUG
- #ifdef IN_R
- Rprintf("%d\n", count+ palhits);
- #else
- printf("%d\n", count+ palhits);
- #endif
- #endif
- return count+palhits;
+ return count;
 }
 
 void scoreOccurances(double *station, double *trans, 
   DMatrix *pwm, char *seq, int seqlen,
  double *dist, double granularity, int smin, int order) {
   int i, j;
-  int is, index;
-  int s=0;
+  int s, index;
   int score[power(ALPHABETSIZE, order+1)];
 
   // if the sequence contains any N's, do not process the scores
@@ -240,6 +150,8 @@ void scoreOccurances(double *station, double *trans,
      getScoresInitialIndex(pwm->data, station, score, &granularity, order);
      index=getIndexFromAssignment(&seq[i], order);
      s=score[index];
+   } else {
+     s=0;
    }
 
    for (j=order; j<pwm->nrow; j++) {
@@ -251,7 +163,7 @@ void scoreOccurances(double *station, double *trans,
 
      index-=(index/power(ALPHABETSIZE,order))*power(ALPHABETSIZE,order);
    }
-   //Rprintf("s=%d\n",s-smin);
+  // Rprintf("smin=%d, s=%d\n",smin,s);
    dist[s-smin]++;
  }
 }

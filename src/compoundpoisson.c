@@ -17,6 +17,13 @@
 //#include "overlap.h"
 
 #define DSTRANDED 2
+// This function determines the Poisson parameter
+// for scanning both strands of the DNA sequence
+//
+//      2 x alpha x (S-M+1)
+//      -------------------
+//         E[ clumpsize]
+//
 double computePoissonParameter(int seqlen, int mlen, 
    int maxclump, double alpha,double *theta) {
   int i;
@@ -24,19 +31,40 @@ double computePoissonParameter(int seqlen, int mlen,
   for (i=0; i<maxclump; i++) {
     ec+=(theta[i*DSTRANDED] + theta[i*DSTRANDED+1])*(double)(i+1);
   }
-//  ec=2.15;
-  //Rprintf("slen=%d, mlen=%d, alpha=%e, ec=%e, lambda=%e\n", seqlen,mlen,alpha,ec, ((double)2*(seqlen-mlen+1)*(alpha))/(ec));
   return ((double)2*(seqlen-mlen+1)*(alpha))/(ec);
 }
 
+// This function determines the Poisson parameter
+// for scanning a single strand of the DNA sequence
+//
+//        alpha x (S-M+1)
+//      -------------------
+//         E[ clumpsize]
+//
+double computePoissonParameterSingleStranded(int seqlen, int mlen, 
+   int maxclump, double alpha,double *theta) {
+  int i;
+  double ec=0.0;
+  for (i=0; i<maxclump; i++) {
+    ec+=(theta[i])*(double)(i+1);
+  }
+  return ((double)(seqlen-mlen+1)*(alpha))/(ec);
+}
+
+// allocate the memory required to compute the clump size distribution
 double *initTheta(int maxclump) {
   return Calloc(maxclump*DSTRANDED, double);
 }
+double *initThetaSingleStranded(int maxclump) {
+  return Calloc(maxclump, double);
+}
 
+// free the memory required to compute the clump size distribution
 void deleteTheta(double *theta) {
   Free(theta);
 }
 
+// This is the Pape et al. version of having a 1-clump
 void computeInitialClump(double *theta, double *gamma, int mlen) {
   int i;
   theta[0]=1-gamma[mlen];
@@ -48,6 +76,22 @@ void computeInitialClump(double *theta, double *gamma, int mlen) {
   }
 }
 
+// This is the Kopp et al. version of having a 1-clump for 
+// scanning both strands of the DNA sequence
+void computeInitialClumpKopp(double *theta, double *beta3p, 
+  double *delta, double *deltap, int mlen) {
+  theta[0]=delta[mlen-1];
+  theta[1]=deltap[mlen-1]*(1-beta3p[0]);
+}
+
+// This is the Kopp et al. version of having a 1-clump for 
+// scanning a single strand of the DNA sequence
+void computeInitialClumpKoppSingleStranded(double *theta, double *delta,  int mlen) {
+  theta[0]=delta[mlen-1];
+}
+
+// Computation of the extention factors according to Pape et al.
+// Note that this function is only applicable to scanning both DNA strands
 void computeExtentionFactorsPape(double *xi, double *gamma, int mlen) {
   int k, j;
   double xik;
@@ -106,88 +150,8 @@ void computeExtentionFactorsPape(double *xi, double *gamma, int mlen) {
   #endif
 }
 
-// Implementation based on separating the clumps
-// and convolving individual poisson distributions
-#ifdef for_later_use
-static void computeCompoundPoissonDistributionKopp(double lambda, 
-  int maxhit, int maxclump, double *theta, double *cp) {
-  int i, k;
-  double normalize=0.0;
-  double *pin1, *pin2;
-	
-	pin1=Calloc(maxhit+1, double);
-  if (pin1==NULL) {
-  	error("Memory-allocation in computeCompoundPoissonDistributionKopp failed");
-	}
-	pin2=Calloc(maxhit+1, double);
-  if (pin2==NULL) {
-  	error("Memory-allocation in computeCompoundPoissonDistributionKopp failed");
-	}
-
-	// init
-  for (k=0;k<=maxhit;k++) {
-    pin1[k]=dpois((double)k,
-    		lambda*(theta[0]+theta[1]), 0);
-	}
-
-	for (i=1; i<maxclump;i++) {
-    for (k=0;k*(i+1)<=maxhit;k++) {
-      pin2[k*(i+1)]=dpois((double)k,
-    		lambda*(theta[(i)*DSTRANDED]+theta[i*DSTRANDED+1]), 0);
-	  }
-	  convolute(cp, pin1,pin2,maxhit);
-	  memcpy(cp,pin1,(maxhit+1)*sizeof(double));
-	}
-  for (i=0; i<=maxhit; i++) normalize+=cp[i];
-  for (i=0; i<=maxhit; i++) cp[i]/=normalize;
-  
-  Free(pin1);
-  Free(pin2);
-}
-#endif
-
-// Implementation of Kemp et al., which was also used 
-// in Pape et al.
-static void computeCompoundPoissonDistributionKemp(double lambda, 
-  int maxhit, int maxclump, double *theta, double *cp) {
-  int i, j;
-  double p;
-  double normalize=0.0;
-
-  #ifdef DEBUG
-  Rprintf( "lambda=%f\n",lambda);
-  #endif
-  cp[0]=exp(-lambda);
-
-  for (i=1;i<maxhit;i++) {
-    p=0.0;
-    j=i-maxclump+1;
-    j=(j>0) ? j : 0;
-    for (; j<i;j++) {
-      p+=(i-j)*(theta[(i-j-1)*DSTRANDED]+theta[(i-j-1)*DSTRANDED +1])*cp[j];
-    }
-    cp[i]=lambda/((double)i)*p;
-  }
-  for (i=0; i<maxhit; i++) normalize+=cp[i];
-  for (i=0; i<maxhit; i++) cp[i]/=normalize;
-  
-
-}
-
-void computeCompoundPoissonDistribution(double lambda, 
-  int maxhit, int maxclump, double *theta, double *cp) {
-  computeCompoundPoissonDistributionKemp(lambda,
-  		maxhit,maxclump, theta,cp);
-}
-
-void computeInitialClumpKopp(double *theta, double *beta3p, 
-  double *delta, double *deltap, int mlen) {
-  theta[0]=delta[mlen-1];
-  theta[1]=deltap[mlen-1]*(1-beta3p[0]);
-}
-
-#define DEBUG
-#undef DEBUG
+// This function computes the extension factors according to Kopp et al.
+// for scanning both DNA strands
 void computeExtentionFactorsKopp(double *xi, 
   double *delta, double *deltap, double *beta, 
   double *beta3p, double *beta5p, int mlen) {
@@ -206,6 +170,22 @@ void computeExtentionFactorsKopp(double *xi,
   #endif
 
 }
+
+// This function computes the extension factors according to Kopp et al.
+// for scanning a single DNA strand
+void computeExtentionFactorsKoppSingleStranded(double *xi, double *beta, 
+  int mlen) {
+  int k;
+
+  for (k=1;k<mlen;k++) {
+    xi[0]+=beta[k];
+  }
+  #ifdef DEBUG
+  Rprintf("Extention factors: xi=%e\n",xi[0]);
+  #endif
+
+}
+
 void computeTheta(int maxclump, double *theta, 
   double *extention, int mlen) {
   int i;
@@ -239,4 +219,118 @@ void computeTheta(int maxclump, double *theta,
   }
 }
 
+
+void computeThetaSingleStranded(int maxclump, double *theta, 
+  double *extention, int mlen) {
+  int i;
+  double total=0.0;
+
+  // geometric series appoximation
+  total=theta[0];
+  //Rprintf("%e\n",total);
+  for (i=1;i<maxclump; i++) {
+    theta[i]= extention[0]*theta[(i-1)];
+
+    total+=(theta[i]);
+  }
+
+  // normalize the theta such that they sum up to one
+  for (i=0;i<maxclump; i++) {
+    theta[i]/=total;
+    Rprintf("total=%e, theta=%e\n",total, theta[i]);
+  }
+}
+
+
+// Implementation based on separating the clumps
+// and convolving individual poisson distributions
+#ifdef for_later_use
+static void computeCompoundPoissonDistributionKopp(double lambda, 
+  int maxhit, int maxclump, double *theta, double *cp) {
+  int i, k;
+  double normalize=0.0;
+  double *pin1, *pin2;
+	
+  pin1=Calloc(maxhit+1, double);
+  if (pin1==NULL) {
+    error("Memory-allocation in computeCompoundPoissonDistributionKopp failed");
+  }
+  pin2=Calloc(maxhit+1, double);
+  if (pin2==NULL) {
+    error("Memory-allocation in computeCompoundPoissonDistributionKopp failed");
+  }
+
+	// init
+  for (k=0;k<=maxhit;k++) {
+    pin1[k]=dpois((double)k,
+ 		lambda*(theta[0]+theta[1]), 0);
+  }
+
+  for (i=1; i<maxclump;i++) {
+    for (k=0;k*(i+1)<=maxhit;k++) {
+      pin2[k*(i+1)]=dpois((double)k,
+    		lambda*(theta[(i)*DSTRANDED]+theta[i*DSTRANDED+1]), 0);
+    }
+    convolute(cp, pin1,pin2,maxhit);
+    memcpy(cp,pin1,(maxhit+1)*sizeof(double));
+  }
+  for (i=0; i<=maxhit; i++) normalize+=cp[i];
+  for (i=0; i<=maxhit; i++) cp[i]/=normalize;
+  
+  Free(pin1);
+  Free(pin2);
+}
+#endif
+
+// Implementation of Kemp et al., which was also used 
+// in Pape et al.
+void computeCompoundPoissonDistributionKemp(double lambda, 
+  int maxhit, int maxclump, double *theta, double *cp) {
+  int i, j;
+  double p;
+  double normalize=0.0;
+
+  #ifdef DEBUG
+  Rprintf( "lambda=%f\n",lambda);
+  #endif
+  cp[0]=exp(-lambda);
+
+  for (i=1;i<maxhit;i++) {
+    p=0.0;
+    j=i-maxclump+1;
+    j=(j>0) ? j : 0;
+    for (; j<i;j++) {
+      p+=(i-j)*(theta[(i-j-1)*DSTRANDED]+theta[(i-j-1)*DSTRANDED +1])*cp[j];
+    }
+    cp[i]=lambda/((double)i)*p;
+  }
+  for (i=0; i<maxhit; i++) normalize+=cp[i];
+  for (i=0; i<maxhit; i++) cp[i]/=normalize;
+  
+
+}
+
+void computeCompoundPoissonDistributionKempSingleStranded(double lambda, 
+  int maxhit, int maxclump, double *theta, double *cp) {
+  int i, j;
+  double p;
+  double normalize=0.0;
+
+  #ifdef DEBUG
+  Rprintf( "lambda=%f\n",lambda);
+  #endif
+  cp[0]=exp(-lambda);
+
+  for (i=1;i<maxhit;i++) {
+    p=0.0;
+    j=i-maxclump+1;
+    j=(j>0) ? j : 0;
+    for (; j<i;j++) {
+      p+=(i-j)*theta[i-j-1]*cp[j];
+    }
+    cp[i]=lambda/((double)i)*p;
+  }
+  for (i=0; i<maxhit; i++) normalize+=cp[i];
+  for (i=0; i<maxhit; i++) cp[i]/=normalize;
+}
 

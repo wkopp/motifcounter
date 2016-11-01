@@ -1,10 +1,10 @@
 
-combinatorialDist=function(seqlen, overlap, singlestranded=TRUE, maxhits=100) {
+combinatorialDist=function(seqlen, overlap, maxhits=100) {
   if (!all(seqlen==seqlen[1])) {
      stop("The sequences must be of equal length for dynamic programming!");
   }
-  if (singlestranded==TRUE) {
-      warning("This function must be checked. Originally, the method was intended for scanning both DNA strands only.")
+  if (overlap$singlestranded==TRUE) {
+      warning("It must be checked if this function works without any changes in the single stranded case")
   }
   dist=numeric(maxhits+1)
   ret=.C("RPosteriorProbability", 

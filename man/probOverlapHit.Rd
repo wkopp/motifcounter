@@ -1,12 +1,12 @@
-\name{overlap.prob}
-\alias{overlap.prob}
+\name{probOverlapHit}
+\alias{probOverlapHit}
 \title{Motif overlap probabilities}
 \description{
 This function computes the self-overlapping probabilites of the motif
 for the loaded PWM and background based on dynamic programming.
 }
 \usage{
-overlap.prob()
+probOverlapHit(singlestranded=F)
 }
 
 \examples{
@@ -24,7 +24,10 @@ read.background(seqfile,1)
 # load motif model from pwmfile
 read.motif(pwmfile,"tab", 0.01)
 
-# compute the overlap probabilities
-op=overlap.prob()
+# compute the overlap probabilities for scanning both DNA strands
+op=overlap.prob(singlestranded=F)
+
+# compute the overlap probabilities for scanning a single DNA strand
+op=overlap.prob(singlestranded=T)
 }
 
