@@ -853,7 +853,7 @@ void computeConditionalOverlappingProbabilities(DMatrix *pwm1, DMatrix *pwm2, do
   int intervalsize, threshold, shift, submotiflen;
   int size1, size2;
   double quantile;
-  double alpha1, alpha2;
+  //double alpha1, alpha2;
   #ifndef IN_R
   #endif
 
@@ -896,8 +896,8 @@ void computeConditionalOverlappingProbabilities(DMatrix *pwm1, DMatrix *pwm2, do
     quantile=getQuantileWithIndex1d(&init1d1,
     		getQuantileIndex1d(&init1d1.totalScore,*pvalue));
     threshold=(int)(quantile/(*dx));
-    alpha1=getProbWithIndex1d(&init1d1, threshold);
-    alpha2=getProbWithIndex1d(&init1d2, threshold);
+    //alpha1=getProbWithIndex1d(&init1d1, threshold);
+    //alpha2=getProbWithIndex1d(&init1d2, threshold);
 //      Rprintf("Probability mass-null: %f\n",
  //       getProbability1d(&init1d1.totalScore, &init1d1.meta));
     //  Rprintf("pval=%f, th=%f th=%d pvalf=%f pvalr=%f\n", 
