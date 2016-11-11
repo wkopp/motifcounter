@@ -4,13 +4,15 @@ combinatorialDist=function(seqlen, overlap, maxhits=100) {
      stop("The sequences must be of equal length for dynamic programming!");
   }
   if (overlap$singlestranded==TRUE) {
-      warning("It must be checked if this function works without any changes in the single stranded case")
+      stop("Currently the combinatorial model only supports scanning
+            of both DNA strands")
   }
   dist=numeric(maxhits+1)
-  ret=.C("RPosteriorProbability", 
-  overlap$alpha, overlap$beta, overlap$beta3p, overlap$beta5p,
-  as.numeric(dist), as.integer(seqlen[1]),
-   as.integer(maxhits), as.integer(length(seqlen)))
+  ret=.C("mdist_combinatorialDist", 
+        overlap$alpha, overlap$beta, overlap$beta3p, overlap$beta5p,
+        as.numeric(dist), as.integer(seqlen[1]),
+        as.integer(maxhits), as.integer(length(seqlen)),
+        as.integer(overlap$singlestranded))
   return(list(dist=ret[[5]]))
 }
 

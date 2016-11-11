@@ -23,7 +23,7 @@ extern double Rgran, Rsiglevel;
 void RPosteriorProbability(double *alpha, double *beta, 
   double *beta3p, double *beta5p,
   double *hitdistribution, int *sseqlen,
-  int *smaxhits, int *snos) {
+  int *smaxhits, int *snos, int *singlestranded) {
   PosteriorCount prob;
   int seqlen;
   int i, maxhits, k, nos;
@@ -76,6 +76,7 @@ void RPosteriorProbability(double *alpha, double *beta,
   cgmin(1, &a0, &aN, &res, minmc, dmc, &fail, abstol, intol,
        (void*)extra, type, trace, &fncount, &gncount, 100);
 
+  Rprintf("alpha=%e, alpha'=%e\n",alpha[0], aN);
   Free(extra);
   removeDist();
 
