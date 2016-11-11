@@ -11,3 +11,5 @@ int getJasparMotifWidth(FILE *f);
 void getTableMotif(FILE *f, DMatrix *m, double pseudocount);
 void getTransfacMotif(FILE *f, DMatrix *m, double pseudocount);
 void getJasparMotif(FILE *f, DMatrix *m, double pseudocount);
+int getMemeMotifWidth(FILE *f);
+void getMemeMotif(FILE *f, DMatrix *m, double pseudocount);
