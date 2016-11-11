@@ -9,8 +9,8 @@
 
 mdist.unload=function() {
 # to be removed when the package is detached
-  dummy=.C("RdestroyBackground")
-  dummy=.C("Rdestroymotif")
+  dummy=.C("mdist_deleteBackground")
+  dummy=.C("mdist_deleteMotif")
   
   #to be removed alpha, beta, delta
 }

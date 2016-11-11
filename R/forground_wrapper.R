@@ -8,33 +8,27 @@ readMotif=function(pwm, pseudocount=0.01) {
     }
     pwm=pwm+pseudocount
     pwm=pwm/apply(pwm,2,sum)
-    dummy=.C("Rloadmotif", as.numeric(pwm), nrow(pwm), ncol(pwm))
+    dummy=.C("mdist_loadmotif", as.numeric(pwm), nrow(pwm), ncol(pwm))
   } else if (is.character(pwm)) {
-    sdummy=.C("Rmotiffromfile", as.character(pwm),
+    sdummy=.C("mdist_motiffromfile", as.character(pwm),
         as.numeric(pseudocount))
   } else {
       stop("pwm must be a filename pointing that contains a PFM or a PFM matrix")
   }
 }
 
-matrix2motif=function(data) {
-  if (!is.matrix(data)) {
-     stop("data must be a matrix")
-  }
-}
-
 deleteMotif=function() {
-  dummy=.C("Rdestroymotif")
+  dummy=.C("mdist_deleteMotif")
 }
 
 motif2matrix=function() {
-	m=.Call("fetchMotif");
+	m=.Call("mdist_fetchMotif");
 	return (m)
 }
 
 motifLength=function() {
   x=integer(1);
-  res=.C("Rmotiflength",x)
+  res=.C("mdist_motiflength",x)
   return (res[[1]])
 }
 
