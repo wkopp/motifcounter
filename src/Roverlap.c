@@ -81,7 +81,7 @@ void RoverlapSingleStranded(double *alpha, double *beta, double *beta3p, double 
     gamma[Rpwm->nrow*2+i]/=gamma[0];
   }
 
-  computeBetasSingleStranded(beta, beta3p,beta5p,gamma,Rpwm->nrow, 0.0);
+  computeBetasSingleStranded(beta, gamma,Rpwm->nrow, 0.0);
   *alpha=gamma[0];
 
 }

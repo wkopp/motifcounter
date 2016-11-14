@@ -1,29 +1,34 @@
 library(mdist)
 
-alpha=0.1
-gran=0.1
-seqlen=1000
-numofseqs=1
-maxhits=100
+for ( m in 0:3) {
+    seqfile=system.file("extdata","seq.fasta", package="mdist")
+    readBackground(seqfile,m)
 
+    printBackground()
+    seqfile=system.file("extdata","seq1.fasta", package="mdist")
+    readBackground(seqfile,m)
+    printBackground()
 
-seqfile=system.file("extdata","seq.fasta", package="mdist")
-read.background(seqfile,1)
-print.background()
-seqfile=system.file("extdata","seq1.fasta", package="mdist")
-read.background(seqfile,1)
-print.background()
-seqfile=system.file("extdata","seq2.fasta", package="mdist")
-read.background(seqfile,1)
-print.background()
+}
 
-seqfile=system.file("extdata","cpg.fa", package="mdist")
-num.sequences(seqfile)
-read.background(seqfile,1)
-print.background()
+library(mdist)
+seqfile=system.file("extdata","test.fa", package="mdist")
+readBackground(seqfile,0)
+printBackground()
+ret=fetchBackground()
+#c+g=21
+#a+t=9
+correct=c(12,21,21,12)/(66)
+if (all(ret[[1]]==correct)==FALSE) {
+    stop("Background model for order zero is incorrect")
+}
 
-#bgfile=system.file("extdata","background.bgbin", package="mdist")
-# num.sequences(seqfile)
-# len.sequences(seqfile)
-
-
+readBackground(seqfile,1)
+printBackground()
+ret=fetchBackground()
+#the correct number of observations
+correct=matrix(c(8,6,7,2,6,12,14,7,7,14,12,6,2,7,6,8),4,4)
+correct=correct/apply(correct,1,sum)
+if (all(t(matrix(ret[[2]],4,4))==correct)==FALSE) {
+    stop("Background model for order one is incorrect")
+}

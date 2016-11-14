@@ -13,6 +13,7 @@ int getForwardTransition(double *di, double *forwardtrans, int order);
 //int getReverseTransition(DMatrix *di, DMatrix *forwardtrans);
 //int getReverseTransition(DMatrix *di, DMatrix *stationary, DMatrix *reversetrans);
 void readBackground (FILE *f, double **station, double **trans, int *order);
+void printBackground(double *stat, double *trans, int);
 void deleteBackground(double * station, double *trans);
 int getStationaryDistribution(double *trans, double *station, int order);
 int makebg(char *infasta, char *outmodel, char *outseq, char *order);

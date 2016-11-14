@@ -1,6 +1,7 @@
 
 #include <R.h>
 #include <Rinternals.h>
+#include<string.h>
 #include "overlap.h"
 #include "forground.h"
 
@@ -19,7 +20,7 @@ int checkPositivity(DMatrix *pwm) {
   return 0;
 }
 
-void Rmotiffromfile(char **fmotif, double *pseudocount, char **format) {
+void Rmotiffromfile(char **fmotif, double *pseudocount) {
   FILE *f;
   //DMatrix *pwm, *cpwm;
   int mwidth;
@@ -27,67 +28,70 @@ void Rmotiffromfile(char **fmotif, double *pseudocount, char **format) {
 
   Rdestroymotif();
 
-    f=fopen(fmotif[0],"r");
-    if (f==NULL) {
-      error("%s not found!", fmotif[0]);
-      return;
-    }
-    if (strcmp(format[0], "tab")==0) {
-      mwidth=getTableMotifWidth(f);
-    } else if (strcmp(format[0], "transfac")==0){
-      mwidth=getTransfacMotifWidth(f);
-    } else if (strcmp(format[0], "jaspar")==0){
-      mwidth=getJasparMotifWidth(f);
-    } else {
-      error("%s: format is unknown\n", format[0]);
-      return;
-    }
+  f=fopen(fmotif[0],"r");
+  if (f==NULL) {
+    error("%s not found!", fmotif[0]);
+    return;
+  }
+  if (strcmp(&fmotif[0][strlen(fmotif[0])-strlen("tab")], "tab")==0) {
+    mwidth=getTableMotifWidth(f);
+  } else if (strcmp(&fmotif[0][strlen(fmotif[0])-strlen("transfac")], "transfac")==0){
+    mwidth=getTransfacMotifWidth(f);
+  } else if (strcmp(&fmotif[0][strlen(fmotif[0])-strlen("jaspar")], "jaspar")==0){
+    mwidth=getJasparMotifWidth(f);
+  //} else if (strcmp(&fmotif[0][strlen(fmotif[0])-strlen("meme")], "meme")==0){
+  //  mwidth=getMemeMotifWidth(f);
+  } else {
+    error("%s: format is unknown. \n", fmotif[0]);
+    return;
+  }
 
-    f=freopen(fmotif[0],"r",f);
+  f=freopen(fmotif[0],"r",f);
 
-    Rpwm=Calloc(1,DMatrix);
-    if (Rpwm==NULL) {
-    	error("Memory-allocation in Rmotiffromfile failed");
-    	return;
-    }
-    Rpwm->data=Calloc(4*mwidth,double);
-    if (Rpwm->data==NULL) {
-    	error("Memory-allocation in Rmotiffromfile failed");
-    	return;
-    }
-    Rpwm->ncol=4;Rpwm->nrow=mwidth;
+  Rpwm=Calloc(1,DMatrix);
+  if (Rpwm==NULL) {
+    error("Memory-allocation in Rmotiffromfile failed");
+    return;
+  }
+  Rpwm->data=Calloc(4*mwidth,double);
+  if (Rpwm->data==NULL) {
+    error("Memory-allocation in Rmotiffromfile failed");
+    return;
+  }
+  Rpwm->ncol=4;Rpwm->nrow=mwidth;
 
-    Rcpwm=Calloc(1,DMatrix);
-    if (Rcpwm==NULL) {
-    	error("Memory-allocation in Rmotiffromfile failed");
-    	return;
-    }
-    Rcpwm->ncol=4;Rcpwm->nrow=mwidth;
+  Rcpwm=Calloc(1,DMatrix);
+  if (Rcpwm==NULL) {
+    error("Memory-allocation in Rmotiffromfile failed");
+    return;
+  }
+  Rcpwm->ncol=4;Rcpwm->nrow=mwidth;
 
-    ps=(double)pseudocount[0];
+  ps=(double)pseudocount[0];
 
-    if (strcmp(format[0], "tab")==0) {
-      getTableMotif(f, Rpwm, ps);
-      getComplementaryMotif(Rpwm, Rcpwm);
-    } else if (strcmp(format[0], "transfac")==0){
-      getTransfacMotif(f, Rpwm, ps);
-      getComplementaryMotif(Rpwm, Rcpwm);
-    } else if (strcmp(format[0], "jaspar")==0){
-      getJasparMotif(f, Rpwm, ps);
-      getComplementaryMotif(Rpwm, Rcpwm);
-    } else {
-      Free(Rpwm->data);Free(Rpwm);
-      Free(Rcpwm->data);Free(Rcpwm);
-      error("this format is unknown\n");
-    }
-    fclose(f);
-    if (checkPositivity(Rpwm)!=0) {
-      Rdestroymotif();
-      error("All elements of the motif must be strictly positive!");
-    	return;
-    }
-    //printMotif(Rpwm);
-    //printMotif(Rcpwm);
+  if (strcmp(&fmotif[0][strlen(fmotif[0])-strlen("tab")], "tab")==0) {
+    getTableMotif(f, Rpwm, ps);
+    getComplementaryMotif(Rpwm, Rcpwm);
+  } else if (strcmp(&fmotif[0][strlen(fmotif[0])-strlen("transfac")], "transfac")==0){
+    getTransfacMotif(f, Rpwm, ps);
+    getComplementaryMotif(Rpwm, Rcpwm);
+  } else if (strcmp(&fmotif[0][strlen(fmotif[0])-strlen("jaspar")], "jaspar")==0){
+    getJasparMotif(f, Rpwm, ps);
+    getComplementaryMotif(Rpwm, Rcpwm);
+//  } else if (strcmp(&fmotif[0][strlen(fmotif[0])-strlen("meme")], "meme")==0){
+//    getMemeMotif(f, Rpwm, ps);
+//    getComplementaryMotif(Rpwm, Rcpwm);
+  } else {
+    Free(Rpwm->data);Free(Rpwm);
+    Free(Rcpwm->data);Free(Rcpwm);
+    error("this format is unknown\n");
+  }
+  fclose(f);
+  if (checkPositivity(Rpwm)!=0) {
+    Rdestroymotif();
+    error("All elements of the motif must be strictly positive!");
+    return;
+  }
 
   return;
 }

@@ -17,7 +17,7 @@
 #include "score2d.h"
 #include "overlap.h"
 #include "countdist.h"
-#include "posteriorcount.h"
+#include "combinatorial.h"
 #include "markovchain.h"
 
 extern DMatrix *Rpwm, *Rcpwm;
@@ -92,9 +92,10 @@ void markovchain(double *dist, double *a,
   prior=dist;
   alphacond=a[0];
   memset(prior, 0, (2*Rpwm->nrow+2)*sizeof(double));
-  prior[0]=1-a[0]*2;
-  prior[1]=a[0];
-  prior[2]=a[0];
+  //prior[0]=1-a[0]*2;
+  prior[0]=1.;
+  //prior[1]=a[0];
+  //prior[2]=a[0];
   //tmphits[0]=1;
 
   for (k=0; k<slen; k++) {

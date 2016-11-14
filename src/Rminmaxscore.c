@@ -23,7 +23,7 @@ void Rscorerange(int *scorerange) {
   }
 
   dx=Rgran;
-  Rprintf("range=%d, gran=%e\n",scorerange[0],dx);
+//  Rprintf("range=%d, gran=%e\n",scorerange[0],dx);
   initExtremalScore(&fescore, dx, Rpwm->nrow, Rorder);
   initExtremalScore(&rescore, dx, Rcpwm->nrow, Rorder);
 
@@ -36,13 +36,16 @@ void Rscorerange(int *scorerange) {
   rmins=getTotalScoreLowerBound(&rescore);
   fmaxs=getTotalScoreUpperBound(&fescore);
   rmaxs=getTotalScoreUpperBound(&rescore);
+//	Rprintf("Rscorerange: f[lb, ub]=[%d,%d]\n",fmins, fmaxs);
+//	Rprintf("Rscorerange: r[lb, ub]=[%d,%d]\n",rmins, rmaxs);
   maxs=(fmaxs>rmaxs) ? fmaxs : rmaxs;
-  mins=(fmins>rmins) ? fmins : rmins;
+  mins=(fmins<rmins) ? fmins : rmins;
+//	Rprintf("Rscorerange: [lb, ub]=[%d,%d]\n",mins, maxs);
 
   scorerange[0]=maxs-mins+1;
 
   deleteExtremalScore(&fescore);
   deleteExtremalScore(&rescore);
-  Rprintf("range=%d\n",scorerange[0]);
+ // Rprintf("range=%d\n",scorerange[0]);
 }
 

@@ -39,8 +39,6 @@ int getNucleotideFrequencyFromSequence(FILE *f, double *di, int order, int *nseq
 }
 
 int getStationaryDistribution(double *trans, double *station, int order) {
-  // use LAPACK to compute stationary distribution
-  //
   int j, i, k;
   double *tmp1, *tmp2, *tmpres, *tmpstart;
   int ass [order+1];
@@ -54,8 +52,8 @@ int getStationaryDistribution(double *trans, double *station, int order) {
   tmp1=Calloc(power(ALPHABETSIZE, order), double);
   tmp2=Calloc(power(ALPHABETSIZE, order), double);
   if (tmp1==NULL||tmp2==NULL) {
-  	error("Memory-allocation in getStationaryDistribution failed");
-	}
+    error("Memory-allocation in getStationaryDistribution failed");
+  }
   tmpres=tmp1;
   tmpstart=tmp2;
 
@@ -63,6 +61,8 @@ int getStationaryDistribution(double *trans, double *station, int order) {
     tmpstart[i]=1.0/(double)power(ALPHABETSIZE, order);
   }
 
+  // compute the stationary distribution using the power method
+  //
   for (i=0; i<1000; i++) {
     for (j=0; j<power(ALPHABETSIZE, order+1); j++) {
       getAssignmentFromIndex(j, order+1, ass);
@@ -75,9 +75,7 @@ int getStationaryDistribution(double *trans, double *station, int order) {
         previndex+=ass[k]*power(ALPHABETSIZE, order-k-1);
       }
 
-      //for (a=0; a<ALPHABETSIZE; a++) {
-        tmpres[nextindex]+=tmpstart[previndex]*trans[j];
-      //}
+      tmpres[nextindex]+=tmpstart[previndex]*trans[j];
     }
     if (tmpres==tmp1) {
       tmpstart=tmpres;
@@ -150,5 +148,27 @@ void readBackground (FILE *f, double **station, double **trans, int *order) {
     fread(*station, sizeof(double),ALPHABETSIZE,f );
     memcpy(*trans, *station, sizeof(double)*ALPHABETSIZE);
   }
+}
+
+void printBackground(double *stat, double *trans, int order) {
+  int i;
+	if (stat==NULL) return;
+
+  if (order>0) {
+    for (i=0; i<power(ALPHABETSIZE, order); i++) {
+      Rprintf("mu(i=%d)=%e\n", i, stat[i]);
+    }
+    for (i=0; i<power(ALPHABETSIZE, order+1); i++) {
+      Rprintf("T(i=%d)=%e\n", i, trans[i]);
+    }
+	} else {
+
+    for (i=0; i<power(ALPHABETSIZE, 1); i++) {
+      Rprintf("mu(i=%d)=%e\n", i, stat[i]);
+    }
+    for (i=0; i<power(ALPHABETSIZE, 1); i++) {
+      Rprintf("T(i=%d)=%e\n", i, trans[i]);
+    }
+	}
 }
 

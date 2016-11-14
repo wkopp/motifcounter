@@ -55,6 +55,28 @@ int getTransfacMotifWidth(FILE *f) {
   return mwidth;
 }
 
+int getMemeMotifWidth(FILE *f) {
+  int mwidth=0, i;
+  char line[LINELENGTH];
+  while(fgets(line, LINELENGTH, f)!=NULL) { 
+    if(strncmp(line,"letter-",7)==0) {
+      for (i=0; i<LINELENGTH; i++) {
+          if (strncmp(&line[i], "w= ", 3)==0) {
+            mwidth=atoi(&line[i+3]);
+            return mwidth;
+          }
+      }
+    }
+  }
+  if(ferror(f)) {
+    error("The motif does not appear to be in meme format");
+  }
+  if (mwidth==0) {
+    error("The motif does not appear to be in meme format");
+  }
+  return mwidth;
+}
+
 int getJasparMotifWidth(FILE *f) {
   error("getJasparMotifWidth ... to be implemented\n");
   return -1;
@@ -151,8 +173,84 @@ void getTransfacMotif(FILE *f, DMatrix *m, double pseudocount) {
   return;
 }
 
+void getMemeMotif(FILE *f, DMatrix *m, double pseudocount) {
+  int i=0, p;
+  float a,c,g,t, n;
+  char letter;
+  int startreading=0;
+  char line[LINELENGTH];
+  while(fgets(line, LINELENGTH,f)!=NULL) { 
+    if(strncmp(line,"letter-",7)==0) {
+      startreading=1;
+      continue;
+    }
+    if(strncmp(line,"XX",2)==0) {
+      startreading=0;
+      continue;
+    }
+    if (startreading==1) {
+      sscanf(line, "%d\t%f\t%f\t%f\t%f\t%c\n",&p, &a, &c,&g,&t,&letter);
+      n=a+c+g+t+4*pseudocount;
+   m->data[i*4]=((double)a + pseudocount)/(n);
+   m->data[i*4+1]=((double)c + pseudocount)/(n);
+   m->data[i*4+2]=((double)g + pseudocount)/(n);
+   m->data[i*4+3]=((double)t + pseudocount)/(n);
+  //   min=(min<posmin(posmin(m->data[i*4],m->data[i*4+1]),
+ //    posmin(m->data[i*4+2],m->data[i*4+3]))) ? min :
+ //    posmin(posmin(m->data[i*4],m->data[i*4+1]), posmin(m->data[i*4+2],m->data[i*4+3]));
+   i++;
+   }
+  }
+
+  return;
+}
+
 void getJasparMotif(FILE *f, DMatrix *m, double pseudocount) {
- error("getJasparMotif ...  to be implemented!\n");
+#ifdef TODO_WK
+  int i=0, p;
+  float a,c,g,t, n;
+  char letter;
+  int startreading=0;
+  char line[LINELENGTH];
+  char subline[LINELENGTH];
+  while(fgets(line, LINELENGTH,f)!=NULL) { 
+    if(strncmp(line,">MA",3)==0) {
+      startreading=1;
+      n=0;
+      continue;
+    }
+    if (startreading==1) {
+      pos=strtok(line,"[");
+      i=0;
+      if (isspace(pos[1])==0) {
+        m->data[i*4+n]=(atol(&pos[2]) + pseudocount);
+        pos=&pos[2]
+      } else {
+        m->data[i*4+n]=(atol(&pos[1]) + pseudocount);
+        pos=&pos[1]
+      }
+      i=1;
+      while(strtok(pos," ")!=NULL) {
+         pos=strtok(pos," ");
+         pos=&pos[1];
+         m->data[i*4+n]=(atol(&pos[1]) + pseudocount);
+         i++;
+      }
+      n++;
+    }
+         
+    for (i=0; i<m->nrow; i++) {
+      for (j=0; j<4; j++) {
+        tot+=m->data[i*4+j];
+      }
+      for (j=0; j<4; j++) {
+        m->data[i*4+1]/=(double)tot;
+      }
+    }
+#else
+    warning("getJasparMotif not yet implemented");
+#endif
+
  return;
 }
 

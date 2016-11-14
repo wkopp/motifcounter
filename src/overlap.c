@@ -28,6 +28,20 @@ void computeDeltas(double *delta, double *deltap,
   }
 }
 
+// delta_k=P(X_k=0, ...., X_1=0|X_0=1)
+void computeDeltasSingleStranded(double *delta, double *beta, int mlen) {
+  int i,k;
+  for (k=0;k<mlen;k++) {
+    delta[k]=1.0;
+    for (i=0; i<=k; i++) {
+      delta[k]-=(beta[i]);
+    }
+    #ifdef DEBUG
+    Rprintf("d%d=%f\n",k,delta[k]);
+    #endif
+  }
+}
+
 // beta_k=P(X_k=1, ...., X_1'=0,X_1=0|X_0=1)
 // beta_3pk=P(X_k'=1,X_k=0, ...., X_1'=0,X_1=0|X_0=1)
 // beta_5pk=P(X_k=1, ...., X_1'=0,X_1=0|X_0'=1)
@@ -58,31 +72,22 @@ void computeBetas(double *beta, double *beta3p, double *beta5p,
   #endif
 }
 
-void computeBetasSingleStranded(double *beta, double *beta3p, double *beta5p,
+// beta_k=P(X_k=1, .... ,X_1=0|X_0=1)
+void computeBetasSingleStranded(double *beta, 
   double *gamma, int mlen, double eps) {
   int i,k;
   
-  //beta3p[0]=0.0;
-
   //forward-forward
   for (k=1;k<mlen;k++) {
     beta[k]=gamma[k];
-    //beta3p[k]=0.0;
-    //beta5p[k]=0.0;
     for (i=0; i<k; i++) {
       beta[k]-=(beta[i]*gamma[k-i]);
       if (beta[k]<0.0) beta[k]=0;
-      //beta3p[k]-=(beta[i]*gamma[mlen+k-i] +beta3p[i]*gamma[k-i]);
-      //if (beta3p[k]<0.0) beta3p[k]=0;
-      //beta5p[k]-=(beta[i]*gamma[mlen*2+k-i] +beta5p[i]*gamma[k-i]);
-      //if (beta5p[k]<0.0) beta5p[k]=0;
 
     }
   }
   #ifdef DEBUG
   for (k=0; k<mlen;k++) Rprintf("beta%d=%f\n",k,beta[k]);
-  for (k=0; k<mlen;k++) Rprintf("beta3p%d=%f\n",k,beta3p[k]);
-  for (k=0; k<mlen;k++) Rprintf("beta5p%d=%f\n",k,beta5p[k]);
   #endif
 }
 

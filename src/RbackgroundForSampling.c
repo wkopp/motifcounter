@@ -10,6 +10,7 @@ void RdestroyBackgroundForSampling();
 void RmakebgForSampling(char **infasta, int *order, int *nseq, int *lseq) {
   FILE *f;
   double *count;
+  int i;
 
   RdestroyBackgroundForSampling();
   f =fopen(infasta[0],"r");
@@ -44,6 +45,19 @@ void RmakebgForSampling(char **infasta, int *order, int *nseq, int *lseq) {
     getForwardTransition(count, RstationForSampling, order[0]);
     getForwardTransition(count, RtransForSampling, order[0]);
   }
+  // check if all transition probabilities are greater than zero
+  for (i=0; i<power(ALPHABETSIZE,order[0]+1);i++) {
+      if (count[i]<=0) {
+          RdestroyBackgroundForSampling();
+          fclose(f);
+          Free(count);
+          error("All transition probabilities must be greater than zero:"
+                  "Either reduce the order of the Markov model or use a DNA "
+                  "sequence that is more heterogeneous");
+          return;
+      }
+  }
+
   fclose(f);
   RorderForSampling=order[0];
 
@@ -64,17 +78,7 @@ void RgetBackgroundForSampling(double *station, double *trans) {
 }
 
 void RprintBackgroundForSampling() {
-  int i;
-  int order_;
-
-  if (RorderForSampling>0) order_=RorderForSampling;
-  else order_=1;
-  for (i=0; i<power(ALPHABETSIZE, order_); i++) {
-    Rprintf("mu(i=%d)=%e\n", i, RstationForSampling[i]);
-  }
-  for (i=0; i<power(ALPHABETSIZE, order_+1); i++) {
-    Rprintf("T(i=%d)=%e\n", i, RtransForSampling[i]);
-  }
+  printBackground(RstationForSampling,RtransForSampling,RorderForSampling);
 }
 
 void RdestroyBackgroundForSampling() {
