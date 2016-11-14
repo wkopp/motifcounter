@@ -1,5 +1,7 @@
 # mdist - R package for determining motif enrichment in DNA sequences.
 
+[![Travis-CI Build Status](https://travis-ci.org/wkopp/mdist.svg?branch=master)](https://travis-ci.org/wkopp/mdist)
+
 The package implements functions for  elucidating the statistical enrichment 
 of known motif (e.g. from TRANSFAC or JASPAR) in a given DNA sequence of interest (e.g. a gene promoter).
 
