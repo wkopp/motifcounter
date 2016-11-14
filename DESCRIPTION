@@ -5,7 +5,7 @@ Version: 0.99.0
 Date: 2014-10-29
 Author: Wolfgang Kopp
 Suggests:
-    seqLogo
+    knitr, rmarkdown,BiocStyle
 Maintainer: Wolfgang Kopp <kopp@molgen.mpg.de>
 Description: The package contains methods to test for statistical enrichment of
     Transcription factor motifs in DNA sequences represented as higher order
@@ -13,3 +13,5 @@ Description: The package contains methods to test for statistical enrichment of
 License: GPL-2
 Packaged: 2014-10-29 14:08:04 UTC; kopp
 RoxygenNote: 5.0.0
+VignetteBuilder: knitr
+NeedsCompilation: yes
