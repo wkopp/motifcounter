@@ -4,24 +4,33 @@ library(mdist)
 alpha=0.01
 gran=0.1
 maxhits=200
-mdist.option(alpha, gran)
+mdistOption(alpha, gran)
 
-pwmname="x31.pwm"
-seqfile=system.file("extdata","seq.fasta", package="mdist")
-pwmfile=system.file("extdata",pwmname, package="mdist")
+# 1. test whether numSequences and lenSequences work
+seqfile=system.file("extdata","test.fa", package="mdist")
+nseq=numSequences(seqfile)
+if (nseq!=3) {
+    stop(paste("extdata/test.fa contains 3 sequences, but numSequences returned ", nseq))
+}
+lseq=lenSequences(seqfile)
+if (!all(lseq==c(23,10,0))) {
+    stop(paste("extdata/test.fa sequence lengths must be 23, 10 and 0, but lenSequences returned ", lseq))
+}
 
-read.background(seqfile,1)
-read.motif(pwmfile,"tab")
-#print.motif(pwmfile,"tab")
-
-nom=num.motifhits(seqfile)
-
-pwmname="x31.pwm"
+pwmname="x31.tab"
 seqfile=system.file("extdata","seq1.fasta", package="mdist")
 pwmfile=system.file("extdata",pwmname, package="mdist")
 
-read.background(seqfile,1)
-read.motif(pwmfile,"tab")
-#print.motif(pwmfile,"tab")
+readBackground(seqfile,1)
+readMotif(pwmfile)
 
-nom=num.motifhits(seqfile)
+nom=numMotifHits(seqfile)
+
+pwmname="x31.tab"
+seqfile=system.file("extdata","seq1.fasta", package="mdist")
+pwmfile=system.file("extdata",pwmname, package="mdist")
+
+readBackground(seqfile,1)
+readMotif(pwmfile)
+
+nom=numMotifHits(seqfile)

@@ -136,9 +136,12 @@ static R_CMethodDef cMethods[] = {
 
 
 
-void R_init_mdist(DllInfo *info)
-{
+void R_init_mdist(DllInfo *info) {
     R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
 }
 
-
+void R_unload_mdist(DllInfo *info) {
+    RdestroyBackground();
+    RdestroyBackgroundForSampling();
+    Rdestroymotif();
+}

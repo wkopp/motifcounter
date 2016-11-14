@@ -1,0 +1,70 @@
+
+
+#' Enrichment analysis of sequence motifs mdist
+#' 
+#' The package provides functions for scoring DNA sequences for motif
+#' occurrences and to test for enrichment of the motifs. For the enrichment
+#' test, we determine the the null distribution of the number of motif hits
+#' based on an improved compound Poisson approximation. Alternatively, we also
+#' support a novel combinatorial model for determining the null distribution.
+#' 
+#' \tabular{ll}{ Package: \tab mdist\cr Type: \tab Package\cr Version: \tab
+#' 1.0\cr Date: \tab 2016-11-04\cr License: \tab GPL-2\cr }
+#' 
+#' @name mdist-package
+#' @aliases mdist-package mdist
+#' @docType package
+#' @author Wolfgang Kopp
+#' 
+#' Maintainer: Wolfgang Kopp <kopp@@molgen.mpg.de>
+#' @keywords Position frequency matrix, Motif enrichment, Motif score
+#' @useDynLib mdist, .registration=TRUE
+#' @examples
+#' 
+#' library(mdist)
+#' # set motif scan options
+#' seqfile=system.file("extdata","seq.fasta", package="mdist")
+#' pwmfile=system.file("extdata","x31.tab", package="mdist")
+#' alpha=0.01
+#' gran=0.01
+#' seqlen=rep(100,1)
+#' maxhits=100
+#' mdistOption(alpha, gran)
+#' 
+#' # estimate background model from seqfile
+#' readBackground(seqfile,1)
+#' readBackgroundForSampling(seqfile,1)
+#' 
+#' # load motif model from pwmfile
+#' readMotif(pwmfile, 0.01)
+#' 
+#' # compute score distribution by dynamic programming
+#' dp=scoreDist()
+#' plot(dp[[1]],dp[[2]], col="green")
+#' 
+#' # simulate the number of motif hits on random sequences
+#' simc=simulateNumHitsDist(seqlen,maxhits,nsim=1000)
+#' 
+#' # Compute overlap probabilities
+#' op=probOverlapHit()
+#' 
+#' # compute a compound poisson approximation of the motif hits distribution
+#' cpdist=compoundPoissonDist(seqlen, op)
+#' 
+#' pdist=combinatorialDist(seqlen, op)
+#' 
+#' # plot the probability distributions
+#' plot(simc[[1]], main="Distribution of the number of motif hits",
+#'  xlab="# hits", ylab="Prob(hits)")
+#' points(cpdist[[1]],col="green")
+#' points(pdist[[1]],col="blue")
+#' legend(70,.23,c("simulated","Comp. Poisson","Combinatorial Dist."), 
+#'  fill=c("black","green", "blue"))
+#' 
+#' 
+#' 
+#' 
+NULL
+
+
+

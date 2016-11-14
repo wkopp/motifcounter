@@ -6,7 +6,6 @@ mdistOption(alpha)
 pwmname="x1.tab"
 pwmfile=system.file("extdata",pwmname, package="mdist")
 seqfile=system.file("extdata","seq.fasta", package="mdist")
-seqfile=system.file("extdata","cpg.fa", package="mdist")
 
 # 1. test:
 # with an order zero model only sample one letter for P times
@@ -51,7 +50,8 @@ if (!all(abs(sims[[2]]-dp[[2]])<1e-3)) {
 # test whether the range is equally long
 # test whether the zero entries in the score distribution overlap perfectly
 # test with the stationary probabilities of the background model only
-for (m in seq(0,5)) {
+
+for (m in seq(0,3)) {
     print(m)
     readBackground(seqfile, m)
     readBackgroundForSampling(seqfile,m)
@@ -92,7 +92,7 @@ for (m in seq(0,5)) {
 # test whether the range is equally long
 # test whether the zero entries in the score distribution overlap perfectly
 # test with the stationary and the transition probabilities
-for (m in seq(1,5)) {
+for (m in seq(1,3)) {
     print(m)
     readBackground(seqfile, m)
     readBackgroundForSampling(seqfile,m)
