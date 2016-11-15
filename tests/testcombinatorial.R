@@ -5,18 +5,18 @@ gran=0.1
 seqlen=100
 numofseqs=10
 maxhits=100
-mdist.option(alpha, gran)
+mdistOption(alpha, gran)
 
-pwmname="x3.pwm"
+pwmname="x3.tab"
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 pwmfile=system.file("extdata",pwmname, package="mdist")
 
-read.background(seqfile,1)
-read.motif(pwmfile,"tab", 0.01)
+readBackground(seqfile,1)
+readMotif(pwmfile, 0.01)
 
-op=overlap.prob()
+op=probOverlapHit()
 
-dist=dynprog.count(seqlen, maxhits, op)
+dist=combinatorialDist(seqlen, op)
 
 #dist2=posterior.count.debug(seqlen, numofseqs, maxhits, op,"poisson")
 #dist3=posterior.count.debug(seqlen, numofseqs, maxhits, op,"nbinom")
