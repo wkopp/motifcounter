@@ -23,7 +23,7 @@ library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 pwmfile=system.file("extdata","x31.tab", package="mdist")
 alpha=0.01
-gran=0.01
+gran=0.1
 seqlen=rep(100,1)
 maxhits=100
 mdistOption(alpha, gran)

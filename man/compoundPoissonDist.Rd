@@ -39,7 +39,7 @@ library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 pwmfile=system.file("extdata","x31.tab", package="mdist")
 alpha=0.001
-gran=0.01
+gran=0.1
 mdistOption(alpha, gran)
 
 # estimate background model from seqfile
