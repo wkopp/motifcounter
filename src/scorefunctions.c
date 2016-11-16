@@ -9,97 +9,99 @@
 #include "scorefunctions.h"
 #include "sequence.h"
 #include "forground.h"
-//#include "inputoutput.h"
 
 double ProbinitPWM (double b, double *f, int index, int order) {
-  double g=1;
-  int o, l;
+    double g=1;
+    int o, l;
 
-  for (o=0; o<order; o++) {
-    l=index/power(ALPHABETSIZE, order-o-1);
-    g*=f[o*ALPHABETSIZE+l];
-    index-=l*power(ALPHABETSIZE, order-o-1);
-  }
-  return g;
+    for (o=0; o<order; o++) {
+        l=index/power(ALPHABETSIZE, order-o-1);
+        g*=f[o*ALPHABETSIZE+l];
+        index-=l*power(ALPHABETSIZE, order-o-1);
+    }
+    return g;
 }
 double ProbinitBg (double b, double *f, int ass, int order) {
-  return b;
+    return b;
 }
 
 double ProbPWM (double b, double f) {
-
-  return f;
+    return f;
 }
 double ProbBg (double b, double f) {
-  return b;
+    return b;
 }
 
 void getScoresIndex(double *P,double *Q, int *score, double *dx) {
-  int i;
+    int i;
 
-  for (i=0;i<ALPHABETSIZE; i++) {
-    score[i]=getScoreIndex(P[i],Q[i],*dx);
-  }
+    for (i=0;i<ALPHABETSIZE; i++) {
+        score[i]=getScoreIndex(P[i],Q[i],*dx);
+    }
 }
 
-void getScoresInitialIndex(double *P,double *Q, int *score, double *dx, int order) {
-  int i, j;
-  int ass[order];
-  double s;
+void getScoresInitialIndex(double *P,double *Q, int *score, 
+        double *dx, int order) {
+    int i, j;
+    int ass[order];
+    double s;
 
-  if (order==0) {
-    order++;
-  }
-  for (i=0;i<power(ALPHABETSIZE, order); i++) {
-    s=0;
-    getAssignmentFromIndex(i, order, ass);
-    for (j=0; j<order; j++) {
-      s+=log(P[j*ALPHABETSIZE+ass[j]]);
+    if (order==0) {
+        order++;
     }
-    s-=log(Q[i]);
-    score[i]=(int)roundl(s/ (*dx));
-    //fprintf(stdout, "si=%d, s=%f\n",score[i], s);
-  }
+    for (i=0;i<power(ALPHABETSIZE, order); i++) {
+        s=0;
+        getAssignmentFromIndex(i, order, ass);
+        for (j=0; j<order; j++) {
+            s+=log(P[j*ALPHABETSIZE+ass[j]]);
+        }
+        s-=log(Q[i]);
+        score[i]=(int)roundl(s/ (*dx));
+        //fprintf(stdout, "si=%d, s=%f\n",score[i], s);
+    }
 }
 
 double getScore(double P,double Q) {
-  return log(P/Q);
+    return log(P/Q);
 }
 
 int getScoreIndex(double P,double Q, double dx) {
 
-  return (int)roundl(getScore(P,Q)/dx);
+    return (int)roundl(getScore(P,Q)/dx);
 }
 
 double getDiscretizedScore(double P, double Q, double dx) {
-  double s=(double)getScoreIndex(P,Q,dx);
-  return dx* s;
+    double s=(double)getScoreIndex(P,Q,dx);
+    return dx* s;
 }
 
-int initScoreMetaInfo (int smin, int smax, int intervalsize, double dx, ScoreMetaInfo *meta) {
-  meta->length=(intervalsize)+1;
-  meta->dx=dx;
-  meta->xmax=smax;
-  meta->xmin=smin;
-  if (smax-smin>meta->length) {error("score range length error, len=%d, xmax=%d, xmin=%d",
-  		intervalsize+1,smax,smin);}
-  meta->zero=0;
+int initScoreMetaInfo (int smin, int smax, int intervalsize, 
+        double dx, ScoreMetaInfo *meta) {
+    meta->length=(intervalsize)+1;
+    meta->dx=dx;
+    meta->xmax=smax;
+    meta->xmin=smin;
+    if (smax-smin>meta->length) {
+        error("score range length error, len=%d, xmax=%d, xmin=%d",
+                    intervalsize+1,smax,smin);
+    }
+    meta->zero=0;
 
-  meta->prob=&ProbBg;
-  meta->probinit=&ProbinitBg;
-  return 0;
+    meta->prob=&ProbBg;
+    meta->probinit=&ProbinitBg;
+    return 0;
 }
 
 void printSeq(int index, int len) {
 #ifndef IN_R
-  int tmp, i;
-  char nuc[]="acgt";
-  tmp=index;
-  for (i=0; i<len; i++) {
-    fprintf(stdout,"%c", nuc[tmp/power(ALPHABETSIZE,len-i-1)]);
-    tmp-=(tmp/power(ALPHABETSIZE,len-i-1))*power(ALPHABETSIZE,len-i-1);
-  }
-  #endif
+    int tmp, i;
+    char nuc[]="acgt";
+    tmp=index;
+    for (i=0; i<len; i++) {
+        fprintf(stdout,"%c", nuc[tmp/power(ALPHABETSIZE,len-i-1)]);
+        tmp-=(tmp/power(ALPHABETSIZE,len-i-1))*power(ALPHABETSIZE,len-i-1);
+    }
+#endif
 }
 
 

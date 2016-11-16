@@ -9,7 +9,6 @@ double *initThetaSingleStranded(int maxclump);
 void deleteTheta(double *theta);
 void computeTheta(int maxclump, double *theta, double *delta, int mlen);
 void computeThetaSingleStranded(int maxclump, double *theta, double *delta, int mlen);
-//void computePapeTheta(int maxclump, double *theta, double *delta, double *gamma, int mlen);
 void computeExtentionFactorsPape(double *xi, double *gamma, int mlen);
 void computeExtentionFactorsKopp(double *xi,
   double *delta, double *deltap, double *beta, 

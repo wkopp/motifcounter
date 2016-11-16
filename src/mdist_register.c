@@ -8,10 +8,10 @@ SEXP fetchTransBackground();
 SEXP fetchMotif();
 
 static R_CallMethodDef callMethods[]  = {
-       {"mdist_fetchStationBackground", (DL_FUNC) &fetchStationBackground, 0},
-       {"mdist_fetchTransBackground", (DL_FUNC) &fetchTransBackground, 0},
-       {"mdist_fetchMotif", (DL_FUNC) &fetchMotif, 0},
-        {NULL, NULL, 0}
+    {"mdist_fetchStationBackground", (DL_FUNC) &fetchStationBackground, 0},
+    {"mdist_fetchTransBackground", (DL_FUNC) &fetchTransBackground, 0},
+    {"mdist_fetchMotif", (DL_FUNC) &fetchMotif, 0},
+    {NULL, NULL, 0}
 };
 
 
@@ -35,15 +35,17 @@ static R_NativePrimitiveArgType combinatorial_t[] = {
    REALSXP, REALSXP, REALSXP, REALSXP, REALSXP,INTSXP,INTSXP,INTSXP,INTSXP
 };
 
-void Roverlap(double *alpha, double *beta, double *beta3p, double *beta5p, double *gamma);
-void RoverlapSingleStranded(double *alpha, double *beta, double *beta3p, double *beta5p,
-                        double *gamma);
+void Roverlap(double *alpha, double *beta, 
+        double *beta3p, double *beta5p, double *gamma);
+void RoverlapSingleStranded(double *alpha, double *beta, 
+        double *beta3p, double *beta5p, double *gamma);
 static R_NativePrimitiveArgType overlap_t[] = {
         REALSXP, REALSXP, REALSXP, REALSXP, REALSXP
 };
 
 void RcompoundpoissonPape_useGamma(double *gamma,
-          double *hitdistribution, int *nseq, int *lseq, int * mhit, int *mclump);
+          double *hitdistribution, int *nseq, 
+          int *lseq, int * mhit, int *mclump);
 
 static R_NativePrimitiveArgType cp_gamma_t[] = {
         REALSXP, REALSXP, INTSXP, INTSXP, INTSXP,INTSXP
@@ -53,7 +55,8 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
             double *hitdistribution, int *nseq, int *lseq, int * mhit, 
             int *mclump, int *sstrand);
 static R_NativePrimitiveArgType cp_beta_t[] = {
-        REALSXP, REALSXP, REALSXP,REALSXP,REALSXP,INTSXP, INTSXP, INTSXP,INTSXP,INTSXP
+        REALSXP, REALSXP, REALSXP,REALSXP,
+        REALSXP,INTSXP, INTSXP, INTSXP,INTSXP,INTSXP
 };
 void Rloadmotif(double *data, int *nrow, int *ncol);
 static R_NativePrimitiveArgType loadmotif_t[] = {
@@ -111,13 +114,19 @@ static R_CMethodDef cMethods[] = {
     {"mdist_printBackground", (DL_FUNC) &RprintBackground, 0, NULL},
     {"mdist_deleteBackground", (DL_FUNC) &RdestroyBackground, 0, NULL},
     {"mdist_makebgForSampling", (DL_FUNC) &RmakebgForSampling, 4, makebg_t},
-    {"mdist_printBackgroundForSampling", (DL_FUNC) &RprintBackgroundForSampling, 0, NULL},
-    {"mdist_deleteBackgroundForSampling", (DL_FUNC) &RdestroyBackgroundForSampling, 0, NULL},
-    {"mdist_combinatorialDist", (DL_FUNC) &RPosteriorProbability, 9, combinatorial_t},
-    {"mdist_overlapSingleStranded", (DL_FUNC) &RoverlapSingleStranded, 5, overlap_t},
+    {"mdist_printBackgroundForSampling", 
+            (DL_FUNC) &RprintBackgroundForSampling, 0, NULL},
+    {"mdist_deleteBackgroundForSampling", 
+            (DL_FUNC) &RdestroyBackgroundForSampling, 0, NULL},
+    {"mdist_combinatorialDist", 
+            (DL_FUNC) &RPosteriorProbability, 9, combinatorial_t},
+    {"mdist_overlapSingleStranded", 
+            (DL_FUNC) &RoverlapSingleStranded, 5, overlap_t},
     {"mdist_overlap", (DL_FUNC) &Roverlap, 5, overlap_t},
-    {"mdist_compoundPoisson_useBeta", (DL_FUNC) &Rcompoundpoisson_useBeta, 10, cp_beta_t},
-    {"mdist_compoundPoissonPape_useGamma", (DL_FUNC) &RcompoundpoissonPape_useGamma, 6, cp_gamma_t},
+    {"mdist_compoundPoisson_useBeta", 
+            (DL_FUNC) &Rcompoundpoisson_useBeta, 10, cp_beta_t},
+    {"mdist_compoundPoissonPape_useGamma", 
+            (DL_FUNC) &RcompoundpoissonPape_useGamma, 6, cp_gamma_t},
     {"mdist_loadmotif", (DL_FUNC) &Rloadmotif, 3, loadmotif_t},
     {"mdist_motiffromfile", (DL_FUNC) &Rmotiffromfile, 2, motiffromfile_t},
     {"mdist_deleteMotif", (DL_FUNC) &Rdestroymotif, 0, NULL},
@@ -130,7 +139,8 @@ static R_CMethodDef cMethods[] = {
     {"mdist_scoredist", (DL_FUNC) &Rscoredist, 2, scoredist_t},
     {"mdist_scoredist_bf", (DL_FUNC) &Rscoredist_bf, 2, scoredist_t},
     {"mdist_simulateScores", (DL_FUNC) &RsimulateScores, 4, simscoredist_t},
-    {"mdist_simulateCountDistribution", (DL_FUNC) &RsimulateCountDistribution, 6, simcountdist_t},
+    {"mdist_simulateCountDistribution", 
+            (DL_FUNC) &RsimulateCountDistribution, 6, simcountdist_t},
     {NULL, NULL, 0}
 };
 

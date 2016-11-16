@@ -3,14 +3,11 @@
 #include "stdio.h"
 
 #define ALPHABETSIZE 4
-#define NUMSEQ 100
-#define IDLEN 200
-#define WSIZE 150
 
 typedef struct {
-  char **seq;
-  int  nseq;
-  int  *lseq;
+    char **seq;
+    int  nseq;
+    int  *lseq;
 } Sequence;
 
 void allocSequence(Sequence *seq, int nseq, int *lseq);

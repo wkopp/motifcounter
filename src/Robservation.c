@@ -14,142 +14,71 @@ extern double Rsiglevel, Rgran;
 
 void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq,  
         int *singlestranded) {
-  int intervalsize;
-  ExtremalScore escore;
-  MotifScore1d null;
-  Sequence seq;
-  double dx, quantile,pvalue;
-  int s;
-  int threshold;
-  FILE *f;
+    int intervalsize;
+    ExtremalScore escore;
+    MotifScore1d null;
+    Sequence seq;
+    double dx, quantile,pvalue;
+    int s;
+    int threshold;
+    FILE *f;
 
-  if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
-    error("load forground and background properly");
-    return;
-  }
-  if (!numofhits||!inputfile||!nseq||!lseq) {
-    error("parameters are null");
-    return;
-  }
-  if (Rsiglevel==0.0 || Rgran==0.0) {
-    error ("call mdist.option first");
-    return;
-  }
-
-  pvalue=Rsiglevel;
-  dx=Rgran;
-
-  // compute significance threshold
-  initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
-
-  loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
-  loadIntervalSize(&escore, NULL);
-  //intervalsize=maxScoreIntervalSize(&escore);
-  intervalsize=getTotalScoreUpperBound(&escore)-
-  		getTotalScoreLowerBound(&escore)+1;
-
-  initScoreMetaInfo(getTotalScoreLowerBound(&escore),
-           getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
-  null.meta.prob=&ProbBg;
-  null.meta.probinit=&ProbinitBg;
-  initScoreDistribution1d(Rpwm,Rtrans,&null, Rorder);
-
-  computeScoreDistribution1d(Rpwm, Rtrans,  Rstation, &null, &escore, Rorder);
-
-  quantile=getQuantileWithIndex1d(&null,getQuantileIndex1d(&null.totalScore,pvalue));
-  threshold=(int)(quantile/dx);
-  deleteExtremalScore(&escore);
-  deleteScoreDistribution1d(&null, Rorder);
-
-  f=fopen(inputfile[0], "r");
-  if (!f) {
-    error("no such file: %s\n", inputfile[0]);
-    return;
-  }
-  allocSequence(&seq,*nseq, lseq);
-  getSequence(f,&seq);
-  fclose(f);
-
-  for (s=0;s<*nseq; s++) {
-    numofhits[s]+=countOccurances(Rstation, Rtrans, Rpwm, seq.seq[s], seq.lseq[s], threshold, dx, Rorder);
-    if (*singlestranded==0) {
-        numofhits[s]+=countOccurances(Rstation, Rtrans, Rcpwm, seq.seq[s], seq.lseq[s], threshold, dx, Rorder);
+    if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
+        error("load forground and background properly");
+        return;
     }
-  }
+    if (!numofhits||!inputfile||!nseq||!lseq) {
+        error("parameters are null");
+        return;
+    }
+    if (Rsiglevel==0.0 || Rgran==0.0) {
+        error ("call mdist.option first");
+        return;
+    }
 
-  destroySequence(&seq);
-  //numofhits[0]=Nhits;
+    pvalue=Rsiglevel;
+    dx=Rgran;
+
+    // compute significance threshold
+    initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
+
+    loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
+    loadIntervalSize(&escore, NULL);
+    intervalsize=getTotalScoreUpperBound(&escore)-
+                    getTotalScoreLowerBound(&escore)+1;
+
+    initScoreMetaInfo(getTotalScoreLowerBound(&escore),
+            getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
+    null.meta.prob=&ProbBg;
+    null.meta.probinit=&ProbinitBg;
+    initScoreDistribution1d(Rpwm,Rtrans,&null, Rorder);
+
+    computeScoreDistribution1d(Rpwm, Rtrans,  Rstation, &null, &escore, Rorder);
+
+    quantile=getQuantileWithIndex1d(&null,getQuantileIndex1d(&null.totalScore,
+                pvalue));
+    threshold=(int)(quantile/dx);
+    deleteExtremalScore(&escore);
+    deleteScoreDistribution1d(&null, Rorder);
+
+    f=fopen(inputfile[0], "r");
+    if (!f) {
+        error("no such file: %s\n", inputfile[0]);
+        return;
+    }
+    allocSequence(&seq,*nseq, lseq);
+    getSequence(f,&seq);
+    fclose(f);
+
+    for (s=0;s<*nseq; s++) {
+        numofhits[s]+=countOccurances(Rstation, Rtrans, Rpwm, seq.seq[s], 
+                seq.lseq[s], threshold, dx, Rorder);
+        if (*singlestranded==0) {
+            numofhits[s]+=countOccurances(Rstation, Rtrans, Rcpwm, seq.seq[s], 
+                    seq.lseq[s], threshold, dx, Rorder);
+        }
+    }
+
+    destroySequence(&seq);
 }
 
-#ifdef WKO
-void RnumberOfHitsSingleStranded(char **inputfile, int *numofhits, int *nseq, int *lseq) {
-  int Nhits,  intervalsize;
-  ExtremalScore escore;
-  MotifScore1d null;
-  Sequence seq;
-  double dx, quantile,pvalue;
-  int s;
-  int threshold;
-  FILE *f;
-
-  if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
-    error("load forground and background properly");
-    return;
-  }
-  if (!numofhits||!inputfile||!nseq||!lseq) {
-    error("parameters are null");
-    return;
-  }
-  if (Rsiglevel==0.0 || Rgran==0.0) {
-    error ("call mdist.option first");
-    return;
-  }
-
-  pvalue=Rsiglevel;
-  dx=Rgran;
-
-  // compute significance threshold
-  initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
-
-  loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
-  loadIntervalSize(&escore, NULL);
-  //intervalsize=maxScoreIntervalSize(&escore);
-  intervalsize=getTotalScoreUpperBound(&escore)-
-  		getTotalScoreLowerBound(&escore)+1;
-
-  initScoreMetaInfo(getTotalScoreLowerBound(&escore),
-           getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
-  null.meta.prob=&ProbBg;
-  null.meta.probinit=&ProbinitBg;
-  initScoreDistribution1d(Rpwm,Rtrans,&null, Rorder);
-
-  computeScoreDistribution1d(Rpwm, Rtrans,  Rstation, &null, &escore, Rorder);
-
-  quantile=getQuantileWithIndex1d(&null,getQuantileIndex1d(&null.totalScore,pvalue));
-  threshold=(int)(quantile/dx);
-  deleteExtremalScore(&escore);
-  deleteScoreDistribution1d(&null, Rorder);
-
-  f=fopen(inputfile[0], "r");
-  if (!f) {
-    error("no such file: %s\n", inputfile[0]);
-    return;
-  }
-
-  allocSequence(&seq,*nseq, lseq);
-  getSequence(f,&seq);
-  fclose(f);
-  //getNucleotideSequence(f, seq, nseq, lseq);
-  //fclose(f);
-  //Rprintf("numofseq=%d, seqlen=%d\n", numofseq, seqlen);
-
-  for (s=0, Nhits=0;s<*nseq; s++) {
-    numofhits[s]+=countOccurancesSingleStranded(Rstation, 
-    		Rtrans, Rpwm, Rcpwm, seq.seq[s], seq.lseq[s], threshold, dx, Rorder);
-  }
-
-  destroySequence(&seq);
-  //numofhits[0]=Nhits;
-}
-
-#endif

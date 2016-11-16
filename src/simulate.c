@@ -14,53 +14,54 @@
 #include "score1d.h"
 
 char sampleNucleotide(double *prob) {
-  double ip=unif_rand();
-  double p;
-  double cumprob=0.0;
-  char n;
-  int i;
+    double ip=unif_rand();
+    double p;
+    double cumprob=0.0;
+    char n;
+    int i;
 
-  p=(double)(ip);
-  for (i=0; i<ALPHABETSIZE; i++) {
-    cumprob+=prob[i];
-    if(p<=cumprob) {
-      break;
+    p=(double)(ip);
+    for (i=0; i<ALPHABETSIZE; i++) {
+        cumprob+=prob[i];
+        if(p<=cumprob) {
+            break;
+        }
     }
-  }
-  if (i==4)
-    n= getNuc(i-1);
-  else
-    n= getNuc(i);
-  return n;
+    if (i==4)
+        n= getNuc(i-1);
+    else
+        n= getNuc(i);
+    return n;
 }
 
 void sampleInitialNucleotide(double *prob, char *seq, int order) {
-  double ip=unif_rand();
-  double p;
-  double cumprob=0.0;
-  int i, ass[order];
+    double ip=unif_rand();
+    double p;
+    double cumprob=0.0;
+    int i, ass[order];
 
-  p=(double)(ip);
-  for (i=0; i<power(ALPHABETSIZE, order); i++) {
-    cumprob+=prob[i];
-    if(p<=cumprob) {
-      break;
+    p=(double)(ip);
+    for (i=0; i<power(ALPHABETSIZE, order); i++) {
+        cumprob+=prob[i];
+        if(p<=cumprob) {
+            break;
+        }
     }
-  }
-  getAssignmentFromIndex(i, order, ass);
-  for(i=0;i<order; i++) {
-    seq[i]=getNuc(ass[i]);
-  }
+    getAssignmentFromIndex(i, order, ass);
+    for(i=0;i<order; i++) {
+        seq[i]=getNuc(ass[i]);
+    }
 }
 
-void generateRandomSequence(double *station, double *trans, char *seq, int seqlen, int order) {
-  int i, ind;
+void generateRandomSequence(double *station, double *trans, char *seq, 
+        int seqlen, int order) {
+    int i, ind;
 
- sampleInitialNucleotide(station, seq, order);
- for (i=order; i<seqlen; i++) {
-   ind=getIndexFromAssignment(&seq[i-order], order);
-   seq[i]=sampleNucleotide(&trans[ind*ALPHABETSIZE]);
- }
+    sampleInitialNucleotide(station, seq, order);
+    for (i=order; i<seqlen; i++) {
+        ind=getIndexFromAssignment(&seq[i-order], order);
+        seq[i]=sampleNucleotide(&trans[ind*ALPHABETSIZE]);
+    }
 }
 
 void randomStatistics(char *seq, int seqlen, double *stat, double *trans) {
@@ -163,7 +164,6 @@ void scoreOccurances(double *station, double *trans,
 
      index-=(index/power(ALPHABETSIZE,order))*power(ALPHABETSIZE,order);
    }
-  // Rprintf("smin=%d, s=%d\n",smin,s);
    dist[s-smin]++;
  }
 }

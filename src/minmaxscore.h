@@ -3,17 +3,17 @@
 #include "matrix.h"
 
 typedef struct {
-  double dx; // is supposed to be the same as in struct ScoreMetaInfo
-  int *maxforward;
-  int *maxbackward;
-  int *minforward;
-  int *minbackward;
-  int *intervalstart;
-  int *intervalend;
-  int Smax;
-  int xmin;
-  int order;
-  int len;
+    double dx; // is supposed to be the same as in struct ScoreMetaInfo
+    int *maxforward;
+    int *maxbackward;
+    int *minforward;
+    int *minbackward;
+    int *intervalstart;
+    int *intervalend;
+    int Smax;
+    int xmin;
+    int order;
+    int len;
 } ExtremalScore;
 
 int initExtremalScore(ExtremalScore *s, double, int length, int order);

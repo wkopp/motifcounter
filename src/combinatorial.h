@@ -4,21 +4,21 @@
 #define EPSILON 1e-30
 
 typedef struct {
-  int seqlen;
-  int mlen;
-  int maxhits;
-  double ***value;
-  double *beta;
-  double *beta3p;
-  double *beta5p;
-  double *delta;
-  double *deltap;
-  double alpha;
-  double omega;
-  double probzerohits;
-  double **extentionMatrix;
-  double *K;
-  double *B;
+    int seqlen;
+    int mlen;
+    int maxhits;
+    double ***value;
+    double *beta;
+    double *beta3p;
+    double *beta5p;
+    double *delta;
+    double *deltap;
+    double alpha;
+    double omega;
+    double probzerohits;
+    double **extentionMatrix;
+    double *K;
+    double *B;
 } PosteriorCount;
 
 double dpower(double v, int exp);

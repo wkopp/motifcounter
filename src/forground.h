@@ -1,3 +1,5 @@
+#ifndef forground_h
+#define forground_h
 
 #include "matrix.h"
 int getMotifWidth(FILE *f);
@@ -13,3 +15,5 @@ void getTransfacMotif(FILE *f, DMatrix *m, double pseudocount);
 void getJasparMotif(FILE *f, DMatrix *m, double pseudocount);
 int getMemeMotifWidth(FILE *f);
 void getMemeMotif(FILE *f, DMatrix *m, double pseudocount);
+
+#endif

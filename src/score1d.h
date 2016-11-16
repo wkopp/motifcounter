@@ -1,10 +1,6 @@
-
-
 #ifndef score1d_h
 #define score1d_h
 
-//#include "sharedtypes.h"
-//#include "align.h"
 #include "matrix.h"
 #include "minmaxscore.h"
 #include "scorefunctions.h"
@@ -12,32 +8,27 @@
 
 
 typedef struct {
-  double *y;
-  double merged;
-  int start,end;
+    double *y;
+    double merged;
+    int start,end;
 } Score1d;
 
 typedef struct {
-  int mlen;
-  ScoreMetaInfo meta;
-  Score1d *ScoreBuffer1;
-  Score1d *tmpScore;
-  Score1d totalScore;
+    int mlen;
+    ScoreMetaInfo meta;
+    Score1d *ScoreBuffer1;
+    Score1d *tmpScore;
+    Score1d totalScore;
 } MotifScore1d;
 
 // initialize the score distribution structure
 int initScoreDistribution1d (DMatrix *theta, double *bg1, MotifScore1d *result, int order);
-
-//int deleteMotifScore1d(MotifScore1d *m);
 
 double getQuantileWithIndex1d(MotifScore1d *s, int qi);
 int getQuantileIndex1d(Score1d *s, double pvalue);
 double getProbWithIndex1d(MotifScore1d *s, int iquantile);
 double getProb1d(MotifScore1d *s, double quantile);
 int deleteScoreDistribution1d(MotifScore1d *m, int order);
-// Compute the score distribution for the motif
-//int computeJointScoreDistribution1d(DMatrix *theta, DMatrix *bg1, DMatrix *bg0, 
-//    MotifScore1d *result, int conditionalPosition, MotifScore1d *marginalScore);
 
 
 int computeMarginalScoreDistribution1d(DMatrix *theta, double *bg1, double *bg0, 

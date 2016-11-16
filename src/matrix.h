@@ -5,20 +5,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#define WSIZE 550
-//#define BSIZE 100*550
-//#define MAXMOTIFWIDTH 151
-//#define MAXBGWIDTH 100000+MAXMOTIFWIDTH
-#define DHSSIZE 150
 
 typedef struct {
-  int nrow,ncol;
-  double *data;
+    int nrow,ncol;
+    double *data;
 } DMatrix;
 
 typedef struct {
-  int nrow,ncol;
-  int *data;
+    int nrow,ncol;
+    int *data;
 } IMatrix;
 
 void deleteMatrix(DMatrix *m);
