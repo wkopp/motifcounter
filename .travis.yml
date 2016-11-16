@@ -2,6 +2,12 @@
 
 language: r
 warnings_are_errors: false
-sudo: required
 bioc_packages:
     - BiocStyle
+
+matrix:
+    include:
+     - os: linux
+     - dist: trusty
+     - sudo: required
+
