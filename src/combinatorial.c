@@ -38,13 +38,13 @@ int allocPosteriorProbability(PosteriorCount *p, int seqlen, int mlen, int maxhi
 
   for (i=0; i<maxhits; i++) {
     p->value[i]=Calloc(seqlen, double*);
-    if (!p->value[i]) { 
+    if (p->value[i]==NULL) { 
   	  error("Memory-allocation in allocPosteriorProbability failed");
       return 1;
     }
     for (j=0; j<seqlen; j++) {
       p->value[i][j]=Calloc(2*mlen, double);
-      if (!p->value[i][j]) {
+      if (p->value[i][j]==NULL) {
   	    error("Memory-allocation in allocPosteriorProbability failed");
         return 1;
       }
@@ -101,11 +101,20 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
   p->deltap=*deltap;
 
   _alpha=Calloc(p->seqlen, double);
+  if (_alpha==NULL) {
+    error("Memory-allocation in initPosteriorProbability failed");
+  }
   _omega=Calloc(p->seqlen, double);
+  if (_omega==NULL) {
+    error("Memory-allocation in initPosteriorProbability failed");
+  }
 
 	m=(70>p->seqlen) ? p->seqlen : 70; 
 
   extra=Calloc(3*p->mlen+2, double);
+  if (extra==NULL) {
+    error("Memory-allocation in initPosteriorProbability failed");
+  }
   extra[0]=alpha;
   a0=alpha;
 

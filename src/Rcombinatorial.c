@@ -56,7 +56,7 @@ void RPosteriorProbability(double *alpha, double *beta,
 
   delta=Calloc(Rpwm->nrow,double);
   deltap=Calloc(Rpwm->nrow,double);
-  if (!delta||!deltap) error("failed to allocate delta");
+  if (delta==NULL||deltap==NULL) error("failed to allocate delta");
 
   computeDeltas(delta, deltap, beta, beta3p,beta5p,Rpwm->nrow);
 
