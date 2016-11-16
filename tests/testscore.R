@@ -39,14 +39,6 @@ if (!all(abs(p-dp[[2]])<1e-12)) {
         programming variant and R variant divergent")
 }
 
-#simluate score distribution
-sims=simulateScoreDist(seqlen,1000000)
-
-if (!all(abs(sims[[2]]-dp[[2]])<1e-3)) {
-    stop("Score probabilities between dynamic 
-        programming variant and R variant divergent")
-}
-
 # test whether the range is equally long
 # test whether the zero entries in the score distribution overlap perfectly
 # test with the stationary probabilities of the background model only
@@ -75,6 +67,10 @@ for (m in seq(0,3)) {
       stop(paste("Score ranges between dynamic programming 
            variant and enumerative variant divergent: ",m))
     }
+    if (!all(bf[[2]]==dp[[2]])) {
+      stop(paste("Score distribution between dynamic programming 
+           variant and enumerative variant divergent: ",m))
+    }
     if (!all(sims[[1]]==dp[[1]])) {
       stop(paste("Score ranges between dynamic programming 
            variant and sampling variant divergent: ", m))
@@ -83,10 +79,13 @@ for (m in seq(0,3)) {
       stop(paste("Score probabilities between dynamic 
            programming variant and simulated variant divergent: ",m))
     }
-    if (dp[[2]][1]<=0 || dp[[2]][length(dp[[2]])]<=0) {
-      stop(paste("The first and the last 
-                 score entry must be greater than zero: ",m))
-    }
+    # This test is incorrect
+    # Due to rounding differences of scores collected on either
+    # DNA strand, this condition might actually be wrong
+    #if (dp[[2]][1]<=0 || dp[[2]][length(dp[[2]])]<=0) {
+    #  stop(paste("The first and the last 
+    #             score entry must be greater than zero: ",m))
+    #}
 }
 
 # test whether the range is equally long
@@ -110,6 +109,10 @@ for (m in seq(1,3)) {
 
     if (!all(bf[[1]]==dp[[1]])) {
       stop(paste("Score ranges between dynamic programming 
+           variant and enumerative variant divergent: ",m))
+    }
+    if (!all(abs(bf[[2]]-dp[[2]])<1e-5)) {
+      stop(paste("Score distribution between dynamic programming 
            variant and enumerative variant divergent: ",m))
     }
     if (!all(sims[[1]]==dp[[1]])) {
