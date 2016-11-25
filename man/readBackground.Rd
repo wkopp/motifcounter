@@ -7,22 +7,23 @@
 readBackground(file, order = 1)
 }
 \arguments{
-\item{file}{Filename where the sequence is stored in. The file must be in
-fasta format.}
+\item{file}{Fasta-filename.}
 
-\item{order}{Defines the order of the Markov models used for the background.
-Default: order=1.}
+\item{order}{Order of the Markov models that shall be used as the
+background model. Default: order=1.}
+}
+\value{
+None
 }
 \description{
-This function reads a DNA sequence in fasta format and estimates and order m
-Markov model.
+This function reads a DNA sequence from a given fasta file
+and uses that sequence to estimate an order-m Markov model.
 }
 \examples{
 
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-library(mdist)
 file=system.file("extdata","seq.fasta", package="mdist")
 readBackground(file,1)
 

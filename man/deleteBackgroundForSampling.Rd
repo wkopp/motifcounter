@@ -6,19 +6,25 @@
 \usage{
 deleteBackgroundForSampling()
 }
+\value{
+None
+}
 \description{
-This function unloads the current background model for sampling.
+Similar to \code{link{deleteBackgroundForSampling}}, but
+deletes parameters that where acquired using 
+\code{link{readBackgroundForSampling}}.
 }
 \examples{
 
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 readBackgroundForSampling(file=seqfile,1)
 deleteBackgroundForSampling()
 
-
+}
+\seealso{
+\code{link{deleteBackgroundForSampling}}
 }
 

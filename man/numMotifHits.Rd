@@ -7,30 +7,42 @@
 numMotifHits(seqfile, singlestranded = FALSE)
 }
 \arguments{
-\item{seqfile}{Name of the sequence file in fasta format.}
+\item{seqfile}{Fasta-file name}
 
 \item{singlestranded}{Boolian flag that indicates whether a single strand or
 both strands shall be scanned for motif hits}
 }
+\value{
+A list containing 
+\describe{
+\item{nseq}{Number of individual sequences}
+\item{lseq}{Vector of individual sequence lengths}
+\item{numofhits}{Vector of the number of hits in each individual sequence}
+}
+}
 \description{
-The function scans a given DNA sequence or a set of sequences and counts the
-number of motif hits on both, the forward and the reverse strand. It returns
-the length of each sequence supplied in the fasta file and the number of
-hits observed across all sequences.
+This function scans the DNA sequences contained in the fasta file
+and counts the number of motif hits using the score threshold
+that is associated with the false positive probability 'alpha' 
+(see \code{\link{mdistOption}}. The function can be used
+to count motif hits on one or both strands, respectively.
 }
 \examples{
 
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
-pwmfile=system.file("extdata","x31.tab", package="mdist")
+motiffile=system.file("extdata","x31.tab", package="mdist")
+
+# Set false positive probability
 alpha=0.001
 mdistOption(alpha)
 
+# Estimate order-1 background model
 readBackground(seqfile,1)
-readMotif(pwmfile,0.01)
+# read PFM from file
+readMotif(motiffile,0.01)
 
 # scan the given sequence on both strands for the motif occurances
 noc=numMotifHits(seqfile)

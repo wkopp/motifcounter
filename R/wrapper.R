@@ -1,9 +1,4 @@
-.onLoad=function(libpath,pkgname) {
-  #packageStartupMessage("loading ", libpath, '::',pkgname)
-}
+s.onLoad=function(libpath,pkgname) { }
 
-.onUnload=function(pkgpath) {
-  #packageStartupMessage("unloading ", pkgpath )
-#  mdist.unload()
-}
+.onUnload=function(pkgpath) { }
 

@@ -2,9 +2,12 @@
 % Please edit documentation in R/forground_wrapper.R
 \name{motif2matrix}
 \alias{motif2matrix}
-\title{Get the motif in an R matrix}
+\title{Returns the current PFM as an R matrix}
 \usage{
 motif2matrix()
+}
+\value{
+A position frequency matrix
 }
 \description{
 This function returns the current PFM as an R matrix.
@@ -12,9 +15,8 @@ This function returns the current PFM as an R matrix.
 \examples{
 
 
-library(mdist)
-pwmfile=system.file("extdata","x31.tab", package="mdist")
-readMotif(pwmfile)
+motiffile=system.file("extdata","x31.tab", package="mdist")
+readMotif(motiffile)
 x=motif2matrix()
 
 }

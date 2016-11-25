@@ -6,32 +6,43 @@
 \usage{
 scoreDistBf()
 }
+\value{
+List containing
+\describe{
+\item{score}{Vector of motif scores}
+\item{probability}{Score probabilities}
+}
+}
 \description{
-This function computes the score distribution for the provided PFM and order
-m background based on enumerating all DNA sequences of the 
-length of the motif. This function is only used for debugging
-\code{\link{scoreDist}}, and might require substantial computational
-resources for long motifs.
+This function computes the score distribution for the provided PFM and 
+background model. The result is identical to \code{\link{scoreDist}},
+however, the method employs a less efficient algorithm that
+enumerates all DNA sequences of the length of the motif. 
+This function is only used for debugging purposes
+and might require substantial computational
+resources for long motifs. Therefore, use \code{\link{scoreDist}} instead.
 }
 \examples{
 
 
-library(mdist)
 # Set the significance level and granularity for the score computation
 mdistOption(alpha=0.01,gran=0.1)
 
 # Load the DNA sequence and a Motif
 seqfile=system.file("extdata","seq.fasta", package="mdist")
-pwmfile=system.file("extdata","x31.tab",package="mdist")
+motiffile=system.file("extdata","x31.tab",package="mdist")
 
 # Load the order-1 background model from the DNA sequence
 readBackground(seqfile,1)
 
-# Load the motif from the pwmfile
-readMotif(pwmfile)
+# Load the motif from the motiffile
+readMotif(motiffile)
 
 # Compute the score distribution
 dp=scoreDistBf()
 
+}
+\seealso{
+\code{\link{scoreDist}}
 }
 

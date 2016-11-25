@@ -1,79 +1,95 @@
-#' Simlulate score distribution
+#' Empirical score distribution
 #' 
-#' This function estimates the score distribution by simulation of DNA
-#' sequences based on the background model and scanning with the PWM.
+#' This function estimates the empirical score distribution 
+#' by simulating random DNA sequences based on the 
+#' background model. Subsequently, the random sequences are scanned
+#' with the scoring measure which yields the score distribution.
 #' 
 #' 
-#' @param seqlen Integer that defines the length of the sequence to be
+#' @param seqlen Length of the sequence to be
 #' simulated.
-#' @param nsim Defines the number of samples to be generated.
+#' @param nsim Number of samples to be generated.
+#' @return List containing 
+#' \describe{
+#' \item{score}{Vector of scores}
+#' \item{probability}{Vector of score probabilities}
+#' }
 #' @examples
 #' 
-#' library(mdist)
 #' # Set the the significance level and the score granularity
 #' mdistOption(alpha=0.01, gran=0.1)
 #' 
 #' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' pwmfile=system.file("extdata","x31.tab",package="mdist")
+#' motiffile=system.file("extdata","x31.tab",package="mdist")
 #' 
 #' # Load an order-1 background model
 #' readBackground(seqfile,1)
 #' 
-#' # Load a motif from the pwmfile
-#' readMotif(pwmfile)
+#' # Load a motif from the motiffile
+#' readMotif(motiffile)
 #' 
-#' # generate the simulated score distribution on sequences of length 1kb using 1000 samples 
+#' # generate the simulated score distribution on 
+#' # sequences of length 1kb using 1000 samples 
 #' simulateScoreDist(seqlen= 1000,nsim=1000)
 #' 
+#' @seealso \code{\link{scoreDist}}
 #' @export
 simulateScoreDist=function(seqlen, nsim) {
-  scorerange=integer(1)
-  scorerange=.C("mdist_scorerange",as.integer(scorerange),PACKAGE="mdist")[[1]]
-  scores=numeric(scorerange); dist=numeric(scorerange)
-  length(scores)
-  return(.C("mdist_simulateScores", as.numeric(scores), 
-    as.numeric(dist), as.integer(seqlen), 
-    as.integer(nsim),PACKAGE="mdist"))
+    scorerange=integer(1)
+    scorerange=.C("mdist_scorerange",
+                as.integer(scorerange),PACKAGE="mdist")[[1]]
+    scores=numeric(scorerange); dist=numeric(scorerange)
+    length(scores)
+    ret=.C("mdist_simulateScores", as.numeric(scores), 
+        as.numeric(dist), as.integer(seqlen), 
+        as.integer(nsim),PACKAGE="mdist")
+    return(list(score=ret[[1]], probability=ret[[2]]))
 }
 
 
 
-#' Simulate number of PWM hit distribution
+#' Empirical number of motif hits distribution
 #' 
-#' This function simulates DNA sequences according to the background model and
-#' subsequently counts how many motif hits occur.
+#' This function simulates random DNA sequences according to 
+#' the background model and
+#' subsequently counts how many motif hits occur in them.
+#' Doing that repeatedly eventually established the empirical
+#' distribution of the number of motif hits.
 #' 
 #' 
-#' @param seqlen Integer-valued vector contaning the sequence lengths of the
-#' individual sequences.
+#' @param seqlen Integer-valued vector contanting the individual
+#' sequence lengths.
 #' @param maxhits Maximal number of hits.
 #' @param nsim Number of random samples.
 #' @param singlestranded Boolian flag that indicates whether a single strand or
 #' both strands shall be scanned for motif hits.
+#' @return Empirical number of motif hits distribution
 #' @examples
 #' 
 #' 
-#' library(mdist)
 #' mdistOption(0.01, 0.01)
 #' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' pwmfile=system.file("extdata","x31.tab",package="mdist")
+#' motiffile=system.file("extdata","x31.tab",package="mdist")
 #' 
 #' readBackground(seqfile,1)
-#' readMotif(pwmfile)
+#' readMotif(motiffile)
 #' 
 #' seqlen=rep(150,100)
 #' simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=1000,singlestranded=FALSE)
 #' 
 #' simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=1000,singlestranded=TRUE)
 #' 
+#' @seealso \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
 #' @export
-simulateNumHitsDist=function(seqlen, maxhits, nsim, singlestranded=F) {
-  if (length(seqlen)<=0) {
-    stop("seqlen must be non-empty")
-  }
-  dist=numeric(maxhits+1);
-  return(.C("mdist_simulateCountDistribution", as.numeric(dist), 
-    as.integer(nsim), as.integer(length(seqlen)),
-    as.integer(seqlen), as.integer(maxhits), as.integer(singlestranded),PACKAGE="mdist"))
+simulateNumHitsDist=function(seqlen, maxhits, nsim, singlestranded=FALSE) {
+    if (length(seqlen)<=0) {
+        stop("seqlen must be non-empty")
+    }
+    dist=numeric(maxhits+1);
+    ret=.C("mdist_simulateCountDistribution", as.numeric(dist), 
+        as.integer(nsim), as.integer(length(seqlen)),
+        as.integer(seqlen), as.integer(maxhits), 
+        as.integer(singlestranded),PACKAGE="mdist")
+    return(list(dist=ret[[1]]))
 }
 

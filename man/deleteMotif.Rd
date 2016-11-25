@@ -6,15 +6,17 @@
 \usage{
 deleteMotif()
 }
+\value{
+None
+}
 \description{
 This function unloads the current motif and frees the allocated memory
 }
 \examples{
 
 
-library(mdist)
-pwmfile=system.file("extdata","x31.tab", package="mdist")
-readMotif(pwmfile,0.01)
+motiffile=system.file("extdata","x31.tab", package="mdist")
+readMotif(motiffile,0.01)
 deleteMotif()
 
 }

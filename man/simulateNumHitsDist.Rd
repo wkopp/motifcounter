@@ -2,13 +2,13 @@
 % Please edit documentation in R/simulate_wrapper.R
 \name{simulateNumHitsDist}
 \alias{simulateNumHitsDist}
-\title{Simulate number of PWM hit distribution}
+\title{Empirical number of motif hits distribution}
 \usage{
-simulateNumHitsDist(seqlen, maxhits, nsim, singlestranded = F)
+simulateNumHitsDist(seqlen, maxhits, nsim, singlestranded = FALSE)
 }
 \arguments{
-\item{seqlen}{Integer-valued vector contaning the sequence lengths of the
-individual sequences.}
+\item{seqlen}{Integer-valued vector contanting the individual
+sequence lengths.}
 
 \item{maxhits}{Maximal number of hits.}
 
@@ -17,25 +17,33 @@ individual sequences.}
 \item{singlestranded}{Boolian flag that indicates whether a single strand or
 both strands shall be scanned for motif hits.}
 }
+\value{
+Empirical number of motif hits distribution
+}
 \description{
-This function simulates DNA sequences according to the background model and
-subsequently counts how many motif hits occur.
+This function simulates random DNA sequences according to 
+the background model and
+subsequently counts how many motif hits occur in them.
+Doing that repeatedly eventually established the empirical
+distribution of the number of motif hits.
 }
 \examples{
 
 
-library(mdist)
 mdistOption(0.01, 0.01)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
-pwmfile=system.file("extdata","x31.tab",package="mdist")
+motiffile=system.file("extdata","x31.tab",package="mdist")
 
 readBackground(seqfile,1)
-readMotif(pwmfile)
+readMotif(motiffile)
 
 seqlen=rep(150,100)
 simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=1000,singlestranded=FALSE)
 
 simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=1000,singlestranded=TRUE)
 
+}
+\seealso{
+\code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
 }
 

@@ -7,21 +7,22 @@
 fetchBackground()
 }
 \value{
-A list containing a vector containing the stationary
-             and the transition probabilities, respectively.
+A list containing the stationary
+and the transition probabilities, respectively:
+\describe{
+\item{stat}{Stationary distribution}
+\item{trans}{Transition probabilities}
+}
 }
 \description{
-This function fetches the current stationary distribution
-and transition probabilities into R two vectors that are
-contained in list. This function is only used for debugging 
-and testing purposes.
+This function returns the parameters of the current background model
+as an R list.
 }
 \examples{
 
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-library(mdist)
 file=system.file("extdata","seq.fasta", package="mdist")
 readBackground(file,1)
 fetchBackground()

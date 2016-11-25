@@ -6,15 +6,17 @@
 \usage{
 motifLength()
 }
+\value{
+Length of the motif
+}
 \description{
 This function returns the length of the currently loaded PFM.
 }
 \examples{
 
 
-library(mdist)
-pwmfile=system.file("extdata","x31.tab", package="mdist")
-readMotif(pwmfile)
+motiffile=system.file("extdata","x31.tab", package="mdist")
+readMotif(motiffile)
 motifLength()
 
 }

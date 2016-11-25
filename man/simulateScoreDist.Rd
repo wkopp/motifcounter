@@ -2,37 +2,49 @@
 % Please edit documentation in R/simulate_wrapper.R
 \name{simulateScoreDist}
 \alias{simulateScoreDist}
-\title{Simlulate score distribution}
+\title{Empirical score distribution}
 \usage{
 simulateScoreDist(seqlen, nsim)
 }
 \arguments{
-\item{seqlen}{Integer that defines the length of the sequence to be
+\item{seqlen}{Length of the sequence to be
 simulated.}
 
-\item{nsim}{Defines the number of samples to be generated.}
+\item{nsim}{Number of samples to be generated.}
+}
+\value{
+List containing 
+\describe{
+\item{score}{Vector of scores}
+\item{probability}{Vector of score probabilities}
+}
 }
 \description{
-This function estimates the score distribution by simulation of DNA
-sequences based on the background model and scanning with the PWM.
+This function estimates the empirical score distribution 
+by simulating random DNA sequences based on the 
+background model. Subsequently, the random sequences are scanned
+with the scoring measure which yields the score distribution.
 }
 \examples{
 
-library(mdist)
 # Set the the significance level and the score granularity
 mdistOption(alpha=0.01, gran=0.1)
 
 seqfile=system.file("extdata","seq.fasta", package="mdist")
-pwmfile=system.file("extdata","x31.tab",package="mdist")
+motiffile=system.file("extdata","x31.tab",package="mdist")
 
 # Load an order-1 background model
 readBackground(seqfile,1)
 
-# Load a motif from the pwmfile
-readMotif(pwmfile)
+# Load a motif from the motiffile
+readMotif(motiffile)
 
-# generate the simulated score distribution on sequences of length 1kb using 1000 samples 
+# generate the simulated score distribution on 
+# sequences of length 1kb using 1000 samples 
 simulateScoreDist(seqlen= 1000,nsim=1000)
 
+}
+\seealso{
+\code{\link{scoreDist}}
 }
 

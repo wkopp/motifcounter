@@ -2,23 +2,25 @@
 % Please edit documentation in R/observed_wrapper.R
 \name{numSequences}
 \alias{numSequences}
-\title{Number of sequence in a provided fasta file}
+\title{Number of sequences in a given fasta file}
 \usage{
 numSequences(seqfile)
 }
 \arguments{
-\item{seqfile}{Name of the sequence file in fasta format.}
+\item{seqfile}{Fasta-file name}
+}
+\value{
+The number of sequences contained in the fasta file
 }
 \description{
 The function parses a fasta file and returns the number of individual
-sequence in it.
+sequence that it contains.
 }
 \examples{
 
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 
 # scan the given sequence for the motif occurances

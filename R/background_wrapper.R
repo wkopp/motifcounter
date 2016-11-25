@@ -1,46 +1,48 @@
 #' Estimates the background model
 #' 
-#' This function reads a DNA sequence in fasta format and estimates and order m
-#' Markov model.
+#' This function reads a DNA sequence from a given fasta file
+#' and uses that sequence to estimate an order-m Markov model.
 #' 
 #' 
-#' @param file Filename where the sequence is stored in. The file must be in
-#' fasta format.
-#' @param order Defines the order of the Markov models used for the background.
-#' Default: order=1.
+#' @param file Fasta-filename.
+#' @param order Order of the Markov models that shall be used as the
+#' background model. Default: order=1.
+#'
+#' @return None
+#'
 #' @examples
 #' 
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' library(mdist)
 #' file=system.file("extdata","seq.fasta", package="mdist")
 #' readBackground(file,1)
 #' 
 #' @export
 readBackground=function(file, order=1) {
-   nseq=numSequences(file)
-   lseq=lenSequences(file)
-   dummy=.C("mdist_makebg", as.character(file), as.integer(order),
-    				 as.integer(nseq),as.integer(lseq),PACKAGE="mdist")
+    nseq=numSequences(file)
+    lseq=lenSequences(file)
+    dummy=.C("mdist_makebg", as.character(file), as.integer(order),
+        as.integer(nseq),as.integer(lseq),PACKAGE="mdist")
 }
 
 #' Fetch background model into R vectors
 #' 
-#' This function fetches the current stationary distribution
-#' and transition probabilities into R two vectors that are
-#' contained in list. This function is only used for debugging 
-#' and testing purposes.
+#' This function returns the parameters of the current background model
+#' as an R list.
 #' 
-#' @return A list containing a vector containing the stationary
-#'              and the transition probabilities, respectively.
+#' @return A list containing the stationary
+#' and the transition probabilities, respectively:
+#' \describe{
+#' \item{stat}{Stationary distribution}
+#' \item{trans}{Transition probabilities}
+#' }
 #' 
 #' @examples
 #' 
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' library(mdist)
 #' file=system.file("extdata","seq.fasta", package="mdist")
 #' readBackground(file,1)
 #' fetchBackground()
@@ -49,7 +51,7 @@ readBackground=function(file, order=1) {
 fetchBackground=function() {
     stat=.Call("mdist_fetchStationBackground",PACKAGE="mdist");
     trans=.Call("mdist_fetchTransBackground",PACKAGE="mdist");
-    return(list(stat,trans))
+    return(list(stat=stat,trans=trans))
 }
 
 
@@ -57,21 +59,22 @@ fetchBackground=function() {
 #' Prints the current background model
 #' 
 #' This function prints the currently loaded background model.
+#' The function is primarily used for debugging and testing.
 #' 
+#' @return None
 #' 
 #' @examples
 #' 
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' library(mdist)
 #' seqfile=system.file("extdata","seq.fasta", package="mdist")
 #' readBackground(file=seqfile,1)
 #' printBackground()
 #' 
 #' @export
 printBackground=function() {
-  dummy=.C("mdist_printBackground",PACKAGE="mdist");
+    dummy=.C("mdist_printBackground",PACKAGE="mdist");
 }
 
 
@@ -79,15 +82,15 @@ printBackground=function() {
 #' Delete background model
 #' 
 #' This function unloads the current background model and frees its allocated
-#' memeory.
+#' memory.
 #' 
+#' @return None
 #' 
 #' @examples
 #' 
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' library(mdist)
 #' seqfile=system.file("extdata","seq.fasta", package="mdist")
 #' readBackground(file=seqfile,1)
 #' deleteBackground()
@@ -95,47 +98,57 @@ printBackground=function() {
 #' 
 #' @export
 deleteBackground=function() {
-  dummy=.C("mdist_deleteBackground",PACKAGE="mdist")
+    dummy=.C("mdist_deleteBackground",PACKAGE="mdist")
 }
 
 
 
 #' Estimates the background model for sampling
 #' 
-#' This function reads a DNA sequence in fasta format and estimates and order m
-#' Markov model. This function is only used when simulated DNA sequences are
-#' scanned by the model.  The compound Poisson model and the combinatorial
-#' model do not use this backgroud model.
+#' This function reads a DNA sequence from a given fasta file
+#' and uses that sequence to estimate an order-m Markov model.
+#' \strong{Note}: This function is only used for generating the random DNA
+#' sequence that is used for computing the empirical
+#' distribution. When using  \code{\link{compoundPoissonDist}},
+#' \code{\link{combinatorialDist}} or \code{\link{motifEnrichmentTest}},
+#' this function is not relevant. Instead, consult
+#' \code{link{readBackground}}.
 #' 
 #' 
-#' @param file Name of the sequence file in fasta format.
-#' @param order Defines the order of the Markov models used for the background.
-#' Default: order=1.
+#' @param file Fasta-filename.
+#' @param order Order of the Markov models that shall be used as the
+#' background model. Default: order=1.
+#' 
+#' @return None
+#' 
+#' @seealso \code{link{readBackground}}
 #' @examples
 #' 
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' library(mdist)
 #' file=system.file("extdata","seq.fasta", package="mdist")
 #' readBackgroundForSampling(file,1)
 #' 
 #' 
 #' @export
 readBackgroundForSampling=function(file, order=1) {
-	 nseq=numSequences(file)
-   lseq=lenSequences(file)
-  dummy=.C("mdist_makebgForSampling", as.character(file), as.integer(order),
-  				 as.integer(nseq),as.integer(lseq),PACKAGE="mdist")
+    nseq=numSequences(file)
+    lseq=lenSequences(file)
+    dummy=.C("mdist_makebgForSampling", as.character(file), as.integer(order),
+        as.integer(nseq),as.integer(lseq),PACKAGE="mdist")
 }
 
 
 
 #' Prints the current background model for sampling
 #' 
-#' This function prints the currently loaded background model that is employed
-#' during scanning the sampled DNA sequence. It is not used for the compound
-#' Poisson model and the combinatorial model
+#' Similar to \code{link{printBackgroundForSampling}}, but
+#' prints parameters that where acquired using 
+#' \code{link{readBackgroundForSampling}}.
+#' 
+#' 
+#' @return None
 #' 
 #' 
 #' @examples
@@ -143,22 +156,27 @@ readBackgroundForSampling=function(file, order=1) {
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' library(mdist)
 #' seqfile=system.file("extdata","seq.fasta", package="mdist")
 #' readBackgroundForSampling(file=seqfile,1)
 #' printBackgroundForSampling()
 #' 
 #' 
+#' @seealso \code{link{printBackgroundForSampling}}
 #' @export
 printBackgroundForSampling=function() {
-  dummy=.C("mdist_printBackgroundForSampling",PACKAGE="mdist");
+    dummy=.C("mdist_printBackgroundForSampling",PACKAGE="mdist");
 }
 
 
 
 #' Delete the current background model for sampling
 #' 
-#' This function unloads the current background model for sampling.
+#' Similar to \code{link{deleteBackgroundForSampling}}, but
+#' deletes parameters that where acquired using 
+#' \code{link{readBackgroundForSampling}}.
+#' 
+#' 
+#' @return None
 #' 
 #' 
 #' @examples
@@ -166,13 +184,12 @@ printBackgroundForSampling=function() {
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' library(mdist)
 #' seqfile=system.file("extdata","seq.fasta", package="mdist")
 #' readBackgroundForSampling(file=seqfile,1)
 #' deleteBackgroundForSampling()
 #' 
-#' 
+#' @seealso \code{link{deleteBackgroundForSampling}}
 #' @export
 deleteBackgroundForSampling=function() {
-  dummy=.C("mdist_deleteBackgroundForSampling",PACKAGE="mdist")
+    dummy=.C("mdist_deleteBackgroundForSampling",PACKAGE="mdist")
 }

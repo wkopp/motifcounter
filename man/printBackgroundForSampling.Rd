@@ -6,21 +6,26 @@
 \usage{
 printBackgroundForSampling()
 }
+\value{
+None
+}
 \description{
-This function prints the currently loaded background model that is employed
-during scanning the sampled DNA sequence. It is not used for the compound
-Poisson model and the combinatorial model
+Similar to \code{link{printBackgroundForSampling}}, but
+prints parameters that where acquired using 
+\code{link{readBackgroundForSampling}}.
 }
 \examples{
 
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 readBackgroundForSampling(file=seqfile,1)
 printBackgroundForSampling()
 
 
+}
+\seealso{
+\code{link{printBackgroundForSampling}}
 }
 

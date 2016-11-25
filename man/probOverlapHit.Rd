@@ -2,7 +2,7 @@
 % Please edit documentation in R/comppoiss_wrapper.R
 \name{probOverlapHit}
 \alias{probOverlapHit}
-\title{Motif overlap probabilities}
+\title{Overlapping motif hit probabilities}
 \usage{
 probOverlapHit(singlestranded = FALSE)
 }
@@ -12,19 +12,43 @@ probabilities shall be computed with respect to scanning both DNA strands or
 only one strand.  Default: Both strands are scanned for DNA sequences.}
 }
 \value{
-A list containing various overlapping hit probabilities,  including
-            beta ... the overlapping hit probability for hits occurring on the same strand
+A list containing various overlapping hit probabilities.
+The list contains the following entries
+    \describe{
+    \item{alpha}{False positive motif hit probability}
+    \item{beta}{Vector of overlapping hit probability for hits 
+            occurring on the same strand. Each element corresponds to
+            relative distance of the starting positions between the
+            motif hits.}
+    \item{beta3p}{Vector of overlapping hit probability for a 
+            forward strand hit that is followed by a reverse strand
+            hit. Each element corresponds to
+            relative distance of the starting positions between the
+            motif hits.}
+    \item{beta5p}{Vector of overlapping hit probability for a
+            reverse strand hit that is followed by a forward strand
+            hit. Each element corresponds to
+            relative distance of the starting positions between the
+            motif hits.}
+    \item{gamma}{Vector of overlapping hit probabilities across
+            all configurations. In contrast to beta, beta3p and beta5p,
+            gamma is not corrected for intermediate motif hit events.
+            only used for the compound Poisson variant according to Pape
+            et al. 2008.}
+    \item{singlestranded}{returns to singlestranded flag}
+    }
 }
 \description{
 This function computes the self-overlapping probabilites of the motif for
-the loaded PWM and background based on dynamic programming.
+the current PFM and background based on two-dimensional score distributions.
+Subsequently, the overlapping hit probabilities are corrected for motif hits
+that would arise in between the shifted positions.
 }
 \examples{
 
 
-library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
-pwmfile=system.file("extdata","x31.tab", package="mdist")
+motiffile=system.file("extdata","x31.tab", package="mdist")
 alpha=0.001
 gran=0.1
 mdistOption(alpha, gran)
@@ -32,8 +56,8 @@ mdistOption(alpha, gran)
 # estimate background model from seqfile
 readBackground(seqfile,1)
 
-# load motif model from pwmfile
-readMotif(pwmfile,0.01)
+# load motif model from motiffile
+readMotif(motiffile,0.01)
 
 # compute the overlap probabilities for scanning both DNA strands
 op=probOverlapHit(singlestranded=FALSE)

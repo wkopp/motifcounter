@@ -6,27 +6,33 @@
 \usage{
 scoreDist()
 }
+\value{
+List containing 
+\describe{
+\item{score}{Vector of motif scores}
+\item{probability}{Score probabilities}
+}
+}
 \description{
-This function computes the score distribution for the provided PFM and order
-m background. The Score distribution is computed based on dynamic
+This function computes the score distribution for the provided PFM and 
+background. The Score distribution is computed based on dynamic
 programming.
 }
 \examples{
 
 
-library(mdist)
 # Set the significance level and granularity for the score computation
 mdistOption(alpha=0.01,gran=0.1)
 
 # Load the DNA sequence and a Motif
 seqfile=system.file("extdata","seq.fasta", package="mdist")
-pwmfile=system.file("extdata","x31.tab",package="mdist")
+motiffile=system.file("extdata","x31.tab",package="mdist")
 
 # Load the order-1 background model from the DNA sequence
 readBackground(seqfile,1)
 
-# Load the motif from the pwmfile
-readMotif(pwmfile)
+# Load the motif from the motiffile
+readMotif(motiffile)
 
 # Compute the score distribution
 dp=scoreDist()

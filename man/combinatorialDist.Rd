@@ -2,41 +2,49 @@
 % Please edit documentation in R/combinatorial_wrapper.R
 \name{combinatorialDist}
 \alias{combinatorialDist}
-\title{Combinatrial distribution for the number of motif hits}
+\title{Combinatrial model approximation of the number of motif hits}
 \usage{
-combinatorialDist(seqlen, overlap, maxhits = 100)
+combinatorialDist(seqlen, overlap)
 }
 \arguments{
-\item{seqlen}{Is an integer-valued vector that defines the lengths of the
-individual sequences.}
+\item{seqlen}{Integer-valued vector that defines the lengths of the
+individual sequences. This information can be extracted for 
+given DNA sequence of interest using \code{\link{numMotifHits}}.
+Note that as the combinatorial model only supports the analysis
+of a set of sequences of equal length, each element `seqlen`
+must be the same.}
 
-\item{overlap}{A list that contains the overlapping hit probabilities which
-is produced by `probOverlapHit()`}
-
-\item{maxhits}{Integer that sets the maximal number of motif hits.}
+\item{overlap}{List that contains the overlapping hit probabilities which
+are determined by \code{\link{probOverlapHit}}}
 }
 \value{
-The distribution of the number of motif hits
+List that contains 
+\describe{
+\item{dist}{Distribution of the number of motif hits}
+}
 }
 \description{
-This function approxmiates the distribution of the number of motif hits by
-summing over all combinations of obtaining k hits in a given sequence. The
-summation is done by employing dynamic programming.
+This function approxmiates the distribution of the number of motif hits.
+It is determined by efficiently  
+summing over all combinations of obtaining k hits in a given sequence.
+This function can be viewed as an alternative analytical approximation
+to \code{\link{compoundPoissonDist}}.
+Currently, the combinatorial model approximation is only supported
+for scanning both strands of the DNA.
 }
 \examples{
 
 
-library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
-pwmfile=system.file("extdata","x31.tab", package="mdist")
+motiffile=system.file("extdata","x31.tab", package="mdist")
 alpha=0.001
 mdistOption(alpha)
 
 # estimate background model from seqfile
 readBackground(seqfile,1)
 
-# load motif model from pwmfile
-readMotif(pwmfile, 0.01)
+# load motif model from motiffile
+readMotif(motiffile, 0.01)
 
 # Compute overlap probabilies
 op=probOverlapHit(singlestranded=FALSE)
@@ -44,5 +52,8 @@ seqlen=rep(100,1)
 # Computes the distribution of the number of motif hits
 dist=combinatorialDist(seqlen, op)
 
+}
+\seealso{
+\code{\link{compoundPoissonDist}}
 }
 

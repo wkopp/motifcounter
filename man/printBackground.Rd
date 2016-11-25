@@ -6,15 +6,18 @@
 \usage{
 printBackground()
 }
+\value{
+None
+}
 \description{
 This function prints the currently loaded background model.
+The function is primarily used for debugging and testing.
 }
 \examples{
 
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-library(mdist)
 seqfile=system.file("extdata","seq.fasta", package="mdist")
 readBackground(file=seqfile,1)
 printBackground()
