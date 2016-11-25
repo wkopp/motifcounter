@@ -18,15 +18,4 @@ op=probOverlapHit()
 
 dist=combinatorialDist(seqlen, op)
 
-#dist2=posterior.count.debug(seqlen, numofseqs, maxhits, op,"poisson")
-#dist3=posterior.count.debug(seqlen, numofseqs, maxhits, op,"nbinom")
-#dist4=posterior.count.debug(seqlen, numofseqs, maxhits, op,"uniform")
-#dist5=posterior.count.debug(seqlen, numofseqs, maxhits, op,"truncunif")
-
 plot(dist$dist)
-#points(dist2$dist,col="blue")
-#points(dist3$dist,col="green")
-#points(dist4$dist,col="red")
-#points(dist5$dist,col="yellow")
-
-#p.value=comp.pois.test(num.motifhits(seqfile), op, maxhit=150)

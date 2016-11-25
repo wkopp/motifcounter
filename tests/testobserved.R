@@ -10,11 +10,13 @@ mdistOption(alpha, gran)
 seqfile=system.file("extdata","test.fa", package="mdist")
 nseq=numSequences(seqfile)
 if (nseq!=3) {
-    stop(paste("extdata/test.fa contains 3 sequences, but numSequences returned ", nseq))
+    stop(paste("extdata/test.fa contains 3 
+               sequences, but numSequences returned ", nseq))
 }
 lseq=lenSequences(seqfile)
 if (!all(lseq==c(23,10,0))) {
-    stop(paste("extdata/test.fa sequence lengths must be 23, 10 and 0, but lenSequences returned ", lseq))
+    stop(paste("extdata/test.fa sequence lengths 
+               must be 23, 10 and 0, but lenSequences returned ", lseq))
 }
 
 pwmname="x31.tab"

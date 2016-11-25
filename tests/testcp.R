@@ -7,19 +7,18 @@ numofseqs=100
 maxhits=200
 mdistOption(alpha, gran)
 
-#pwmname="x31.pwm"
 for ( pwmname in c("x31.tab","x32.tab")) {
-seqfile=system.file("extdata","seq.fasta", package="mdist")
-pwmfile=system.file("extdata",pwmname, package="mdist")
+    seqfile=system.file("extdata","seq.fasta", package="mdist")
+    pwmfile=system.file("extdata",pwmname, package="mdist")
 
-readBackground(seqfile,1)
-readMotif(pwmfile)
+    readBackground(seqfile,1)
+    readMotif(pwmfile)
 
-op=probOverlapHit()
-seqlen=rep(100,100)
+    op=probOverlapHit()
+    seqlen=rep(100,100)
 
-cpdist=compoundPoissonDist(seqlen, op)
+    cpdist=compoundPoissonDist(seqlen, op)
 
-nom=numMotifHits(seqfile)
+    nom=numMotifHits(seqfile)
 
 }
