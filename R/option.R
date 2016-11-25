@@ -1,7 +1,7 @@
 #' Set parameters for the enrichment analysis
 #' 
 #' This function sets some parameters that are necessary for
-#' the computations of the `mdist` package.
+#' the computations of the `motifcounter` package.
 #' 
 #' 
 #' @param alpha Significance level for calling
@@ -21,11 +21,11 @@
 #' @examples
 #' 
 #' 
-#' mdistOption(alpha=0.001)
+#' motifcounterOption(alpha=0.001)
 #' 
 #' @export
-mdistOption=function(alpha, gran=0.1, ncores=1) {
-    dummy=.C("mdist_option", 
+motifcounterOption=function(alpha, gran=0.1, ncores=1) {
+    dummy=.C("motifcounter_option", 
         as.numeric(alpha), 
-        as.numeric(gran),as.integer(ncores),PACKAGE="mdist")
+        as.numeric(gran),as.integer(ncores),PACKAGE="motifcounter")
 }

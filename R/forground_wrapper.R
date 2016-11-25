@@ -17,7 +17,7 @@
 #' @examples
 #' 
 #' 
-#' motiffile=system.file("extdata","x31.tab", package="mdist")
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' # load a motif in tab format
 #' readMotif(motiffile, 0.01)
 #' 
@@ -40,11 +40,11 @@ readMotif=function(motif, pseudocount=0.01) {
         }
         motif=motif+pseudocount
         motif=motif/apply(motif,2,sum)
-        dummy=.C("mdist_loadmotif", as.numeric(motif), 
-                nrow(motif), ncol(motif),PACKAGE="mdist")
+        dummy=.C("motifcounter_loadmotif", as.numeric(motif), 
+                nrow(motif), ncol(motif),PACKAGE="motifcounter")
     } else if (is.character(motif)) {
-        sdummy=.C("mdist_motiffromfile", as.character(motif),
-                as.numeric(pseudocount),PACKAGE="mdist")
+        sdummy=.C("motifcounter_motiffromfile", as.character(motif),
+                as.numeric(pseudocount),PACKAGE="motifcounter")
     } else {
         stop("motif must be a filename pointing 
                 that contains a PFM or a PFM matrix")
@@ -62,13 +62,13 @@ readMotif=function(motif, pseudocount=0.01) {
 #' @examples
 #' 
 #' 
-#' motiffile=system.file("extdata","x31.tab", package="mdist")
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' readMotif(motiffile,0.01)
 #' deleteMotif()
 #' 
 #' @export
 deleteMotif=function() {
-    dummy=.C("mdist_deleteMotif",PACKAGE="mdist")
+    dummy=.C("motifcounter_deleteMotif",PACKAGE="motifcounter")
 }
 
 
@@ -82,13 +82,13 @@ deleteMotif=function() {
 #' @examples
 #' 
 #' 
-#' motiffile=system.file("extdata","x31.tab", package="mdist")
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' readMotif(motiffile)
 #' x=motif2matrix()
 #' 
 #' @export
 motif2matrix=function() {
-    m=.Call("mdist_fetchMotif",PACKAGE="mdist");
+    m=.Call("motifcounter_fetchMotif",PACKAGE="motifcounter");
     return (m)
 }
 
@@ -101,14 +101,14 @@ motif2matrix=function() {
 #' @examples
 #' 
 #' 
-#' motiffile=system.file("extdata","x31.tab", package="mdist")
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' readMotif(motiffile)
 #' motifLength()
 #' 
 #' @export
 motifLength=function() {
     x=integer(1);
-    res=.C("mdist_motiflength",x,PACKAGE="mdist")
+    res=.C("motifcounter_motiflength",x,PACKAGE="motifcounter")
     return (res[[1]])
 }
 

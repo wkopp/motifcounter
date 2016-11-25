@@ -30,17 +30,17 @@ distribution of the number of motif hits.
 \examples{
 
 
-mdistOption(0.01, 0.01)
-seqfile=system.file("extdata","seq.fasta", package="mdist")
-motiffile=system.file("extdata","x31.tab",package="mdist")
+motifcounterOption(0.01, 0.01)
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
 readBackground(seqfile,1)
 readMotif(motiffile)
 
 seqlen=rep(150,100)
-simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=1000,singlestranded=FALSE)
+simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=100,singlestranded=FALSE)
 
-simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=1000,singlestranded=TRUE)
+simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=100,singlestranded=TRUE)
 
 }
 \seealso{

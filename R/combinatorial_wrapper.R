@@ -26,10 +26,10 @@
 #' @examples
 #' 
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' motiffile=system.file("extdata","x31.tab", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' alpha=0.001
-#' mdistOption(alpha)
+#' motifcounterOption(alpha)
 #' 
 #' # estimate background model from seqfile
 #' readBackground(seqfile,1)
@@ -73,11 +73,11 @@ combinatorialDist=function(seqlen, overlap) {
     # across multiple sequences
     totalmaxhits=maxhits*length(seqlen)
     dist=numeric(totalmaxhits+1)
-    ret=.C("mdist_combinatorialDist", 
+    ret=.C("motifcounter_combinatorialDist", 
         overlap$alpha, overlap$beta, overlap$beta3p, overlap$beta5p,
         as.numeric(dist), as.integer(seqlen[1]),
         as.integer(maxhits), as.integer(length(seqlen)),
-        as.integer(overlap$singlestranded),PACKAGE="mdist")
+        as.integer(overlap$singlestranded),PACKAGE="motifcounter")
     return(list(dist=ret[[5]]))
 }
 

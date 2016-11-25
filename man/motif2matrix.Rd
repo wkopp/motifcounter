@@ -15,7 +15,7 @@ This function returns the current PFM as an R matrix.
 \examples{
 
 
-motiffile=system.file("extdata","x31.tab", package="mdist")
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 readMotif(motiffile)
 x=motif2matrix()
 

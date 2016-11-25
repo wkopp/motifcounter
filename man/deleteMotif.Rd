@@ -15,7 +15,7 @@ This function unloads the current motif and frees the allocated memory
 \examples{
 
 
-motiffile=system.file("extdata","x31.tab", package="mdist")
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 readMotif(motiffile,0.01)
 deleteMotif()
 

@@ -17,10 +17,10 @@
 #' @examples
 #' 
 #' # Set the the significance level and the score granularity
-#' mdistOption(alpha=0.01, gran=0.1)
+#' motifcounterOption(alpha=0.01, gran=0.1)
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' motiffile=system.file("extdata","x31.tab",package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' 
 #' # Load an order-1 background model
 #' readBackground(seqfile,1)
@@ -36,13 +36,13 @@
 #' @export
 simulateScoreDist=function(seqlen, nsim) {
     scorerange=integer(1)
-    scorerange=.C("mdist_scorerange",
-                as.integer(scorerange),PACKAGE="mdist")[[1]]
+    scorerange=.C("motifcounter_scorerange",
+                as.integer(scorerange),PACKAGE="motifcounter")[[1]]
     scores=numeric(scorerange); dist=numeric(scorerange)
     length(scores)
-    ret=.C("mdist_simulateScores", as.numeric(scores), 
+    ret=.C("motifcounter_simulateScores", as.numeric(scores), 
         as.numeric(dist), as.integer(seqlen), 
-        as.integer(nsim),PACKAGE="mdist")
+        as.integer(nsim),PACKAGE="motifcounter")
     return(list(score=ret[[1]], probability=ret[[2]]))
 }
 
@@ -67,17 +67,17 @@ simulateScoreDist=function(seqlen, nsim) {
 #' @examples
 #' 
 #' 
-#' mdistOption(0.01, 0.01)
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' motiffile=system.file("extdata","x31.tab",package="mdist")
+#' motifcounterOption(0.01, 0.01)
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' 
 #' readBackground(seqfile,1)
 #' readMotif(motiffile)
 #' 
 #' seqlen=rep(150,100)
-#' simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=1000,singlestranded=FALSE)
+#' simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=100,singlestranded=FALSE)
 #' 
-#' simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=1000,singlestranded=TRUE)
+#' simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=100,singlestranded=TRUE)
 #' 
 #' @seealso \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
 #' @export
@@ -86,10 +86,10 @@ simulateNumHitsDist=function(seqlen, maxhits, nsim, singlestranded=FALSE) {
         stop("seqlen must be non-empty")
     }
     dist=numeric(maxhits+1);
-    ret=.C("mdist_simulateCountDistribution", as.numeric(dist), 
+    ret=.C("motifcounter_simulateCountDistribution", as.numeric(dist), 
         as.integer(nsim), as.integer(length(seqlen)),
         as.integer(seqlen), as.integer(maxhits), 
-        as.integer(singlestranded),PACKAGE="mdist")
+        as.integer(singlestranded),PACKAGE="motifcounter")
     return(list(dist=ret[[1]]))
 }
 

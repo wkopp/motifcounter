@@ -14,11 +14,11 @@
 #' 
 #' 
 #' # Set the significance level and granularity for the score computation
-#' mdistOption(alpha=0.01,gran=0.1)
+#' motifcounterOption(alpha=0.01,gran=0.1)
 #' 
 #' # Load the DNA sequence and a Motif
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' motiffile=system.file("extdata","x31.tab",package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' 
 #' # Load the order-1 background model from the DNA sequence
 #' readBackground(seqfile,1)
@@ -32,11 +32,11 @@
 #' @export
 scoreDist=function() {
     scorerange=integer(1)
-    scorerange=.C("mdist_scorerange",
-                as.integer(scorerange),PACKAGE="mdist")[[1]]
+    scorerange=.C("motifcounter_scorerange",
+                as.integer(scorerange),PACKAGE="motifcounter")[[1]]
     scores=numeric(scorerange); dist=numeric(scorerange)
-    ret=.C("mdist_scoredist",as.numeric(scores),
-        as.numeric(dist),PACKAGE="mdist")
+    ret=.C("motifcounter_scoredist",as.numeric(scores),
+        as.numeric(dist),PACKAGE="motifcounter")
     return(list(score=ret[[1]], probability=ret[[2]]))
 }
 
@@ -61,11 +61,11 @@ scoreDist=function() {
 #' 
 #' 
 #' # Set the significance level and granularity for the score computation
-#' mdistOption(alpha=0.01,gran=0.1)
+#' motifcounterOption(alpha=0.01,gran=0.1)
 #' 
 #' # Load the DNA sequence and a Motif
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' motiffile=system.file("extdata","x31.tab",package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' 
 #' # Load the order-1 background model from the DNA sequence
 #' readBackground(seqfile,1)
@@ -79,10 +79,10 @@ scoreDist=function() {
 #' @export
 scoreDistBf=function() {
     scorerange=integer(1)
-    scorerange=.C("mdist_scorerange",
-                as.integer(scorerange),PACKAGE="mdist")[[1]]
+    scorerange=.C("motifcounter_scorerange",
+                as.integer(scorerange),PACKAGE="motifcounter")[[1]]
     scores=numeric(scorerange); dist=numeric(scorerange)
-    .C("mdist_scoredist_bf",as.numeric(scores),
-        as.numeric(dist),PACKAGE="mdist")
+    .C("motifcounter_scoredist_bf",as.numeric(scores),
+        as.numeric(dist),PACKAGE="motifcounter")
 }
 

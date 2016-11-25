@@ -24,7 +24,7 @@ A list containing
 This function scans the DNA sequences contained in the fasta file
 and counts the number of motif hits using the score threshold
 that is associated with the false positive probability 'alpha' 
-(see \code{\link{mdistOption}}. The function can be used
+(see \code{\link{motifcounterOption}}. The function can be used
 to count motif hits on one or both strands, respectively.
 }
 \examples{
@@ -32,12 +32,12 @@ to count motif hits on one or both strands, respectively.
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-seqfile=system.file("extdata","seq.fasta", package="mdist")
-motiffile=system.file("extdata","x31.tab", package="mdist")
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 
 # Set false positive probability
 alpha=0.001
-mdistOption(alpha)
+motifcounterOption(alpha)
 
 # Estimate order-1 background model
 readBackground(seqfile,1)

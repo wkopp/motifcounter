@@ -1,13 +1,13 @@
 
-library(mdist)
+library(motifcounter)
 
 alpha=0.01
 gran=0.1
 maxhits=200
-mdistOption(alpha, gran)
+motifcounterOption(alpha, gran)
 
 # 1. test whether numSequences and lenSequences work
-seqfile=system.file("extdata","test.fa", package="mdist")
+seqfile=system.file("extdata","test.fa", package="motifcounter")
 nseq=numSequences(seqfile)
 if (nseq!=3) {
     stop(paste("extdata/test.fa contains 3 
@@ -20,8 +20,8 @@ if (!all(lseq==c(23,10,0))) {
 }
 
 pwmname="x31.tab"
-seqfile=system.file("extdata","seq1.fasta", package="mdist")
-pwmfile=system.file("extdata",pwmname, package="mdist")
+seqfile=system.file("extdata","seq1.fasta", package="motifcounter")
+pwmfile=system.file("extdata",pwmname, package="motifcounter")
 
 readBackground(seqfile,1)
 readMotif(pwmfile)
@@ -29,8 +29,8 @@ readMotif(pwmfile)
 nom=numMotifHits(seqfile)
 
 pwmname="x31.tab"
-seqfile=system.file("extdata","seq1.fasta", package="mdist")
-pwmfile=system.file("extdata",pwmname, package="mdist")
+seqfile=system.file("extdata","seq1.fasta", package="motifcounter")
+pwmfile=system.file("extdata",pwmname, package="motifcounter")
 
 readBackground(seqfile,1)
 readMotif(pwmfile)

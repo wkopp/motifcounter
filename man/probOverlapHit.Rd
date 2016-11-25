@@ -47,11 +47,11 @@ that would arise in between the shifted positions.
 \examples{
 
 
-seqfile=system.file("extdata","seq.fasta", package="mdist")
-motiffile=system.file("extdata","x31.tab", package="mdist")
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 alpha=0.001
 gran=0.1
-mdistOption(alpha, gran)
+motifcounterOption(alpha, gran)
 
 # estimate background model from seqfile
 readBackground(seqfile,1)

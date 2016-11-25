@@ -23,7 +23,7 @@ as an R list.
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-file=system.file("extdata","seq.fasta", package="mdist")
+file=system.file("extdata","seq.fasta", package="motifcounter")
 readBackground(file,1)
 fetchBackground()
 

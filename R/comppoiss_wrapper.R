@@ -38,11 +38,11 @@
 #' @examples
 #' 
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' motiffile=system.file("extdata","x31.tab", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' alpha=0.001
 #' gran=0.1
-#' mdistOption(alpha, gran)
+#' motifcounterOption(alpha, gran)
 #' 
 #' # estimate background model from seqfile
 #' readBackground(seqfile,1)
@@ -65,11 +65,11 @@ probOverlapHit=function(singlestranded=FALSE) {
     beta5p=numeric(mlen)
     gamma=numeric(3*mlen)
     if (singlestranded==TRUE) {
-        res=.C("mdist_overlapSingleStranded", alpha, 
-            beta, beta3p, beta5p, gamma,PACKAGE="mdist")
+        res=.C("motifcounter_overlapSingleStranded", alpha, 
+            beta, beta3p, beta5p, gamma,PACKAGE="motifcounter")
     } else {
-        res=.C("mdist_overlap", alpha, 
-            beta, beta3p, beta5p, gamma,PACKAGE="mdist")
+        res=.C("motifcounter_overlap", alpha, 
+            beta, beta3p, beta5p, gamma,PACKAGE="motifcounter")
     }
     return (list(alpha=res[[1]],beta=res[[2]],beta3p=res[[3]],beta5p=res[[4]],
         gamma=res[[5]], singlestranded=singlestranded))
@@ -114,11 +114,11 @@ probOverlapHit=function(singlestranded=FALSE) {
 #' @examples
 #' 
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' motiffile=system.file("extdata","x31.tab", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' alpha=0.001
 #' gran=0.1
-#' mdistOption(alpha, gran)
+#' motifcounterOption(alpha, gran)
 #' 
 #' # estimate background model from seqfile
 #' readBackground(seqfile,1)
@@ -159,12 +159,12 @@ compoundPoissonDist=function(seqlen, overlap, method="kopp") {
     maxhits=sum(seqlen)
     dist=numeric(maxhits+1)
     if (method=="kopp") {
-        res=.C("mdist_compoundPoisson_useBeta", overlap$alpha,
+        res=.C("motifcounter_compoundPoisson_useBeta", overlap$alpha,
             overlap$beta, overlap$beta3p, overlap$beta5p,
             as.numeric(dist), as.integer(length(seqlen)),
             as.integer(seqlen),
             as.integer(maxhits), as.integer(maxclumpsize),
-            as.integer(overlap$singlestranded),PACKAGE="mdist")
+            as.integer(overlap$singlestranded),PACKAGE="motifcounter")
         dist=res[[5]]
     } else if (method=="pape") {
         if (overlap$singlestranded==TRUE) {
@@ -172,9 +172,10 @@ compoundPoissonDist=function(seqlen, overlap, method="kopp") {
                 Poisson distribution can only be for scanning both DNA strands.
                 Use probOverlapHit(singlestranded=F).")
         }
-        res=.C("mdist_compoundPoissonPape_useGamma", overlap$gamma,
+        res=.C("motifcounter_compoundPoissonPape_useGamma", overlap$gamma,
             as.numeric(dist), as.integer(length(seqlen)), as.integer(seqlen),
-            as.integer(maxhits), as.integer(maxclumpsize),PACKAGE="mdist")
+            as.integer(maxhits), as.integer(maxclumpsize),
+            PACKAGE="motifcounter")
         dist=res[[2]]
     } else {
         stop("The method must be 'kopp' or 'pape'")

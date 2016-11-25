@@ -15,15 +15,15 @@
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' file=system.file("extdata","seq.fasta", package="mdist")
+#' file=system.file("extdata","seq.fasta", package="motifcounter")
 #' readBackground(file,1)
 #' 
 #' @export
 readBackground=function(file, order=1) {
     nseq=numSequences(file)
     lseq=lenSequences(file)
-    dummy=.C("mdist_makebg", as.character(file), as.integer(order),
-        as.integer(nseq),as.integer(lseq),PACKAGE="mdist")
+    dummy=.C("motifcounter_makebg", as.character(file), as.integer(order),
+        as.integer(nseq),as.integer(lseq),PACKAGE="motifcounter")
 }
 
 #' Fetch background model into R vectors
@@ -43,14 +43,14 @@ readBackground=function(file, order=1) {
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' file=system.file("extdata","seq.fasta", package="mdist")
+#' file=system.file("extdata","seq.fasta", package="motifcounter")
 #' readBackground(file,1)
 #' fetchBackground()
 #' 
 #' @export
 fetchBackground=function() {
-    stat=.Call("mdist_fetchStationBackground",PACKAGE="mdist");
-    trans=.Call("mdist_fetchTransBackground",PACKAGE="mdist");
+    stat=.Call("motifcounter_fetchStationBackground",PACKAGE="motifcounter");
+    trans=.Call("motifcounter_fetchTransBackground",PACKAGE="motifcounter");
     return(list(stat=stat,trans=trans))
 }
 
@@ -68,13 +68,13 @@ fetchBackground=function() {
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' readBackground(file=seqfile,1)
 #' printBackground()
 #' 
 #' @export
 printBackground=function() {
-    dummy=.C("mdist_printBackground",PACKAGE="mdist");
+    dummy=.C("motifcounter_printBackground",PACKAGE="motifcounter");
 }
 
 
@@ -91,14 +91,14 @@ printBackground=function() {
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' readBackground(file=seqfile,1)
 #' deleteBackground()
 #' 
 #' 
 #' @export
 deleteBackground=function() {
-    dummy=.C("mdist_deleteBackground",PACKAGE="mdist")
+    dummy=.C("motifcounter_deleteBackground",PACKAGE="motifcounter")
 }
 
 
@@ -127,7 +127,7 @@ deleteBackground=function() {
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' file=system.file("extdata","seq.fasta", package="mdist")
+#' file=system.file("extdata","seq.fasta", package="motifcounter")
 #' readBackgroundForSampling(file,1)
 #' 
 #' 
@@ -135,8 +135,9 @@ deleteBackground=function() {
 readBackgroundForSampling=function(file, order=1) {
     nseq=numSequences(file)
     lseq=lenSequences(file)
-    dummy=.C("mdist_makebgForSampling", as.character(file), as.integer(order),
-        as.integer(nseq),as.integer(lseq),PACKAGE="mdist")
+    dummy=.C("motifcounter_makebgForSampling", 
+    as.character(file), as.integer(order),
+        as.integer(nseq),as.integer(lseq),PACKAGE="motifcounter")
 }
 
 
@@ -156,7 +157,7 @@ readBackgroundForSampling=function(file, order=1) {
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' readBackgroundForSampling(file=seqfile,1)
 #' printBackgroundForSampling()
 #' 
@@ -164,7 +165,7 @@ readBackgroundForSampling=function(file, order=1) {
 #' @seealso \code{link{printBackgroundForSampling}}
 #' @export
 printBackgroundForSampling=function() {
-    dummy=.C("mdist_printBackgroundForSampling",PACKAGE="mdist");
+    dummy=.C("motifcounter_printBackgroundForSampling",PACKAGE="motifcounter");
 }
 
 
@@ -184,12 +185,12 @@ printBackgroundForSampling=function() {
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' readBackgroundForSampling(file=seqfile,1)
 #' deleteBackgroundForSampling()
 #' 
 #' @seealso \code{link{deleteBackgroundForSampling}}
 #' @export
 deleteBackgroundForSampling=function() {
-    dummy=.C("mdist_deleteBackgroundForSampling",PACKAGE="mdist")
+    dummy=.C("motifcounter_deleteBackgroundForSampling",PACKAGE="motifcounter")
 }

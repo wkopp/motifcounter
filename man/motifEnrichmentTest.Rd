@@ -4,15 +4,14 @@
 \alias{motifEnrichmentTest}
 \title{Enrichment of motif hits}
 \usage{
-motifEnrichmentTest(observations, overlap, method = "compound")
+motifEnrichmentTest(sequence, singlestranded = FALSE, method = "compound")
 }
 \arguments{
-\item{observations}{List containing the number of motif hit 
-in the given sequence. This argument is
-determined by \code{\link{numMotifHits}}.}
+\item{sequence}{Fasta-filename containing the sequence that should
+be scanned}
 
-\item{overlap}{List containing the overlapping hit probabilities. 
-This argument is determined by  \code{\link{probOverlapHit}}.}
+\item{singlestranded}{Boolean flag that indicates whether one or both
+strands are scanned for motif hits}
 
 \item{method}{String that defines whether to use 
 the 'compound' Poisson approximation' or the 'combinatorial' model.
@@ -31,11 +30,11 @@ It can optionally be used based on the
 \examples{
 
 
-seqfile=system.file("extdata","seq.fasta", package="mdist")
-motiffile=system.file("extdata","x31.tab", package="mdist")
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 alpha=0.001
 gran=0.1
-mdistOption(alpha, gran)
+motifcounterOption(alpha, gran)
 
 # estimate background model from seqfile
 readBackground(seqfile,1)
@@ -44,48 +43,23 @@ readBackground(seqfile,1)
 readMotif(motiffile, 0.01)
 
 ### 1 ) Compute the distribution for scanning a *single* DNA strand
-
-# Compute overlapping probabilities 
-op=probOverlapHit(singlestranded=TRUE)
-
-# Determine the observed number of motif hits in 'seq.fasta'
-numhits=numMotifHits(seqfile,singlestranded=TRUE)
-
-# Determine the enrichment of the motif in the sequence
 # based on the 'Compound Poisson model'
 
-pvalue=motifEnrichmentTest(numhits,op,method="compound")
+pvalue=motifEnrichmentTest(seqfile,singlestranded=TRUE,method="compound")
 
 ### 2 ) Compute the distribution for scanning *both* DNA strand
-
-#Compute overlapping probabilities 
-op=probOverlapHit(singlestranded=FALSE)
-
-# Determine the observed number of motif hits in 'seq.fasta'
-numhits=numMotifHits(seqfile,singlestranded=FALSE)
-
-# Determine the enrichment of the motif in the sequence
 # based on the 'Compound Poisson model'
 
-pvalue=motifEnrichmentTest(numhits,op,method="compound")
+pvalue=motifEnrichmentTest(seqfile,method="compound")
 
 ### 3 ) Compute the distribution for scanning *both* DNA strand
-
-#Compute overlapping probabilities 
-op=probOverlapHit(singlestranded=FALSE)
-
-#Determine the observed number of motif hits in 'seq.fasta'
-numhits=numMotifHits(seqfile,singlestranded=FALSE)
-
-# Determine the enrichment of the motif in the sequence
 # based on the *combinatorial model*
 
-pvalue=motifEnrichmentTest(numhits,op,method="combinatorial")
+pvalue=motifEnrichmentTest(seqfile,singlestranded=FALSE,
+method="combinatorial")
 
 }
 \seealso{
 \code{\link{compoundPoissonDist}}, \code{\link{combinatorialDist}}
-
-\code{\link{numMotifHits}}, \code{\link{probOverlapHit}}
 }
 

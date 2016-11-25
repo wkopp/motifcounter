@@ -27,7 +27,7 @@ and each file must contain only one PFM.
 \examples{
 
 
-motiffile=system.file("extdata","x31.tab", package="mdist")
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 # load a motif in tab format
 readMotif(motiffile, 0.01)
 

@@ -15,7 +15,7 @@ This function returns the length of the currently loaded PFM.
 \examples{
 
 
-motiffile=system.file("extdata","x31.tab", package="mdist")
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 readMotif(motiffile)
 motifLength()
 

@@ -19,11 +19,11 @@
 #' @examples
 #' 
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' motiffile=system.file("extdata","x31.tab", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' alpha=0.001
 #' gran=0.1
-#' mdistOption(alpha, gran)
+#' motifcounterOption(alpha, gran)
 #' 
 #' # estimate background model from seqfile
 #' readBackground(seqfile,1)
@@ -49,7 +49,7 @@
 #' 
 #' @seealso \code{\link{compoundPoissonDist}}, \code{\link{combinatorialDist}}
 #' @export
-motifEnrichmentTest=function(sequence,singlestranded,method="compound") {
+motifEnrichmentTest=function(sequence,singlestranded=FALSE,method="compound") {
     #compute overlapping hit probs
     overlap=probOverlapHit(singlestranded)
 
@@ -63,7 +63,7 @@ motifEnrichmentTest=function(sequence,singlestranded,method="compound") {
     if (sum(observations$numofhits)>length(dist$dist)-1) {
         p=0.0;
     } else {
-        p=1-sum(dist$dist[1:observations$numofhits])
+        p=1-sum(dist$dist[1:sum(observations$numofhits)])
     }
     return (p)
 }

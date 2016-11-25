@@ -1,18 +1,18 @@
-library(mdist)
+library(motifcounter)
 
 for ( m in 0:3) {
-    seqfile=system.file("extdata","seq.fasta", package="mdist")
+    seqfile=system.file("extdata","seq.fasta", package="motifcounter")
     readBackground(seqfile,m)
 
     printBackground()
-    seqfile=system.file("extdata","seq1.fasta", package="mdist")
+    seqfile=system.file("extdata","seq1.fasta", package="motifcounter")
     readBackground(seqfile,m)
     printBackground()
 
 }
 
-library(mdist)
-seqfile=system.file("extdata","test.fa", package="mdist")
+library(motifcounter)
+seqfile=system.file("extdata","test.fa", package="motifcounter")
 readBackground(seqfile,0)
 printBackground()
 ret=fetchBackground()

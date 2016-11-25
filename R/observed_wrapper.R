@@ -11,7 +11,7 @@
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' 
 #' # scan the given sequence for the motif occurances
 #' nseq=numSequences(seqfile)
@@ -20,8 +20,8 @@
 #' @export
 numSequences=function(seqfile) {
     nseq=integer(1)
-    res=.C("mdist_numSeqs",as.character(seqfile),
-        as.integer(nseq),PACKAGE="mdist")
+    res=.C("motifcounter_numSeqs",as.character(seqfile),
+        as.integer(nseq),PACKAGE="motifcounter")
     return (res[[2]])
 }
 
@@ -43,7 +43,7 @@ numSequences=function(seqfile) {
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' 
 #' # scan the given sequence for the motif occurances
 #' lseq=lenSequences(seqfile)
@@ -53,8 +53,8 @@ numSequences=function(seqfile) {
 lenSequences=function(seqfile) {
     nseq=numSequences(seqfile)
     lseq=integer(nseq)
-    res=.C("mdist_lenSeqs",as.character(seqfile),
-        as.integer(nseq),as.integer(lseq),PACKAGE="mdist")
+    res=.C("motifcounter_lenSeqs",as.character(seqfile),
+        as.integer(nseq),as.integer(lseq),PACKAGE="motifcounter")
     return (res[[3]])
 }
 
@@ -65,7 +65,7 @@ lenSequences=function(seqfile) {
 #' This function scans the DNA sequences contained in the fasta file
 #' and counts the number of motif hits using the score threshold
 #' that is associated with the false positive probability 'alpha' 
-#' (see \code{\link{mdistOption}}. The function can be used
+#' (see \code{\link{motifcounterOption}}. The function can be used
 #' to count motif hits on one or both strands, respectively.
 #' 
 #' 
@@ -83,12 +83,12 @@ lenSequences=function(seqfile) {
 #' # Estimate first order Markov model based on the sequence provided
 #' # in seq.fasta
 #' 
-#' seqfile=system.file("extdata","seq.fasta", package="mdist")
-#' motiffile=system.file("extdata","x31.tab", package="mdist")
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' 
 #' # Set false positive probability
 #' alpha=0.001
-#' mdistOption(alpha)
+#' motifcounterOption(alpha)
 #' 
 #' # Estimate order-1 background model
 #' readBackground(seqfile,1)
@@ -108,9 +108,9 @@ numMotifHits=function(seqfile, singlestranded=FALSE) {
     nseq=numSequences(seqfile)
     lseq=lenSequences(seqfile)
     noh=vector(mode="integer",length=nseq)
-    res=.C("mdist_numberOfHits",as.character(seqfile),as.integer(noh),
+    res=.C("motifcounter_numberOfHits",as.character(seqfile),as.integer(noh),
         as.integer(nseq), as.integer(lseq),
-        as.integer(singlestranded),PACKAGE="mdist")
+        as.integer(singlestranded),PACKAGE="motifcounter")
     return (list(nseq=nseq, lseq=lseq,
         numofhits=res[[2]]))
 }

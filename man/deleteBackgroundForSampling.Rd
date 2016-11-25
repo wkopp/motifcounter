@@ -19,7 +19,7 @@ deletes parameters that where acquired using
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-seqfile=system.file("extdata","seq.fasta", package="mdist")
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 readBackgroundForSampling(file=seqfile,1)
 deleteBackgroundForSampling()
 

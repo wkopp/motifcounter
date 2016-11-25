@@ -1,11 +1,11 @@
 
-library(mdist)
+library(motifcounter)
 alpha=0.01
 
-mdistOption(alpha)
+motifcounterOption(alpha)
 pwmname="x1.tab"
-pwmfile=system.file("extdata",pwmname, package="mdist")
-seqfile=system.file("extdata","seq.fasta", package="mdist")
+pwmfile=system.file("extdata",pwmname, package="motifcounter")
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 
 # 1. test:
 # with an order zero model only sample one letter for P times

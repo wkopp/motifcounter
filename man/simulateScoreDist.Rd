@@ -28,10 +28,10 @@ with the scoring measure which yields the score distribution.
 \examples{
 
 # Set the the significance level and the score granularity
-mdistOption(alpha=0.01, gran=0.1)
+motifcounterOption(alpha=0.01, gran=0.1)
 
-seqfile=system.file("extdata","seq.fasta", package="mdist")
-motiffile=system.file("extdata","x31.tab",package="mdist")
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
 # Load an order-1 background model
 readBackground(seqfile,1)

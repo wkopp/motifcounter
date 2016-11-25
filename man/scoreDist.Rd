@@ -22,11 +22,11 @@ programming.
 
 
 # Set the significance level and granularity for the score computation
-mdistOption(alpha=0.01,gran=0.1)
+motifcounterOption(alpha=0.01,gran=0.1)
 
 # Load the DNA sequence and a Motif
-seqfile=system.file("extdata","seq.fasta", package="mdist")
-motiffile=system.file("extdata","x31.tab",package="mdist")
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
 # Load the order-1 background model from the DNA sequence
 readBackground(seqfile,1)

@@ -1,7 +1,7 @@
 
-library(mdist)
+library(motifcounter)
 
-pwmfile=system.file("extdata","x1.tab", package="mdist")
+pwmfile=system.file("extdata","x1.tab", package="motifcounter")
 
 # create a motif from tab format
 readMotif(pwmfile,0)
@@ -29,7 +29,7 @@ readMotif(m)
 
 # load a motif in transfac format
 
-pwmfile=system.file("extdata","test.transfac", package="mdist")
+pwmfile=system.file("extdata","test.transfac", package="motifcounter")
 readMotif(pwmfile)
 m=motif2matrix()
 vcorrect=c(.1,.1,.1,.7)+.01

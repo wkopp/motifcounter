@@ -1,6 +1,8 @@
-# mdist - R package for determining motif enrichment in DNA sequences.
+# motifcounter - R package for determining motif enrichment in DNA sequences.
 
-[![Travis-CI Build Status](https://travis-ci.org/wkopp/mdist.svg?branch=master)](https://travis-ci.org/wkopp/mdist)
+[![Travis-CI Build Status](https://travis-ci.org/wkopp/motifcounter.svg?branch=master)](https://travis-ci.org/wkopp/motifcounter)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/wkopp/motifcounter?branch=master&svg=true)](https://ci.appveyor.com/project/wkopp/motifcounter)
+
 
 The package implements functions for  elucidating the statistical enrichment 
 of known motif (e.g. from TRANSFAC or JASPAR) in a given DNA sequence of interest (e.g. a gene promoter).
@@ -26,17 +28,17 @@ motifs (e.g. PPARG) and repetitive motif structures (e.g. SP1).
 - Third, the methods take motif hits on both strands of the DNA into account
 
 ## Installation
-The `mdist` package can be installed by cloning the git repository and typing
+The `motifcounter` package can be installed by cloning the git repository and typing
 
 ```R
-R CMD INSTALL mdist
+R CMD INSTALL motifcounter
 ```
 or via the `devtools` package
 
 ```R
 install.packages("devtools")
 library(devtools)
-install_github("wkopp/mdist")
+install_github("wkopp/motifcounter")
 ```
 
 The package contains a vignette that explains the main functionality.

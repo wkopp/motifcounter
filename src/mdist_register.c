@@ -8,9 +8,10 @@ SEXP fetchTransBackground();
 SEXP fetchMotif();
 
 static R_CallMethodDef callMethods[]  = {
-    {"mdist_fetchStationBackground", (DL_FUNC) &fetchStationBackground, 0},
-    {"mdist_fetchTransBackground", (DL_FUNC) &fetchTransBackground, 0},
-    {"mdist_fetchMotif", (DL_FUNC) &fetchMotif, 0},
+    {"motifcounter_fetchStationBackground", 
+        (DL_FUNC) &fetchStationBackground, 0},
+    {"motifcounter_fetchTransBackground", (DL_FUNC) &fetchTransBackground, 0},
+    {"motifcounter_fetchMotif", (DL_FUNC) &fetchMotif, 0},
     {NULL, NULL, 0}
 };
 
@@ -110,47 +111,50 @@ static R_NativePrimitiveArgType simcountdist_t[] = {
 };
 
 static R_CMethodDef cMethods[] = {
-    {"mdist_makebg", (DL_FUNC) &Rmakebg, 4, makebg_t},
-    {"mdist_printBackground", (DL_FUNC) &RprintBackground, 0, NULL},
-    {"mdist_deleteBackground", (DL_FUNC) &RdestroyBackground, 0, NULL},
-    {"mdist_makebgForSampling", (DL_FUNC) &RmakebgForSampling, 4, makebg_t},
-    {"mdist_printBackgroundForSampling", 
+    {"motifcounter_makebg", (DL_FUNC) &Rmakebg, 4, makebg_t},
+    {"motifcounter_printBackground", (DL_FUNC) &RprintBackground, 0, NULL},
+    {"motifcounter_deleteBackground", (DL_FUNC) &RdestroyBackground, 0, NULL},
+    {"motifcounter_makebgForSampling", 
+        (DL_FUNC) &RmakebgForSampling, 4, makebg_t},
+    {"motifcounter_printBackgroundForSampling", 
             (DL_FUNC) &RprintBackgroundForSampling, 0, NULL},
-    {"mdist_deleteBackgroundForSampling", 
+    {"motifcounter_deleteBackgroundForSampling", 
             (DL_FUNC) &RdestroyBackgroundForSampling, 0, NULL},
-    {"mdist_combinatorialDist", 
+    {"motifcounter_combinatorialDist", 
             (DL_FUNC) &RPosteriorProbability, 9, combinatorial_t},
-    {"mdist_overlapSingleStranded", 
+    {"motifcounter_overlapSingleStranded", 
             (DL_FUNC) &RoverlapSingleStranded, 5, overlap_t},
-    {"mdist_overlap", (DL_FUNC) &Roverlap, 5, overlap_t},
-    {"mdist_compoundPoisson_useBeta", 
+    {"motifcounter_overlap", (DL_FUNC) &Roverlap, 5, overlap_t},
+    {"motifcounter_compoundPoisson_useBeta", 
             (DL_FUNC) &Rcompoundpoisson_useBeta, 10, cp_beta_t},
-    {"mdist_compoundPoissonPape_useGamma", 
+    {"motifcounter_compoundPoissonPape_useGamma", 
             (DL_FUNC) &RcompoundpoissonPape_useGamma, 6, cp_gamma_t},
-    {"mdist_loadmotif", (DL_FUNC) &Rloadmotif, 3, loadmotif_t},
-    {"mdist_motiffromfile", (DL_FUNC) &Rmotiffromfile, 2, motiffromfile_t},
-    {"mdist_deleteMotif", (DL_FUNC) &Rdestroymotif, 0, NULL},
-    {"mdist_motiflength", (DL_FUNC) &Rmotiflength, 1, motif_len_t},
-    {"mdist_numSeqs", (DL_FUNC) &RnumSeqs, 2, num_seqs_t},
-    {"mdist_lenSeqs", (DL_FUNC) &RlenSeqs, 3, seq_len_t},
-    {"mdist_numberOfHits", (DL_FUNC) &RnumberOfHits, 5, num_hits_t},
-    {"mdist_option", (DL_FUNC) &Roption, 3, option_t},
-    {"mdist_scorerange", (DL_FUNC) &Rscorerange, 1, scorerange_t},
-    {"mdist_scoredist", (DL_FUNC) &Rscoredist, 2, scoredist_t},
-    {"mdist_scoredist_bf", (DL_FUNC) &Rscoredist_bf, 2, scoredist_t},
-    {"mdist_simulateScores", (DL_FUNC) &RsimulateScores, 4, simscoredist_t},
-    {"mdist_simulateCountDistribution", 
+    {"motifcounter_loadmotif", (DL_FUNC) &Rloadmotif, 3, loadmotif_t},
+    {"motifcounter_motiffromfile", 
+            (DL_FUNC) &Rmotiffromfile, 2, motiffromfile_t},
+    {"motifcounter_deleteMotif", (DL_FUNC) &Rdestroymotif, 0, NULL},
+    {"motifcounter_motiflength", (DL_FUNC) &Rmotiflength, 1, motif_len_t},
+    {"motifcounter_numSeqs", (DL_FUNC) &RnumSeqs, 2, num_seqs_t},
+    {"motifcounter_lenSeqs", (DL_FUNC) &RlenSeqs, 3, seq_len_t},
+    {"motifcounter_numberOfHits", (DL_FUNC) &RnumberOfHits, 5, num_hits_t},
+    {"motifcounter_option", (DL_FUNC) &Roption, 3, option_t},
+    {"motifcounter_scorerange", (DL_FUNC) &Rscorerange, 1, scorerange_t},
+    {"motifcounter_scoredist", (DL_FUNC) &Rscoredist, 2, scoredist_t},
+    {"motifcounter_scoredist_bf", (DL_FUNC) &Rscoredist_bf, 2, scoredist_t},
+    {"motifcounter_simulateScores", 
+            (DL_FUNC) &RsimulateScores, 4, simscoredist_t},
+    {"motifcounter_simulateCountDistribution", 
             (DL_FUNC) &RsimulateCountDistribution, 6, simcountdist_t},
     {NULL, NULL, 0}
 };
 
 
 
-void R_init_mdist(DllInfo *info) {
+void R_init_motifcounter(DllInfo *info) {
     R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
 }
 
-void R_unload_mdist(DllInfo *info) {
+void R_unload_motifcounter(DllInfo *info) {
     RdestroyBackground();
     RdestroyBackgroundForSampling();
     Rdestroymotif();

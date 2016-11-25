@@ -18,7 +18,7 @@ memory.
 # Estimate first order Markov model based on the sequence provided
 # in seq.fasta
 
-seqfile=system.file("extdata","seq.fasta", package="mdist")
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 readBackground(file=seqfile,1)
 deleteBackground()
 
