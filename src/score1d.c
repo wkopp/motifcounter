@@ -14,7 +14,7 @@
 #include "score1d.h"
 #include "forground.h"
 #include "compoundpoisson.h"
-#include "countdist.h"
+//#include "countdist.h"
 #include "overlap.h"
 #include "background.h"
 
@@ -347,6 +347,7 @@ int computeScoreDistribution1d(DMatrix *pwm, double *trans,
     }
 
     for (m=corder; m<pwm->nrow;m++) {
+        R_CheckUserInterrupt();
         for (i=0; i<power(ALPHABETSIZE, order); i++) {
             getScoresIndex(&pwm->data[m*ALPHABETSIZE],&trans[i*ALPHABETSIZE], 
                         score,&mscore->meta.dx);
