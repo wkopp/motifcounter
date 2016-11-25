@@ -16,7 +16,7 @@
 #include "matrix.h"
 #include "score2d.h"
 #include "overlap.h"
-#include "countdist.h"
+//#include "countdist.h"
 #include "combinatorial.h"
 #include "markovchain.h"
 
@@ -142,7 +142,7 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
 
     double *beta, *beta3p, *beta5p;
     double val;
-    double *extra=(double*)ex;
+    CGParams *cgparams=(CGParams*)ex;
     double epsilon;
     double pa,ma;
     int len;
@@ -152,10 +152,10 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
         return;
     }
 
-    beta=&extra[1];
-    beta3p=&extra[Rpwm->nrow+1];
-    beta5p=&extra[2*Rpwm->nrow+1];
-    len=(int) extra[3*Rpwm->nrow+1];
+    //beta=&extra[1];
+    //beta3p=&extra[Rpwm->nrow+1];
+    //beta5p=&extra[2*Rpwm->nrow+1];
+    //len=(int) extra[3*Rpwm->nrow+1];
 
     if (!Rdist) {
         Rdist=Calloc(2*Rpwm->nrow+2, double);
@@ -167,27 +167,31 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
     epsilon=alphacond[0]/1000;
     pa=*alphacond + epsilon;
     ma=*alphacond - epsilon;
-    markovchain(Rdist, &pa, beta, beta3p, beta5p, len);
+    markovchain(Rdist, &pa, cgparams->beta, 
+			cgparams->beta3p, cgparams->beta5p, cgparams->len);
 
     val=Rdist[1]+Rdist[2];
-    markovchain(Rdist, &ma, beta, beta3p, beta5p, len);
+    markovchain(Rdist, &ma, cgparams->beta, 
+			cgparams->beta3p, cgparams->beta5p, cgparams->len);
 
     val-=(Rdist[1]+Rdist[2]);
     val/=2*epsilon;
 
-    markovchain(Rdist, alphacond, beta, beta3p, beta5p, len);
+    markovchain(Rdist, alphacond, cgparams->beta, 
+			cgparams->beta3p, cgparams->beta5p, cgparams->len);
 
-    *gradient=-2*(2*extra[0]-Rdist[1]-Rdist[2])*val;
+    *gradient=-2*(2*cgparams->alpha-Rdist[1]-Rdist[2])*val;
 }
 double minmc(int n, double *alpha, void *ex) {
 
-    double *extra=(double*)ex;
+    //double *extra=(double*)ex;
+    CGParams *cgparams=(CGParams*)ex;
     double *beta, *beta3p, *beta5p;
     int len;
-    beta=&extra[1];
-    beta3p=&extra[Rpwm->nrow+1];
-    beta5p=&extra[2*Rpwm->nrow+1];
-    len=(int) extra[3*Rpwm->nrow+1];
+    //beta=&extra[1];
+    //beta3p=&extra[Rpwm->nrow+1];
+    //beta5p=&extra[2*Rpwm->nrow+1];
+    //len=(int) extra[3*Rpwm->nrow+1];
 
     if (!Rdist) {
         Rdist=Calloc(2*Rpwm->nrow+2, double);
@@ -196,9 +200,10 @@ double minmc(int n, double *alpha, void *ex) {
         }
     }
 
-    markovchain(Rdist, alpha, beta, beta3p, beta5p,len);
+    markovchain(Rdist, alpha, cgparams->beta, 
+			cgparams->beta3p, cgparams->beta5p,cgparams->len);
 
-    return R_pow_di(2*extra[0]-Rdist[1]-Rdist[2], 2);
+    return R_pow_di(2*cgparams->alpha-Rdist[1]-Rdist[2], 2);
 }
 
 SEXP getMarkovProb(SEXP niter, 

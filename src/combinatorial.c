@@ -18,7 +18,7 @@
 #include "matrix.h"
 #include "score2d.h"
 #include "overlap.h"
-#include "countdist.h"
+//#include "countdist.h"
 #include "combinatorial.h"
 #include "markovchain.h"
 
@@ -81,12 +81,13 @@ void printVector(double **m, int i1, int i2, int len) {
 #undef DEBUG
 void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
   double **beta3p, double **beta5p, double **delta, double **deltap) {
-    double *extra;
+    //double *extra;
     int i, j;
     int m;
     double abstol=1e-30, intol=1e-30;
     double res;
     int trace=0, fail,fncount, type=2, gncount;
+	CGParams cgparams;
     double a0, aN;
     double *_alpha, *_omega;
 
@@ -107,26 +108,35 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
 
     m=(70>p->seqlen) ? p->seqlen : 70; 
 
+/*
     extra=Calloc(3*p->mlen+2, double);
     if (extra==NULL) {
         error("Memory-allocation in initPosteriorProbability failed");
     }
     extra[0]=alpha;
+	*/
     a0=alpha;
 
+	cgparams.alpha=alpha;
+	cgparams.beta=p->beta;
+	cgparams.beta3p=p->beta3p;
+	cgparams.beta5p=p->beta5p;
+	cgparams.len=500;
+	/*
     for (i=0; i<p->mlen; i++) {
         extra[1+i]=p->beta[i];
         extra[p->mlen+1+i]=p->beta3p[i];
         extra[2*p->mlen+1+i]=p->beta5p[i];
     }
+	*/
 
     m=1;
     for (i=0; i<m; i++) {
 
-        extra[3*p->mlen+1]=(double)(500);
+     //   extra[3*p->mlen+1]=(double)(500);
 
         cgmin(1, &a0, &aN, &res, minmc, dmc, &fail, abstol, intol,
-                        (void*)extra, type, trace, &fncount, &gncount, 100);
+                        (void*)&cgparams, type, trace, &fncount, &gncount, 100);
 
         _alpha[i]=aN;
         a0=aN;
@@ -144,7 +154,7 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
     p->alpha=aN;
     p->omega=1-2*p->alpha+p->alpha*p->beta3p[0];
 
-    Free(extra);
+   // Free(extra);
     removeDist();
 
     #ifdef DEBUG
@@ -374,6 +384,7 @@ void finishPosteriorProbability(PosteriorCount *prob,
 }
 
 #undef DEBUG
+// convolution operation
 void convolute(double *result, double *p1, double *p2, int len) {
     int i, j;
     for(i=0;i<=len;i++) {
@@ -383,6 +394,11 @@ void convolute(double *result, double *p1, double *p2, int len) {
     }
 }
 
+// this function determines the actual recursive convolution
+// of the individual sequences. 
+// The final result is determined from intermediate results
+// in a dynamic programming manner to reduce redundant computational
+// effort.
 void computeResultRecursive(double ** part, int nos, int klen) {
     int l1, l2;
     #ifdef DEBUG
@@ -395,11 +411,20 @@ void computeResultRecursive(double ** part, int nos, int klen) {
     #ifdef DEBUG
     Rprintf("nos=%d from l1=%d l2=%d\n", nos, l1, l2);
     #endif
+    // if the distribution across nos sequences was reached, 
+    // the computation is accomplished, otherwise continue 
+    // the recursion
     if (part[nos-1]) { return; }
 
+    // if the first half of the computation wasn't
+    // evaluated previously, call computeResultRecursive
+    // with l1
     if (!part[l1-1]) {
         computeResultRecursive(part, l1, klen);
     }
+    // if the second half of the computation wasn't
+    // evaluated previously, call computeResultRecursive
+    // with l2
     if (!part[l2-1]) {
         computeResultRecursive(part, l2, klen);
     }
@@ -420,28 +445,38 @@ void computeResultRecursive(double ** part, int nos, int klen) {
     #endif
 }
 
-void multipleShortSequenceProbability(double *simple, double *aggregated, 
-     int maxsimplehits, int maxagghits, int numofseqs) {
+// This function determines the distribution of the number of hits
+// in multiple i.i.d. sequences based on recursively
+// convolving the distribution of hits of single sequences
+void multipleShortSequenceProbability(double *singledist, 
+        double *aggregateddist, 
+     int maxsinglehits, int maxagghits, int numofseqs) {
     int i;
     double sum;
     double **part_results;
 
+    // allocate array of pointers to sub-aggregated distributions
     part_results=Calloc(numofseqs, double*);
     part_results[0]=Calloc(maxagghits+1, double);
     if (part_results==NULL||part_results[0]==NULL) {
         error("Memory-allocation in multipleShortSequenceProbability failed");
     }
-    memcpy(part_results[0],simple, (maxagghits+1)*sizeof(double));
+    // copy the distribution of a single sequence to part_results
+    // this corresponds to the base case
+    memcpy(part_results[0],singledist, (maxsinglehits+1)*sizeof(double));
 
+    // recursively determine the distribution in N i.i.d. sequences
     computeResultRecursive(part_results, numofseqs, maxagghits);
 
+    // copy the final result into aggregated
     for (i=0, sum=0.0;i<=maxagghits; i++) {
-        aggregated[i]=part_results[numofseqs-1][i];
-        sum+=aggregated[0];
+        aggregateddist[i]=part_results[numofseqs-1][i];
+        sum+=aggregateddist[i];
     }
     #ifdef DEBUG
     Rprintf("P[%d]=%1.3e\n ",numofseqs, sum);
     #endif
+    // free the allocated memory
     for (i=0; i<numofseqs; i++) {
         if (part_results[i]) Free(part_results[i]);
     }

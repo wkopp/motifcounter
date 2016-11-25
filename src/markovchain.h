@@ -5,4 +5,12 @@ void markovchain(double *dist,
 double minmc(int n, double *par, void *extra);
 void dmc(int n, double *par, double *gradient, void *ex);
 void removeDist();
+
+typedef struct {
+	double alpha;
+	double *beta;
+	double *beta3p;
+	double *beta5p;
+	int len;
+} CGParams;
 #endif
