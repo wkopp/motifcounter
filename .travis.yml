@@ -3,3 +3,14 @@
 language: R
 sudo: false
 cache: packages
+warnings_are_errors: false
+bioc_packages:
+    - BiocStyle
+
+matrix:
+    include:
+     - os: linux
+       dist: trusty
+       sudo: required
+     - os: osx
+       osx_image: xcode7.2
