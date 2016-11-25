@@ -25,7 +25,7 @@ void RPosteriorProbability(double *alpha, double *beta,
     PosteriorCount prob;
     int seqlen;
     int i, maxhits, k, nos;
-    int maxsinglehits;
+    int totalmaxhits; // total number of hits in the entire set of seq.
     double *prior, Zpartition;
     double *singlehitdistribution;
     double *delta, *deltap;
@@ -48,7 +48,7 @@ void RPosteriorProbability(double *alpha, double *beta,
     seqlen=sseqlen[0] - Rpwm->nrow+1;
     nos=snos[0];
     maxhits=smaxhits[0];
-    maxsinglehits=maxhits;
+    totalmaxhits=maxhits*nos;
 
     delta=Calloc(Rpwm->nrow,double);
     deltap=Calloc(Rpwm->nrow,double);
@@ -56,7 +56,8 @@ void RPosteriorProbability(double *alpha, double *beta,
 
     computeDeltas(delta, deltap, beta, beta3p,beta5p,Rpwm->nrow);
 
-    // correct bias
+    // correct bias of alpha by fitting 
+    // markov model to the stationary distribution
     extra=Calloc(3*Rpwm->nrow+1, double);
     if (extra==NULL) {
         error("Memory-allocation in RPosteriorProbability failed");
@@ -75,21 +76,13 @@ void RPosteriorProbability(double *alpha, double *beta,
     Free(extra);
     removeDist();
 
-    allocPosteriorProbability(&prob, seqlen, Rpwm->nrow, maxsinglehits);
+    allocPosteriorProbability(&prob, seqlen, Rpwm->nrow, maxhits);
     initPosteriorProbability(&prob, alpha[0], &beta, &beta3p, &beta5p, 
         &delta, &deltap);
 
     computePosteriorProbability(&prob);
 
-    prior=Calloc(maxsinglehits+1, double);
-    if (prior==NULL) {
-        error("Memory-allocation in RPosteriorProbability failed");
-    }
-    for (i=0; i<=maxsinglehits; i++) {
-        prior[i]=1.0;
-    }
-
-    singlehitdistribution=Calloc(maxsinglehits+1, double);
+    singlehitdistribution=Calloc(maxhits+1, double);
     if (singlehitdistribution==NULL) {
         error("Memory-allocation in RPosteriorProbability failed");
     }
@@ -99,21 +92,23 @@ void RPosteriorProbability(double *alpha, double *beta,
 #endif
 
 
-    singlehitdistribution[0]=prob.probzerohits*prior[0];
+    // renormalize the distribution so that it sums to one
+    singlehitdistribution[0]=prob.probzerohits;
     Zpartition=singlehitdistribution[0];
 
-    for (k=1; k<=maxsinglehits; k++) {
+    for (k=1; k<=maxhits; k++) {
         finishPosteriorProbability(&prob, singlehitdistribution, k);
-        singlehitdistribution[k]*=prior[k];
         Zpartition+=singlehitdistribution[k];
     }
-    for (k=0; k<=maxsinglehits; k++) {
+    for (k=0; k<=maxhits; k++) {
         singlehitdistribution[k]/=Zpartition;
     }
 
+    // compute the distribution of the number of hits
+    // across multiple independent DNA sequences
     multipleShortSequenceProbability(singlehitdistribution, hitdistribution, 
-                maxsinglehits, maxhits, nos);
-    for (k=0,sum=0.0; k<=maxhits; k++) {
+                maxhits, totalmaxhits, nos);
+    for (k=0,sum=0.0; k<=totalmaxhits; k++) {
         sum+=hitdistribution[k];
     }
 
