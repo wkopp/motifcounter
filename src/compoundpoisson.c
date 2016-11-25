@@ -9,7 +9,7 @@
 #include "score2d.h"
 #include "compoundpoisson.h"
 #include "forground.h"
-#include "countdist.h"
+//#include "countdist.h"
 #include "background.h"
 #include "overlap.h"
 
