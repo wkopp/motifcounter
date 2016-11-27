@@ -69,6 +69,7 @@ lenSequences=function(seqfile) {
 #' to count motif hits on one or both strands, respectively.
 #' 
 #' 
+#' @param pfm A position frequency matrix
 #' @param seqfile Fasta-file name
 #' @param singlestranded Boolian flag that indicates whether a single strand or
 #' both strands shall be scanned for motif hits
@@ -93,25 +94,28 @@ lenSequences=function(seqfile) {
 #' # Estimate order-1 background model
 #' readBackground(seqfile,1)
 #' # read PFM from file
-#' readMotif(motiffile,0.01)
+#' motif=t(as.matrix(read.table(motiffile)))
 #' 
 #' # scan the given sequence on both strands for the motif occurances
-#' noc=numMotifHits(seqfile)
+#' noc=numMotifHits(motif,seqfile)
 #' noc
 #' 
 #' # scan the given sequence on a single strand for the motif occurances
-#' noc=numMotifHits(seqfile,singlestranded=TRUE)
+#' noc=numMotifHits(motif,seqfile,singlestranded=TRUE)
 #' noc
 #' 
 #' @export
-numMotifHits=function(seqfile, singlestranded=FALSE) {
+numMotifHits=function(pfm, seqfile, singlestranded=FALSE) {
     nseq=numSequences(seqfile)
     lseq=lenSequences(seqfile)
+    motifValid(pfm)
     noh=vector(mode="integer",length=nseq)
-    res=.C("motifcounter_numberOfHits",as.character(seqfile),as.integer(noh),
+    res=.C("motifcounter_numberOfHits",
+        as.numeric(pfm), nrow(pfm),ncol(pfm),
+        as.character(seqfile),as.integer(noh),
         as.integer(nseq), as.integer(lseq),
         as.integer(singlestranded),PACKAGE="motifcounter")
     return (list(nseq=nseq, lseq=lseq,
-        numofhits=res[[2]]))
+        numofhits=res[[5]]))
 }
 

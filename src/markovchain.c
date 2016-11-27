@@ -20,14 +20,13 @@
 #include "combinatorial.h"
 #include "markovchain.h"
 
-extern DMatrix *Rpwm, *Rcpwm;
 extern double *Rstation, *Rtrans;
 
 double OverlapHit(int N, double *beta, double *betap) {
     int i;
     double d=1.0, n=1.0;
 
-    if (N<0 || N>=Rpwm->nrow) error("wrong index, i=%d\n", N);
+    //if (N<0 || N>=Rpwm->nrow) error("wrong index, i=%d\n", N);
 
     // beta ... forward hit
     // betap .. reverse hit either 3p or 5p
@@ -45,7 +44,7 @@ double NoOverlapHit(int N, double *beta, double *betap) {
     int i;
     double d=1.0, n=1.0;
 
-    if (N<0 || N>=Rpwm->nrow) error("wrong index, i=%d\n", N);
+    //if (N<0) error("wrong index, i=%d\n", N);
 
     // beta ... forward hit
     // betap .. reverse hit either 3p or 5p
@@ -63,12 +62,12 @@ double NoOverlapHit(int N, double *beta, double *betap) {
 #define DEBUG
 static double *Rdist=NULL;
 void markovchain(double *dist, double *a,
- double *beta, double *beta3p, double *beta5p, int slen) {
+ double *beta, double *beta3p, double *beta5p, int slen, int motiflen) {
     int i, k;
     double *post, *prior;
     double alphacond;
 
-    if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
+    if (!Rstation||!Rtrans) {
         error("load forground and background properly");
         return;
     }
@@ -80,40 +79,40 @@ void markovchain(double *dist, double *a,
     // dist[3 ... 3+M-1] ... p(n0), ... , p(nL)
     // dist[3+M, ..., 3+M+M-2] ... p(n1'), ..., p(nL')
     //
-    post=Calloc(2*Rpwm->nrow+2, double);
+    post=Calloc(2*motiflen+2, double);
     if(post==NULL) {
         error("Memory-allocation in markovchain failed");
     }
     prior=dist;
     alphacond=a[0];
-    memset(prior, 0, (2*Rpwm->nrow+2)*sizeof(double));
+    memset(prior, 0, (2*motiflen+2)*sizeof(double));
     prior[0]=1.;
 
     for (k=0; k<slen; k++) {
         // P(N)
-        post[0]=(1-alphacond*(2-beta3p[0]))*(prior[0]+prior[Rpwm->nrow+2] + 
-        prior[2*Rpwm->nrow+1]);
+        post[0]=(1-alphacond*(2-beta3p[0]))*(prior[0]+prior[motiflen+2] + 
+        prior[2*motiflen+1]);
 
         // P(Hf)
-        post[1]=alphacond*(prior[0]+prior[Rpwm->nrow+2] +
-            prior[2*Rpwm->nrow+1]);
+        post[1]=alphacond*(prior[0]+prior[motiflen+2] +
+            prior[2*motiflen+1]);
 
-        for (i=1;i<Rpwm->nrow;i++) {
+        for (i=1;i<motiflen;i++) {
             post[1]+=OverlapHit(i, beta, beta3p)*prior[3+i-1];
         }
-        for (i=2;i<Rpwm->nrow;i++) {
-            post[1]+=OverlapHit(i, beta5p, beta)*prior[Rpwm->nrow+3+i-2];
+        for (i=2;i<motiflen;i++) {
+            post[1]+=OverlapHit(i, beta5p, beta)*prior[motiflen+3+i-2];
         }
         post[1]+=beta5p[1]*prior[2];
 
 
         // P(Hr)
-        post[2]=alphacond*(1-beta3p[0])*(prior[0]+prior[Rpwm->nrow+2] +
-            prior[2*Rpwm->nrow+1]);
-        for (i=2;i<Rpwm->nrow;i++) {
-            post[2]+=OverlapHit(i, beta, beta5p)*prior[Rpwm->nrow+3+i-2];
+        post[2]=alphacond*(1-beta3p[0])*(prior[0]+prior[motiflen+2] +
+            prior[2*motiflen+1]);
+        for (i=2;i<motiflen;i++) {
+            post[2]+=OverlapHit(i, beta, beta5p)*prior[motiflen+3+i-2];
         }
-        for (i=1;i<Rpwm->nrow;i++) {
+        for (i=1;i<motiflen;i++) {
             post[2]+=OverlapHit(i, beta3p, beta)*prior[3+i-1];
         }
         // should i switch this line
@@ -122,17 +121,17 @@ void markovchain(double *dist, double *a,
 
         // P(n0)
         post[3]=NoOverlapHit(0, beta, beta3p)*prior[1];
-        for (i=1;i<Rpwm->nrow;i++) {
+        for (i=1;i<motiflen;i++) {
             post[3+i]=NoOverlapHit(i, beta,beta3p)*prior[3+i-1];
         }
         // P(n1')
-        post[3+Rpwm->nrow]=NoOverlapHit(1, beta, beta5p)*prior[2];
-        for (i=2;i<Rpwm->nrow;i++) {
-            post[Rpwm->nrow+3+i-1]=NoOverlapHit(i, beta,beta5p)*
-                prior[Rpwm->nrow+3+i-2];
+        post[3+motiflen]=NoOverlapHit(1, beta, beta5p)*prior[2];
+        for (i=2;i<motiflen;i++) {
+            post[motiflen+3+i-1]=NoOverlapHit(i, beta,beta5p)*
+                prior[motiflen+3+i-2];
         }
-        memcpy(prior, post, (2*Rpwm->nrow+2)*sizeof(double));
-        memset(post, 0, (2*Rpwm->nrow+2)*sizeof(double));
+        memcpy(prior, post, (2*motiflen+2)*sizeof(double));
+        memset(post, 0, (2*motiflen+2)*sizeof(double));
     }
 
     Free(post);
@@ -140,25 +139,18 @@ void markovchain(double *dist, double *a,
 
 void dmc(int n, double *alphacond, double *gradient, void *ex) {
 
-    double *beta, *beta3p, *beta5p;
     double val;
     CGParams *cgparams=(CGParams*)ex;
     double epsilon;
     double pa,ma;
-    int len;
 
-    if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
+    if (!Rstation||!Rtrans) {
         error("load forground and background properly");
         return;
     }
 
-    //beta=&extra[1];
-    //beta3p=&extra[Rpwm->nrow+1];
-    //beta5p=&extra[2*Rpwm->nrow+1];
-    //len=(int) extra[3*Rpwm->nrow+1];
-
     if (!Rdist) {
-        Rdist=Calloc(2*Rpwm->nrow+2, double);
+        Rdist=Calloc(2*cgparams->motiflen+2, double);
         if(Rdist==NULL) {
             error("Memory-allocation in dmc failed");
         }
@@ -168,17 +160,20 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
     pa=*alphacond + epsilon;
     ma=*alphacond - epsilon;
     markovchain(Rdist, &pa, cgparams->beta, 
-			cgparams->beta3p, cgparams->beta5p, cgparams->len);
+            cgparams->beta3p, cgparams->beta5p, 
+            cgparams->len,cgparams->motiflen);
 
     val=Rdist[1]+Rdist[2];
     markovchain(Rdist, &ma, cgparams->beta, 
-			cgparams->beta3p, cgparams->beta5p, cgparams->len);
+            cgparams->beta3p, cgparams->beta5p, 
+            cgparams->len,cgparams->motiflen);
 
     val-=(Rdist[1]+Rdist[2]);
     val/=2*epsilon;
 
     markovchain(Rdist, alphacond, cgparams->beta, 
-			cgparams->beta3p, cgparams->beta5p, cgparams->len);
+            cgparams->beta3p, cgparams->beta5p, 
+            cgparams->len,cgparams->motiflen);
 
     *gradient=-2*(2*cgparams->alpha-Rdist[1]-Rdist[2])*val;
 }
@@ -186,26 +181,22 @@ double minmc(int n, double *alpha, void *ex) {
 
     //double *extra=(double*)ex;
     CGParams *cgparams=(CGParams*)ex;
-    double *beta, *beta3p, *beta5p;
-    int len;
-    //beta=&extra[1];
-    //beta3p=&extra[Rpwm->nrow+1];
-    //beta5p=&extra[2*Rpwm->nrow+1];
-    //len=(int) extra[3*Rpwm->nrow+1];
 
     if (!Rdist) {
-        Rdist=Calloc(2*Rpwm->nrow+2, double);
+        Rdist=Calloc(2*cgparams->motiflen+2, double);
         if(Rdist==NULL) {
             error("Memory-allocation in minmc failed");
         }
     }
 
     markovchain(Rdist, alpha, cgparams->beta, 
-			cgparams->beta3p, cgparams->beta5p,cgparams->len);
+            cgparams->beta3p, cgparams->beta5p, 
+            cgparams->len,cgparams->motiflen);
 
     return R_pow_di(2*cgparams->alpha-Rdist[1]-Rdist[2], 2);
 }
 
+#ifdef OBSOLETE_
 SEXP getMarkovProb(SEXP niter, 
 		SEXP alpha, SEXP beta, SEXP beta3p, SEXP beta5p) {
     int i, n;
@@ -226,7 +217,7 @@ SEXP getMarkovProb(SEXP niter,
     _beta3p=REAL(beta3p);
     _beta5p=REAL(beta5p);
 
-    nrow=2*Rpwm->nrow+2;
+    nrow=2*motiflen+2;
     PROTECT(retMatrix=allocMatrix(REALSXP,nrow, _niter));
 
     _rm=REAL(retMatrix);
@@ -247,12 +238,14 @@ SEXP getMarkovProb(SEXP niter,
     removeDist();
     return retMatrix;
 }
+#endif
 
 void removeDist() {
     if(Rdist) Free(Rdist);
     Rdist=NULL;
 }
 
+#ifdef OBSOLETE_
 // sampling from the Markov model for debugging purposes:
 void sampling_markovchain(double *a,
  double *beta, double *beta3p, double *beta5p, int slen, int nos, int nperm) {
@@ -266,7 +259,7 @@ void sampling_markovchain(double *a,
         error("Memory-allocation in sampling_markovchain failed");
     }
 
-    if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
+    if (!Rstation||!Rtrans) {
         error("load forground and background properly");
         return;
     }
@@ -292,7 +285,7 @@ void sampling_markovchain(double *a,
                 } else if (state==1) {
                     cnt[perm]++;
                     pa=0.0;
-                    for (i=0; i<Rpwm->nrow && pa<val; i++) {
+                    for (i=0; i<motiflen && pa<val; i++) {
                         pa+=beta[i];
                         if (val<=pa) {
                             pos+=i;
@@ -300,7 +293,7 @@ void sampling_markovchain(double *a,
                             break;
                         }
                     }
-                    for (i=0; i<Rpwm->nrow && pa<val; i++) {
+                    for (i=0; i<motiflen && pa<val; i++) {
                             pa+=beta3p[i];
                         if (val<=pa) {
                             pos+=i;
@@ -309,13 +302,13 @@ void sampling_markovchain(double *a,
                         }
                     }
                     if (pa<val) {
-                        pos+=Rpwm->nrow;
+                        pos+=motiflen;
                         state=0;
                     }
                 } else if (state==2) {
                     cnt[perm]++;
                     pa=0.0;
-                    for (i=0; i<Rpwm->nrow && pa<val; i++) {
+                    for (i=0; i<motiflen && pa<val; i++) {
                         pa+=beta[i];
                         if (val<=pa) {
                             pos+=i;
@@ -323,7 +316,7 @@ void sampling_markovchain(double *a,
                             break;
                         }
                     }
-                    for (i=0; i<Rpwm->nrow && pa<val; i++) {
+                    for (i=0; i<motiflen && pa<val; i++) {
                         pa+=beta5p[i];
                         if (val<=pa) {
                             pos+=i;
@@ -332,7 +325,7 @@ void sampling_markovchain(double *a,
                         }
                     }
                     if(pa<val) {
-                        pos+=Rpwm->nrow;
+                        pos+=motiflen;
                         state=0;
                     }
                 }
@@ -386,3 +379,4 @@ SEXP sample_mc( SEXP alpha, SEXP beta, SEXP beta3p,
     UNPROTECT(3);
     return R_NilValue;
 }
+#endif

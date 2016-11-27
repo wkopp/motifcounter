@@ -8,22 +8,24 @@
 #include "score1d.h"
 
 extern int Rorder;
-extern DMatrix *Rpwm, *Rcpwm;
+//extern DMatrix *Rpwm, *Rcpwm;
 extern double *Rstation, *Rtrans;
 extern double Rsiglevel, Rgran;
 
-void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq,  
+void RnumberOfHits(double *pfm_,int *nrow, int *ncol,
+        char **inputfile, int *numofhits, int *nseq, int *lseq,  
         int *singlestranded) {
     int intervalsize;
     ExtremalScore escore;
     MotifScore1d null;
     Sequence seq;
     double dx, quantile,pvalue;
-    int s;
+    int s,i;
     int threshold;
     FILE *f;
+    DMatrix pfm, cpfm;
 
-    if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
+    if (!Rstation||!Rtrans) {
         error("load forground and background properly");
         return;
     }
@@ -36,13 +38,24 @@ void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq,
         return;
     }
 
+    pfm.data=Calloc(nrow[0]*ncol[0],double);
+    cpfm.data=Calloc(nrow[0]*ncol[0],double);
+    // Rcol and c-col are swapped
+    pfm.ncol=nrow[0];
+    cpfm.ncol=nrow[0];
+    pfm.nrow=ncol[0];
+    cpfm.nrow=ncol[0];
+    memcpy(pfm.data,pfm_,nrow[0]*ncol[0]*sizeof(double));
+    for (i=1; i<=nrow[0]*ncol[0];i++) {
+        cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
+    }
     pvalue=Rsiglevel;
     dx=Rgran;
 
     // compute significance threshold
-    initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
+    initExtremalScore(&escore, dx, pfm.nrow, Rorder);
 
-    loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
+    loadMinMaxScores(&pfm, Rstation, Rtrans, &escore);
     loadIntervalSize(&escore, NULL);
     intervalsize=getTotalScoreUpperBound(&escore)-
                     getTotalScoreLowerBound(&escore)+1;
@@ -51,9 +64,9 @@ void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq,
             getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
     null.meta.prob=&ProbBg;
     null.meta.probinit=&ProbinitBg;
-    initScoreDistribution1d(Rpwm,Rtrans,&null, Rorder);
+    initScoreDistribution1d(&pfm,Rtrans,&null, Rorder);
 
-    computeScoreDistribution1d(Rpwm, Rtrans,  Rstation, &null, &escore, Rorder);
+    computeScoreDistribution1d(&pfm, Rtrans,  Rstation, &null, &escore, Rorder);
 
     quantile=getQuantileWithIndex1d(&null,getQuantileIndex1d(&null.totalScore,
                 pvalue));
@@ -71,14 +84,16 @@ void RnumberOfHits(char **inputfile, int *numofhits, int *nseq, int *lseq,
     fclose(f);
 
     for (s=0;s<*nseq; s++) {
-        numofhits[s]+=countOccurances(Rstation, Rtrans, Rpwm, seq.seq[s], 
+        numofhits[s]+=countOccurances(Rstation, Rtrans, &pfm, seq.seq[s], 
                 seq.lseq[s], threshold, dx, Rorder);
         if (*singlestranded==0) {
-            numofhits[s]+=countOccurances(Rstation, Rtrans, Rcpwm, seq.seq[s], 
+            numofhits[s]+=countOccurances(Rstation, Rtrans, &cpfm, seq.seq[s], 
                     seq.lseq[s], threshold, dx, Rorder);
         }
     }
 
     destroySequence(&seq);
+    Free(pfm.data);
+    Free(cpfm.data);
 }
 

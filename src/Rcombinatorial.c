@@ -13,7 +13,6 @@
 
 extern int Rorder;
 extern double *Rstation, *Rtrans;
-extern DMatrix *Rcpwm, *Rpwm;
 extern double Rgran, Rsiglevel;
 
 #define DEBUG
@@ -21,21 +20,21 @@ extern double Rgran, Rsiglevel;
 void RPosteriorProbability(double *alpha, double *beta, 
     double *beta3p, double *beta5p,
     double *hitdistribution, int *sseqlen,
-    int *smaxhits, int *snos, int *singlestranded) {
+    int *smaxhits, int *snos, int *motiflen, int *singlestranded) {
     PosteriorCount prob;
     int seqlen;
-    int i, maxhits, k, nos;
+    int maxhits, k, nos;
     int totalmaxhits; // total number of hits in the entire set of seq.
-    double *prior, Zpartition;
+    double Zpartition;
     double *singlehitdistribution;
     double *delta, *deltap;
     double a0, aN;
     double abstol=1e-30, intol=1e-30;
     int trace=0, fail,fncount, type=2, gncount;
-    double *extra=NULL;
     double sum, res;
+    CGParams cgparams;
 
-    if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
+    if (!Rstation||!Rtrans) {
         error("load forground and background properly");
         return;
     }
@@ -45,38 +44,44 @@ void RPosteriorProbability(double *alpha, double *beta,
         return;
     }
 
-    seqlen=sseqlen[0] - Rpwm->nrow+1;
+    seqlen=sseqlen[0] - motiflen[0]+1;
     nos=snos[0];
     maxhits=smaxhits[0];
     totalmaxhits=maxhits*nos;
 
-    delta=Calloc(Rpwm->nrow,double);
-    deltap=Calloc(Rpwm->nrow,double);
+    delta=Calloc(motiflen[0],double);
+    deltap=Calloc(motiflen[0],double);
     if (delta==NULL||deltap==NULL) error("failed to allocate delta");
 
-    computeDeltas(delta, deltap, beta, beta3p,beta5p,Rpwm->nrow);
+    computeDeltas(delta, deltap, beta, beta3p,beta5p,motiflen[0]);
 
     // correct bias of alpha by fitting 
     // markov model to the stationary distribution
-    extra=Calloc(3*Rpwm->nrow+1, double);
-    if (extra==NULL) {
-        error("Memory-allocation in RPosteriorProbability failed");
-    }
-    extra[0]=alpha[0];
+    //extra=Calloc(3*motiflen[0]+1, double);
+    //if (extra==NULL) {
+        //error("Memory-allocation in RPosteriorProbability failed");
+    //}
+    //extra[0]=alpha[0];
     a0=alpha[0];
-    for (i=0; i<Rpwm->nrow; i++) {
-        extra[1+i]=beta[i];
-        extra[Rpwm->nrow+1+i]=beta3p[i];
-        extra[2*Rpwm->nrow+1+i]=beta5p[i];
-    }
+    //for (i=0; i<motiflen[0]; i++) {
+        //extra[1+i]=beta[i];
+        //extra[motiflen[0]+1+i]=beta3p[i];
+        //extra[2*motiflen[0]+1+i]=beta5p[i];
+    //}
+    cgparams.alpha=alpha[0];
+    cgparams.beta=beta;
+    cgparams.beta3p=beta3p;
+    cgparams.beta5p=beta5p;
+    cgparams.len=500;
+    cgparams.motiflen=motiflen[0];
 
     cgmin(1, &a0, &aN, &res, minmc, dmc, &fail, abstol, intol,
-        (void*)extra, type, trace, &fncount, &gncount, 100);
+        (void*)&cgparams, type, trace, &fncount, &gncount, 100);
 
-    Free(extra);
+    //Free(extra);
     removeDist();
 
-    allocPosteriorProbability(&prob, seqlen, Rpwm->nrow, maxhits);
+    allocPosteriorProbability(&prob, seqlen, motiflen[0], maxhits);
     initPosteriorProbability(&prob, alpha[0], &beta, &beta3p, &beta5p, 
         &delta, &deltap);
 
@@ -116,7 +121,6 @@ void RPosteriorProbability(double *alpha, double *beta,
     Free(singlehitdistribution);
     Free(delta);
     Free(deltap);
-    Free(prior);
 
     return;
 }

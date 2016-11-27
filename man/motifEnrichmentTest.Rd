@@ -4,9 +4,12 @@
 \alias{motifEnrichmentTest}
 \title{Enrichment of motif hits}
 \usage{
-motifEnrichmentTest(sequence, singlestranded = FALSE, method = "compound")
+motifEnrichmentTest(pfm, sequence, singlestranded = FALSE,
+  method = "compound")
 }
 \arguments{
+\item{pfm}{A position frequency matrix}
+
 \item{sequence}{Fasta-filename containing the sequence that should
 be scanned}
 
@@ -40,23 +43,24 @@ motifcounterOption(alpha, gran)
 readBackground(seqfile,1)
 
 # load motif model from motiffile
-readMotif(motiffile, 0.01)
+motif=t(as.matrix(read.table(motiffile)))
 
 ### 1 ) Compute the distribution for scanning a *single* DNA strand
 # based on the 'Compound Poisson model'
 
-pvalue=motifEnrichmentTest(seqfile,singlestranded=TRUE,method="compound")
+pvalue=motifEnrichmentTest(motif, 
+             seqfile,singlestranded=TRUE,method="compound")
 
 ### 2 ) Compute the distribution for scanning *both* DNA strand
 # based on the 'Compound Poisson model'
 
-pvalue=motifEnrichmentTest(seqfile,method="compound")
+pvalue=motifEnrichmentTest(motif, seqfile,method="compound")
 
 ### 3 ) Compute the distribution for scanning *both* DNA strand
 # based on the *combinatorial model*
 
-pvalue=motifEnrichmentTest(seqfile,singlestranded=FALSE,
-method="combinatorial")
+pvalue=motifEnrichmentTest(motif, seqfile,singlestranded=FALSE,
+             method="combinatorial")
 
 }
 \seealso{

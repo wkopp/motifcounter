@@ -4,9 +4,11 @@
 \alias{numMotifHits}
 \title{Number of motif hits in a given DNA sequence}
 \usage{
-numMotifHits(seqfile, singlestranded = FALSE)
+numMotifHits(pfm, seqfile, singlestranded = FALSE)
 }
 \arguments{
+\item{pfm}{A position frequency matrix}
+
 \item{seqfile}{Fasta-file name}
 
 \item{singlestranded}{Boolian flag that indicates whether a single strand or
@@ -42,14 +44,14 @@ motifcounterOption(alpha)
 # Estimate order-1 background model
 readBackground(seqfile,1)
 # read PFM from file
-readMotif(motiffile,0.01)
+motif=t(as.matrix(read.table(motiffile)))
 
 # scan the given sequence on both strands for the motif occurances
-noc=numMotifHits(seqfile)
+noc=numMotifHits(motif,seqfile)
 noc
 
 # scan the given sequence on a single strand for the motif occurances
-noc=numMotifHits(seqfile,singlestranded=TRUE)
+noc=numMotifHits(motif,seqfile,singlestranded=TRUE)
 noc
 
 }

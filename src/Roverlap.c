@@ -1,18 +1,21 @@
 #include <R.h>
 #include "overlap.h"
 #include "score2d.h"
+#include "forground.h"
 
-extern DMatrix *Rpwm, *Rcpwm;
+//extern DMatrix *Rpwm, *Rcpwm;
 extern double *Rtrans, *Rstation, Rgran, Rsiglevel;
 extern int Rorder;
 
-void Roverlap(double *alpha, double *beta, double *beta3p, double *beta5p, 
-		double *gamma) {
+void Roverlap(double *pfm_, int *nrow, int *ncol,
+        double *alpha, double *beta, double *beta3p, double *beta5p, 
+        double *gamma) {
 
     int i;
     double dx, pvalue;
+    DMatrix pfm, cpfm;
 
-    if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
+    if (!Rstation||!Rtrans) {
         error("load forground and background properly");
         return;
     }
@@ -25,34 +28,53 @@ void Roverlap(double *alpha, double *beta, double *beta3p, double *beta5p,
         return;
     }
 
+    pfm.data=Calloc(nrow[0]*ncol[0],double);
+    cpfm.data=Calloc(nrow[0]*ncol[0],double);
+    // Rcol and c-col are swapped
+    pfm.ncol=nrow[0];
+    cpfm.ncol=nrow[0];
+    pfm.nrow=ncol[0];
+    cpfm.nrow=ncol[0];
+    memcpy(pfm.data,pfm_,nrow[0]*ncol[0]*sizeof(double));
+    for (i=1; i<=nrow[0]*ncol[0];i++) {
+        cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
+    }
+    ////printMotif(&pfm);
+    //printMotif(&cpfm);
+
+
     dx=(double)Rgran;
     pvalue=(double)Rsiglevel;
 
-    computeConditionalOverlappingProbabilities(Rpwm, Rcpwm, 
+    computeConditionalOverlappingProbabilities(&pfm, &cpfm, 
             Rstation, Rtrans, NULL, &pvalue, NULL, &dx, gamma, Rorder);
 
-    for (i=1;i<Rpwm->nrow; i++) {
+    for (i=1;i<pfm.nrow; i++) {
         gamma[i]/=gamma[0];
     }
-    for (i=0;i<Rpwm->nrow; i++) {
-        gamma[Rpwm->nrow+i]/=gamma[0];
+    for (i=0;i<pfm.nrow; i++) {
+        gamma[pfm.nrow+i]/=gamma[0];
     }
-    for (i=0;i<Rpwm->nrow; i++) {
-        gamma[Rpwm->nrow*2+i]/=gamma[0];
+    for (i=0;i<pfm.nrow; i++) {
+        gamma[pfm.nrow*2+i]/=gamma[0];
     }
 
-    computeBetas(beta, beta3p,beta5p,gamma,Rpwm->nrow, 0.0);
+    computeBetas(beta, beta3p,beta5p,gamma,pfm.nrow, 0.0);
     *alpha=gamma[0];
 
+    Free(pfm.data);
+    Free(cpfm.data);
 }
 
-void RoverlapSingleStranded(double *alpha, double *beta, double *beta3p, 
+void RoverlapSingleStranded(double *pfm_, int *nrow, int *ncol,
+        double *alpha, double *beta, double *beta3p, 
         double *beta5p, double *gamma) {
 
     int i;
     double dx, pvalue;
+    DMatrix pfm, cpfm;
 
-    if (!Rpwm||!Rcpwm||!Rstation||!Rtrans) {
+    if (!Rstation||!Rtrans) {
         error("load forground and background properly");
         return;
     }
@@ -65,24 +87,40 @@ void RoverlapSingleStranded(double *alpha, double *beta, double *beta3p,
         return;
     }
 
+    pfm.data=Calloc(nrow[0]*ncol[0],double);
+    cpfm.data=Calloc(nrow[0]*ncol[0],double);
+    // Rcol and c-col are swapped
+    pfm.ncol=nrow[0];
+    cpfm.ncol=nrow[0];
+    pfm.nrow=ncol[0];
+    cpfm.nrow=ncol[0];
+    memcpy(pfm.data,pfm_,nrow[0]*ncol[0]*sizeof(double));
+    for (i=1; i<=nrow[0]*ncol[0];i++) {
+        cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
+    }
+    //printMotif(&pfm);
+    //printMotif(&cpfm);
+
     dx=(double)Rgran;
     pvalue=(double)Rsiglevel;
 
-    computeConditionalOverlappingProbabilities(Rpwm, Rcpwm, 
+    computeConditionalOverlappingProbabilities(&pfm, &cpfm, 
             Rstation, Rtrans, NULL, &pvalue, NULL, &dx, gamma, Rorder);
 
-    for (i=1;i<Rpwm->nrow; i++) {
+    for (i=1;i<pfm.nrow; i++) {
         gamma[i]/=gamma[0];
     }
-    for (i=0;i<Rpwm->nrow; i++) {
-        gamma[Rpwm->nrow+i]/=gamma[0];
+    for (i=0;i<pfm.nrow; i++) {
+        gamma[pfm.nrow+i]/=gamma[0];
     }
-    for (i=0;i<Rpwm->nrow; i++) {
-        gamma[Rpwm->nrow*2+i]/=gamma[0];
+    for (i=0;i<pfm.nrow; i++) {
+        gamma[pfm.nrow*2+i]/=gamma[0];
     }
 
-    computeBetasSingleStranded(beta, gamma,Rpwm->nrow, 0.0);
+    computeBetasSingleStranded(beta, gamma,pfm.nrow, 0.0);
     *alpha=gamma[0];
 
+    Free(pfm.data);
+    Free(cpfm.data);
 }
 

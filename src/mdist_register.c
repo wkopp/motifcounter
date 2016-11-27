@@ -5,13 +5,13 @@
 
 SEXP fetchStationBackground();
 SEXP fetchTransBackground();
-SEXP fetchMotif();
+//SEXP fetchMotif();
 
 static R_CallMethodDef callMethods[]  = {
     {"motifcounter_fetchStationBackground", 
         (DL_FUNC) &fetchStationBackground, 0},
     {"motifcounter_fetchTransBackground", (DL_FUNC) &fetchTransBackground, 0},
-    {"motifcounter_fetchMotif", (DL_FUNC) &fetchMotif, 0},
+    //{"motifcounter_fetchMotif", (DL_FUNC) &fetchMotif, 0},
     {NULL, NULL, 0}
 };
 
@@ -30,47 +30,37 @@ void RdestroyBackgroundForSampling();
 void RPosteriorProbability(double *alpha, double *beta,
           double *beta3p, double *beta5p,
             double *hitdistribution, int *sseqlen,
-              int *smaxhits, int *snos);
+              int *smaxhits, int *snos,int *motiflen,
+              int *singlestranded);
 
 static R_NativePrimitiveArgType combinatorial_t[] = {
-   REALSXP, REALSXP, REALSXP, REALSXP, REALSXP,INTSXP,INTSXP,INTSXP,INTSXP
+   REALSXP, REALSXP, REALSXP, REALSXP, REALSXP,
+   INTSXP,INTSXP,INTSXP,INTSXP,INTSXP
 };
 
-void Roverlap(double *alpha, double *beta, 
+void Roverlap(double *data,int*nrow,int*ncol,double *alpha, double *beta, 
         double *beta3p, double *beta5p, double *gamma);
-void RoverlapSingleStranded(double *alpha, double *beta, 
+void RoverlapSingleStranded(double *data,int*nrow,int*ncol,
+        double *alpha, double *beta, 
         double *beta3p, double *beta5p, double *gamma);
 static R_NativePrimitiveArgType overlap_t[] = {
-        REALSXP, REALSXP, REALSXP, REALSXP, REALSXP
+        REALSXP,INTSXP,INTSXP,REALSXP, REALSXP, REALSXP, REALSXP, REALSXP
 };
 
 void RcompoundpoissonPape_useGamma(double *gamma,
           double *hitdistribution, int *nseq, 
-          int *lseq, int * mhit, int *mclump);
+          int *lseq, int * mhit, int *mclump, int *motiflen);
 
 static R_NativePrimitiveArgType cp_gamma_t[] = {
-        REALSXP, REALSXP, INTSXP, INTSXP, INTSXP,INTSXP
+        REALSXP, REALSXP, INTSXP, INTSXP, INTSXP,INTSXP,INTSXP
 };
 void Rcompoundpoisson_useBeta(double *alpha, double *beta,
           double *beta3p, double *beta5p,
             double *hitdistribution, int *nseq, int *lseq, int * mhit, 
-            int *mclump, int *sstrand);
+            int *mclump, int *motiflen, int *sstrand);
 static R_NativePrimitiveArgType cp_beta_t[] = {
         REALSXP, REALSXP, REALSXP,REALSXP,
-        REALSXP,INTSXP, INTSXP, INTSXP,INTSXP,INTSXP
-};
-void Rloadmotif(double *data, int *nrow, int *ncol);
-static R_NativePrimitiveArgType loadmotif_t[] = {
-        REALSXP, INTSXP, INTSXP
-};
-void Rmotiffromfile(char **fmotif, double *pseudocount);
-static R_NativePrimitiveArgType motiffromfile_t[] = {
-        STRSXP, REALSXP
-};
-void Rdestroymotif();
-void Rmotiflength(int *mlen);
-static R_NativePrimitiveArgType motif_len_t[] = {
-        INTSXP
+        REALSXP,INTSXP, INTSXP, INTSXP,INTSXP,INTSXP, INTSXP
 };
 void RnumSeqs(char ** fastafile, int *numofseqs);
 static R_NativePrimitiveArgType num_seqs_t[] = {
@@ -80,34 +70,36 @@ void RlenSeqs(char ** fastafile, int *numofseqs, int * lseq);
 static R_NativePrimitiveArgType seq_len_t[] = {
         STRSXP,INTSXP,INTSXP
 };
-void RnumberOfHits(char **inputfile, 
+void RnumberOfHits(double *pfm, int*nrow,int*ncol,char **inputfile, 
         int *numofhits, int *nseq, int *lseq, int *singlestranded);
 static R_NativePrimitiveArgType num_hits_t[] = {
-    STRSXP,INTSXP,INTSXP,INTSXP,INTSXP
+    REALSXP,INTSXP,INTSXP,STRSXP,INTSXP,INTSXP,INTSXP,INTSXP
 };
 void Roption(double *siglevel, double *gran, int *ncores);
 static R_NativePrimitiveArgType option_t[] = {
     REALSXP,REALSXP,INTSXP
 };
-void Rscorerange(int *scorerange);
+void Rscorerange(double *,int*,int*,int *scorerange);
 static R_NativePrimitiveArgType scorerange_t[] = {
-    INTSXP
+    REALSXP,INTSXP,INTSXP,INTSXP
 };
-void Rscoredist( double *score, double *prob);
-void Rscoredist_bf( double *score, double *prob);
+void Rscoredist(double *,int*,int*, double *score, double *prob);
+void Rscoredist_bf(double *,int*,int*, double *score, double *prob);
 static R_NativePrimitiveArgType scoredist_t[] = {
-    REALSXP,REALSXP
+    REALSXP,INTSXP,INTSXP,REALSXP,REALSXP
 };
-void RsimulateScores(double *scores, double *distribution, int *slen,
-          int *perm);
+void RsimulateScores(double *,int*,int*,double *scores, 
+            double *distribution, int *slen,
+            int *perm);
 static R_NativePrimitiveArgType simscoredist_t[] = {
-    REALSXP,REALSXP,INTSXP,INTSXP
+    REALSXP,INTSXP,INTSXP,REALSXP,REALSXP,INTSXP,INTSXP
 };
 
-void RsimulateCountDistribution( double *distribution, int* perm,
-           int *nseq, int *lseq, int *mxhit, int *singlestranded);
+void RsimulateCountDistribution(double*,int*,int*, 
+        double *distribution, int* perm,
+        int *nseq, int *lseq, int *mxhit, int *singlestranded);
 static R_NativePrimitiveArgType simcountdist_t[] = {
-    REALSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP
+    REALSXP,INTSXP,INTSXP,REALSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP
 };
 
 static R_CMethodDef cMethods[] = {
@@ -121,30 +113,25 @@ static R_CMethodDef cMethods[] = {
     {"motifcounter_deleteBackgroundForSampling", 
             (DL_FUNC) &RdestroyBackgroundForSampling, 0, NULL},
     {"motifcounter_combinatorialDist", 
-            (DL_FUNC) &RPosteriorProbability, 9, combinatorial_t},
+            (DL_FUNC) &RPosteriorProbability, 10, combinatorial_t},
     {"motifcounter_overlapSingleStranded", 
-            (DL_FUNC) &RoverlapSingleStranded, 5, overlap_t},
-    {"motifcounter_overlap", (DL_FUNC) &Roverlap, 5, overlap_t},
+            (DL_FUNC) &RoverlapSingleStranded, 8, overlap_t},
+    {"motifcounter_overlap", (DL_FUNC) &Roverlap, 8, overlap_t},
     {"motifcounter_compoundPoisson_useBeta", 
-            (DL_FUNC) &Rcompoundpoisson_useBeta, 10, cp_beta_t},
+            (DL_FUNC) &Rcompoundpoisson_useBeta, 11, cp_beta_t},
     {"motifcounter_compoundPoissonPape_useGamma", 
-            (DL_FUNC) &RcompoundpoissonPape_useGamma, 6, cp_gamma_t},
-    {"motifcounter_loadmotif", (DL_FUNC) &Rloadmotif, 3, loadmotif_t},
-    {"motifcounter_motiffromfile", 
-            (DL_FUNC) &Rmotiffromfile, 2, motiffromfile_t},
-    {"motifcounter_deleteMotif", (DL_FUNC) &Rdestroymotif, 0, NULL},
-    {"motifcounter_motiflength", (DL_FUNC) &Rmotiflength, 1, motif_len_t},
+            (DL_FUNC) &RcompoundpoissonPape_useGamma, 7, cp_gamma_t},
     {"motifcounter_numSeqs", (DL_FUNC) &RnumSeqs, 2, num_seqs_t},
     {"motifcounter_lenSeqs", (DL_FUNC) &RlenSeqs, 3, seq_len_t},
-    {"motifcounter_numberOfHits", (DL_FUNC) &RnumberOfHits, 5, num_hits_t},
+    {"motifcounter_numberOfHits", (DL_FUNC) &RnumberOfHits, 8, num_hits_t},
     {"motifcounter_option", (DL_FUNC) &Roption, 3, option_t},
-    {"motifcounter_scorerange", (DL_FUNC) &Rscorerange, 1, scorerange_t},
-    {"motifcounter_scoredist", (DL_FUNC) &Rscoredist, 2, scoredist_t},
-    {"motifcounter_scoredist_bf", (DL_FUNC) &Rscoredist_bf, 2, scoredist_t},
+    {"motifcounter_scorerange", (DL_FUNC) &Rscorerange, 4, scorerange_t},
+    {"motifcounter_scoredist", (DL_FUNC) &Rscoredist, 5, scoredist_t},
+    {"motifcounter_scoredist_bf", (DL_FUNC) &Rscoredist_bf, 5, scoredist_t},
     {"motifcounter_simulateScores", 
-            (DL_FUNC) &RsimulateScores, 4, simscoredist_t},
+            (DL_FUNC) &RsimulateScores, 7, simscoredist_t},
     {"motifcounter_simulateCountDistribution", 
-            (DL_FUNC) &RsimulateCountDistribution, 6, simcountdist_t},
+            (DL_FUNC) &RsimulateCountDistribution, 9, simcountdist_t},
     {NULL, NULL, 0}
 };
 
@@ -157,5 +144,4 @@ void R_init_motifcounter(DllInfo *info) {
 void R_unload_motifcounter(DllInfo *info) {
     RdestroyBackground();
     RdestroyBackgroundForSampling();
-    Rdestroymotif();
 }

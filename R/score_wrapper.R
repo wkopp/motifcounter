@@ -4,6 +4,7 @@
 #' background. The Score distribution is computed based on dynamic
 #' programming.
 #' 
+#' @param pfm A position frequency matrix
 #' @return List containing 
 #' \describe{
 #' \item{score}{Vector of motif scores}
@@ -24,20 +25,24 @@
 #' readBackground(seqfile,1)
 #' 
 #' # Load the motif from the motiffile
-#' readMotif(motiffile)
+#' motif=t(as.matrix(read.table(motiffile)))
 #' 
 #' # Compute the score distribution
-#' dp=scoreDist()
+#' dp=scoreDist(motif)
 #' 
 #' @export
-scoreDist=function() {
+scoreDist=function(pfm) {
+    motifValid(pfm)
     scorerange=integer(1)
     scorerange=.C("motifcounter_scorerange",
-                as.integer(scorerange),PACKAGE="motifcounter")[[1]]
+        as.numeric(pfm),nrow(pfm),ncol(pfm),
+        as.integer(scorerange),PACKAGE="motifcounter")[[4]]
     scores=numeric(scorerange); dist=numeric(scorerange)
-    ret=.C("motifcounter_scoredist",as.numeric(scores),
+    ret=.C("motifcounter_scoredist",
+        as.numeric(pfm),nrow(pfm),ncol(pfm),
+        as.numeric(scores),
         as.numeric(dist),PACKAGE="motifcounter")
-    return(list(score=ret[[1]], probability=ret[[2]]))
+    return(list(score=ret[[4]], probability=ret[[5]]))
 }
 
 #' Score distribution
@@ -50,6 +55,7 @@ scoreDist=function() {
 #' and might require substantial computational
 #' resources for long motifs. Therefore, use \code{\link{scoreDist}} instead.
 #' 
+#' @param pfm A position frequency matrix
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of motif scores}
@@ -71,18 +77,23 @@ scoreDist=function() {
 #' readBackground(seqfile,1)
 #' 
 #' # Load the motif from the motiffile
-#' readMotif(motiffile)
+#' motif=t(as.matrix(read.table(motiffile)))
 #' 
 #' # Compute the score distribution
-#' dp=scoreDistBf()
+#' dp=scoreDistBf(motif)
 #' 
 #' @export
-scoreDistBf=function() {
+scoreDistBf=function(pfm) {
+    motifValid(pfm)
     scorerange=integer(1)
     scorerange=.C("motifcounter_scorerange",
-                as.integer(scorerange),PACKAGE="motifcounter")[[1]]
+                as.numeric(pfm),nrow(pfm),ncol(pfm),
+                as.integer(scorerange),PACKAGE="motifcounter")[[4]]
     scores=numeric(scorerange); dist=numeric(scorerange)
-    .C("motifcounter_scoredist_bf",as.numeric(scores),
+    ret=.C("motifcounter_scoredist_bf",
+        as.numeric(pfm),nrow(pfm),ncol(pfm),
+        as.numeric(scores),
         as.numeric(dist),PACKAGE="motifcounter")
+    return(list(score=ret[[4]], probability=ret[[5]]))
 }
 

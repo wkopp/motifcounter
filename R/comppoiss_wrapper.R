@@ -1,82 +1,3 @@
-#' Overlapping motif hit probabilities
-#' 
-#' This function computes the self-overlapping probabilites of the motif for
-#' the current PFM and background based on two-dimensional score distributions.
-#' Subsequently, the overlapping hit probabilities are corrected for motif hits
-#' that would arise in between the shifted positions.
-#' 
-#' 
-#' @param singlestranded Boolian which defines whether the overlapping hit
-#' probabilities shall be computed with respect to scanning both DNA strands or
-#' only one strand.  Default: Both strands are scanned for DNA sequences.
-#' @return A list containing various overlapping hit probabilities.
-#' The list contains the following entries
-#'     \describe{
-#'     \item{alpha}{False positive motif hit probability}
-#'     \item{beta}{Vector of overlapping hit probability for hits 
-#'             occurring on the same strand. Each element corresponds to
-#'             relative distance of the starting positions between the
-#'             motif hits.}
-#'     \item{beta3p}{Vector of overlapping hit probability for a 
-#'             forward strand hit that is followed by a reverse strand
-#'             hit. Each element corresponds to
-#'             relative distance of the starting positions between the
-#'             motif hits.}
-#'     \item{beta5p}{Vector of overlapping hit probability for a
-#'             reverse strand hit that is followed by a forward strand
-#'             hit. Each element corresponds to
-#'             relative distance of the starting positions between the
-#'             motif hits.}
-#'     \item{gamma}{Vector of overlapping hit probabilities across
-#'             all configurations. In contrast to beta, beta3p and beta5p,
-#'             gamma is not corrected for intermediate motif hit events.
-#'             only used for the compound Poisson variant according to Pape
-#'             et al. 2008.}
-#'     \item{singlestranded}{returns to singlestranded flag}
-#'     }
-#'              
-#' @examples
-#' 
-#' 
-#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' alpha=0.001
-#' gran=0.1
-#' motifcounterOption(alpha, gran)
-#' 
-#' # estimate background model from seqfile
-#' readBackground(seqfile,1)
-#' 
-#' # load motif model from motiffile
-#' readMotif(motiffile,0.01)
-#' 
-#' # compute the overlap probabilities for scanning both DNA strands
-#' op=probOverlapHit(singlestranded=FALSE)
-#' 
-#' # compute the overlap probabilities for scanning a single DNA strand
-#' op=probOverlapHit(singlestranded=TRUE)
-#' 
-#' @export
-probOverlapHit=function(singlestranded=FALSE) {
-    mlen=motifLength()
-    alpha=numeric(1)
-    beta=numeric(mlen)
-    beta3p=numeric(mlen)
-    beta5p=numeric(mlen)
-    gamma=numeric(3*mlen)
-    if (singlestranded==TRUE) {
-        res=.C("motifcounter_overlapSingleStranded", alpha, 
-            beta, beta3p, beta5p, gamma,PACKAGE="motifcounter")
-    } else {
-        res=.C("motifcounter_overlap", alpha, 
-            beta, beta3p, beta5p, gamma,PACKAGE="motifcounter")
-    }
-    return (list(alpha=res[[1]],beta=res[[2]],beta3p=res[[3]],beta5p=res[[4]],
-        gamma=res[[5]], singlestranded=singlestranded))
-}
-
-
-
 #' Compound Poisson Approximation
 #' 
 #' This function computes the distribution of the number of motif hits 
@@ -124,12 +45,12 @@ probOverlapHit=function(singlestranded=FALSE) {
 #' readBackground(seqfile,1)
 #' 
 #' # load motif model from motiffile
-#' readMotif(motiffile, 0.01)
+#' motif=t(as.matrix(read.table(motiffile)))
 #' 
 #' # compute the distribution for scanning a single DNA strand
 #' 
 #' #Compute overlapping probabilities
-#' op=probOverlapHit(singlestranded=TRUE)
+#' op=probOverlapHit(motif,singlestranded=TRUE)
 #' 
 #' # Computes the distribution of the number of motif hits
 #' seqlen=rep(150,100)
@@ -139,7 +60,7 @@ probOverlapHit=function(singlestranded=FALSE) {
 #' # compute the distribution for scanning both DNA strands
 #' 
 #' #Compute overlapping probabilities
-#' op=probOverlapHit(singlestranded=FALSE)
+#' op=probOverlapHit(motif,singlestranded=FALSE)
 #' 
 #' # Computes the distribution of the number of motif hits
 #' seqlen=rep(150,100)
@@ -164,6 +85,7 @@ compoundPoissonDist=function(seqlen, overlap, method="kopp") {
             as.numeric(dist), as.integer(length(seqlen)),
             as.integer(seqlen),
             as.integer(maxhits), as.integer(maxclumpsize),
+            length(overlap$beta),
             as.integer(overlap$singlestranded),PACKAGE="motifcounter")
         dist=res[[5]]
     } else if (method=="pape") {
@@ -175,6 +97,7 @@ compoundPoissonDist=function(seqlen, overlap, method="kopp") {
         res=.C("motifcounter_compoundPoissonPape_useGamma", overlap$gamma,
             as.numeric(dist), as.integer(length(seqlen)), as.integer(seqlen),
             as.integer(maxhits), as.integer(maxclumpsize),
+            length(overlap$beta),
             PACKAGE="motifcounter")
         dist=res[[2]]
     } else {

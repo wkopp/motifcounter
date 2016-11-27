@@ -87,7 +87,7 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
     double abstol=1e-30, intol=1e-30;
     double res;
     int trace=0, fail,fncount, type=2, gncount;
-	CGParams cgparams;
+    CGParams cgparams;
     double a0, aN;
     double *_alpha, *_omega;
 
@@ -117,11 +117,12 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
 	*/
     a0=alpha;
 
-	cgparams.alpha=alpha;
-	cgparams.beta=p->beta;
-	cgparams.beta3p=p->beta3p;
-	cgparams.beta5p=p->beta5p;
-	cgparams.len=500;
+    cgparams.alpha=alpha;
+    cgparams.beta=p->beta;
+    cgparams.beta3p=p->beta3p;
+    cgparams.beta5p=p->beta5p;
+    cgparams.len=500;
+    cgparams.motiflen=p->mlen;
 	/*
     for (i=0; i<p->mlen; i++) {
         extra[1+i]=p->beta[i];

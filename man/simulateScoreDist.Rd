@@ -4,9 +4,11 @@
 \alias{simulateScoreDist}
 \title{Empirical score distribution}
 \usage{
-simulateScoreDist(seqlen, nsim)
+simulateScoreDist(pfm, seqlen, nsim)
 }
 \arguments{
+\item{pfm}{A position frequency matrix}
+
 \item{seqlen}{Length of the sequence to be
 simulated.}
 
@@ -37,11 +39,11 @@ motiffile=system.file("extdata","x31.tab",package="motifcounter")
 readBackground(seqfile,1)
 
 # Load a motif from the motiffile
-readMotif(motiffile)
+motif=t(as.matrix(read.table(motiffile)))
 
 # generate the simulated score distribution on 
 # sequences of length 1kb using 1000 samples 
-simulateScoreDist(seqlen= 1000,nsim=1000)
+simulateScoreDist(motif,seqlen= 1000,nsim=1000)
 
 }
 \seealso{

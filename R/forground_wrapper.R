@@ -1,114 +1,58 @@
-#' Read and load a PFM
+#' Check valididity of PFM
 #' 
-#' The function reads a position frequency matrix (PFM) for scanning a DNA
-#' sequence. The PFM can be loaded directly in transfac format, in tab format
-#' or from an R matrix. To load a PFM from a file directly, the files must end
-#' in '.transfac' or '.tab' to load from transfac or tab format, respectively,
-#' and each file must contain only one PFM.
+#' This function checks if the PFM is valid. The function throws
+#' an error if the R matrix does not represent a PFM.
 #' 
-#' 
-#' @param motif Filename to load the PFM from
-#' or PFM provided as an R matrix.
-#' @param pseudocount Numeric value which is added to each element of the
-#' PFM in order to avoid zero probability elements. The columns of the
-#' matrix are renormalized automatically.
-#' 
+#' @param pfm A position frequency matrix
 #' @return None
+#' 
 #' @examples
 #' 
-#' 
-#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' # load a motif in tab format
-#' readMotif(motiffile, 0.01)
-#' 
-#' # fetch the motif to an R matrix
-#' motif=motif2matrix()
-#' 
-#' #reload the motif again from the R matrix
-#' readMotif(motif, 0.01)
-#' 
+#' motiffile=system.file("extdata","x1.tab", package="motifcounter")
+#' motif=t(as.matrix(read.table(motiffile)))
+#' motifValid(motif)
 #' 
 #' @export
-readMotif=function(motif, pseudocount=0.01) {
-    if (is.matrix(motif)) {
-        if (any(motif<=0)) {
-            stop("All entries in the matrix must be greater than zero")
-        }
-        if (nrow(motif)!=4) {
-            stop("The number of rows must be 4, 
-                representing the number nucleotides.")
-        }
-        motif=motif+pseudocount
-        motif=motif/apply(motif,2,sum)
-        dummy=.C("motifcounter_loadmotif", as.numeric(motif), 
-                nrow(motif), ncol(motif),PACKAGE="motifcounter")
-    } else if (is.character(motif)) {
-        sdummy=.C("motifcounter_motiffromfile", as.character(motif),
-                as.numeric(pseudocount),PACKAGE="motifcounter")
-    } else {
-        stop("motif must be a filename pointing 
-                that contains a PFM or a PFM matrix")
+motifValid=function(pfm) {
+    if (!is.matrix(pfm)) {
+        stop("pfm must be a matrix")
+    }
+    #check if matrix has four rows
+    if (nrow(pfm)!=4) {
+        stop("pfm ncol must equal 4")
+    }
+    #check if all entries are positive
+    if (!all(pfm>0)) {
+        stop("pfm must be strictly positive.
+            add a small pseudocount in case they are not")
+    }
+    #check if all columns sum to one
+    if (!all(abs(1-apply(pfm,2,sum))<0.0000001)) {
+        stop("all columns must sum to one, which seems not
+            to be the case")
     }
 }
 
-
-
-#' Deletes the current motif
+#' Add pseudo-count to PFM
 #' 
-#' This function unloads the current motif and frees the allocated memory
+#' This function can be used to prevent the PFM from
+#' containing zero-value entries.
 #' 
+#' @param pfm A position frequency matrix
+#' @param pseudo Small pseudo-value that is added to each entry in the PFM
 #' @return None
 #' 
 #' @examples
 #' 
 #' 
-#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' readMotif(motiffile,0.01)
-#' deleteMotif()
+#' motiffile=system.file("extdata","x1.tab", package="motifcounter")
+#' motif=t(as.matrix(read.table(motiffile)))
+#' new_motif=normalizeMotif(motif)
 #' 
 #' @export
-deleteMotif=function() {
-    dummy=.C("motifcounter_deleteMotif",PACKAGE="motifcounter")
-}
-
-
-
-#' Returns the current PFM as an R matrix
-#' 
-#' This function returns the current PFM as an R matrix.
-#' 
-#' @return  A position frequency matrix
-#' 
-#' @examples
-#' 
-#' 
-#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' readMotif(motiffile)
-#' x=motif2matrix()
-#' 
-#' @export
-motif2matrix=function() {
-    m=.Call("motifcounter_fetchMotif",PACKAGE="motifcounter");
-    return (m)
-}
-
-#' Length of the currently loaded PFM
-#' 
-#' This function returns the length of the currently loaded PFM.
-#' 
-#' @return Length of the motif
-#' 
-#' @examples
-#' 
-#' 
-#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' readMotif(motiffile)
-#' motifLength()
-#' 
-#' @export
-motifLength=function() {
-    x=integer(1);
-    res=.C("motifcounter_motiflength",x,PACKAGE="motifcounter")
-    return (res[[1]])
+normalizeMotif=function(pfm,pseudo=0.01) {
+    pfm=pfm+pseudo
+    pfm=t(t(pfm)/apply(pfm,2,sum))
+    return(pfm)
 }
 

@@ -4,9 +4,11 @@
 \alias{simulateNumHitsDist}
 \title{Empirical number of motif hits distribution}
 \usage{
-simulateNumHitsDist(seqlen, maxhits, nsim, singlestranded = FALSE)
+simulateNumHitsDist(pfm, seqlen, maxhits, nsim, singlestranded = FALSE)
 }
 \arguments{
+\item{pfm}{A position frequency matrix}
+
 \item{seqlen}{Integer-valued vector contanting the individual
 sequence lengths.}
 
@@ -35,12 +37,14 @@ seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
 readBackground(seqfile,1)
-readMotif(motiffile)
+motif=t(as.matrix(read.table(motiffile)))
 
 seqlen=rep(150,100)
-simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=100,singlestranded=FALSE)
+simc=simulateNumHitsDist(motif, seqlen,
+        maxhits=1000,nsim=100,singlestranded=FALSE)
 
-simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=100,singlestranded=TRUE)
+simc=simulateNumHitsDist(motif, seqlen,
+        maxhits=1000,nsim=100,singlestranded=TRUE)
 
 }
 \seealso{

@@ -59,10 +59,10 @@
 #' 
 #' # Load a PFM model from motiffile and add pseudo-evidence of 0.01
 #' # to each element to prevent zero-entry occurrences
-#' readMotif(motiffile, 0.01)
+#' motif=t(as.matrix(read.table(motiffile)))
 #' 
 #' # Score distribution is determined analytically using  dynamic programming
-#' scoredist=scoreDist()
+#' scoredist=scoreDist(motif)
 #' plot(scoredist$score,scoredist$probability, col="green")
 #' 
 #' 
@@ -70,7 +70,7 @@
 #' # Compute the overlap probabilities with respect to scanning both
 #' # DNA strands. They are necessary for the 
 #' # distribution of the number of motif hits and the enrichment test
-#' op=probOverlapHit(singlestranded=FALSE)
+#' op=probOverlapHit(motif,singlestranded=FALSE)
 #' 
 #' # Compound poisson approximation of the motif hits distribution
 #' # in random sequences
@@ -84,7 +84,7 @@
 #' # Compute the overlap probabilities with respect to scanning both
 #' # DNA strands. They are necessary for the 
 #' # distribution of the number of motif hits and the enrichment test
-#' op=probOverlapHit(singlestranded=TRUE)
+#' op=probOverlapHit(motif,singlestranded=TRUE)
 #' 
 #' # Compound poisson approximation of the motif hits distribution
 #' # in random sequences
@@ -93,17 +93,19 @@
 #' # Determine the motif enrichment in a given DNA sequence
 #' 
 #' # Obtain the number of motif hits in the given sequence
-#' numhits=numMotifHits(seqfile,singlestranded=TRUE)
-#' op=probOverlapHit(singlestranded=TRUE)
-#' pvalue=motifEnrichmentTest(seqfile,singlestranded=TRUE,method="compound")
+#' numhits=numMotifHits(motif,seqfile,singlestranded=TRUE)
+#' op=probOverlapHit(motif,singlestranded=TRUE)
+#' pvalue=motifEnrichmentTest(motif,seqfile,
+#'              singlestranded=TRUE,method="compound")
 #' 
-#' numhits=numMotifHits(seqfile,singlestranded=FALSE)
-#' op=probOverlapHit(singlestranded=FALSE)
-#' pvalue=motifEnrichmentTest(seqfile,singlestranded=FALSE,method="compound")
+#' numhits=numMotifHits(motif, seqfile,singlestranded=FALSE)
+#' op=probOverlapHit(motif,singlestranded=FALSE)
+#' pvalue=motifEnrichmentTest(motif,seqfile,
+#'              singlestranded=FALSE,method="compound")
 #' 
-#' numhits=numMotifHits(seqfile,singlestranded=FALSE)
-#' op=probOverlapHit(singlestranded=FALSE)
-#' pvalue=motifEnrichmentTest(seqfile,singlestranded=FALSE,
+#' numhits=numMotifHits(motif,seqfile,singlestranded=FALSE)
+#' op=probOverlapHit(motif,singlestranded=FALSE)
+#' pvalue=motifEnrichmentTest(motif,seqfile,singlestranded=FALSE,
 #' method="combinatorial")
 #' 
 #' 

@@ -56,12 +56,12 @@ motifcounterOption(alpha, gran)
 readBackground(seqfile,1)
 
 # load motif model from motiffile
-readMotif(motiffile, 0.01)
+motif=t(as.matrix(read.table(motiffile)))
 
 # compute the distribution for scanning a single DNA strand
 
 #Compute overlapping probabilities
-op=probOverlapHit(singlestranded=TRUE)
+op=probOverlapHit(motif,singlestranded=TRUE)
 
 # Computes the distribution of the number of motif hits
 seqlen=rep(150,100)
@@ -71,7 +71,7 @@ dist=compoundPoissonDist(seqlen, op)
 # compute the distribution for scanning both DNA strands
 
 #Compute overlapping probabilities
-op=probOverlapHit(singlestranded=FALSE)
+op=probOverlapHit(motif,singlestranded=FALSE)
 
 # Computes the distribution of the number of motif hits
 seqlen=rep(150,100)

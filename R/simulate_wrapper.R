@@ -6,6 +6,7 @@
 #' with the scoring measure which yields the score distribution.
 #' 
 #' 
+#' @param pfm A position frequency matrix
 #' @param seqlen Length of the sequence to be
 #' simulated.
 #' @param nsim Number of samples to be generated.
@@ -26,24 +27,28 @@
 #' readBackground(seqfile,1)
 #' 
 #' # Load a motif from the motiffile
-#' readMotif(motiffile)
+#' motif=t(as.matrix(read.table(motiffile)))
 #' 
 #' # generate the simulated score distribution on 
 #' # sequences of length 1kb using 1000 samples 
-#' simulateScoreDist(seqlen= 1000,nsim=1000)
+#' simulateScoreDist(motif,seqlen= 1000,nsim=1000)
 #' 
 #' @seealso \code{\link{scoreDist}}
 #' @export
-simulateScoreDist=function(seqlen, nsim) {
+simulateScoreDist=function(pfm,seqlen, nsim) {
+    motifValid(pfm)
     scorerange=integer(1)
     scorerange=.C("motifcounter_scorerange",
-                as.integer(scorerange),PACKAGE="motifcounter")[[1]]
+                as.numeric(pfm),nrow(pfm),ncol(pfm),
+                as.integer(scorerange),PACKAGE="motifcounter")[[4]]
     scores=numeric(scorerange); dist=numeric(scorerange)
     length(scores)
-    ret=.C("motifcounter_simulateScores", as.numeric(scores), 
+    ret=.C("motifcounter_simulateScores", 
+        as.numeric(pfm),nrow(pfm),ncol(pfm),
+        as.numeric(scores), 
         as.numeric(dist), as.integer(seqlen), 
         as.integer(nsim),PACKAGE="motifcounter")
-    return(list(score=ret[[1]], probability=ret[[2]]))
+    return(list(score=ret[[4]], probability=ret[[5]]))
 }
 
 
@@ -56,7 +61,7 @@ simulateScoreDist=function(seqlen, nsim) {
 #' Doing that repeatedly eventually established the empirical
 #' distribution of the number of motif hits.
 #' 
-#' 
+#' @param pfm A position frequency matrix
 #' @param seqlen Integer-valued vector contanting the individual
 #' sequence lengths.
 #' @param maxhits Maximal number of hits.
@@ -72,24 +77,29 @@ simulateScoreDist=function(seqlen, nsim) {
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' 
 #' readBackground(seqfile,1)
-#' readMotif(motiffile)
+#' motif=t(as.matrix(read.table(motiffile)))
 #' 
 #' seqlen=rep(150,100)
-#' simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=100,singlestranded=FALSE)
+#' simc=simulateNumHitsDist(motif, seqlen,
+#'         maxhits=1000,nsim=100,singlestranded=FALSE)
 #' 
-#' simc=simulateNumHitsDist(seqlen,maxhits=1000,nsim=100,singlestranded=TRUE)
+#' simc=simulateNumHitsDist(motif, seqlen,
+#'         maxhits=1000,nsim=100,singlestranded=TRUE)
 #' 
 #' @seealso \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
 #' @export
-simulateNumHitsDist=function(seqlen, maxhits, nsim, singlestranded=FALSE) {
+simulateNumHitsDist=function(pfm,seqlen, maxhits, nsim, singlestranded=FALSE) {
+    motifValid(pfm)
     if (length(seqlen)<=0) {
         stop("seqlen must be non-empty")
     }
     dist=numeric(maxhits+1);
-    ret=.C("motifcounter_simulateCountDistribution", as.numeric(dist), 
+    ret=.C("motifcounter_simulateCountDistribution", 
+        as.numeric(pfm),nrow(pfm),ncol(pfm),
+        as.numeric(dist), 
         as.integer(nsim), as.integer(length(seqlen)),
         as.integer(seqlen), as.integer(maxhits), 
         as.integer(singlestranded),PACKAGE="motifcounter")
-    return(list(dist=ret[[1]]))
+    return(list(dist=ret[[4]]))
 }
 

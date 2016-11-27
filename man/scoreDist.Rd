@@ -4,7 +4,10 @@
 \alias{scoreDist}
 \title{Score distribution}
 \usage{
-scoreDist()
+scoreDist(pfm)
+}
+\arguments{
+\item{pfm}{A position frequency matrix}
 }
 \value{
 List containing 
@@ -32,10 +35,10 @@ motiffile=system.file("extdata","x31.tab",package="motifcounter")
 readBackground(seqfile,1)
 
 # Load the motif from the motiffile
-readMotif(motiffile)
+motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the score distribution
-dp=scoreDist()
+dp=scoreDist(motif)
 
 }
 

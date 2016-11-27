@@ -35,10 +35,10 @@
 #' readBackground(seqfile,1)
 #' 
 #' # load motif model from motiffile
-#' readMotif(motiffile, 0.01)
+#' motif=t(as.matrix(read.table(motiffile)))
 #' 
-#' # Compute overlap probabilies
-#' op=probOverlapHit(singlestranded=FALSE)
+#' # Compute overlap probabilities
+#' op=probOverlapHit(motif,singlestranded=FALSE)
 #' seqlen=rep(100,1)
 #' # Computes the distribution of the number of motif hits
 #' dist=combinatorialDist(seqlen, op)
@@ -77,6 +77,7 @@ combinatorialDist=function(seqlen, overlap) {
         overlap$alpha, overlap$beta, overlap$beta3p, overlap$beta5p,
         as.numeric(dist), as.integer(seqlen[1]),
         as.integer(maxhits), as.integer(length(seqlen)),
+        length(overlap$beta),
         as.integer(overlap$singlestranded),PACKAGE="motifcounter")
     return(list(dist=ret[[5]]))
 }

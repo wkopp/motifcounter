@@ -44,10 +44,10 @@ motifcounterOption(alpha)
 readBackground(seqfile,1)
 
 # load motif model from motiffile
-readMotif(motiffile, 0.01)
+motif=t(as.matrix(read.table(motiffile)))
 
-# Compute overlap probabilies
-op=probOverlapHit(singlestranded=FALSE)
+# Compute overlap probabilities
+op=probOverlapHit(motif,singlestranded=FALSE)
 seqlen=rep(100,1)
 # Computes the distribution of the number of motif hits
 dist=combinatorialDist(seqlen, op)

@@ -7,6 +7,7 @@
 #' 'compound Poisson approximation' or the 'combinatorial model'.
 #' 
 #' 
+#' @param pfm A position frequency matrix
 #' @param sequence Fasta-filename containing the sequence that should
 #'      be scanned
 #' @param singlestranded Boolean flag that indicates whether one or both
@@ -29,32 +30,35 @@
 #' readBackground(seqfile,1)
 #' 
 #' # load motif model from motiffile
-#' readMotif(motiffile, 0.01)
+#' motif=t(as.matrix(read.table(motiffile)))
 #' 
 #' ### 1 ) Compute the distribution for scanning a *single* DNA strand
 #' # based on the 'Compound Poisson model'
 #'
-#' pvalue=motifEnrichmentTest(seqfile,singlestranded=TRUE,method="compound")
+#' pvalue=motifEnrichmentTest(motif, 
+#'              seqfile,singlestranded=TRUE,method="compound")
 #'
 #' ### 2 ) Compute the distribution for scanning *both* DNA strand
 #' # based on the 'Compound Poisson model'
 #'
-#' pvalue=motifEnrichmentTest(seqfile,method="compound")
+#' pvalue=motifEnrichmentTest(motif, seqfile,method="compound")
 #' 
 #' ### 3 ) Compute the distribution for scanning *both* DNA strand
 #' # based on the *combinatorial model*
 #'
-#' pvalue=motifEnrichmentTest(seqfile,singlestranded=FALSE,
-#' method="combinatorial")
+#' pvalue=motifEnrichmentTest(motif, seqfile,singlestranded=FALSE,
+#'              method="combinatorial")
 #' 
 #' @seealso \code{\link{compoundPoissonDist}}, \code{\link{combinatorialDist}}
 #' @export
-motifEnrichmentTest=function(sequence,singlestranded=FALSE,method="compound") {
+motifEnrichmentTest=function(pfm,sequence,
+    singlestranded=FALSE,method="compound") {
+    motifValid(pfm)
     #compute overlapping hit probs
-    overlap=probOverlapHit(singlestranded)
+    overlap=probOverlapHit(pfm,singlestranded)
 
     # detemine the number of motif hits
-    observations=numMotifHits(sequence,singlestranded)
+    observations=numMotifHits(pfm,sequence,singlestranded)
     if (method=="compound") {
         dist=compoundPoissonDist(observations$lseq, overlap)
     } else if (method=="combinatorial") {

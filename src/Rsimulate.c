@@ -11,13 +11,13 @@
 
 extern int Rorder;
 extern int RorderForSampling;
-extern DMatrix *Rpwm, *Rcpwm;
 extern double *Rstation, *Rtrans;
 extern double *RstationForSampling, *RtransForSampling;
 extern double Rsiglevel, Rgran;
 
-void RsimulateCountDistribution( double *distribution, int* perm, 
-   int *nseq, int *lseq, int *mxhit, int *singlestranded) {
+void RsimulateCountDistribution(double *pfm_, int *nrow, int *ncol,
+    double *distribution, int* perm, 
+    int *nseq, int *lseq, int *mxhit, int *singlestranded) {
     int seqlen,maxhits,Nperm, intervalsize;
     int *_nh;
     ExtremalScore escore;
@@ -26,10 +26,11 @@ void RsimulateCountDistribution( double *distribution, int* perm,
     int n, s;
     int i;
     char *seq;
+    DMatrix pfm, cpfm;
 
     int threshold;
 
-    if (!Rpwm||!Rcpwm||!Rstation||!RstationForSampling) {
+    if (!Rstation||!RstationForSampling) {
         error("load forground and background properly");
         return;
     }
@@ -43,14 +44,26 @@ void RsimulateCountDistribution( double *distribution, int* perm,
     }
     GetRNGstate();
 
+    pfm.data=Calloc(nrow[0]*ncol[0],double);
+    cpfm.data=Calloc(nrow[0]*ncol[0],double);
+    // Rcol and c-col are swapped
+    pfm.ncol=nrow[0];
+    cpfm.ncol=nrow[0];
+    pfm.nrow=ncol[0];
+    cpfm.nrow=ncol[0];
+    memcpy(pfm.data,pfm_,nrow[0]*ncol[0]*sizeof(double));
+    for (i=1; i<=nrow[0]*ncol[0];i++) {
+        cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
+    }
+
     maxhits=mxhit[0];
     Nperm=perm[0];
     pvalue=Rsiglevel;
     dx=Rgran;
 
     // compute significance threshold
-    initExtremalScore(&escore, dx, Rpwm->nrow, Rorder);
-    loadMinMaxScores(Rpwm, Rstation, Rtrans, &escore);
+    initExtremalScore(&escore, dx, pfm.nrow, Rorder);
+    loadMinMaxScores(&pfm, Rstation, Rtrans, &escore);
     loadIntervalSize(&escore, NULL);
 
     intervalsize=getTotalScoreUpperBound(&escore)-
@@ -60,9 +73,9 @@ void RsimulateCountDistribution( double *distribution, int* perm,
             getTotalScoreUpperBound(&escore),intervalsize,dx, &null.meta);
     null.meta.prob=&ProbBg;
     null.meta.probinit=&ProbinitBg;
-    initScoreDistribution1d(Rpwm,Rtrans,&null, Rorder);
+    initScoreDistribution1d(&pfm,Rtrans,&null, Rorder);
 
-    computeScoreDistribution1d(Rpwm, Rtrans,  Rstation, &null, &escore, Rorder);
+    computeScoreDistribution1d(&pfm, Rtrans,  Rstation, &null, &escore, Rorder);
 
     quantile=getQuantileWithIndex1d(&null,
                 getQuantileIndex1d(&null.totalScore,pvalue));
@@ -97,10 +110,10 @@ void RsimulateCountDistribution( double *distribution, int* perm,
         for (s=0;s<*nseq; s++) {
             generateRandomSequence(RstationForSampling, RtransForSampling, seq, 
                     lseq[s], RorderForSampling);
-            _nh[n]+=countOccurances(Rstation, Rtrans, Rpwm, seq, lseq[s], 
+            _nh[n]+=countOccurances(Rstation, Rtrans, &pfm, seq, lseq[s], 
                     threshold, dx, Rorder);
             if (*singlestranded==0) {
-                _nh[n]+=countOccurances(Rstation, Rtrans, Rcpwm, seq, lseq[s], 
+                _nh[n]+=countOccurances(Rstation, Rtrans, &cpfm, seq, lseq[s], 
                         threshold, dx, Rorder);
             }
         }
@@ -113,10 +126,13 @@ void RsimulateCountDistribution( double *distribution, int* perm,
     Free(_nh);
     Free(seq);
     PutRNGstate();
+    Free(pfm.data);
+    Free(cpfm.data);
 }
 
-void RsimulateScores(double *scores, double *distribution, int *slen, 
-  int *perm) {
+void RsimulateScores(double *pfm_, int *nrow, int *ncol,
+    double *scores, double *distribution, int *slen, 
+    int *perm) {
     int i, n;
     char *seq=NULL;
     ExtremalScore fescore, rescore;
@@ -124,6 +140,7 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
     int mins, maxs;
     int seqlen, Nperm;
     double dx;
+    DMatrix pfm, cpfm;
 
     if (Rgran==0.0) {
         error("call mdistOption  first");
@@ -137,6 +154,18 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
 
     GetRNGstate();
 
+    pfm.data=Calloc(nrow[0]*ncol[0],double);
+    cpfm.data=Calloc(nrow[0]*ncol[0],double);
+    // Rcol and c-col are swapped
+    pfm.ncol=nrow[0];
+    cpfm.ncol=nrow[0];
+    pfm.nrow=ncol[0];
+    cpfm.nrow=ncol[0];
+    memcpy(pfm.data,pfm_,nrow[0]*ncol[0]*sizeof(double));
+    for (i=1; i<=nrow[0]*ncol[0];i++) {
+        cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
+    }
+
     seqlen=slen[0];
     Nperm=perm[0];
 
@@ -147,11 +176,11 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
         error("Allocation for sequence failed");
     }
 
-    initExtremalScore(&fescore, dx, Rpwm->nrow, Rorder);
-    initExtremalScore(&rescore, dx, Rcpwm->nrow, Rorder);
+    initExtremalScore(&fescore, dx, pfm.nrow, Rorder);
+    initExtremalScore(&rescore, dx, cpfm.nrow, Rorder);
 
-    loadMinMaxScores(Rpwm, Rstation, Rtrans, &fescore);
-    loadMinMaxScores(Rcpwm, Rstation, Rtrans, &rescore);
+    loadMinMaxScores(&pfm, Rstation, Rtrans, &fescore);
+    loadMinMaxScores(&cpfm, Rstation, Rtrans, &rescore);
     loadIntervalSize(&fescore, NULL);
     loadIntervalSize(&rescore, NULL);
 
@@ -166,10 +195,10 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
         generateRandomSequence(RstationForSampling, 
                 RtransForSampling, seq, seqlen, RorderForSampling);
         scoreOccurances(Rstation, Rtrans, 
-                Rpwm, seq, seqlen, distribution, dx, mins,Rorder);
+                &pfm, seq, seqlen, distribution, dx, mins,Rorder);
     }
     for (n=0; n<maxs-mins+1; n++) {
-        distribution[n]/=(double)Nperm*(seqlen-Rpwm->nrow+1);
+        distribution[n]/=(double)Nperm*(seqlen-pfm.nrow+1);
     }
 
     for (i=0; i<maxs-mins+1; i++) {
@@ -179,5 +208,7 @@ void RsimulateScores(double *scores, double *distribution, int *slen,
     deleteExtremalScore(&rescore);
     PutRNGstate();
     Free(seq);
+    Free(pfm.data);
+    Free(cpfm.data);
 }
 
