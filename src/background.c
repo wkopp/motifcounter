@@ -112,6 +112,7 @@ int getForwardTransition(double *di, double *trans, int order) {
     return ret;
 }
 
+#ifdef OBSOLETE_
 void writeBackground(FILE *f, double * station, double * trans, int order) {
     fwrite(&order, sizeof(int),1, f);
     if (order==0) {
@@ -122,6 +123,7 @@ void writeBackground(FILE *f, double * station, double * trans, int order) {
         fwrite(trans, sizeof(double), power(ALPHABETSIZE, order+1), f);
     }
 }
+#endif
 
 void deleteBackground(double * station, double *trans) {
     Free(station);
@@ -130,6 +132,7 @@ void deleteBackground(double * station, double *trans) {
     }
 }
 
+#ifdef OBSOLETE_
 void readBackground (FILE *f, double **station, double **trans, int *order) {
     fread(order, sizeof(int),1, f);
 
@@ -151,6 +154,7 @@ void readBackground (FILE *f, double **station, double **trans, int *order) {
         memcpy(*trans, *station, sizeof(double)*ALPHABETSIZE);
     }
 }
+#endif
 
 void printBackground(double *stat, double *trans, int order) {
   int i;
