@@ -13,7 +13,7 @@ test_that("overlap probs", {
     readBackground(seqfile,1)
 
     op=probOverlapHit(motif,singlestranded=FALSE)
-    expect_equal(op$alpha,0.0008473007)
+    expect_equal(op$alpha,0.0008473007,tolerance=1e-7)
     expect_equal(op$beta[1],0.0)
     expect_equal(op$beta3p[1],1.0)
     expect_equal(op$beta5p[5],3.940588e-02)

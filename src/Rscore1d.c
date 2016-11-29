@@ -65,12 +65,13 @@ void Rscoredist(double *pfm_, int *nrow, int *ncol,
     null.meta.probinit=&ProbinitBg;
     initScoreDistribution1d(&pfm,Rtrans,&null, Rorder);
 
-    computeScoreDistribution1d(&pfm, Rtrans,  Rstation, 
+    computeScoreDistribution1d(&pfm, Rtrans,  Rstation,
             &null, &fescore, Rorder);
 
     quantile=getQuantileWithIndex1d(&null,
                     getQuantileIndex1d(&null.totalScore,p));
     threshold=(int)(quantile/dx);
+    //Rprintf("threshold=%e\n",quantile);
     pcomp=getProbWithIndex1d(&null,threshold);
 
     for (i=0; i<null.meta.xmax-null.meta.xmin + 1; i++) {
@@ -158,4 +159,3 @@ void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
     Free(pfm.data);
     Free(cpfm.data);
 }
-

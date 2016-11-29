@@ -11,7 +11,7 @@ None
 }
 \description{
 Similar to \code{link{printBackgroundForSampling}}, but
-prints parameters that where acquired using 
+prints parameters that where acquired using
 \code{link{readBackgroundForSampling}}.
 }
 \examples{

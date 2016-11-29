@@ -17,10 +17,10 @@ List containing
 }
 }
 \description{
-This function computes the score distribution for the provided PFM and 
+This function computes the score distribution for the provided PFM and
 background model. The result is identical to \code{\link{scoreDist}},
 however, the method employs a less efficient algorithm that
-enumerates all DNA sequences of the length of the motif. 
+enumerates all DNA sequences of the length of the motif.
 This function is only used for debugging purposes
 and might require substantial computational
 resources for long motifs. Therefore, use \code{\link{scoreDist}} instead.

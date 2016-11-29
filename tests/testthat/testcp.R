@@ -12,6 +12,7 @@ test_that("compound", {
         seqfile=system.file("extdata","seq.fasta", package="motifcounter")
         motiffile=system.file("extdata",pwmname, package="motifcounter")
 
+        seqs=Biostrings::readDNAStringSet(seqfile)
         readBackground(seqfile,1)
         motif=t(as.matrix(read.table(motiffile)))
 
@@ -20,6 +21,6 @@ test_that("compound", {
 
         cpdist=compoundPoissonDist(seqlen, op)
 
-        nom=numMotifHits(motif,seqfile)
+        nom=numMotifHits(motif,seqs)
     }
 })

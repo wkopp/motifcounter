@@ -147,8 +147,8 @@ int getSequence(FILE *f, Sequence *s) {
                 }
                 writeseq=0;
             }
-            if (writeheader==1 && buffer[i]=='\n') { 
-                writeheader=0; writeseq=1; ipos=0; break; 
+            if (writeheader==1 && buffer[i]=='\n') {
+                writeheader=0; writeseq=1; ipos=0; break;
             }
 
             if (writeseq==1 && buffer[i]=='\n') break;
@@ -259,4 +259,3 @@ int getIndexFromReverseComplementaryAssignment(char *ass, int length) {
     }
     return index;
 }
-

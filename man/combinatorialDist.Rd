@@ -8,7 +8,7 @@ combinatorialDist(seqlen, overlap)
 }
 \arguments{
 \item{seqlen}{Integer-valued vector that defines the lengths of the
-individual sequences. This information can be extracted for 
+individual sequences. This information can be extracted for
 given DNA sequence of interest using \code{\link{numMotifHits}}.
 Note that as the combinatorial model only supports the analysis
 of a set of sequences of equal length, each element `seqlen`
@@ -18,14 +18,14 @@ must be the same.}
 are determined by \code{\link{probOverlapHit}}}
 }
 \value{
-List that contains 
+List that contains
 \describe{
 \item{dist}{Distribution of the number of motif hits}
 }
 }
 \description{
 This function approxmiates the distribution of the number of motif hits.
-It is determined by efficiently  
+It is determined by efficiently
 summing over all combinations of obtaining k hits in a given sequence.
 This function can be viewed as an alternative analytical approximation
 to \code{\link{compoundPoissonDist}}.

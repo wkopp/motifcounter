@@ -12,14 +12,14 @@ motif hits. E.g. alpha=0.001 amounts to calling 1 in 1000 positions
 in the DNA motif hit by chance if a single DNA strand is scanned.}
 
 \item{gran}{The score granularity which is used
-for discretizing the score range. Decreasing gran values 
+for discretizing the score range. Decreasing gran values
 result an increased number
 of discrete bins that represent the real-valued score range
 and consequently mmomre accurate score distribution approximations.
 On the other hand, decreasing gran incurs higher computations costs.
 Default: gran=0.1}
 
-\item{ncores}{Number of cores used for parallel processing if openMP is 
+\item{ncores}{Number of cores used for parallel processing if openMP is
 available. Default: ncores=1.}
 }
 \value{

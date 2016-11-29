@@ -24,21 +24,21 @@ void RmakebgForSampling(char **infasta, int *order, int *nseq, int *lseq) {
         RstationForSampling=Calloc(power(ALPHABETSIZE,order[0]),double);
         count=Calloc(power(ALPHABETSIZE,order[0]+1),double);
         RtransForSampling=Calloc(power(ALPHABETSIZE, order[0]+1),double);
-        if (RstationForSampling==NULL || count==NULL || 
+        if (RstationForSampling==NULL || count==NULL ||
                     RtransForSampling==NULL) {
             error("Memory allocation in RmakebgForSampling failed");
         }
 
         getNucleotideFrequencyFromSequence(f,count, order[0], nseq, lseq);
         getForwardTransition(count, RtransForSampling, order[0]);
-        getStationaryDistribution(RtransForSampling, 
+        getStationaryDistribution(RtransForSampling,
                     RstationForSampling, order[0]);
 
     } else {
         RstationForSampling=Calloc(power(ALPHABETSIZE,order[0]+1),double);
         RtransForSampling=Calloc(power(ALPHABETSIZE,order[0]+1),double);
         count=Calloc(power(ALPHABETSIZE,order[0]+1),double);
-        if (RstationForSampling==NULL || count==NULL || 
+        if (RstationForSampling==NULL || count==NULL ||
                     RtransForSampling==NULL) {
             error("Memory allocation in RmakebgForSampling failed");
         }
@@ -65,6 +65,9 @@ void RmakebgForSampling(char **infasta, int *order, int *nseq, int *lseq) {
 }
 
 void RgetOrderForSampling(int *o) {
+    if (!RstationForSampling) {
+        error("Load background for sampling first!");
+    }
     o[0]=RorderForSampling;
 }
 void RgetBackgroundForSampling(double *station, double *trans) {
@@ -87,4 +90,3 @@ void RdestroyBackgroundForSampling() {
     RstationForSampling=NULL;
     RtransForSampling=NULL;
 }
-

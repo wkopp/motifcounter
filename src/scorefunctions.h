@@ -28,4 +28,10 @@ double getDiscretizedScore(double P, double Q, double dx);
 int getScoreIndex(double P,double Q, double dx);
 void getScoresInitialIndex(double *P,double *Q, int *score, double *dx, int order);
 void printSeq(int index, int len);
+void scoreSequence(double *station, double *trans,
+  DMatrix *pwm, char *seq, int seqlen, double *scores,
+  double granularity, int order);
+void scoreHistogram(double *station, double *trans,
+    DMatrix *pwm, char *seq, int seqlen,
+   double *dist, double granularity, int smin, int order);
 #endif

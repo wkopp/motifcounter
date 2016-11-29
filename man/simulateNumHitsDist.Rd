@@ -4,15 +4,13 @@
 \alias{simulateNumHitsDist}
 \title{Empirical number of motif hits distribution}
 \usage{
-simulateNumHitsDist(pfm, seqlen, maxhits, nsim, singlestranded = FALSE)
+simulateNumHitsDist(pfm, seqlen, nsim, singlestranded = FALSE)
 }
 \arguments{
 \item{pfm}{A position frequency matrix}
 
 \item{seqlen}{Integer-valued vector contanting the individual
 sequence lengths.}
-
-\item{maxhits}{Maximal number of hits.}
 
 \item{nsim}{Number of random samples.}
 
@@ -23,7 +21,7 @@ both strands shall be scanned for motif hits.}
 Empirical number of motif hits distribution
 }
 \description{
-This function simulates random DNA sequences according to 
+This function simulates random DNA sequences according to
 the background model and
 subsequently counts how many motif hits occur in them.
 Doing that repeatedly eventually established the empirical
@@ -39,12 +37,10 @@ motiffile=system.file("extdata","x31.tab",package="motifcounter")
 readBackground(seqfile,1)
 motif=t(as.matrix(read.table(motiffile)))
 
-seqlen=rep(150,100)
-simc=simulateNumHitsDist(motif, seqlen,
-        maxhits=1000,nsim=100,singlestranded=FALSE)
+seqlen=rep(150,1)
+simc=simulateNumHitsDist(motif, seqlen, nsim=100,singlestranded=FALSE)
 
-simc=simulateNumHitsDist(motif, seqlen,
-        maxhits=1000,nsim=100,singlestranded=TRUE)
+simc=simulateNumHitsDist(motif, seqlen, nsim=100,singlestranded=TRUE)
 
 }
 \seealso{

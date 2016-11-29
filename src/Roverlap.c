@@ -8,7 +8,7 @@ extern double *Rtrans, *Rstation, Rgran, Rsiglevel;
 extern int Rorder;
 
 void Roverlap(double *pfm_, int *nrow, int *ncol,
-        double *alpha, double *beta, double *beta3p, double *beta5p, 
+        double *alpha, double *beta, double *beta3p, double *beta5p,
         double *gamma) {
 
     int i;
@@ -39,14 +39,12 @@ void Roverlap(double *pfm_, int *nrow, int *ncol,
     for (i=1; i<=nrow[0]*ncol[0];i++) {
         cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
     }
-    ////printMotif(&pfm);
-    //printMotif(&cpfm);
 
 
     dx=(double)Rgran;
     pvalue=(double)Rsiglevel;
 
-    computeConditionalOverlappingProbabilities(&pfm, &cpfm, 
+    computeConditionalOverlappingProbabilities(&pfm, &cpfm,
             Rstation, Rtrans, NULL, &pvalue, NULL, &dx, gamma, Rorder);
 
     for (i=1;i<pfm.nrow; i++) {
@@ -67,7 +65,7 @@ void Roverlap(double *pfm_, int *nrow, int *ncol,
 }
 
 void RoverlapSingleStranded(double *pfm_, int *nrow, int *ncol,
-        double *alpha, double *beta, double *beta3p, 
+        double *alpha, double *beta, double *beta3p,
         double *beta5p, double *gamma) {
 
     int i;
@@ -98,13 +96,11 @@ void RoverlapSingleStranded(double *pfm_, int *nrow, int *ncol,
     for (i=1; i<=nrow[0]*ncol[0];i++) {
         cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
     }
-    //printMotif(&pfm);
-    //printMotif(&cpfm);
 
     dx=(double)Rgran;
     pvalue=(double)Rsiglevel;
 
-    computeConditionalOverlappingProbabilities(&pfm, &cpfm, 
+    computeConditionalOverlappingProbabilities(&pfm, &cpfm,
             Rstation, Rtrans, NULL, &pvalue, NULL, &dx, gamma, Rorder);
 
     for (i=1;i<pfm.nrow; i++) {
@@ -123,4 +119,3 @@ void RoverlapSingleStranded(double *pfm_, int *nrow, int *ncol,
     Free(pfm.data);
     Free(cpfm.data);
 }
-

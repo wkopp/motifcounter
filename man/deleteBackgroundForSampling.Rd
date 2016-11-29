@@ -11,7 +11,7 @@ None
 }
 \description{
 Similar to \code{link{deleteBackgroundForSampling}}, but
-deletes parameters that where acquired using 
+deletes parameters that where acquired using
 \code{link{readBackgroundForSampling}}.
 }
 \examples{

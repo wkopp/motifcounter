@@ -4,13 +4,13 @@
 \alias{numSequences}
 \title{Number of sequences in a given fasta file}
 \usage{
-numSequences(seqfile)
+numSequences(seqs)
 }
 \arguments{
-\item{seqfile}{Fasta-file name}
+\item{seqs}{DNAStringSet}
 }
 \value{
-The number of sequences contained in the fasta file
+The number of sequences
 }
 \description{
 The function parses a fasta file and returns the number of individual
@@ -22,9 +22,10 @@ sequence that it contains.
 # in seq.fasta
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
 
 # scan the given sequence for the motif occurances
-nseq=numSequences(seqfile)
+nseq=numSequences(seqs)
 nseq
 
 }

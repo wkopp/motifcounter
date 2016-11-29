@@ -40,7 +40,7 @@ void getScoresIndex(double *P,double *Q, int *score, double *dx) {
     }
 }
 
-void getScoresInitialIndex(double *P,double *Q, int *score, 
+void getScoresInitialIndex(double *P,double *Q, int *score,
         double *dx, int order) {
     int i, j;
     int ass[order];
@@ -75,7 +75,7 @@ double getDiscretizedScore(double P, double Q, double dx) {
     return dx* s;
 }
 
-int initScoreMetaInfo (int smin, int smax, int intervalsize, 
+int initScoreMetaInfo (int smin, int smax, int intervalsize,
         double dx, ScoreMetaInfo *meta) {
     meta->length=(intervalsize)+1;
     meta->dx=dx;
@@ -105,3 +105,83 @@ void printSeq(int index, int len) {
 }
 
 
+
+void scoreSequence(double *station, double *trans,
+  DMatrix *pwm, char *seq, int seqlen, double *scores,
+  double granularity, int order) {
+    int i, j;
+    int s, index;
+    int score[power(ALPHABETSIZE, order+1)];
+
+    // if the sequence contains any N's, do not process the scores
+    for (i=0; i<seqlen;i++) {
+        if (getNucIndex(seq[i])<0) {
+            return;
+        }
+    }
+
+    for (i=0; i< seqlen; i++) {
+        R_CheckUserInterrupt();
+        index=0;
+
+        if (order>0) {
+            getScoresInitialIndex(pwm->data, station,
+                    score, &granularity, order);
+            index=getIndexFromAssignment(&seq[i], order);
+            s=score[index];
+        } else {
+            s=0;
+        }
+
+        for (j=order; j<pwm->nrow; j++) {
+
+            index=index*ALPHABETSIZE + getNucIndex(seq[i+j]);
+
+            s+=getScoreIndex(pwm->data[j*ALPHABETSIZE +getNucIndex(seq[i+j])],
+                trans[index],granularity);
+
+            index-=(index/power(ALPHABETSIZE,order))*power(ALPHABETSIZE,order);
+        }
+        scores[i]=(double)(s*granularity);
+    }
+}
+
+void scoreHistogram(double *station, double *trans,
+  DMatrix *pwm, char *seq, int seqlen,
+ double *dist, double granularity, int smin, int order) {
+    int i, j;
+    int s, index;
+    int score[power(ALPHABETSIZE, order+1)];
+
+    // if the sequence contains any N's, do not process the scores
+    for (i=0; i<seqlen;i++) {
+        if (getNucIndex(seq[i])<0) {
+            return;
+        }
+    }
+
+    for (i=0; i< seqlen-pwm->nrow+1; i++) {
+        R_CheckUserInterrupt();
+        index=0;
+
+        if (order>0) {
+            getScoresInitialIndex(pwm->data, station,
+                    score, &granularity, order);
+            index=getIndexFromAssignment(&seq[i], order);
+            s=score[index];
+        } else {
+            s=0;
+        }
+
+        for (j=order; j<pwm->nrow; j++) {
+
+            index=index*ALPHABETSIZE + getNucIndex(seq[i+j]);
+
+            s+=getScoreIndex(pwm->data[j*ALPHABETSIZE +getNucIndex(seq[i+j])],
+                trans[index],granularity);
+
+            index-=(index/power(ALPHABETSIZE,order))*power(ALPHABETSIZE,order);
+        }
+        dist[s-smin]++;
+    }
+}

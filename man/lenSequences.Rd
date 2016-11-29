@@ -4,10 +4,10 @@
 \alias{lenSequences}
 \title{Length of sequences in a given fasta file}
 \usage{
-lenSequences(seqfile)
+lenSequences(seqs)
 }
 \arguments{
-\item{seqfile}{Fasta-file name}
+\item{seqs}{DNAStringSet}
 }
 \value{
 A vector containing the lengths of each individual sequence in the
@@ -16,7 +16,7 @@ fasta file
 \description{
 The function parses a fasta file and returns a vector containing the length
 of each individual sequence contained in the fasta file. Sequences
-containing 'N' or 'n' are skipped from the analysis and are 
+containing 'N' or 'n' are skipped from the analysis and are
 set to length zero.
 }
 \examples{
@@ -25,9 +25,10 @@ set to length zero.
 # in seq.fasta
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
 
 # scan the given sequence for the motif occurances
-lseq=lenSequences(seqfile)
+lseq=lenSequences(seqs)
 lseq
 
 }

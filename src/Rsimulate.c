@@ -15,8 +15,16 @@ extern double *Rstation, *Rtrans;
 extern double *RstationForSampling, *RtransForSampling;
 extern double Rsiglevel, Rgran;
 
+void RgenRndSeq(char **seq, int *len) {
+    if (!RstationForSampling) {
+        error("load background properly");
+    }
+    generateRandomSequence(RstationForSampling, RtransForSampling, seq[0],
+        len[0], RorderForSampling);
+}
+
 void RsimulateCountDistribution(double *pfm_, int *nrow, int *ncol,
-    double *distribution, int* perm, 
+    double *distribution, int* perm,
     int *nseq, int *lseq, int *mxhit, int *singlestranded) {
     int seqlen,maxhits,Nperm, intervalsize;
     int *_nh;
@@ -108,12 +116,12 @@ void RsimulateCountDistribution(double *pfm_, int *nrow, int *ncol,
     for (n=0; n<Nperm; n++) {
         _nh[n]=0;
         for (s=0;s<*nseq; s++) {
-            generateRandomSequence(RstationForSampling, RtransForSampling, seq, 
+            generateRandomSequence(RstationForSampling, RtransForSampling, seq,
                     lseq[s], RorderForSampling);
-            _nh[n]+=countOccurances(Rstation, Rtrans, &pfm, seq, lseq[s], 
+            _nh[n]+=countOccurances(Rstation, Rtrans, &pfm, seq, lseq[s],
                     threshold, dx, Rorder);
             if (*singlestranded==0) {
-                _nh[n]+=countOccurances(Rstation, Rtrans, &cpfm, seq, lseq[s], 
+                _nh[n]+=countOccurances(Rstation, Rtrans, &cpfm, seq, lseq[s],
                         threshold, dx, Rorder);
             }
         }
@@ -129,86 +137,3 @@ void RsimulateCountDistribution(double *pfm_, int *nrow, int *ncol,
     Free(pfm.data);
     Free(cpfm.data);
 }
-
-void RsimulateScores(double *pfm_, int *nrow, int *ncol,
-    double *scores, double *distribution, int *slen, 
-    int *perm) {
-    int i, n;
-    char *seq=NULL;
-    ExtremalScore fescore, rescore;
-    int fmins,fmaxs, rmins,rmaxs;
-    int mins, maxs;
-    int seqlen, Nperm;
-    double dx;
-    DMatrix pfm, cpfm;
-
-    if (Rgran==0.0) {
-        error("call mdistOption  first");
-        return;
-    }
-    if (RstationForSampling==NULL || RtransForSampling==NULL) {
-        error("Background model uninitialized! "
-                "Use readBackgroundForSampling()");
-        return;
-    }
-
-    GetRNGstate();
-
-    pfm.data=Calloc(nrow[0]*ncol[0],double);
-    cpfm.data=Calloc(nrow[0]*ncol[0],double);
-    // Rcol and c-col are swapped
-    pfm.ncol=nrow[0];
-    cpfm.ncol=nrow[0];
-    pfm.nrow=ncol[0];
-    cpfm.nrow=ncol[0];
-    memcpy(pfm.data,pfm_,nrow[0]*ncol[0]*sizeof(double));
-    for (i=1; i<=nrow[0]*ncol[0];i++) {
-        cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
-    }
-
-    seqlen=slen[0];
-    Nperm=perm[0];
-
-    dx=Rgran;
-
-    seq=Calloc(seqlen+1, char);
-    if(seq==NULL) {
-        error("Allocation for sequence failed");
-    }
-
-    initExtremalScore(&fescore, dx, pfm.nrow, Rorder);
-    initExtremalScore(&rescore, dx, cpfm.nrow, Rorder);
-
-    loadMinMaxScores(&pfm, Rstation, Rtrans, &fescore);
-    loadMinMaxScores(&cpfm, Rstation, Rtrans, &rescore);
-    loadIntervalSize(&fescore, NULL);
-    loadIntervalSize(&rescore, NULL);
-
-    fmins=getTotalScoreLowerBound(&fescore);
-    rmins=getTotalScoreLowerBound(&rescore);
-    fmaxs=getTotalScoreUpperBound(&fescore);
-    rmaxs=getTotalScoreUpperBound(&rescore);
-    maxs=(fmaxs>rmaxs) ? fmaxs : rmaxs;
-    mins=(fmins>rmins) ? fmins : rmins;
-
-    for (n=0; n<Nperm; n++) {
-        generateRandomSequence(RstationForSampling, 
-                RtransForSampling, seq, seqlen, RorderForSampling);
-        scoreOccurances(Rstation, Rtrans, 
-                &pfm, seq, seqlen, distribution, dx, mins,Rorder);
-    }
-    for (n=0; n<maxs-mins+1; n++) {
-        distribution[n]/=(double)Nperm*(seqlen-pfm.nrow+1);
-    }
-
-    for (i=0; i<maxs-mins+1; i++) {
-        scores[i]= (double)(mins+i)*dx;
-    }
-    deleteExtremalScore(&fescore);
-    deleteExtremalScore(&rescore);
-    PutRNGstate();
-    Free(seq);
-    Free(pfm.data);
-    Free(cpfm.data);
-}
-

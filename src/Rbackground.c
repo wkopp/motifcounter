@@ -58,16 +58,14 @@ void Rmakebg(char **infasta, int *order, int *nseq, int *lseq) {
         }
     }
 
-    
+
     fclose(f);
     Rorder=order[0];
 
     Free(count);
 }
 
-void RgetOrder(int *o) {
-    o[0]=Rorder;
-}
+
 void RgetBackground(double *station, double *trans) {
     int i;
     if (Rstation==NULL) return;
