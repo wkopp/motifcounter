@@ -12,15 +12,23 @@ test_that("compound", {
         seqfile=system.file("extdata","seq.fasta", package="motifcounter")
         motiffile=system.file("extdata",pwmname, package="motifcounter")
 
+        readBackgroundForSampling(seqfile,1)
         seqs=Biostrings::readDNAStringSet(seqfile)
         readBackground(seqfile,1)
         motif=t(as.matrix(read.table(motiffile)))
 
-        op=probOverlapHit(motif)
+        op=probOverlapHit(motif, singlestranded=FALSE)
         seqlen=rep(100,100)
 
-        cpdist=compoundPoissonDist(seqlen, op)
+        expect_error(compoundPoissonDist(seqlen, op, method=0))
+        
+        cpdist=compoundPoissonDist(seqlen, op, method="kopp")
+        cpdist=compoundPoissonDist(seqlen, op,method="pape")
 
-        nom=numMotifHits(motif,seqs)
+        op=probOverlapHit(motif, singlestranded=TRUE)
+        cpdist=compoundPoissonDist(seqlen, op, method="kopp")
+        expect_error(compoundPoissonDist(seqlen, op,method="pape"))
+
+
     }
 })

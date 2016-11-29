@@ -62,6 +62,8 @@ motifEnrichmentTest=function(pfm,seqs, singlestranded=FALSE,method="compound") {
         dist=compoundPoissonDist(observations$lseq, overlap)
     } else if (method=="combinatorial") {
         dist=combinatorialDist(observations$lseq, overlap)
+    } else {
+        stop("method must be 'compound' or 'combinatorial'")
     }
     if (sum(observations$numofhits)>length(dist$dist)-1) {
         p=0.0;

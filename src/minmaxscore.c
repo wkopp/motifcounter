@@ -10,17 +10,8 @@
 #include "scorefunctions.h"
 #include "score1d.h"
 #include "sequence.h"
-#include "forground.h"
 #include "background.h"
 #include "minmaxscore.h"
-
-int min(int a, int b) {
-    return (a<b) ? a: b;
-}
-
-int max(int a, int b) {
-    return (a>b) ? a: b;
-}
 
 int getMax(int *v, int N) {
     int i;
@@ -50,30 +41,6 @@ int getExtrem(int *v, int N, int max) {
     } else {
         return getMin(v,N);
     }
-}
-
-int whichIsMin(int *v, int N) {
-    int mi=-1,i;
-    int m=INT_MAX;
-    for (i=0; i<N;i++) {
-        if(m>v[i]) {
-            m=v[i];
-            mi=i;
-        }
-    }
-    return mi;
-}
-
-int whichIsMax(int *v, int N) {
-    int mi=-1,i;
-    int m=INT_MIN;
-    for (i=0; i<N;i++) {
-        if(m<v[i]) {
-            m=v[i];
-            mi=i;
-        }
-    }
-    return mi;
 }
 
 int initExtremalScore(ExtremalScore *s, double dx, int length, int order) {

@@ -5,7 +5,6 @@ test_that("combinatorial", {
     gran=0.1
     seqlen=100
     numofseqs=10
-    maxhits=100
     motifcounterOption(alpha, gran)
 
     pwmname="x3.tab"
@@ -17,7 +16,12 @@ test_that("combinatorial", {
 
     op=probOverlapHit(motif)
 
-    dist=combinatorialDist(seqlen, op)
+    dist=combinatorialDist(seqlen, op) # single sequence
+    dist=combinatorialDist(rep(seqlen,numofseqs),op) # multiple sequences
+    expect_error(combinatorialDist(30:100,op)) # variable length sequences
+    expect_warning(combinatorialDist(30,op)) # sequence too short warning
 
-    plot(dist$dist)
+    op=probOverlapHit(motif,singlestranded=TRUE)
+    expect_error(combinatorialDist(seqlen,op)) # single strand not supported
+
 })

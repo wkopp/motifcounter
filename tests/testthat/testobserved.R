@@ -8,6 +8,7 @@ test_that("observation", {
     # 1. test whether numSequences and lenSequences work
     seqfile=system.file("extdata","test2.fa", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
+    expect_error(numSequences(seqfile))
     nseq=numSequences(seqs)
     expect_equal(nseq,3)
     #if (nseq!=3) {
@@ -15,6 +16,7 @@ test_that("observation", {
     #               sequences, but numSequences returned ", nseq))
     #}
     lseq=lenSequences(seqs)
+    expect_error(lenSequences(seqfile))
     expect_equal(lseq,c(23,10,0))
     #if (!all(lseq==c(23,10,0))) {
     #    stop(paste("extdata/test.fa sequence lengths
@@ -28,8 +30,13 @@ test_that("observation", {
 
 
     readBackground(seqfile,1)
+    readBackgroundForSampling(seqfile,1)
 
     seqs=Biostrings::readDNAStringSet(seqfile)
+    nom=numMotifHits(motif,seqs[[1]],singlestranded=TRUE)
+    nom=numMotifHits(motif,seqs[[1]],singlestranded=FALSE)
+    expect_error(numMotifHits(motif,seqfile,singlestranded=TRUE))
+
     nom=numMotifHits(motif,seqs,singlestranded=TRUE)
     expect_equal(as.vector(nom$numofhits),c(1,0,0))
 

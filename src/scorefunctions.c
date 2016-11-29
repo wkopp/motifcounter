@@ -8,7 +8,6 @@
 #endif
 #include "scorefunctions.h"
 #include "sequence.h"
-#include "forground.h"
 
 double ProbinitPWM (double b, double *f, int index, int order) {
     double g=1;
@@ -70,11 +69,6 @@ int getScoreIndex(double P,double Q, double dx) {
     return (int)roundl(getScore(P,Q)/dx);
 }
 
-double getDiscretizedScore(double P, double Q, double dx) {
-    double s=(double)getScoreIndex(P,Q,dx);
-    return dx* s;
-}
-
 int initScoreMetaInfo (int smin, int smax, int intervalsize,
         double dx, ScoreMetaInfo *meta) {
     meta->length=(intervalsize)+1;
@@ -91,19 +85,6 @@ int initScoreMetaInfo (int smin, int smax, int intervalsize,
     meta->probinit=&ProbinitBg;
     return 0;
 }
-
-void printSeq(int index, int len) {
-#ifndef IN_R
-    int tmp, i;
-    char nuc[]="acgt";
-    tmp=index;
-    for (i=0; i<len; i++) {
-        fprintf(stdout,"%c", nuc[tmp/power(ALPHABETSIZE,len-i-1)]);
-        tmp-=(tmp/power(ALPHABETSIZE,len-i-1))*power(ALPHABETSIZE,len-i-1);
-    }
-#endif
-}
-
 
 
 void scoreSequence(double *station, double *trans,

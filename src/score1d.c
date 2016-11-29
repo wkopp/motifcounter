@@ -12,9 +12,7 @@
 #endif
 #include "scorefunctions.h"
 #include "score1d.h"
-#include "forground.h"
 #include "compoundpoisson.h"
-//#include "countdist.h"
 #include "overlap.h"
 #include "background.h"
 
@@ -46,28 +44,6 @@ double getProbWithIndex1d(MotifScore1d *s, int iquantile) {
     }
     return sum;
 }
-
-double getProb1d(MotifScore1d *s, double quantile) {
-    double r=(quantile-s->meta.xmin)/(s->meta.dx);
-    int iq=(int)roundl(r);
-
-    return getProbWithIndex1d(s,iq);
-}
-
-void storeScoreDist1d (FILE *f, MotifScore1d *s, int withhead) {
-    int i;
-    if (withhead==1) {
-        for (i=0; i<=s->meta.xmax-s->meta.xmin&&i<s->meta.length; i++) {
-            fprintf(f, "%e ", (double)(s->meta.xmin+i)*s->meta.dx);
-        }
-        fprintf(f, "\n");
-    }
-    for (i=0; i<=s->meta.xmax-s->meta.xmin; i++) {
-        fprintf(f, "%e ", s->totalScore.y[i]);
-    }
-    fprintf(f, "\n");
-}
-
 
 void initScore1d(Score1d *s, int l) {
     s->y=Calloc(l, double);
@@ -136,15 +112,6 @@ void addScore1d(Score1d *a, Score1d *b, ScoreMetaInfo *meta) {
     for (i=b->start; i<=b->end;i++) {
         a->y[i]+=b->y[i];
     }
-}
-
-double getProbability1d(Score1d *a, ScoreMetaInfo *meta) {
-    int i;
-    double sum=0;
-    for (i=a->start; i<=a->end;i++){
-        sum+=a->y[i];
-    }
-    return sum;
 }
 
 static void ShiftMultiplyScoreIndex1d(Score1d *dest, Score1d *src, 

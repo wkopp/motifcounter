@@ -5,7 +5,6 @@
 #include <R.h>
 #endif
 #include "overlap.h"
-#include "forground.h"
 #include "background.h"
 
 #define DEBUG

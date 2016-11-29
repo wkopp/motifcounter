@@ -118,8 +118,8 @@ numMotifHits=function(pfm, seqs, singlestranded=FALSE) {
         nseq=length(seqs)
     } else if (class(seqs)=="DNAString") {
         nseq=1
-        if (Biostrings::countPattern("N",seq)>0 ||
-            Biostrings::countPattern("n",seq)>0) {
+        if (Biostrings::countPattern("N",seqs)>0 ||
+            Biostrings::countPattern("n",seqs)>0) {
             lseq=0
             noh=0
         } else {

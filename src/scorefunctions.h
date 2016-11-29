@@ -24,10 +24,8 @@ double ProbBg (double p, double );
 double ProbPWM (double p, double);
 double ProbinitBg (double p, double *b, int, int);
 double ProbinitPWM (double p, double *b, int, int);
-double getDiscretizedScore(double P, double Q, double dx);
 int getScoreIndex(double P,double Q, double dx);
 void getScoresInitialIndex(double *P,double *Q, int *score, double *dx, int order);
-void printSeq(int index, int len);
 void scoreSequence(double *station, double *trans,
   DMatrix *pwm, char *seq, int seqlen, double *scores,
   double granularity, int order);

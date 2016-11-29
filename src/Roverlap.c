@@ -1,7 +1,6 @@
 #include <R.h>
 #include "overlap.h"
 #include "score2d.h"
-#include "forground.h"
 
 //extern DMatrix *Rpwm, *Rcpwm;
 extern double *Rtrans, *Rstation, Rgran, Rsiglevel;

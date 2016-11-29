@@ -15,7 +15,6 @@
 #include "background.h"
 #include "scorefunctions.h"
 #include "score2d.h"
-#include "forground.h"
 
 void initScore2d(Score2d *s, int l) {
     s->y=Calloc(l*l,double);

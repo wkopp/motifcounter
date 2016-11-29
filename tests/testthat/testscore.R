@@ -57,7 +57,7 @@ test_that("scorehistogram", {
     # expect non-zero entries
     expect_equal(sum(sh$frequency),10-ncol(motif)+1)
 
-    seq[3]="N"
+    seq=Biostrings::replaceLetterAt(seq,3,"N")
     sh=scoreHistogram(motif,seq)
     expect_equal(sum(sh$frequency),0)
 
@@ -93,7 +93,8 @@ test_that("scoresequence", {
     # Nscores= Nseq-Nmotif+1
     expect_equal(length(scores$fscores),10-ncol(motif)+1)
 
-    seq[3]="N"
+    seq=Biostrings::replaceLetterAt(seq,3,"N")
+    sh=scoreHistogram(motif,seq)
     scores=scoreSequence(motif,seq)
     expect_equal(scores$fscores,scores$rscores) # both should be very small
                                                 # and equal

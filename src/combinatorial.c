@@ -14,7 +14,6 @@
 #endif
 
 #include "background.h"
-#include "forground.h"
 #include "matrix.h"
 #include "score2d.h"
 #include "overlap.h"
@@ -357,16 +356,6 @@ void computePosteriorProbability(PosteriorCount *prob) {
         }
 
     }
-}
-
-void printResult(PosteriorCount *prob) {
-    int k, p;
-    for (k=0; k<prob->maxhits; k++) {
-        for(p=0;p<prob->mlen*2;p++) {
-            Rprintf("%1.2e\t",prob->value[k][prob->seqlen-1][p]);
-        }
-        Rprintf("\n");
-  }
 }
 
 void finishPosteriorProbability(PosteriorCount *prob, 

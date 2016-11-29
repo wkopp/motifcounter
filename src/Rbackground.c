@@ -78,6 +78,9 @@ void RgetBackground(double *station, double *trans) {
 }
 
 void RprintBackground() {
+    if (!Rtrans) { 
+        error("No background loaded. Use readBackground() first");
+    }
     printBackground(Rstation,Rtrans,Rorder);
 }
 
@@ -91,7 +94,9 @@ void RdestroyBackground() {
 SEXP fetchStationBackground() {
     int i,or_;
     SEXP station;
-    if (!Rstation) return R_NilValue;
+    if (!Rtrans) { 
+        error("No background loaded. Use readBackground() first");
+    }
 
     or_=(Rorder==0) ? 1 : Rorder;
 
@@ -106,7 +111,9 @@ SEXP fetchStationBackground() {
 SEXP fetchTransBackground() {
     int i,or_;
     SEXP trans;
-    if (!Rtrans) return R_NilValue;
+    if (!Rtrans) { 
+        error("No background loaded. Use readBackground() first");
+    }
 
     or_=Rorder+1;
 

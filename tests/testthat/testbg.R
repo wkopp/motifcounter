@@ -1,7 +1,30 @@
 context("Background")
 
+test_that("Background loading unloading", {
+    seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+    # tests for background
+    deleteBackground()
+    expect_error(fetchBackground())
+    expect_error(printBackground())
+    deleteBackground()
+    readBackground(seqfile,0)
+    fetchBackground()
+    printBackground()
+    deleteBackground()
+    expect_error(printBackground())
+
+    # tests for background for sampling
+    expect_error(printBackgroundForSampling())
+    deleteBackgroundForSampling()
+    readBackgroundForSampling(seqfile,0)
+    printBackgroundForSampling()
+    deleteBackgroundForSampling()
+    expect_error(printBackgroundForSampling())
+
+})
+
 test_that("Background Syntax check", {
-    # check if all the files can be loaded without 
+    # check if all the files can be loaded without
     # syntax check
     for ( m in 0:3) {
         seqfile=system.file("extdata","seq.fasta", package="motifcounter")

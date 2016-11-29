@@ -81,6 +81,9 @@ void RgetBackgroundForSampling(double *station, double *trans) {
 }
 
 void RprintBackgroundForSampling() {
+    if (!RtransForSampling) { 
+        error("No background loaded. Use readBackground() first");
+    }
     printBackground(RstationForSampling,RtransForSampling,RorderForSampling);
 }
 

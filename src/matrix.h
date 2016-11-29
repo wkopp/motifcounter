@@ -16,8 +16,5 @@ typedef struct {
     int *data;
 } IMatrix;
 
-void deleteMatrix(DMatrix *m);
-int writeMatrix(FILE *f, DMatrix *m);
-int readMatrix(FILE *f,DMatrix *m);
 int power(int base, int exp);
 #endif
