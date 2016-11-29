@@ -10,10 +10,10 @@ void Rscoredist(double *pfm_, int *nrow, int *ncol,
     double *score, double *prob) {
     MotifScore1d null;
     ExtremalScore fescore,rescore;
-    double p, quantile, dx;
-    double pcomp;
+    double dx;
+    //double pcomp;
     int i, intervalsize,maxs,mins, fmins,fmaxs,rmins, rmaxs;
-    int threshold;
+    //int threshold;
     DMatrix pfm, cpfm;
 
 
@@ -40,7 +40,7 @@ void Rscoredist(double *pfm_, int *nrow, int *ncol,
     }
 
     dx=Rgran;
-    p=Rsiglevel;
+    //p=Rsiglevel;
 
     initExtremalScore(&fescore, dx, pfm.nrow, Rorder);
     initExtremalScore(&rescore, dx, cpfm.nrow, Rorder);
@@ -68,11 +68,11 @@ void Rscoredist(double *pfm_, int *nrow, int *ncol,
     computeScoreDistribution1d(&pfm, Rtrans,  Rstation,
             &null, &fescore, Rorder);
 
-    quantile=getQuantileWithIndex1d(&null,
-                    getQuantileIndex1d(&null.totalScore,p));
-    threshold=(int)(quantile/dx);
+    //quantile=getQuantileWithIndex1d(&null,
+                    //getQuantileIndex1d(&null.totalScore,p));
+    //threshold=(int)(quantile/dx);
     //Rprintf("threshold=%e\n",quantile);
-    pcomp=getProbWithIndex1d(&null,threshold);
+    //pcomp=getProbWithIndex1d(&null,threshold);
 
     for (i=0; i<null.meta.xmax-null.meta.xmin + 1; i++) {
         score[i]=(double)(null.meta.xmin+i)*null.meta.dx;
@@ -91,12 +91,10 @@ void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
     int i;
     MotifScore1d null;
     ExtremalScore fescore,rescore;
-    double p, quantile, dx;
-    double pcomp;
+    double dx;
     int fmins,fmaxs,rmins,rmaxs;
     int mins,maxs;
     int intervalsize;
-    int threshold;
     DMatrix pfm, cpfm;
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
@@ -112,7 +110,7 @@ void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
     }
 
     dx=Rgran;
-    p=Rsiglevel;
+    //p=Rsiglevel;
 
     initExtremalScore(&fescore, dx, pfm.nrow, Rorder);
     initExtremalScore(&rescore, dx, cpfm.nrow, Rorder);
@@ -142,10 +140,10 @@ void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
             Rstation, &null, null.meta.xmin, Rorder);
 
 
-    quantile=getQuantileWithIndex1d(&null,
-        getQuantileIndex1d(&null.totalScore,p));
-    threshold=(int)(quantile/dx);
-    pcomp=getProbWithIndex1d(&null,threshold);
+    ////quantile=getQuantileWithIndex1d(&null,
+        //getQuantileIndex1d(&null.totalScore,p));
+    //threshold=(int)(quantile/dx);
+    //pcomp=getProbWithIndex1d(&null,threshold);
 
 
     for (i=0; i<null.meta.xmax-null.meta.xmin+1&& i<null.meta.length; i++) {

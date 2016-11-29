@@ -70,9 +70,6 @@ void RgenRndSeq(char **num_seqs, int *len);
 static R_NativePrimitiveArgType num_seqs_t[] = {
         STRSXP,INTSXP
 };
-static R_NativePrimitiveArgType seq_len_t[] = {
-        STRSXP,INTSXP,INTSXP
-};
 
 void Roption(double *siglevel, double *gran, int *ncores);
 static R_NativePrimitiveArgType option_t[] = {

@@ -94,31 +94,6 @@ char getNuc(int i) {
 }
 
 
-int getIndex(int i) {
-    return i;
-}
-
-int getComplementFromIndex(int i) {
-    int r=0;
-    switch (i) {
-        case 0:
-            r=3;
-            break;
-        case 1:
-            r=2;
-            break;
-        case 2:
-            r=1;
-            break;
-        case 3:
-            r=0;
-            break;
-        default:
-            r=-1;
-    }
-    return r;
-}
-
 int getSequence(FILE *f, Sequence *s) {
     int writeseq=0, writeheader=0, i=0;
     int iseq=-1, ipos=0;
@@ -189,14 +164,6 @@ void destroySequence(Sequence *seq) {
 }
 
 
-int skipAssignment(char *ass, int len) {
-    int i;
-    for (i=0; i<len; i++) {
-        if (ass[i]=='n' || ass[i]=='N') return 1;
-    }
-    return 0;
-}
-
 void getAssignmentFromIndex(int index, int length, int *ret) {
     int rest=index;
     int i;
@@ -204,17 +171,6 @@ void getAssignmentFromIndex(int index, int length, int *ret) {
     for (i=0; i<length; i++) {
         ret[i]=rest/power(ALPHABETSIZE,length-1-i);
         rest-=ret[i]*power(ALPHABETSIZE,length-1-i);
-    }
-    return;
-}
-
-void getAssignmentFromComplementaryIndex(int index, int length, int *ret) {
-    int buf[length];
-    int i;
-
-    getAssignmentFromIndex(index, length, buf);
-    for (i=0; i<length; i++) {
-        ret[length-1-i]=getComplementFromIndex(buf[i]);
     }
     return;
 }

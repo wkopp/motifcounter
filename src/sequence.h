@@ -17,15 +17,11 @@ int getNucIndex(char c);
 char getNuc(int i);
 void writeSequenceBinary(FILE *f, Sequence *s, int dhssize);
 int getSequenceFromBinary(FILE *f,Sequence *s);
-int getComplementFromIndex(int i);
-int getIndex(int i);
 void getAssignmentFromIndex(int index, int length, int *ret);
 int getIndexFromReverseAssignment(char *ass, int length);
-void getAssignmentFromComplementaryIndex(int index, int length, int *ret);
 int getIndexFromComplementaryAssignment(char *ass, int length);
 int getIndexFromAssignment(char *ass, int length);
 int getIndexFromReverseComplementaryAssignment(char *ass, int length);
-int skipAssignment(char *ass, int len);
 int isNucleotide(char c);
 
 #endif

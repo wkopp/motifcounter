@@ -10,9 +10,8 @@ extern int Rorder;
 
 void Rscoresequence(double *pfm_, int *nrow, int *ncol, char **seq,
     double *fscores, double *rscores, int *slen) {
-    int i, n;
+    int i;
 
-    double dx;
     DMatrix pfm, cpfm;
 
     if (Rgran==0.0) {
@@ -37,7 +36,6 @@ void Rscoresequence(double *pfm_, int *nrow, int *ncol, char **seq,
         cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
     }
 
-    dx=Rgran;
     scoreSequence(Rstation, Rtrans,
         &pfm, seq[0], slen[0], fscores,
         Rgran, Rorder);
@@ -52,7 +50,7 @@ void Rscoresequence(double *pfm_, int *nrow, int *ncol, char **seq,
 
 void RscoreHistogram(double *pfm_, int *nrow, int *ncol, char **seq, int *slen,
     double *scorebins,  double *frequency) {
-    int i, n;
+    int i;
     ExtremalScore fescore, rescore;
     int fmins,fmaxs, rmins,rmaxs;
     int mins, maxs, noscores;
