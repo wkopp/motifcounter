@@ -12,6 +12,10 @@ install:
 
 # Adapt as necessary starting from here
 
+platform:
+  - x86
+  - Any CPU
+
 build_script:
   - travis-tool.sh install_bioc_deps
 
