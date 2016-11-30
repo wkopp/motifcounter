@@ -4,12 +4,10 @@
 #include "scorefunctions.h"
 
 extern double Rgran;
-extern double *Rstation, *Rtrans;
-extern int Rorder;
-
 
 void Rscoresequence(double *pfm_, int *nrow, int *ncol, char **seq,
-    double *fscores, double *rscores, int *slen) {
+    double *fscores, double *rscores, int *slen,
+    double *station, double *trans, int *order) {
     int i;
 
     DMatrix pfm, cpfm;
@@ -18,11 +16,7 @@ void Rscoresequence(double *pfm_, int *nrow, int *ncol, char **seq,
         error("call mdistOption  first");
         return;
     }
-    if (Rstation==NULL || Rtrans==NULL) {
-        error("Background model uninitialized! "
-                "Use readBackground()");
-        return;
-    }
+
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
     cpfm.data=Calloc(nrow[0]*ncol[0],double);
@@ -36,12 +30,12 @@ void Rscoresequence(double *pfm_, int *nrow, int *ncol, char **seq,
         cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
     }
 
-    scoreSequence(Rstation, Rtrans,
+    scoreSequence(station, trans,
         &pfm, seq[0], slen[0], fscores,
-        Rgran, Rorder);
-    scoreSequence(Rstation, Rtrans,
+        Rgran, order[0]);
+    scoreSequence(station, trans,
         &cpfm, seq[0], slen[0], rscores,
-        Rgran, Rorder);
+        Rgran, order[0]);
 
     Free(pfm.data);
     Free(cpfm.data);
@@ -49,7 +43,8 @@ void Rscoresequence(double *pfm_, int *nrow, int *ncol, char **seq,
 
 
 void RscoreHistogram(double *pfm_, int *nrow, int *ncol, char **seq, int *slen,
-    double *scorebins,  double *frequency) {
+    double *scorebins,  double *frequency,
+    double *station, double *trans, int *order) {
     int i;
     ExtremalScore fescore, rescore;
     int fmins,fmaxs, rmins,rmaxs;
@@ -60,11 +55,7 @@ void RscoreHistogram(double *pfm_, int *nrow, int *ncol, char **seq, int *slen,
         error("call mdistOption  first");
         return;
     }
-    if (Rstation==NULL || Rtrans==NULL) {
-        error("Background model uninitialized! "
-                "Use readBackgroundForSampling()");
-        return;
-    }
+
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
     cpfm.data=Calloc(nrow[0]*ncol[0],double);
@@ -78,11 +69,11 @@ void RscoreHistogram(double *pfm_, int *nrow, int *ncol, char **seq, int *slen,
         cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
     }
 
-    initExtremalScore(&fescore, Rgran, pfm.nrow, Rorder);
-    initExtremalScore(&rescore, Rgran, cpfm.nrow, Rorder);
+    initExtremalScore(&fescore, Rgran, pfm.nrow, order[0]);
+    initExtremalScore(&rescore, Rgran, cpfm.nrow, order[0]);
 
-    loadMinMaxScores(&pfm, Rstation, Rtrans, &fescore);
-    loadMinMaxScores(&cpfm, Rstation, Rtrans, &rescore);
+    loadMinMaxScores(&pfm, station, trans, &fescore);
+    loadMinMaxScores(&cpfm, station, trans, &rescore);
     loadIntervalSize(&fescore, NULL);
     loadIntervalSize(&rescore, NULL);
 
@@ -102,8 +93,8 @@ void RscoreHistogram(double *pfm_, int *nrow, int *ncol, char **seq, int *slen,
         }
     }
     if (noscores==0) {
-        scoreHistogram(Rstation, Rtrans,
-            &pfm, seq[0], slen[0], frequency, Rgran, mins,Rorder);
+        scoreHistogram(station, trans,
+            &pfm, seq[0], slen[0], frequency, Rgran, mins,order[0]);
     }
     for (i=0; i<maxs-mins+1; i++) {
         scorebins[i]= (double)(mins+i)*Rgran;

@@ -59,15 +59,14 @@
 #' seqlen=lenSequences(seqs)
 #'
 #' # Estimate background model as an order-1 Markov model from seqfile
-#' readBackground(seqfile,1)
-#' readBackgroundForSampling(seqfile,1) # only used in conjunction with
+#' bg=readBackground(seqs,1)
 #'
 #' # Load a PFM model from motiffile and add pseudo-evidence of 0.01
 #' # to each element to prevent zero-entry occurrences
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Score distribution is determined analytically using  dynamic programming
-#' scoredist=scoreDist(motif)
+#' scoredist=scoreDist(motif,bg)
 #' plot(scoredist$score,scoredist$probability, col="green")
 #'
 #'
@@ -75,7 +74,7 @@
 #' # Compute the overlap probabilities with respect to scanning both
 #' # DNA strands. They are necessary for the
 #' # distribution of the number of motif hits and the enrichment test
-#' op=probOverlapHit(motif,singlestranded=FALSE)
+#' op=probOverlapHit(motif,bg,singlestranded=FALSE)
 #'
 #' # Compound poisson approximation of the motif hits distribution
 #' # in random sequences
@@ -89,7 +88,7 @@
 #' # Compute the overlap probabilities with respect to scanning both
 #' # DNA strands. They are necessary for the
 #' # distribution of the number of motif hits and the enrichment test
-#' op=probOverlapHit(motif,singlestranded=TRUE)
+#' op=probOverlapHit(motif,bg,singlestranded=TRUE)
 #'
 #' # Compound poisson approximation of the motif hits distribution
 #' # in random sequences
@@ -98,19 +97,19 @@
 #' # Determine the motif enrichment in a given DNA sequence
 #'
 #' # Obtain the number of motif hits in the given sequence
-#' numhits=numMotifHits(motif,seqs,singlestranded=TRUE)
-#' op=probOverlapHit(motif,singlestranded=TRUE)
-#' pvalue=motifEnrichmentTest(motif,seqs,
+#' numhits=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
+#' op=probOverlapHit(motif,bg, singlestranded=TRUE)
+#' pvalue=motifEnrichmentTest(seqs,motif,bg,
 #'             singlestranded=TRUE,method="compound")
 #'
-#' numhits=numMotifHits(motif, seqs,singlestranded=FALSE)
-#' op=probOverlapHit(motif,singlestranded=FALSE)
-#' pvalue=motifEnrichmentTest(motif,seqs,
+#' numhits=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
+#' op=probOverlapHit(motif,bg,singlestranded=FALSE)
+#' pvalue=motifEnrichmentTest(seqs,motif,bg,
 #'             singlestranded=FALSE,method="compound")
 #'
-#' numhits=numMotifHits(motif,seqs,singlestranded=FALSE)
-#' op=probOverlapHit(motif,singlestranded=FALSE)
-#' pvalue=motifEnrichmentTest(motif,seqs,singlestranded=FALSE,
+#' numhits=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
+#' op=probOverlapHit(motif,bg,singlestranded=FALSE)
+#' pvalue=motifEnrichmentTest(seqs,motif,bg,singlestranded=FALSE,
 #' method="combinatorial")
 #'
 #'

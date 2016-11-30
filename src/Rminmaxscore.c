@@ -1,11 +1,11 @@
 #include <R.h>
 #include "minmaxscore.h"
 
-extern int Rorder;
-extern double *Rstation, *Rtrans;
+
 extern double Rgran;
 
-void Rscorerange(double *pfm_, int *nrow, int *ncol, int *scorerange) {
+void Rscorerange(double *pfm_, int *nrow, int *ncol, int *scorerange,
+    double *station, double *trans, int *order) {
     ExtremalScore fescore, rescore;
     int fmins,fmaxs, rmins,rmaxs;
     int mins, maxs;
@@ -15,9 +15,6 @@ void Rscorerange(double *pfm_, int *nrow, int *ncol, int *scorerange) {
 
     if (scorerange==NULL) {
         error("scorerange is null");
-    }
-    if (Rstation==NULL || Rtrans==NULL) {
-        error("load forground and background before!");
     }
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
@@ -33,11 +30,11 @@ void Rscorerange(double *pfm_, int *nrow, int *ncol, int *scorerange) {
     }
 
     dx=Rgran;
-    initExtremalScore(&fescore, dx, pfm.nrow, Rorder);
-    initExtremalScore(&rescore, dx, cpfm.nrow, Rorder);
+    initExtremalScore(&fescore, dx, pfm.nrow, order[0]);
+    initExtremalScore(&rescore, dx, cpfm.nrow, order[0]);
 
-    loadMinMaxScores(&pfm, Rstation, Rtrans, &fescore);
-    loadMinMaxScores(&cpfm, Rstation, Rtrans, &rescore);
+    loadMinMaxScores(&pfm, station, trans, &fescore);
+    loadMinMaxScores(&cpfm, station, trans, &rescore);
     loadIntervalSize(&fescore, NULL);
     loadIntervalSize(&rescore, NULL);
 
@@ -56,4 +53,3 @@ void Rscorerange(double *pfm_, int *nrow, int *ncol, int *scorerange) {
     Free(pfm.data);
     Free(cpfm.data);
 }
-

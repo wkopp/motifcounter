@@ -28,19 +28,18 @@ test_that("observation", {
     file=system.file("extdata",name, package="motifcounter")
     motif=t(as.matrix(read.table(file)))
 
-
-    readBackground(seqfile,1)
-    readBackgroundForSampling(seqfile,1)
-
     seqs=Biostrings::readDNAStringSet(seqfile)
-    nom=numMotifHits(motif,seqs[[1]],singlestranded=TRUE)
-    nom=numMotifHits(motif,seqs[[1]],singlestranded=FALSE)
-    expect_error(numMotifHits(motif,seqfile,singlestranded=TRUE))
+    bg=readBackground(seqs,1)
 
-    nom=numMotifHits(motif,seqs,singlestranded=TRUE)
+    nom=numMotifHits(seqs[[1]],motif,bg,singlestranded=TRUE) # using DNAString
+    nom=numMotifHits(seqs[[1]],motif,bg,singlestranded=FALSE) #using DNAString
+    # no DNAString
+    expect_error(numMotifHits(seqfile,motif,bg,singlestranded=TRUE))
+
+    nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE) #Using DNAStringSet
     expect_equal(as.vector(nom$numofhits),c(1,0,0))
 
-    nom=numMotifHits(motif,seqs,singlestranded=FALSE)
+    nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE) #Using DNAStringSet
     expect_equal(as.vector(nom$numofhits),c(2,0,0))
 
     name="x8.tab"
@@ -49,13 +48,12 @@ test_that("observation", {
     file=system.file("extdata",name, package="motifcounter")
     motif=t(as.matrix(read.table(file)))
 
-    #readBackground(seqfile,0)
 
     # in both cases, we expect 1 hit
-    nom=numMotifHits(motif,seqs,singlestranded=TRUE)
+    nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
     expect_equal(as.vector(nom$numofhits),c(0,1,0))
 
-    nom=numMotifHits(motif,seqs,singlestranded=FALSE)
+    nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
     expect_equal(as.vector(nom$numofhits),c(0,1,0))
 
 })

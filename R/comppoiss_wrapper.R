@@ -36,13 +36,14 @@
 #'
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' alpha=0.001
 #' gran=0.1
 #' motifcounterOption(alpha, gran)
 #'
 #' # estimate background model from seqfile
-#' readBackground(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # load motif model from motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
@@ -50,7 +51,7 @@
 #' # compute the distribution for scanning a single DNA strand
 #'
 #' #Compute overlapping probabilities
-#' op=probOverlapHit(motif,singlestranded=TRUE)
+#' op=probOverlapHit(motif,bg,singlestranded=TRUE)
 #'
 #' # Computes the distribution of the number of motif hits
 #' seqlen=rep(150,100)
@@ -60,7 +61,7 @@
 #' # compute the distribution for scanning both DNA strands
 #'
 #' #Compute overlapping probabilities
-#' op=probOverlapHit(motif,singlestranded=FALSE)
+#' op=probOverlapHit(motif,bg,singlestranded=FALSE)
 #'
 #' # Computes the distribution of the number of motif hits
 #' seqlen=rep(150,100)
@@ -70,6 +71,7 @@
 #' @seealso \code{\link{combinatorialDist}}
 #' @export
 compoundPoissonDist=function(seqlen, overlap,method="kopp") {
+    overlapValid(overlap)
     # for all practical cases, a maximal clump size of 60
     # should be enough
     maxclumpsize=60

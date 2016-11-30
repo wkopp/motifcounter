@@ -2,22 +2,23 @@
 % Please edit documentation in R/background_wrapper.R
 \name{readBackground}
 \alias{readBackground}
-\title{Estimates the background model}
+\title{Estimates the background model from a set of DNA sequences}
 \usage{
-readBackground(file, order = 1)
+readBackground(seqs, order = 1)
 }
 \arguments{
-\item{file}{Fasta-filename.}
+\item{seqs}{DNAStringSet}
 
 \item{order}{Order of the Markov models that shall be used as the
 background model. Default: order=1.}
 }
 \value{
-None
+A Background object
 }
 \description{
-This function reads a DNA sequence from a given fasta file
-and uses that sequence to estimate an order-m Markov model.
+Given a set of DNA sequences and an order, this function
+estimates a higher-order Markov model which is used as a
+background model.
 }
 \examples{
 
@@ -25,7 +26,8 @@ and uses that sequence to estimate an order-m Markov model.
 # in seq.fasta
 
 file=system.file("extdata","seq.fasta", package="motifcounter")
-readBackground(file,1)
+seqs=Biostrings::readDNAStringSet(file)
+bg=readBackground(seqs,1)
 
 }
 

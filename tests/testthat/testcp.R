@@ -7,28 +7,31 @@ test_that("compound", {
     numofseqs=100
     maxhits=200
     motifcounterOption(alpha, gran)
+    seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+    seqs=Biostrings::readDNAStringSet(seqfile)
 
     for ( pwmname in c("x31.tab","x32.tab")) {
-        seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+
         motiffile=system.file("extdata",pwmname, package="motifcounter")
 
-        readBackgroundForSampling(seqfile,1)
         seqs=Biostrings::readDNAStringSet(seqfile)
-        readBackground(seqfile,1)
+        bg=readBackground(seqs,1)
         motif=t(as.matrix(read.table(motiffile)))
 
-        op=probOverlapHit(motif, singlestranded=FALSE)
+        op=probOverlapHit(motif, bg,singlestranded=FALSE)
         seqlen=rep(100,100)
 
         expect_error(compoundPoissonDist(seqlen, op, method=0))
-        
-        cpdist=compoundPoissonDist(seqlen, op, method="kopp")
-        cpdist=compoundPoissonDist(seqlen, op,method="pape")
 
-        op=probOverlapHit(motif, singlestranded=TRUE)
-        cpdist=compoundPoissonDist(seqlen, op, method="kopp")
+        expect_equal(sum(compoundPoissonDist(seqlen, op,
+            method="kopp")$dist),1)
+        expect_equal(sum(compoundPoissonDist(seqlen,
+            op,method="pape")$dist),1)
+
+        op=probOverlapHit(motif, bg,singlestranded=TRUE)
+        expect_equal(sum(compoundPoissonDist(seqlen,
+            op, method="kopp")$dist),1)
         expect_error(compoundPoissonDist(seqlen, op,method="pape"))
-
 
     }
 })

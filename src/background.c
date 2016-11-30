@@ -8,27 +8,50 @@
 
 #include "background.h"
 #include "sequence.h"
+#include "matrix.h"
 
-int getNucleotideFrequencyFromSequence(FILE *f, double *di, 
+void getNucleotideFrequencyFromSequence(char *seq, int slen,
+        double *counts, int order) {
+    int j;
+
+    for (j=0; j<slen; j++) {
+        // if the sequence contains any N's, do not process the scores
+        if (getNucIndex(seq[j])<0) {
+            return;
+        }
+    }
+
+    for (j=order; j<slen; j++) {
+        counts[getIndexFromAssignment(&seq[j-order], order+1)]+=1.0;
+        counts[getIndexFromReverseAssignment(
+                            &seq[j-order], order+1)]+=1.0;
+        counts[getIndexFromComplementaryAssignment(
+                            &seq[j-order], order+1)]+=1.0;
+        counts[getIndexFromReverseComplementaryAssignment(
+                            &seq[j-order],order+1)]+=1.0;
+    }
+}
+
+int getNucleotideFrequencyFromFasta(FILE *f, double *counts,
         int order, int *nseq, int *lseq) {
     char *buffer=NULL;
     Sequence seq;
     int i=0, j;
 
     double ret=0;
-    
+
     allocSequence(&seq, *nseq, lseq);
     getSequence(f, &seq);
 
     for (i=0; i<seq.nseq; i++) {
         for (j=0; j<seq.lseq[i]; j++) {
             if (j>=order) {
-                di[getIndexFromAssignment(&seq.seq[i][j-order], order+1)]+=1.0;
-                di[getIndexFromReverseAssignment(
+                counts[getIndexFromAssignment(&seq.seq[i][j-order], order+1)]+=1.0;
+                counts[getIndexFromReverseAssignment(
                                     &seq.seq[i][j-order], order+1)]+=1.0;
-                di[getIndexFromComplementaryAssignment(
+                counts[getIndexFromComplementaryAssignment(
                                     &seq.seq[i][j-order], order+1)]+=1.0;
-                di[getIndexFromReverseComplementaryAssignment(
+                counts[getIndexFromReverseComplementaryAssignment(
                                     &seq.seq[i][j-order],order+1)]+=1.0;
             }
         }
@@ -54,7 +77,7 @@ int getStationaryDistribution(double *trans, double *station, int order) {
     tmp1=Calloc(power(ALPHABETSIZE, order), double);
     tmp2=Calloc(power(ALPHABETSIZE, order), double);
     if (tmp1==NULL||tmp2==NULL) {
-        error("Memory-allocation in getStationaryDistribution failed");
+        error("Memory-allocation in getStationarydistribution failed");
     }
     tmpres=tmp1;
     tmpstart=tmp2;
@@ -95,7 +118,7 @@ int getStationaryDistribution(double *trans, double *station, int order) {
     return 0;
 }
 
-int getForwardTransition(double *di, double *trans, int order) {
+int getForwardTransition(double *counts, double *trans, int order) {
     int i=0, j=0;
     double sum=0,ret=0;
 
@@ -103,78 +126,11 @@ int getForwardTransition(double *di, double *trans, int order) {
     for (i=0; i<power(ALPHABETSIZE, order+1); i+=4) {
         sum=0.0;
         for (j=0; j< ALPHABETSIZE; j++) {
-            sum+=di[i+j];
+            sum+=counts[i+j];
         }
         for (j=0; j< ALPHABETSIZE; j++) {
-            trans[i+j]=di[i+j]/sum;
+            trans[i+j]=counts[i+j]/sum;
         }
     }
     return ret;
 }
-
-#ifdef OBSOLETE_
-void writeBackground(FILE *f, double * station, double * trans, int order) {
-    fwrite(&order, sizeof(int),1, f);
-    if (order==0) {
-        fwrite(station, sizeof(double), power(ALPHABETSIZE, order+1), f);
-        fwrite(station, sizeof(double), power(ALPHABETSIZE, order+1), f);
-    } else {
-        fwrite(station, sizeof(double), power(ALPHABETSIZE, order), f);
-        fwrite(trans, sizeof(double), power(ALPHABETSIZE, order+1), f);
-    }
-}
-#endif
-
-void deleteBackground(double * station, double *trans) {
-    Free(station);
-    if (trans!=NULL) {
-        Free(trans);
-    }
-}
-
-#ifdef OBSOLETE_
-void readBackground (FILE *f, double **station, double **trans, int *order) {
-    fread(order, sizeof(int),1, f);
-
-    if (*order>0) {
-        *station=Calloc(power(ALPHABETSIZE, *order), double);
-        *trans=Calloc(power(ALPHABETSIZE, *order+1), double);
-        if (*station==NULL||*trans==NULL) {
-            error("Memory-allocation in readBackground failed");
-        }
-        fread(*station, sizeof(double),power(ALPHABETSIZE, *order),f );
-        fread(*trans, sizeof(double),power(ALPHABETSIZE, *order+1),f );
-    } else {
-        *station=Calloc(ALPHABETSIZE, double);
-        *trans=Calloc(ALPHABETSIZE, double);
-        if (*station==NULL||*trans==NULL) {
-            error("Memory-allocation in readBackground failed");
-        }
-        fread(*station, sizeof(double),ALPHABETSIZE,f );
-        memcpy(*trans, *station, sizeof(double)*ALPHABETSIZE);
-    }
-}
-#endif
-
-void printBackground(double *stat, double *trans, int order) {
-  int i;
-    if (stat==NULL) return;
-
-    if (order>0) {
-        for (i=0; i<power(ALPHABETSIZE, order); i++) {
-            Rprintf("mu(i=%d)=%e\n", i, stat[i]);
-        }
-        for (i=0; i<power(ALPHABETSIZE, order+1); i++) {
-            Rprintf("T(i=%d)=%e\n", i, trans[i]);
-        }
-    } else {
-
-        for (i=0; i<power(ALPHABETSIZE, 1); i++) {
-            Rprintf("mu(i=%d)=%e\n", i, stat[i]);
-        }
-        for (i=0; i<power(ALPHABETSIZE, 1); i++) {
-            Rprintf("T(i=%d)=%e\n", i, trans[i]);
-        }
-   }
-}
-

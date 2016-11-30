@@ -4,12 +4,14 @@
 \alias{numMotifHits}
 \title{Number of motif hits in a given DNA sequence}
 \usage{
-numMotifHits(pfm, seqs, singlestranded = FALSE)
+numMotifHits(seqs, pfm, bg, singlestranded = FALSE)
 }
 \arguments{
+\item{seqs}{A DNAString or a DNAStringSet object}
+
 \item{pfm}{A position frequency matrix}
 
-\item{seqs}{A DNAString or a DNAStringSet object}
+\item{bg}{A Background object}
 
 \item{singlestranded}{Boolian flag that indicates whether a single strand or
 both strands shall be scanned for motif hits}
@@ -43,16 +45,16 @@ alpha=0.001
 motifcounterOption(alpha)
 
 # Estimate order-1 background model
-readBackground(seqfile,1)
+bg=readBackground(seq,1)
 # read PFM from file
 motif=t(as.matrix(read.table(motiffile)))
 
 # scan the given sequence on both strands for the motif occurances
-noc=numMotifHits(motif,seq)
+noc=numMotifHits(seq,motif,bg)
 noc
 
 # scan the given sequence on a single strand for the motif occurances
-noc=numMotifHits(motif,seq,singlestranded=TRUE)
+noc=numMotifHits(seq,motif,bg,singlestranded=TRUE)
 noc
 
 }

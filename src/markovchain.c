@@ -18,7 +18,6 @@
 #include "combinatorial.h"
 #include "markovchain.h"
 
-extern double *Rstation, *Rtrans;
 
 double OverlapHit(int N, double *beta, double *betap) {
     int i;
@@ -65,10 +64,6 @@ void markovchain(double *dist, double *a,
     double *post, *prior;
     double alphacond;
 
-    if (!Rstation||!Rtrans) {
-        error("load forground and background properly");
-        return;
-    }
 
     // the states are
     // dist[0] ... p(nohit)
@@ -88,7 +83,7 @@ void markovchain(double *dist, double *a,
 
     for (k=0; k<slen; k++) {
         // P(N)
-        post[0]=(1-alphacond*(2-beta3p[0]))*(prior[0]+prior[motiflen+2] + 
+        post[0]=(1-alphacond*(2-beta3p[0]))*(prior[0]+prior[motiflen+2] +
         prior[2*motiflen+1]);
 
         // P(Hf)
@@ -142,10 +137,7 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
     double epsilon;
     double pa,ma;
 
-    if (!Rstation||!Rtrans) {
-        error("load forground and background properly");
-        return;
-    }
+
 
     if (!Rdist) {
         Rdist=Calloc(2*cgparams->motiflen+2, double);
@@ -157,20 +149,20 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
     epsilon=alphacond[0]/1000;
     pa=*alphacond + epsilon;
     ma=*alphacond - epsilon;
-    markovchain(Rdist, &pa, cgparams->beta, 
-            cgparams->beta3p, cgparams->beta5p, 
+    markovchain(Rdist, &pa, cgparams->beta,
+            cgparams->beta3p, cgparams->beta5p,
             cgparams->len,cgparams->motiflen);
 
     val=Rdist[1]+Rdist[2];
-    markovchain(Rdist, &ma, cgparams->beta, 
-            cgparams->beta3p, cgparams->beta5p, 
+    markovchain(Rdist, &ma, cgparams->beta,
+            cgparams->beta3p, cgparams->beta5p,
             cgparams->len,cgparams->motiflen);
 
     val-=(Rdist[1]+Rdist[2]);
     val/=2*epsilon;
 
-    markovchain(Rdist, alphacond, cgparams->beta, 
-            cgparams->beta3p, cgparams->beta5p, 
+    markovchain(Rdist, alphacond, cgparams->beta,
+            cgparams->beta3p, cgparams->beta5p,
             cgparams->len,cgparams->motiflen);
 
     *gradient=-2*(2*cgparams->alpha-Rdist[1]-Rdist[2])*val;
@@ -187,8 +179,8 @@ double minmc(int n, double *alpha, void *ex) {
         }
     }
 
-    markovchain(Rdist, alpha, cgparams->beta, 
-            cgparams->beta3p, cgparams->beta5p, 
+    markovchain(Rdist, alpha, cgparams->beta,
+            cgparams->beta3p, cgparams->beta5p,
             cgparams->len,cgparams->motiflen);
 
     return R_pow_di(2*cgparams->alpha-Rdist[1]-Rdist[2], 2);
@@ -198,4 +190,3 @@ void removeDist() {
     if(Rdist) Free(Rdist);
     Rdist=NULL;
 }
-

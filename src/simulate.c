@@ -61,4 +61,3 @@ void generateRandomSequence(double *station, double *trans, char *seq,
         seq[i]=sampleNucleotide(&trans[ind*ALPHABETSIZE]);
     }
 }
-

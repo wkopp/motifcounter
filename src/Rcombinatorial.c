@@ -11,13 +11,11 @@
 #include "score2d.h"
 #include "markovchain.h"
 
-extern int Rorder;
-extern double *Rstation, *Rtrans;
 extern double Rgran, Rsiglevel;
 
 #define DEBUG
 #undef DEBUG
-void RPosteriorProbability(double *alpha, double *beta, 
+void RPosteriorProbability(double *alpha, double *beta,
     double *beta3p, double *beta5p,
     double *hitdistribution, int *sseqlen,
     int *smaxhits, int *snos, int *motiflen, int *singlestranded) {
@@ -34,10 +32,7 @@ void RPosteriorProbability(double *alpha, double *beta,
     double sum, res;
     CGParams cgparams;
 
-    if (!Rstation||!Rtrans) {
-        error("load forground and background properly");
-        return;
-    }
+
     if (!beta||!beta3p||!beta5p||!hitdistribution||
                     !sseqlen||!smaxhits||!snos) {
         error("parameters are null");
@@ -55,7 +50,7 @@ void RPosteriorProbability(double *alpha, double *beta,
 
     computeDeltas(delta, deltap, beta, beta3p,beta5p,motiflen[0]);
 
-    // correct bias of alpha by fitting 
+    // correct bias of alpha by fitting
     // markov model to the stationary distribution
     //extra=Calloc(3*motiflen[0]+1, double);
     //if (extra==NULL) {
@@ -82,7 +77,7 @@ void RPosteriorProbability(double *alpha, double *beta,
     removeDist();
 
     allocPosteriorProbability(&prob, seqlen, motiflen[0], maxhits);
-    initPosteriorProbability(&prob, alpha[0], &beta, &beta3p, &beta5p, 
+    initPosteriorProbability(&prob, alpha[0], &beta, &beta3p, &beta5p,
         &delta, &deltap);
 
     computePosteriorProbability(&prob);
@@ -111,7 +106,7 @@ void RPosteriorProbability(double *alpha, double *beta,
 
     // compute the distribution of the number of hits
     // across multiple independent DNA sequences
-    multipleShortSequenceProbability(singlehitdistribution, hitdistribution, 
+    multipleShortSequenceProbability(singlehitdistribution, hitdistribution,
                 maxhits, totalmaxhits, nos);
     for (k=0,sum=0.0; k<=totalmaxhits; k++) {
         sum+=hitdistribution[k];

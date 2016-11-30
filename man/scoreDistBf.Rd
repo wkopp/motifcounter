@@ -4,10 +4,12 @@
 \alias{scoreDistBf}
 \title{Score distribution}
 \usage{
-scoreDistBf(pfm)
+scoreDistBf(pfm, bg)
 }
 \arguments{
 \item{pfm}{A position frequency matrix}
+
+\item{bg}{A Background object}
 }
 \value{
 List containing
@@ -33,16 +35,17 @@ motifcounterOption(alpha=0.01,gran=0.1)
 
 # Load the DNA sequence and a Motif
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
 # Load the order-1 background model from the DNA sequence
-readBackground(seqfile,1)
+bg=readBackground(seqs,1)
 
 # Load the motif from the motiffile
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the score distribution
-dp=scoreDistBf(motif)
+dp=scoreDistBf(motif,bg)
 
 }
 \seealso{

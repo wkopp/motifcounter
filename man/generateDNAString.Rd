@@ -4,10 +4,12 @@
 \alias{generateDNAString}
 \title{Generate DNAString}
 \usage{
-generateDNAString(len)
+generateDNAString(len, bg)
 }
 \arguments{
 \item{len}{Length of the sequence}
+
+\item{bg}{A Background object}
 }
 \value{
 DNAString
@@ -22,15 +24,13 @@ by sampling from the the background model.
 motifcounterOption(alpha=0.01, gran=0.1)
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
 
 # Load an order-1 background model
-readBackgroundForSampling(seqfile,1)
+bg=readBackground(seqs,1)
 
 # generates a sequences of length 1kb
-generateDNAString(100)
+generateDNAString(100,bg)
 
-}
-\seealso{
-\code{\link{readBackgroundForSampling}}
 }
 

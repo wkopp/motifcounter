@@ -4,10 +4,12 @@
 \alias{probOverlapHit}
 \title{Overlapping motif hit probabilities}
 \usage{
-probOverlapHit(pfm, singlestranded = FALSE)
+probOverlapHit(pfm, bg, singlestranded = FALSE)
 }
 \arguments{
 \item{pfm}{A position frequency matrix}
+
+\item{bg}{A Background object}
 
 \item{singlestranded}{Boolian which defines whether the overlapping hit
 probabilities shall be computed with respect to scanning both DNA strands or
@@ -18,11 +20,11 @@ A list containing various overlapping hit probabilities.
 The list contains the following entries
     \describe{
     \item{alpha}{False positive motif hit probability}
-    \item{beta}{Vector of overlapping hit probability for hits 
+    \item{beta}{Vector of overlapping hit probability for hits
             occurring on the same strand. Each element corresponds to
             relative distance of the starting positions between the
             motif hits.}
-    \item{beta3p}{Vector of overlapping hit probability for a 
+    \item{beta3p}{Vector of overlapping hit probability for a
             forward strand hit that is followed by a reverse strand
             hit. Each element corresponds to
             relative distance of the starting positions between the
@@ -50,22 +52,23 @@ that would arise in between the shifted positions.
 
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
 motiffile=system.file("extdata","x31.tab", package="motifcounter")
 alpha=0.001
 gran=0.1
 motifcounterOption(alpha, gran)
 
-# estimate background model from seqfile
-readBackground(seqfile,1)
+# estimate background model from seqs
+bg=readBackground(seqs,1)
 
 # load motif model from motiffile
 motif=t(as.matrix(read.table(motiffile)))
 
 # compute the overlap probabilities for scanning both DNA strands
-op=probOverlapHit(motif,singlestranded=FALSE)
+op=probOverlapHit(motif,bg,singlestranded=FALSE)
 
 # compute the overlap probabilities for scanning a single DNA strand
-op=probOverlapHit(motif,singlestranded=TRUE)
+op=probOverlapHit(motif,bg,singlestranded=TRUE)
 
 }
 

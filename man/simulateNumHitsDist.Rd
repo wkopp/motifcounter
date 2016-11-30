@@ -4,10 +4,12 @@
 \alias{simulateNumHitsDist}
 \title{Empirical number of motif hits distribution}
 \usage{
-simulateNumHitsDist(pfm, seqlen, nsim, singlestranded = FALSE)
+simulateNumHitsDist(pfm, bg, seqlen, nsim, singlestranded = FALSE)
 }
 \arguments{
 \item{pfm}{A position frequency matrix}
+
+\item{bg}{A Background object}
 
 \item{seqlen}{Integer-valued vector contanting the individual
 sequence lengths.}
@@ -32,15 +34,16 @@ distribution of the number of motif hits.
 
 motifcounterOption(0.01, 0.01)
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
-readBackground(seqfile,1)
+bg=readBackground(seqs,1)
 motif=t(as.matrix(read.table(motiffile)))
 
 seqlen=rep(150,1)
-simc=simulateNumHitsDist(motif, seqlen, nsim=100,singlestranded=FALSE)
+simc=simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=FALSE)
 
-simc=simulateNumHitsDist(motif, seqlen, nsim=100,singlestranded=TRUE)
+simc=simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=TRUE)
 
 }
 \seealso{

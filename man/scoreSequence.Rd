@@ -4,12 +4,14 @@
 \alias{scoreSequence}
 \title{Score observations}
 \usage{
-scoreSequence(pfm, seq)
+scoreSequence(seq, pfm, bg)
 }
 \arguments{
+\item{seq}{DNAString}
+
 \item{pfm}{A position frequency matrix}
 
-\item{seq}{DNAString}
+\item{bg}{A Background object}
 }
 \value{
 List containing
@@ -30,16 +32,16 @@ motifcounterOption(alpha=0.01,gran=0.1)
 # Load the DNA sequence and a Motif
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
-seq=Biostrings::readDNAStringSet(seqfile)
+seqs=Biostrings::readDNAStringSet(seqfile)
 
 # Load the order-1 background model from the DNA sequence
-readBackground(seqfile,1)
+bg=readBackground(seqs,1)
 
 # Load the motif from the motiffile
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the score distribution
-scoreSequence(motif,seq[[1]])
+scoreSequence(seqs[[1]],motif,bg)
 
 }
 

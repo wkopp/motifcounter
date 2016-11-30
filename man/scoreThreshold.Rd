@@ -4,10 +4,12 @@
 \alias{scoreThreshold}
 \title{Score threshold}
 \usage{
-scoreThreshold(pfm)
+scoreThreshold(pfm, bg)
 }
 \arguments{
 \item{pfm}{A position frequency matrix}
+
+\item{bg}{A Background object}
 }
 \value{
 List containing
@@ -30,16 +32,17 @@ motifcounterOption(alpha=0.01, gran=0.1)
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
 
 # Load an order-1 background model
-readBackground(seqfile,1)
+bg=readBackground(seqs,1)
 
 # Load a motif from the motiffile
 motif=t(as.matrix(read.table(motiffile)))
 
 # generate the simulated score distribution on
 # sequences of length 1kb using 1000 samples
-scoreThreshold(motif)
+scoreThreshold(motif,bg)
 
 }
 \seealso{

@@ -5,6 +5,7 @@
 #' dynamic programming algorithm.
 #'
 #' @param pfm A position frequency matrix
+#' @param bg A Background object
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of motif scores}
@@ -19,29 +20,36 @@
 #'
 #' # Load the DNA sequence and a Motif
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #'
 #' # Load the order-1 background model from the DNA sequence
-#' readBackground(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # Load the motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score distribution
-#' dp=scoreDist(motif)
+#' dp=scoreDist(motif,bg)
 #'
 #' @export
-scoreDist=function(pfm) {
+scoreDist=function(pfm,bg) {
     motifValid(pfm)
+    backgroundValid(bg)
+
     scorerange=integer(1)
     scorerange=.C("motifcounter_scorerange",
         as.numeric(pfm),nrow(pfm),ncol(pfm),
-        as.integer(scorerange),PACKAGE="motifcounter")[[4]]
+        as.integer(scorerange),
+        bg$station,bg$trans,as.integer(bg$order),
+        PACKAGE="motifcounter")[[4]]
     scores=numeric(scorerange); dist=numeric(scorerange)
     ret=.C("motifcounter_scoredist",
         as.numeric(pfm),nrow(pfm),ncol(pfm),
         as.numeric(scores),
-        as.numeric(dist),PACKAGE="motifcounter")
+        as.numeric(dist),
+        bg$station,bg$trans,as.integer(bg$order),
+        PACKAGE="motifcounter")
     return(list(score=ret[[4]], probability=ret[[5]]))
 }
 
@@ -57,6 +65,7 @@ scoreDist=function(pfm) {
 #' resources for long motifs. Therefore, use \code{\link{scoreDist}} instead.
 #'
 #' @param pfm A position frequency matrix
+#' @param bg A Background object
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of motif scores}
@@ -72,29 +81,35 @@ scoreDist=function(pfm) {
 #'
 #' # Load the DNA sequence and a Motif
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #'
 #' # Load the order-1 background model from the DNA sequence
-#' readBackground(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # Load the motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score distribution
-#' dp=scoreDistBf(motif)
+#' dp=scoreDistBf(motif,bg)
 #'
 #' @export
-scoreDistBf=function(pfm) {
+scoreDistBf=function(pfm,bg) {
     motifValid(pfm)
+    backgroundValid(bg)
+
     scorerange=integer(1)
     scorerange=.C("motifcounter_scorerange",
                 as.numeric(pfm),nrow(pfm),ncol(pfm),
-                as.integer(scorerange),PACKAGE="motifcounter")[[4]]
+                as.integer(scorerange),
+                bg$station,bg$trans,as.integer(bg$order),
+                PACKAGE="motifcounter")[[4]]
     scores=numeric(scorerange); dist=numeric(scorerange)
     ret=.C("motifcounter_scoredist_bf",
         as.numeric(pfm),nrow(pfm),ncol(pfm),
         as.numeric(scores),
-        as.numeric(dist),PACKAGE="motifcounter")
+        as.numeric(dist),bg$station,bg$trans,as.integer(bg$order),
+        PACKAGE="motifcounter")
     return(list(score=ret[[4]], probability=ret[[5]]))
 }
 
@@ -104,6 +119,7 @@ scoreDistBf=function(pfm) {
 #'
 #' @param pfm A position frequency matrix
 #' @param seq DNAString
+#' @param bg A Background object
 #' @return List containing
 #' \describe{
 #' \item{fscores}{Scores on the forward strand}
@@ -119,22 +135,26 @@ scoreDistBf=function(pfm) {
 #' # Load the DNA sequence and a Motif
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
-#' seq=Biostrings::readDNAStringSet(seqfile)
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
 #' # Load the order-1 background model from the DNA sequence
-#' readBackground(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # Load the motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score distribution
-#' scoreSequence(motif,seq[[1]])
+#' scoreSequence(seqs[[1]],motif,bg)
 #'
 #' @export
-scoreSequence=function(pfm,seq) {
+scoreSequence=function(seq,pfm,bg) {
     motifValid(pfm)
+    backgroundValid(bg)
     if (class(seq)!="DNAString") {
         stop("seq must be a DNAString object")
+    }
+    if (length(seq)<ncol(pfm)) {
+        stop("length(seq) must be at least as long as the motif")
     }
     # allocate the scores per position
     slen=length(seq)-ncol(pfm)+1
@@ -150,7 +170,8 @@ scoreSequence=function(pfm,seq) {
         ret=.C("motifcounter_scoresequence",
             as.numeric(pfm),nrow(pfm),ncol(pfm),toString(seq),
             as.numeric(fscores),as.numeric(rscores),
-            as.integer(slen),PACKAGE="motifcounter")
+            as.integer(slen),bg$station,bg$trans,as.integer(bg$order),
+            PACKAGE="motifcounter")
         return(list(fscores=ret[[5]],rscores=ret[[6]]))
     }
 }
@@ -164,6 +185,7 @@ scoreSequence=function(pfm,seq) {
 #'
 #' @param seq DNAString
 #' @param pfm A position frequency matrix
+#' @param bg A Background object
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of score bins}
@@ -175,39 +197,45 @@ scoreSequence=function(pfm,seq) {
 #' motifcounterOption(alpha=0.01, gran=0.1)
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #'
 #' # Load an order-1 background model
-#' readBackground(seqfile,1)
-#' readBackgroundForSampling(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # Load a motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
-#' seq=generateDNAString(1000)
+#' seq=generateDNAString(1000,bg)
 #'
 #' # generate the simulated score distribution on
 #' # sequences of length 1kb using 1000 samples
-#' scoreHistogram(motif,seq)
+#' scoreHistogram(seq,motif,bg)
 #'
 #' @seealso \code{\link{scoreDist}}
 #' @export
-scoreHistogramSingleSeq=function(seq,pfm) {
+scoreHistogramSingleSeq=function(seq,pfm, bg) {
     motifValid(pfm)
-
-    scorerange=integer(1)
-    scorerange=.C("motifcounter_scorerange",
-                as.numeric(pfm),nrow(pfm),ncol(pfm),
-                as.integer(scorerange),PACKAGE="motifcounter")[[4]]
-    scores=numeric(scorerange); dist=numeric(scorerange)
-    length(scores)
+    backgroundValid(bg)
     if (class(seq)!="DNAString") {
         stop("seq must be a DNAString or a DNAStringSet object")
     }
+    if (length(seq)<ncol(pfm)) {
+        stop("length(seq) must be at least as long as the motif")
+    }
+    scorerange=integer(1)
+    scorerange=.C("motifcounter_scorerange",
+                as.numeric(pfm),nrow(pfm),ncol(pfm),
+                as.integer(scorerange),
+                bg$station,bg$trans,as.integer(bg$order),
+                PACKAGE="motifcounter")[[4]]
+    scores=numeric(scorerange); dist=numeric(scorerange)
+    length(scores)
 
     ret=.C("motifcounter_scorehistogram",
         as.numeric(pfm),nrow(pfm),ncol(pfm),
         toString(seq),as.integer(length(seq)),
         as.numeric(scores), as.numeric(dist),
+        bg$station,bg$trans,as.integer(bg$order),
         PACKAGE="motifcounter")
     result=list(score=ret[[6]], frequency=ret[[7]])
 
@@ -223,6 +251,7 @@ scoreHistogramSingleSeq=function(seq,pfm) {
 #'
 #' @param pfm A position frequency matrix
 #' @param seq DNAString or DNAStringSet
+#' @param bg A Background object
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of score bins}
@@ -235,28 +264,29 @@ scoreHistogramSingleSeq=function(seq,pfm) {
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
 #' # Load an order-1 background model
-#' readBackground(seqfile,1)
-#' readBackgroundForSampling(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # Load a motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
-#' seq=generateDNAString(1000)
+#' seq=generateDNAString(1000,bg)
 #'
 #' # generate the simulated score distribution on
 #' # sequences of length 1kb using 1000 samples
-#' scoreHistogram(motif,seq)
+#' scoreHistogram(seqs,motif,bg)
 #'
 #' @seealso \code{\link{scoreDist}}
 #' @export
-scoreHistogram=function(pfm,seq) {
+scoreHistogram=function(seq,pfm,bg) {
     motifValid(pfm)
+    backgroundValid(bg)
 
     if (class(seq)=="DNAString") {
-        result=scoreHistogramSingleSeq(seq,pfm)
+        result=scoreHistogramSingleSeq(seq,pfm,bg)
     } else if (class(seq)=="DNAStringSet") {
-        his=lapply(seq, scoreHistogramSingleSeq,pfm)
+        his=lapply(seq, scoreHistogramSingleSeq,pfm,bg)
         nseq=length(his)
         scores=his[[1]]$score
         nrange=length(his[[1]]$frequency)
@@ -283,6 +313,7 @@ scoreHistogram=function(pfm,seq) {
 #' of the discrete nature of the sequences.
 #'
 #' @param pfm A position frequency matrix
+#' @param bg A Background object
 #' @return List containing
 #' \describe{
 #' \item{threshold}{Score threshold}
@@ -295,23 +326,24 @@ scoreHistogram=function(pfm,seq) {
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
 #' # Load an order-1 background model
-#' readBackground(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # Load a motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # generate the simulated score distribution on
 #' # sequences of length 1kb using 1000 samples
-#' scoreThreshold(motif)
+#' scoreThreshold(motif,bg)
 #'
 #' @seealso \code{\link{scoreDist}}
 #' @export
-scoreThreshold=function(pfm) {
+scoreThreshold=function(pfm,bg) {
     motifValid(pfm)
-
-    scoredist=scoreDist(pfm)
+    backgroundValid(bg)
+    scoredist=scoreDist(pfm,bg)
 
     # find quantile
     ind=which(1-cumsum(scoredist$probability)<=sigLevel())

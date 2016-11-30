@@ -2,8 +2,9 @@
 #'
 #' This function computes the observed motif hits in a given DNA sequence
 #'
+#' @param seq A DNAString
 #' @param pfm A position frequency matrix
-#' @param seq DNAString
+#' @param bg A Background object
 #' @return List containing
 #' \describe{
 #' \item{fhits}{Motif hits on the forward strand}
@@ -22,19 +23,21 @@
 #' seq=Biostrings::readDNAStringSet(seqfile)
 #'
 #' # Load the order-1 background model from the DNA sequence
-#' readBackground(seqfile,1)
+#' bg=readBackground(seq,1)
 #'
 #' # Load the motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score distribution
-#' scoreSequence(motif,seq[[1]])
+#' scoreSequence(seq[[1]],motif,bg)
 #'
 #' @export
-motifHits=function(pfm,seq) {
+motifHits=function(seq,pfm,bg) {
     motifValid(pfm)
-    sth=scoreThreshold(pfm)
-    scores=scoreSequence(pfm,seq)
+    backgroundValid(bg)
+
+    sth=scoreThreshold(pfm,bg)
+    scores=scoreSequence(seq,pfm,bg)
     fhits=rep(0,length(scores$fscores))
     rhits=rep(0,length(scores$rscores))
     fhits[scores$fscores>=sth$threshold]=1
@@ -53,8 +56,9 @@ motifHits=function(pfm,seq) {
 #' to count motif hits on one or both strands, respectively.
 #'
 #'
-#' @param pfm A position frequency matrix
 #' @param seqs A DNAString or a DNAStringSet object
+#' @param pfm A position frequency matrix
+#' @param bg A Background object
 #' @param singlestranded Boolian flag that indicates whether a single strand or
 #' both strands shall be scanned for motif hits
 #' @return A list containing
@@ -77,31 +81,32 @@ motifHits=function(pfm,seq) {
 #' motifcounterOption(alpha)
 #'
 #' # Estimate order-1 background model
-#' readBackground(seqfile,1)
+#' bg=readBackground(seq,1)
 #' # read PFM from file
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # scan the given sequence on both strands for the motif occurances
-#' noc=numMotifHits(motif,seq)
+#' noc=numMotifHits(seq,motif,bg)
 #' noc
 #'
 #' # scan the given sequence on a single strand for the motif occurances
-#' noc=numMotifHits(motif,seq,singlestranded=TRUE)
+#' noc=numMotifHits(seq,motif,bg,singlestranded=TRUE)
 #' noc
 #'
 #' @export
-numMotifHits=function(pfm, seqs, singlestranded=FALSE) {
+numMotifHits=function(seqs, pfm, bg, singlestranded=FALSE) {
     motifValid(pfm)
+    backgroundValid(bg)
     if (class(seqs)=="DNAStringSet") {
         # retrieve the number of motif hits
-        x=lapply(seqs, function(seq,singlestranded) {
-            ret=motifHits(pfm,seq)
+        x=lapply(seqs, function(seq,pfm,bg,singlestranded) {
+            ret=motifHits(seq,pfm,bg)
             if (singlestranded==FALSE) {
                 return(sum(ret[[1]]+ret[[2]]))
             } else {
                 return(sum(ret[[1]]))
             }
-        }, singlestranded)
+        }, pfm,bg,singlestranded)
 
         noh=unlist(x)
         # retrieve the individual sequence lengths
@@ -124,7 +129,7 @@ numMotifHits=function(pfm, seqs, singlestranded=FALSE) {
             noh=0
         } else {
             lseq=length(seqs)
-            ret=motifHits(pfm,seqs)
+            ret=motifHits(seqs,pfm,bg)
             if (singlestranded==FALSE) {
                 noh=sum(ret[[1]]+ret[[2]])
             } else {

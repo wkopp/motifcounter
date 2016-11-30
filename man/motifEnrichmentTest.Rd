@@ -4,12 +4,15 @@
 \alias{motifEnrichmentTest}
 \title{Enrichment of motif hits}
 \usage{
-motifEnrichmentTest(pfm, seqs, singlestranded = FALSE, method = "compound")
+motifEnrichmentTest(seqs, pfm, bg, singlestranded = FALSE,
+  method = "compound")
 }
 \arguments{
+\item{seqs}{DNAString or DNAStringSet}
+
 \item{pfm}{A position frequency matrix}
 
-\item{seqs}{DNAString or DNAStringSet}
+\item{bg}{A Background object}
 
 \item{singlestranded}{Boolean flag that indicates whether one or both
 strands are scanned for motif hits}
@@ -39,7 +42,7 @@ gran=0.1
 motifcounterOption(alpha, gran)
 
 # estimate background model from seqfile
-readBackground(seqfile,1)
+bg=readBackground(seqs,1)
 
 # load motif model from motiffile
 motif=t(as.matrix(read.table(motiffile)))
@@ -47,18 +50,18 @@ motif=t(as.matrix(read.table(motiffile)))
 ### 1 ) Compute the distribution for scanning a *single* DNA strand
 # based on the 'Compound Poisson model'
 
-pvalue=motifEnrichmentTest(motif,
-            seqs,singlestranded=TRUE,method="compound")
+pvalue=motifEnrichmentTest(seqs,motif,bg,
+            singlestranded=TRUE,method="compound")
 
 ### 2 ) Compute the distribution for scanning *both* DNA strand
 # based on the 'Compound Poisson model'
 
-pvalue=motifEnrichmentTest(motif, seqs,method="compound")
+pvalue=motifEnrichmentTest(seqs,motif, bg, method="compound")
 
 ### 3 ) Compute the distribution for scanning *both* DNA strand
 # based on the *combinatorial model*
 
-pvalue=motifEnrichmentTest(motif, seqs,singlestranded=FALSE,
+pvalue=motifEnrichmentTest(seqs,motif, bg,singlestranded=FALSE,
             method="combinatorial")
 
 }

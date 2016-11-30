@@ -4,12 +4,14 @@
 \alias{scoreHistogram}
 \title{Score histogram}
 \usage{
-scoreHistogram(pfm, seq)
+scoreHistogram(seq, pfm, bg)
 }
 \arguments{
+\item{seq}{DNAString or DNAStringSet}
+
 \item{pfm}{A position frequency matrix}
 
-\item{seq}{DNAString or DNAStringSet}
+\item{bg}{A Background object}
 }
 \value{
 List containing
@@ -29,18 +31,18 @@ motifcounterOption(alpha=0.01, gran=0.1)
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
 
 # Load an order-1 background model
-readBackground(seqfile,1)
-readBackgroundForSampling(seqfile,1)
+bg=readBackground(seqs,1)
 
 # Load a motif from the motiffile
 motif=t(as.matrix(read.table(motiffile)))
-seq=generateDNAString(1000)
+seq=generateDNAString(1000,bg)
 
 # generate the simulated score distribution on
 # sequences of length 1kb using 1000 samples
-scoreHistogram(motif,seq)
+scoreHistogram(seqs,motif,bg)
 
 }
 \seealso{

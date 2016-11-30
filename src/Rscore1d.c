@@ -1,13 +1,11 @@
 #include <R.h>
 #include "score1d.h"
 
-extern int Rorder;
-extern double *Rstation, *Rtrans;
-//extern DMatrix *&pfm, *&cpfm;
+
 extern double Rsiglevel, Rgran;
 
 void Rscoredist(double *pfm_, int *nrow, int *ncol,
-    double *score, double *prob) {
+    double *score, double *prob,double *station, double *trans, int *order) {
     MotifScore1d null;
     ExtremalScore fescore,rescore;
     double dx;
@@ -17,10 +15,6 @@ void Rscoredist(double *pfm_, int *nrow, int *ncol,
     DMatrix pfm, cpfm;
 
 
-    if (!Rstation||!Rtrans) {
-        error("load forground and background properly");
-        return;
-    }
     if (!score||!prob) {
         error("parameters are null");
         return;
@@ -42,11 +36,11 @@ void Rscoredist(double *pfm_, int *nrow, int *ncol,
     dx=Rgran;
     //p=Rsiglevel;
 
-    initExtremalScore(&fescore, dx, pfm.nrow, Rorder);
-    initExtremalScore(&rescore, dx, cpfm.nrow, Rorder);
+    initExtremalScore(&fescore, dx, pfm.nrow, order[0]);
+    initExtremalScore(&rescore, dx, cpfm.nrow, order[0]);
 
-    loadMinMaxScores(&pfm, Rstation, Rtrans, &fescore);
-    loadMinMaxScores(&cpfm, Rstation, Rtrans, &rescore);
+    loadMinMaxScores(&pfm, station, trans, &fescore);
+    loadMinMaxScores(&cpfm, station, trans, &rescore);
     loadIntervalSize(&fescore, NULL);
     loadIntervalSize(&rescore, NULL);
 
@@ -63,10 +57,10 @@ void Rscoredist(double *pfm_, int *nrow, int *ncol,
             maxs,intervalsize,dx, &null.meta);
     null.meta.prob=&ProbBg;
     null.meta.probinit=&ProbinitBg;
-    initScoreDistribution1d(&pfm,Rtrans,&null, Rorder);
+    initScoreDistribution1d(&pfm,trans,&null, order[0]);
 
-    computeScoreDistribution1d(&pfm, Rtrans,  Rstation,
-            &null, &fescore, Rorder);
+    computeScoreDistribution1d(&pfm, trans,  station,
+            &null, &fescore, order[0]);
 
     //quantile=getQuantileWithIndex1d(&null,
                     //getQuantileIndex1d(&null.totalScore,p));
@@ -80,14 +74,14 @@ void Rscoredist(double *pfm_, int *nrow, int *ncol,
     }
     deleteExtremalScore(&fescore);
     deleteExtremalScore(&rescore);
-    deleteScoreDistribution1d(&null, Rorder);
+    deleteScoreDistribution1d(&null, order[0]);
 
     Free(pfm.data);
     Free(cpfm.data);
 }
 
 void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
-    double *score, double *prob) {
+    double *score, double *prob, double *station, double *trans, int *order) {
     int i;
     MotifScore1d null;
     ExtremalScore fescore,rescore;
@@ -112,11 +106,11 @@ void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
     dx=Rgran;
     //p=Rsiglevel;
 
-    initExtremalScore(&fescore, dx, pfm.nrow, Rorder);
-    initExtremalScore(&rescore, dx, cpfm.nrow, Rorder);
+    initExtremalScore(&fescore, dx, pfm.nrow, order[0]);
+    initExtremalScore(&rescore, dx, cpfm.nrow, order[0]);
 
-    loadMinMaxScores(&pfm, Rstation, Rtrans, &fescore);
-    loadMinMaxScores(&cpfm, Rstation, Rtrans, &rescore);
+    loadMinMaxScores(&pfm, station, trans, &fescore);
+    loadMinMaxScores(&cpfm, station, trans, &rescore);
     loadIntervalSize(&fescore, NULL);
     loadIntervalSize(&rescore, NULL);
 
@@ -134,10 +128,10 @@ void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
 
     null.meta.prob=&ProbBg;
     null.meta.probinit=&ProbinitBg;
-    initScoreDistribution1d(&pfm,Rtrans,&null, Rorder);
+    initScoreDistribution1d(&pfm,trans,&null, order[0]);
 
-    computeMarginalScoreDistribution1dBruteForce(&pfm, Rtrans,
-            Rstation, &null, null.meta.xmin, Rorder);
+    computeMarginalScoreDistribution1dBruteForce(&pfm, trans,
+            station, &null, null.meta.xmin, order[0]);
 
 
     ////quantile=getQuantileWithIndex1d(&null,
@@ -152,7 +146,7 @@ void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
     }
     deleteExtremalScore(&fescore);
     deleteExtremalScore(&rescore);
-    deleteScoreDistribution1d(&null, Rorder);
+    deleteScoreDistribution1d(&null, order[0]);
 
     Free(pfm.data);
     Free(cpfm.data);

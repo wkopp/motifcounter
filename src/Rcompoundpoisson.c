@@ -8,12 +8,9 @@
 #include "compoundpoisson.h"
 
 #define EPSILON 1e-10
-extern double *Rstation, *Rtrans;
-extern int Rorder;
-//extern DMatrix *Rpwm, *Rcpwm;
 extern double Rsiglevel, Rgran;
 
-void RcompoundpoissonPape_useGamma(double *gamma, 
+void RcompoundpoissonPape_useGamma(double *gamma,
     double *hitdistribution, int *nseq, int *lseq, int * mhit, int *mclump,
     int *motiflen) {
     int seqlen, i;
@@ -21,10 +18,6 @@ void RcompoundpoissonPape_useGamma(double *gamma,
     double lambda;
     double *theta, extention[3];
 
-    if (!Rstation||!Rtrans) {
-        error("load forground and background properly");
-        return;
-    }
     if (!gamma||!hitdistribution||!nseq||!lseq||!mhit||!mclump) {
         error("parameters are null");
         return;
@@ -52,14 +45,14 @@ void RcompoundpoissonPape_useGamma(double *gamma,
     computeInitialClump(theta, gamma,motiflen[0]);
     computeTheta(maxclumpsize, theta, extention, motiflen[0]);
 
-    lambda=computePoissonParameter(seqlen, motiflen[0], 
+    lambda=computePoissonParameter(seqlen, motiflen[0],
             maxclumpsize, gamma[0],theta);
-    computeCompoundPoissonDistributionKemp(lambda, maxhits, 
+    computeCompoundPoissonDistributionKemp(lambda, maxhits,
             maxclumpsize, theta, hitdistribution);
     deleteTheta(theta);
 }
 
-void Rcompoundpoisson_useBeta(double *alpha, double *beta, 
+void Rcompoundpoisson_useBeta(double *alpha, double *beta,
                 double *beta3p, double *beta5p,
                 double *hitdistribution, int *nseq, 
                 int *lseq, int * mhit, int *mclump, int *motiflen,
@@ -70,10 +63,6 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
     double *theta, extention[3];
     double *delta, *deltap;
 
-    if (!Rstation||!Rtrans) {
-        error("load forground and background properly");
-        return;
-    }
     if (!alpha||!beta||!beta3p||!beta5p||
             !hitdistribution||!nseq||!lseq||!mhit||!mclump) {
         error("parameters are null");
@@ -115,17 +104,17 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
         computeInitialClumpKoppSingleStranded(theta, delta, motiflen[0]);
         computeThetaSingleStranded(maxclumpsize, theta, extention, motiflen[0]);
 
-        lambda=computePoissonParameterSingleStranded(seqlen, motiflen[0], 
+        lambda=computePoissonParameterSingleStranded(seqlen, motiflen[0],
                     maxclumpsize, alpha[0],theta);
 
-        computeCompoundPoissonDistributionKempSingleStranded(lambda, maxhits, 
+        computeCompoundPoissonDistributionKempSingleStranded(lambda, maxhits,
                     maxclumpsize, theta, hitdistribution);
     } else {
         beta3p[0]=(beta3p[0]+EPSILON)/(1+2*EPSILON);
         computeDeltas(delta, deltap, beta, beta3p,beta5p,motiflen[0]);
 
 
-        computeExtentionFactorsKopp(extention, delta, deltap, beta, 
+        computeExtentionFactorsKopp(extention, delta, deltap, beta,
                     beta3p, beta5p, motiflen[0]);
         theta=initTheta(maxclumpsize);
         if (theta==NULL) {
@@ -135,10 +124,10 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
         computeInitialClumpKopp(theta, beta3p,delta, deltap, motiflen[0]);
         computeTheta(maxclumpsize, theta, extention, motiflen[0]);
 
-        lambda=computePoissonParameter(seqlen, motiflen[0], maxclumpsize, 
+        lambda=computePoissonParameter(seqlen, motiflen[0], maxclumpsize,
                                 alpha[0],theta);
 
-        computeCompoundPoissonDistributionKemp(lambda, maxhits, maxclumpsize, 
+        computeCompoundPoissonDistributionKemp(lambda, maxhits, maxclumpsize,
                                 theta, hitdistribution);
     }
 
@@ -148,5 +137,3 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
     Free(delta);
     Free(deltap);
 }
-
-

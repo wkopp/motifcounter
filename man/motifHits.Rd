@@ -4,12 +4,14 @@
 \alias{motifHits}
 \title{Motif hit observations}
 \usage{
-motifHits(pfm, seq)
+motifHits(seq, pfm, bg)
 }
 \arguments{
+\item{seq}{A DNAString}
+
 \item{pfm}{A position frequency matrix}
 
-\item{seq}{DNAString}
+\item{bg}{A Background object}
 }
 \value{
 List containing
@@ -33,13 +35,13 @@ motiffile=system.file("extdata","x31.tab",package="motifcounter")
 seq=Biostrings::readDNAStringSet(seqfile)
 
 # Load the order-1 background model from the DNA sequence
-readBackground(seqfile,1)
+bg=readBackground(seq,1)
 
 # Load the motif from the motiffile
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the score distribution
-scoreSequence(motif,seq[[1]])
+scoreSequence(seq[[1]],motif,bg)
 
 }
 

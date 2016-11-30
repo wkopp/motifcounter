@@ -7,6 +7,7 @@
 #'
 #'
 #' @param pfm A position frequency matrix
+#' @param bg A Background object
 #' @param seqlen Length of the sequence to be
 #' simulated.
 #' @param nsim Number of samples to be generated.
@@ -21,24 +22,26 @@
 #' motifcounterOption(alpha=0.01, gran=0.1)
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #'
 #' # Load an order-1 background model
-#' readBackground(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # Load a motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # generate the simulated score distribution on
 #' # sequences of length 1kb using 1000 samples
-#' scoreDistEmpirical(motif,seqlen= 1000,nsim=1000)
+#' scoreDistEmpirical(motif,bg,seqlen= 1000,nsim=1000)
 #'
 #' @seealso \code{\link{scoreDist}}
 #' @export
-scoreDistEmpirical=function(pfm,seqlen, nsim) {
+scoreDistEmpirical=function(pfm,bg,seqlen, nsim) {
     motifValid(pfm)
-    seqs=generateDNAStringSet(rep(seqlen,nsim))
-    sh=scoreHistogram(pfm,seqs)
+    backgroundValid(bg)
+    seqs=generateDNAStringSet(rep(seqlen,nsim),bg)
+    sh=scoreHistogram(seqs,pfm,bg)
 
     probs=sh$frequency/sum(sh$frequency)
     return(list(score=sh$score, probability=probs))
@@ -50,6 +53,7 @@ scoreDistEmpirical=function(pfm,seqlen, nsim) {
 #' by sampling from the the background model.
 #'
 #' @param len Length of the sequence
+#' @param bg A Background object
 #'
 #' @return DNAString
 #
@@ -59,29 +63,32 @@ scoreDistEmpirical=function(pfm,seqlen, nsim) {
 #' motifcounterOption(alpha=0.01, gran=0.1)
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
 #' # Load an order-1 background model
-#' readBackgroundForSampling(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # generates a sequences of length 1kb
-#' generateDNAString(100)
+#' generateDNAString(100,bg)
 #'
-#' @seealso \code{\link{readBackgroundForSampling}}
 #' @export
-generateDNAString=function(len) {
+generateDNAString=function(len,bg) {
     len=as.integer(len)
+    backgroundValid(bg)
     if (is.na(len)) {
         stop("len must be a positive integer")
     }
     if (len<=0) {
         stop("len must be a positive integer")
     }
-    if (len<bgOrderForSampling()) {
-        stop(sprintf("len must be at least %d",bgOrderForSampling()))
+    if (len<bg$order) {
+        stop(sprintf("len must be at least %d",bg$order))
     }
     seq=paste(rep("N",len),collapse="",sep="")
     ret=.C("motifcounter_generateRndSeq", as.character(seq),
-        as.integer(len))
+        as.integer(len),
+        bg$station,bg$trans,as.integer(bg$order),
+        PACKAGE="motifcounter")
     return(Biostrings::DNAString(ret[[1]]))
 }
 
@@ -92,6 +99,7 @@ generateDNAString=function(len) {
 #'
 #'
 #' @param len Vector of individual sequence lengths
+#' @param bg A Background object
 #'
 #' @return DNAStringSet
 #
@@ -101,19 +109,20 @@ generateDNAString=function(len) {
 #' motifcounterOption(alpha=0.01, gran=0.1)
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
 #' # Load an order-1 background model
-#' readBackgroundForSampling(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # generates sequences of various lengths
-#' generateDNAStringSet(10:50)
+#' generateDNAStringSet(10:50,bg)
 #'
-#' @seealso \code{\link{readBackgroundForSampling}}
 #' @export
-generateDNAStringSet=function(len) {
+generateDNAStringSet=function(len,bg) {
+    backgroundValid(bg)
     seqs=c()
     for (i in 1:length(len)) {
-        seqs=c(seqs,generateDNAString(len[i]))
+        seqs=c(seqs,generateDNAString(len[i],bg))
     }
 
     return(Biostrings::DNAStringSet(seqs))
@@ -128,6 +137,7 @@ generateDNAStringSet=function(len) {
 #' distribution of the number of motif hits.
 #'
 #' @param pfm A position frequency matrix
+#' @param bg A Background object
 #' @param seqlen Integer-valued vector contanting the individual
 #' sequence lengths.
 #' @param nsim Number of random samples.
@@ -139,20 +149,22 @@ generateDNAStringSet=function(len) {
 #'
 #' motifcounterOption(0.01, 0.01)
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #'
-#' readBackground(seqfile,1)
+#' bg=readBackground(seqs,1)
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' seqlen=rep(150,1)
-#' simc=simulateNumHitsDist(motif, seqlen, nsim=100,singlestranded=FALSE)
+#' simc=simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=FALSE)
 #'
-#' simc=simulateNumHitsDist(motif, seqlen, nsim=100,singlestranded=TRUE)
+#' simc=simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=TRUE)
 #'
 #' @seealso \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
 #' @export
-simulateNumHitsDist=function(pfm,seqlen, nsim, singlestranded=FALSE) {
+simulateNumHitsDist=function(pfm,bg,seqlen, nsim, singlestranded=FALSE) {
     motifValid(pfm)
+    backgroundValid(bg)
     if (length(seqlen)<=0) {
         stop("seqlen must be non-empty")
     }
@@ -165,8 +177,8 @@ simulateNumHitsDist=function(pfm,seqlen, nsim, singlestranded=FALSE) {
 
     freq=rep(0,100)
     for (i in 1:nsim) {
-        seqs=generateDNAStringSet(seqlen)
-        nom=numMotifHits(pfm, seqs,singlestranded)
+        seqs=generateDNAStringSet(seqlen,bg)
+        nom=numMotifHits(seqs,pfm,bg,singlestranded)
         nom=sum(nom$numofhits)
         if (nom>length(freq)+1) {
             #expand freq

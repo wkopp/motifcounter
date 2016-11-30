@@ -13,14 +13,14 @@ test_that("enrichment", {
 
     seqs=Biostrings::readDNAStringSet(seqfile)
 
-    readBackground(seqfile,1)
+    bg=readBackground(seqs,1)
     motif=t(as.matrix(read.table(motiffile)))
 
-    motifEnrichmentTest(motif,seqs)
-    motifEnrichmentTest(motif,seqs,singlestranded=TRUE)
-    motifEnrichmentTest(motif,seqs,method="combinatorial")
-    expect_error(motifEnrichmentTest(motif,seqs,singlestranded=TRUE,
+    motifEnrichmentTest(seqs,motif,bg)
+    motifEnrichmentTest(seqs,motif,bg,singlestranded=TRUE)
+    motifEnrichmentTest(seqs,motif,bg,method="combinatorial")
+    expect_error(motifEnrichmentTest(seqs,motif,bg,singlestranded=TRUE,
                     method="combinatorial"))
-    expect_error(motifEnrichmentTest(motif,seqs,singlestranded=TRUE,
+    expect_error(motifEnrichmentTest(seqs,motif,bg,singlestranded=TRUE,
                     method="tata"))
 })

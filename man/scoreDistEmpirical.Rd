@@ -4,10 +4,12 @@
 \alias{scoreDistEmpirical}
 \title{Empirical score distribution}
 \usage{
-scoreDistEmpirical(pfm, seqlen, nsim)
+scoreDistEmpirical(pfm, bg, seqlen, nsim)
 }
 \arguments{
 \item{pfm}{A position frequency matrix}
+
+\item{bg}{A Background object}
 
 \item{seqlen}{Length of the sequence to be
 simulated.}
@@ -33,17 +35,18 @@ with the scoring measure which yields the score distribution.
 motifcounterOption(alpha=0.01, gran=0.1)
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
 # Load an order-1 background model
-readBackground(seqfile,1)
+bg=readBackground(seqs,1)
 
 # Load a motif from the motiffile
 motif=t(as.matrix(read.table(motiffile)))
 
 # generate the simulated score distribution on
 # sequences of length 1kb using 1000 samples
-scoreDistEmpirical(motif,seqlen= 1000,nsim=1000)
+scoreDistEmpirical(motif,bg,seqlen= 1000,nsim=1000)
 
 }
 \seealso{

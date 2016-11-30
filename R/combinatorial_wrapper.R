@@ -27,24 +27,26 @@
 #'
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' alpha=0.001
 #' motifcounterOption(alpha)
 #'
 #' # estimate background model from seqfile
-#' readBackground(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # load motif model from motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute overlap probabilities
-#' op=probOverlapHit(motif,singlestranded=FALSE)
+#' op=probOverlapHit(motif,bg,singlestranded=FALSE)
 #' seqlen=rep(100,1)
 #' # Computes the distribution of the number of motif hits
 #' dist=combinatorialDist(seqlen, op)
 #'
 #' @export
 combinatorialDist=function(seqlen, overlap) {
+    overlapValid(overlap)
 
     # The remaining sequence must be of equal length!
     if (!all(seqlen==seqlen[1])) {

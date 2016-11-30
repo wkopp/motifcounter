@@ -2,22 +2,17 @@
 #include "overlap.h"
 #include "score2d.h"
 
-//extern DMatrix *Rpwm, *Rcpwm;
-extern double *Rtrans, *Rstation, Rgran, Rsiglevel;
-extern int Rorder;
+
+extern double Rgran, Rsiglevel;
 
 void Roverlap(double *pfm_, int *nrow, int *ncol,
         double *alpha, double *beta, double *beta3p, double *beta5p,
-        double *gamma) {
+        double *gamma, double *station, double *trans, int *order) {
 
     int i;
     double dx, pvalue;
     DMatrix pfm, cpfm;
 
-    if (!Rstation||!Rtrans) {
-        error("load forground and background properly");
-        return;
-    }
     if (!beta||!beta3p||!beta5p) {
         error("parameters are null");
         return;
@@ -44,7 +39,7 @@ void Roverlap(double *pfm_, int *nrow, int *ncol,
     pvalue=(double)Rsiglevel;
 
     computeConditionalOverlappingProbabilities(&pfm, &cpfm,
-            Rstation, Rtrans, NULL, &pvalue, NULL, &dx, gamma, Rorder);
+            station, trans, NULL, &pvalue, NULL, &dx, gamma, order[0]);
 
     for (i=1;i<pfm.nrow; i++) {
         gamma[i]/=gamma[0];
@@ -65,16 +60,13 @@ void Roverlap(double *pfm_, int *nrow, int *ncol,
 
 void RoverlapSingleStranded(double *pfm_, int *nrow, int *ncol,
         double *alpha, double *beta, double *beta3p,
-        double *beta5p, double *gamma) {
+        double *beta5p, double *gamma, double *station, double *trans,
+        int *order) {
 
     int i;
     double dx, pvalue;
     DMatrix pfm, cpfm;
 
-    if (!Rstation||!Rtrans) {
-        error("load forground and background properly");
-        return;
-    }
     if (!beta||!beta3p||!beta5p) {
         error("parameters are null");
         return;
@@ -100,7 +92,7 @@ void RoverlapSingleStranded(double *pfm_, int *nrow, int *ncol,
     pvalue=(double)Rsiglevel;
 
     computeConditionalOverlappingProbabilities(&pfm, &cpfm,
-            Rstation, Rtrans, NULL, &pvalue, NULL, &dx, gamma, Rorder);
+            station, trans, NULL, &pvalue, NULL, &dx, gamma, order[0]);
 
     for (i=1;i<pfm.nrow; i++) {
         gamma[i]/=gamma[0];

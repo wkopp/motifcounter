@@ -7,8 +7,9 @@
 #' 'compound Poisson approximation' or the 'combinatorial model'.
 #'
 #'
-#' @param pfm A position frequency matrix
 #' @param seqs DNAString or DNAStringSet
+#' @param pfm A position frequency matrix
+#' @param bg A Background object
 #' @param singlestranded Boolean flag that indicates whether one or both
 #'      strands are scanned for motif hits
 #' @param method String that defines whether to use
@@ -27,7 +28,7 @@
 #' motifcounterOption(alpha, gran)
 #'
 #' # estimate background model from seqfile
-#' readBackground(seqfile,1)
+#' bg=readBackground(seqs,1)
 #'
 #' # load motif model from motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
@@ -35,29 +36,31 @@
 #' ### 1 ) Compute the distribution for scanning a *single* DNA strand
 #' # based on the 'Compound Poisson model'
 #'
-#' pvalue=motifEnrichmentTest(motif,
-#'             seqs,singlestranded=TRUE,method="compound")
+#' pvalue=motifEnrichmentTest(seqs,motif,bg,
+#'             singlestranded=TRUE,method="compound")
 #'
 #' ### 2 ) Compute the distribution for scanning *both* DNA strand
 #' # based on the 'Compound Poisson model'
 #'
-#' pvalue=motifEnrichmentTest(motif, seqs,method="compound")
+#' pvalue=motifEnrichmentTest(seqs,motif, bg, method="compound")
 #'
 #' ### 3 ) Compute the distribution for scanning *both* DNA strand
 #' # based on the *combinatorial model*
 #'
-#' pvalue=motifEnrichmentTest(motif, seqs,singlestranded=FALSE,
+#' pvalue=motifEnrichmentTest(seqs,motif, bg,singlestranded=FALSE,
 #'             method="combinatorial")
 #'
 #' @seealso \code{\link{compoundPoissonDist}}, \code{\link{combinatorialDist}}
 #' @export
-motifEnrichmentTest=function(pfm,seqs, singlestranded=FALSE,method="compound") {
+motifEnrichmentTest=function(seqs, pfm,bg,
+    singlestranded=FALSE,method="compound") {
     motifValid(pfm)
+    backgroundValid(bg)
     #compute overlapping hit probs
-    overlap=probOverlapHit(pfm,singlestranded)
+    overlap=probOverlapHit(pfm,bg,singlestranded)
 
     # detemine the number of motif hits
-    observations=numMotifHits(pfm,seqs,singlestranded)
+    observations=numMotifHits(seqs,pfm,bg,singlestranded)
     if (method=="compound") {
         dist=compoundPoissonDist(observations$lseq, overlap)
     } else if (method=="combinatorial") {
