@@ -32,37 +32,6 @@ void getNucleotideFrequencyFromSequence(char *seq, int slen,
     }
 }
 
-int getNucleotideFrequencyFromFasta(FILE *f, double *counts,
-        int order, int *nseq, int *lseq) {
-    char *buffer=NULL;
-    Sequence seq;
-    int i=0, j;
-
-    double ret=0;
-
-    allocSequence(&seq, *nseq, lseq);
-    getSequence(f, &seq);
-
-    for (i=0; i<seq.nseq; i++) {
-        for (j=0; j<seq.lseq[i]; j++) {
-            if (j>=order) {
-                counts[getIndexFromAssignment(&seq.seq[i][j-order], order+1)]+=1.0;
-                counts[getIndexFromReverseAssignment(
-                                    &seq.seq[i][j-order], order+1)]+=1.0;
-                counts[getIndexFromComplementaryAssignment(
-                                    &seq.seq[i][j-order], order+1)]+=1.0;
-                counts[getIndexFromReverseComplementaryAssignment(
-                                    &seq.seq[i][j-order],order+1)]+=1.0;
-            }
-        }
-    }
-
-    if (buffer) Free(buffer);
-    destroySequence(&seq);
-
-    return ret;
-}
-
 int getStationaryDistribution(double *trans, double *station, int order) {
     int j, i, k;
     double *tmp1, *tmp2, *tmpres, *tmpstart;

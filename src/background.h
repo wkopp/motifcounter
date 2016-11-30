@@ -3,8 +3,6 @@
 #define background_h
 
 
-int getNucleotideFrequencyFromFasta(FILE *f, double *di, int order,
-    int *nseq, int *lseq);
 void getNucleotideFrequencyFromSequence(char *seq, int slen,
         double *counts, int order);
 int getForwardTransition(double *di, double *forwardtrans, int order);

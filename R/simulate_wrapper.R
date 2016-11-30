@@ -165,12 +165,6 @@ generateDNAStringSet=function(len,bg) {
 simulateNumHitsDist=function(pfm,bg,seqlen, nsim, singlestranded=FALSE) {
     motifValid(pfm)
     backgroundValid(bg)
-    if (length(seqlen)<=0) {
-        stop("seqlen must be non-empty")
-    }
-    if (seqlen[1]<=0) {
-        stop("seqlen must be strictly positive")
-    }
     if (length(nsim)<=0) {
         stop("nsim must be strictly positive")
     }

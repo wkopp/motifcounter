@@ -48,7 +48,6 @@ int * getLastScoreLowerBound(ExtremalScore *escore);
 int getScoreLowerBoundPos(ExtremalScore *escore, int pos);
 int getScoreUpperBoundPos(ExtremalScore *escore, int pos);
 //int minScorePerPositionWithThreshold(DMatrix *theta, double *bg1, ExtremalScore *result, int order, int threshold);
-void printExtremValues(int *e, int m,int);
 int getMax(int *v, int N);
 int getMin(int *v, int N);
 

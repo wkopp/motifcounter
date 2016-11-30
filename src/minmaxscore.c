@@ -353,67 +353,6 @@ int maxScoreIntervalSize(ExtremalScore *e) {
 }
 
 
-void printScores(int *ass, int N, int iscore, double, double);
-
-void printAllScores(DMatrix *theta, double *station, double *trans, 
-    double *dx, int order) {
-    int ass[theta->nrow];
-    int s[power(ALPHABETSIZE, order)];
-    int value, preindex;
-    int i, k, j;
-    double lf=0, lb=0;
-
-    getScoresInitialIndex(&theta->data[0], station,s, dx, order );
-    for (i=0; i<power(ALPHABETSIZE, theta->nrow); i++) {
-        getAssignmentFromIndex(i, theta->nrow, ass);
-
-        preindex=0;
-        for (k=0; k<order; k++) {
-            preindex+=ass[k]*power(ALPHABETSIZE, order-k-1);
-            lf=log(theta->data[ALPHABETSIZE*k+ass[k]]);
-        }
-        value=s[preindex];
-        lb=log(station[preindex]);
-
-        for (j=order; j< theta->nrow;j++) {
-            preindex=0;
-
-            for (k=-order; k<0; k++) {
-                preindex+=ass[j+k]*power(ALPHABETSIZE, -k);
-            }
-            lf+=log(theta->data[ALPHABETSIZE*(j)+ass[j]]);
-            lb+=log(trans[preindex+ass[j]]);
-            value+=getScoreIndex(theta->data[ALPHABETSIZE*(j)+ass[j]], 
-                trans[preindex+ass[j]], *dx);
-        }
-        printScores(ass, theta->nrow, value, lf, lb);
-    }
-}
-
-void printScores(int *ass, int N, int iscore, double lf, double lb) {
-#ifndef IN_R
-    char n[]="acgt";
-    int i;
-    for (i=0; i<N; i++) {
-        printf("%c",n[ass[i]]);
-    }
-    printf(": %d\t%f\t%f\n", iscore, lf,lb);
-#endif
-    return;
-}
-
-void printExtremValues(int *e, int len, int order) {
-#ifndef IN_R
-    int i, j;
-    for (i=0; i<len; i++) {
-        for (j=0; j<power(ALPHABETSIZE, order); j++) {
-            printf( "%d\t",e[i*power(ALPHABETSIZE, order)+j]);
-        }
-        printf("\n");
-    }
-#endif
-}
-
 void loadMinMaxScores(DMatrix *pwm, double *station, 
         double *trans, ExtremalScore *e) {
     int min, max;
