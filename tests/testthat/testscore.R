@@ -197,12 +197,6 @@ test_that("score correctness", {
         expect_equal(length(sims[[1]]),length(dp[[1]]))
         expect_equal(sims[[1]],dp[[1]])
         expect_true(all(!xor(sims[[2]]==0,dp[[2]]==0)))
-        # This test is incorrect
-        # Due to rounding differences of scores collected on either
-        # DNA strand, this condition might actually be wrong
-        #if (dp[[2]][1]<=0 || dp[[2]][length(dp[[2]])]<=0) {
-          #stop(paste("The first and the last
-                     #score entry must be greater than zero: ",m))
-        #}
+
     }
 })
