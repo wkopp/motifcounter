@@ -1,17 +1,17 @@
 #' Check valididity of PFM
-#'
+#' 
 #' This function checks if the PFM is valid. The function throws
 #' an error if the R matrix does not represent a PFM.
-#'
+#' 
 #' @param pfm A position frequency matrix
 #' @return None
-#'
+#' 
 #' @examples
-#'
+#' 
 #' motiffile=system.file("extdata","x1.tab", package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #' motifValid(motif)
-#'
+#' 
 #' @export
 motifValid=function(pfm) {
     if (!is.matrix(pfm)) {
@@ -34,24 +34,25 @@ motifValid=function(pfm) {
 }
 
 #' Add pseudo-count to PFM
-#'
+#' 
 #' This function can be used to prevent the PFM from
 #' containing zero-value entries.
-#'
+#' 
 #' @param pfm A position frequency matrix
 #' @param pseudo Small pseudo-value that is added to each entry in the PFM
-#' @return A renormalized pfm
-#'
+#' @return None
+#' 
 #' @examples
-#'
-#'
+#' 
+#' 
 #' motiffile=system.file("extdata","x1.tab", package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #' new_motif=normalizeMotif(motif)
-#'
+#' 
 #' @export
 normalizeMotif=function(pfm,pseudo=0.01) {
     pfm=pfm+pseudo
     pfm=t(t(pfm)/apply(pfm,2,sum))
     return(pfm)
 }
+
