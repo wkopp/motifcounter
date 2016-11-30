@@ -12,7 +12,7 @@ normalizeMotif(pfm, pseudo = 0.01)
 \item{pseudo}{Small pseudo-value that is added to each entry in the PFM}
 }
 \value{
-None
+A renormalized pfm
 }
 \description{
 This function can be used to prevent the PFM from
