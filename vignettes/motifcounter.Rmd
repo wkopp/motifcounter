@@ -1,46 +1,126 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "Introduction to the motifcounter package"
+author: "Wolfgang Kopp"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
     %\VignetteIndexEntry{Vignette Title}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
-bibliography: literature.bib
 ---
 
-```{r}
+```{r include=FALSE}
 library(knitr)
+library(motifcounter)
+library(MotifDb)
 opts_chunk$set(fig.path="fig/")
 ```
 
-Here is also my first citation [@rsat1].
-Vignettes are long form documentation commonly included in packages.
-Because they are part of the distribution of the package, they need to
-be as compact as possible. The `html_vignette` output type provides a
-custom style sheet (and tweaks some options) to ensure that the
-resulting html is as small as possible. The `html_vignette` format:
+## Introduction
+- General intro
+- Outline of the workflow
+- purpose of the package
+- Hallmarks of the package
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+## Preliminary steps
+### Acquire a background model
+The background model is used to specify the theoretical properties of random DNA sequences.
+`motifcounter` uses the background model to derive the *score distribution*
+and the *distribution of the number of motif hits* for a given motif that emerges on random DNA sequences.
+These distributions are then the basis of e.g. the motif hit enrichment test.
 
-## Vignette Info
+In `motifcounter`, background model of the DNA sequence is given by an order-$d$ Markov model.
+Rather than, providing one fixed background model to the user (e.g. genomic mononucleotide composition),
+`motifcounter` offers some flexibility with respect specififying an appropriate background model
+for the respective analysis: 
 
-Note the various macros within the `vignette` section of the metadata
-block above. These are required in order to instruct R how to build
-the vignette. Note that you should change the `title` field and the
-`\VignetteIndexEntry` to match the title of your vignette.
+1. The background model is determined on a set of DNA sequences that
+must be provided by the user.
 
-## Styles
+2. `motifcounter` allows to choose the order $d$ for the Markov model.
+For example, when confronted with analysing CpG islands for motif hits, the order should be at least
+$d=1$ to capture dinucleotide frequencies accurately.
 
-The `html_vignette` template includes a basic CSS theme. To override
-this theme you can specify your own CSS in the document metadata as follows:
+The following code chunk examplifies how a first-order Markov model is estimated from 
+a given set of DNA sequences. To this end, the set of DNA sequences must be supplied as
+an `DNAStringSet` object from the `Biostrings` bioconductor package.
+```{r}
+order=1
+file=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(file)
+bg=readBackground(seqs,order)
+```
+## Acquire a motif
+`motifcounter` handles motifs in terms of *position frequency matrices* (PFMs), which are commonly
+used to represent the binding affinity of transcription factors (TFs).
 
-    output:
-        rmarkdown::html_vignette:
-            css: mystyles.css
+A convenient source of known motifs is the `MotifDb` bioconductor package, 
+which shall be the basis for our tutorial.
+For example, we retrieve the motif for the human *SP1* transcription factor from JASPAR as follows
+
+
+```{r}
+library(MotifDb)
+motif=as.list(query(query(query(MotifDb,"hsapiens"),"SP1"),"JASPAR_2014"))[[1]]
+motif
+```
+
+**NOTE:** In order for `motifcounter` to be a valid PFM, all entries must be strictly positive.
+As this is not the case for the original *SP1* motif, the package provides the function `normalizeMotif`, which adds
+pseudo-observations to each element of the matrix and renormalize the columns:
+
+```{r}
+# motifValid(motif) # causes an error
+motif=normalizeMotif(motif)
+motifValid(motif)
+motif
+```
+
+
+### Optional settings
+Use Options() to set the desired false positive level for obtaining motif hits in the random sequence.
+set the granulatrity, set the number of cores that should be used if openMP is available for your system.
+
+
+
+
+## Retrieve position- and strand-specific scores and hits
+
+The `motifcounter` package provides functions for identifying position- and strand-specific
+putative transciption factor binding sites (TFBSs). 
+On the one hand, for a given DNA sequence in the form of a `Biostring::DNAString`,
+the per-position and per-strand scores can be determined using `scoreSequence`.
+This function might be used if the exact location and strandedness of the TFBS is of interest.
+
+```{r fig.show=TRUE, fig.height=4,fig.width=6}
+seq=seqs[[1]]
+scores=scoreSequence(seq,motif,bg)
+plot(1:length(scores$fscores),scores$fscores, type="l",
+    col="blue",xlab="position",ylab="score")
+points(scores$rscores,col="red",type="l")
+legend(0,0,c("forward", "reverse"), col=c("blue","red"),lty=c(1,1))
+```
+
+On the other hand, `motifcounter` also provides an analogous function for determining
+the per-position and per-strand motif hit occurrences using `motifHits`.
+
+```{r eval=FALSE}
+seq=seqs[[1]]
+mhits=motifHits(seq,motif,bg)
+```
+
+Both functions can be used to study site-centered profiles across multiple equal-length
+sequences.
+
+
+## Test for motif hit enrichment
+
+The enrichment test for the number of motif hits is alternatively carried out using two
+analytical approximations of the distribution 
+the **compound Poisson distribution** or the **combinatorial distribution**.
+
+### Compound Poisson approximation
+### Combinatorial approximation
 
 ## Figures
 
