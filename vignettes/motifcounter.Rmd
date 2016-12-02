@@ -61,15 +61,15 @@ For example, we retrieve the motif for the human *SP1* transcription factor from
 
 ```{r}
 library(MotifDb)
-motif=as.list(query(query(query(MotifDb,"hsapiens"),"SP1"),"JASPAR_2014"))[[1]]
+motif=as.list(query(query(query(MotifDb,"hsapiens"),"pou5f1"),"jolma2013"))[[1]]
 motif
 ```
 
-**NOTE:** In order for `motifcounter` to be a valid PFM, all entries must be strictly positive.
-As this is not the case for the original *SP1* motif, the package provides the function `normalizeMotif`, which adds
+**NOTE:** `motifcounter` requires the PFMs be be matrices with strictly positive entries.
+If this is not the case, the package provides the function `normalizeMotif`, which adds
 pseudo-observations to each element of the matrix and renormalize the columns:
 
-```{r}
+```{r eval=FALSE}
 # motifValid(motif) # causes an error
 motif=normalizeMotif(motif)
 motifValid(motif)

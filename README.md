@@ -5,6 +5,10 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/wkopp/motifcounter/master.svg)](https://codecov.io/github/wkopp/motifcounter?branch=master)
 
 
+## Purpose of the `motifcounter` package
+
+The `motifcounter` package allows you to study transcription factor binding 
+sites (TFBSs) in DNA sequences.
 The package implements functions for  elucidating the statistical enrichment
 of known motif (e.g. from TRANSFAC or JASPAR) in a given DNA sequence of interest (e.g. a gene promoter).
 
@@ -29,17 +33,22 @@ motifs (e.g. PPARG) and repetitive motif structures (e.g. SP1).
 - Third, the methods take motif hits on both strands of the DNA into account
 
 ## Installation
-The `motifcounter` package can be installed by cloning the git repository and typing
+An easy way to install `motifcounter` is to facilitate the `devtools` R package.
 
 ```R
-R CMD INSTALL motifcounter
-```
-or via the `devtools` package
-
-```R
-install.packages("devtools")
+install.packages("devtools") # if you haven't yet installed devtools
 library(devtools)
 install_github("wkopp/motifcounter")
 ```
 
-The package contains a vignette that explains the main functionality.
+## Getting started
+
+The `motifcounter` package provides a vignette that walks you through
+the analysis of some toy examples, including
+1. Determining position- and strand-specific TF motif binding sites
+2. Test for the enrichment of motif hits in a given DNA sequence
+
+```R
+library(motifcounter)
+vignette("motifcounter")
+```
