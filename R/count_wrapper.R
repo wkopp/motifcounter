@@ -51,7 +51,7 @@ motifHits=function(seq,pfm,bg) {
 #' This function computes the average motif hit profile across a set of DNA sequences.
 #'
 #' @param pfm A position frequency matrix
-#' @param seq DNAString
+#' @param seqs DNAStringSet
 #' @param bg A Background object
 #' @return List containing
 #' \describe{

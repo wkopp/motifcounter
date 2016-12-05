@@ -8,8 +8,11 @@ Author: Wolfgang Kopp
 Suggests:
     knitr,
     rmarkdown,
-    testthat, MotifDb, prettydoc
-Imports: Biostrings
+    testthat,
+    MotifDb,
+    prettydoc
+Imports:
+    Biostrings
 Maintainer: Wolfgang Kopp <kopp@molgen.mpg.de>
 Description: The package contains methods to test for statistical enrichment of
     Transcription factor motifs in DNA sequences represented as higher order
@@ -17,6 +20,6 @@ Description: The package contains methods to test for statistical enrichment of
 License: GPL-2
 biocViews: Transcription,MotifAnnotation,SequenceMatching,Software
 Packaged: 2016-11-24 14:30:57 UTC; kopp
-RoxygenNote: 5.0.0
+RoxygenNote: 5.0.1
 VignetteBuilder: knitr
 NeedsCompilation: yes

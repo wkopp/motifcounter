@@ -7,11 +7,11 @@
 motifHitProfile(seqs, pfm, bg)
 }
 \arguments{
+\item{seqs}{DNAStringSet}
+
 \item{pfm}{A position frequency matrix}
 
 \item{bg}{A Background object}
-
-\item{seq}{DNAString}
 }
 \value{
 List containing
