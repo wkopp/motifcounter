@@ -46,6 +46,60 @@ motifHits=function(seq,pfm,bg) {
     return(list(fhits=fhits,rhits=rhits))
 }
 
+#' Motif hit profile across multiple sequences
+#'
+#' This function computes the average motif hit profile across a set of DNA sequences.
+#'
+#' @param pfm A position frequency matrix
+#' @param seq DNAString
+#' @param bg A Background object
+#' @return List containing
+#' \describe{
+#' \item{fscores}{Average forward strand motif hits}
+#' \item{rscores}{Average reverse strand motif hits}
+#' }
+#'
+#' @examples
+#'
+#'
+#'
+#' # Load the DNA sequence and a Motif
+#' seqfile=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
+#' seqs=seqs[1:10]
+#'
+#' # Load the order-1 background model from the DNA sequence
+#' bg=readBackground(seqs,1)
+#'
+#' # Load the motif from the motiffile
+#' motif=t(as.matrix(read.table(motiffile)))
+#'
+#' # Compute the score distribution
+#' motifHitProfile(seqs,motif,bg)
+#'
+#' @export
+motifHitProfile=function(seqs,pfm,bg) {
+  motifValid(pfm)
+  backgroundValid(bg)
+  if (class(seqs)!="DNAStringSet") {
+    stop("seq must be a DNAString object")
+  }
+  if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
+    stop("all sequences must be equally long")
+  }
+  
+  fhits=sapply(seqs, function(seq,pfm,bg) {
+    motifHits(seq,pfm,bg)$fhits}, 
+    pfm,bg)
+  fhits=apply(fhits,1,mean)
+  
+  rhits=sapply(seqs, function(seq,pfm,bg) {
+    motifHits(seq,pfm,bg)$rhits}, 
+    pfm,bg)
+  rhits=apply(rhits,1,mean)
+  return (list(fhits=fhits,rhits=rhits))
+}
 
 #' Number of motif hits in a given DNA sequence
 #'

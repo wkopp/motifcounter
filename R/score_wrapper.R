@@ -176,6 +176,60 @@ scoreSequence=function(seq,pfm,bg) {
     }
 }
 
+#' Score profile across multiple sequences
+#'
+#' This function computes the average score profile across a set of DNA sequences.
+#'
+#' @param pfm A position frequency matrix
+#' @param seq DNAString
+#' @param bg A Background object
+#' @return List containing
+#' \describe{
+#' \item{fscores}{Average forward strand scores}
+#' \item{rscores}{Average reverse strand scores}
+#' }
+#'
+#' @examples
+#'
+#'
+#'
+#' # Load the DNA sequence and a Motif
+#' seqfile=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
+#' seqs=seqs[1:10]
+#'
+#' # Load the order-1 background model from the DNA sequence
+#' bg=readBackground(seqs,1)
+#'
+#' # Load the motif from the motiffile
+#' motif=t(as.matrix(read.table(motiffile)))
+#'
+#' # Compute the score distribution
+#' scoreSequenceProfile(seqs,motif,bg)
+#'
+#' @export
+scoreSequenceProfile=function(seqs,pfm,bg) {
+  motifValid(pfm)
+  backgroundValid(bg)
+  if (class(seqs)!="DNAStringSet") {
+    stop("seq must be a DNAString object")
+  }
+  if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
+    stop("all sequences must be equally long")
+  }
+
+  fscores=sapply(seqs, function(seq,pfm,bg) {
+    scoreSequence(seq,pfm,bg)$fscores}, 
+    pfm,bg)
+  fscores=apply(fscores,1,mean)
+
+  rscores=sapply(seqs, function(seq,pfm,bg) {
+    scoreSequence(seq,pfm,bg)$rscores}, 
+    pfm,bg)
+  rscores=apply(rscores,1,mean)
+  return (list(fscores=fscores,rscores=rscores))
+}
 
 #' Score histogram on a single sequence
 #'
