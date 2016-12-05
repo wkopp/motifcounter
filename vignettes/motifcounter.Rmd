@@ -13,8 +13,9 @@ vignette: >
     %\VignetteIndexEntry{Introduction to the `motifcounter` package}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
-bibilography: literature.bib
+bibliography: literature.bib
 ---
+
 
 ```{r include=FALSE}
 library(knitr)
@@ -38,7 +39,6 @@ genes by up- or downregulating their gene expression levels.
 The aim of the `motifcounter` package is to provide statistical
 tools for studying putative TFBSs in given DNA sequence, including
 the presence and location of TFBSs and the enrichment of TFBSs.
-
 
 ## Hallmarks of `motifcounter`
 
@@ -250,7 +250,7 @@ In this case, assuming the PFM and the background model have been
 loaded already as shown above, one can determine the
 motif hit enrichment test in several alternative ways
 
-```{r}
+```{r eval=FALSE}
 
 # Fasta-sequence which shall be assessed for motif enrichment
 file=system.file("extdata","seq.fasta", package="motifcounter")
@@ -270,7 +270,7 @@ motifEnrichmentTest(non_oct4peaks, motif,bg, singlestranded=FALSE, method="combi
 ```
 
 
-```{r}
+```{r eval=FALSE}
 
 # Enrichment test based on the compound Poisson distribution and
 # assuming both DNA strands are scanned for motif hits
