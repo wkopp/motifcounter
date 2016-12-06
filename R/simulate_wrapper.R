@@ -169,12 +169,12 @@ simulateNumHitsDist=function(pfm,bg,seqlen, nsim, singlestranded=FALSE) {
         stop("nsim must be strictly positive")
     }
 
-    freq=rep(0,100)
+    freq=rep(0,10)
     for (i in 1:nsim) {
         seqs=generateDNAStringSet(seqlen,bg)
         nom=numMotifHits(seqs,pfm,bg,singlestranded)
         nom=sum(nom$numofhits)
-        if (nom>length(freq)+1) {
+        if (nom>=length(freq)) {
             #expand freq
             new_freq=rep(0,nom+1)
             new_freq[1:length(freq)]=freq
