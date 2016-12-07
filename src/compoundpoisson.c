@@ -246,24 +246,46 @@ void computeCompoundPoissonDistributionKemp(double lambda,
     int i, j;
     double p;
     double normalize=0.0;
+    double logminp, maxcp;
 
     #ifdef DEBUG
     Rprintf( "lambda=%f\n",lambda);
     #endif
-    cp[0]=exp(-lambda);
+    // start log(cp[0]))
+    cp[0]=-lambda;
 
-    for (i=1;i<maxhit;i++) {
+    // compute the compound poisson distribution according to
+    // Kemp in log-space
+    for (i=1;i<=maxhit;i++) {
         p=0.0;
         j=i-maxclump+1;
         j=(j>0) ? j : 0;
+        // find the smallest logp
+        logminp=cp[j];
+        for (; j<i;j++) {
+            if (logminp>cp[j]) {
+                logminp = cp[j];
+            }
+        }
+        j=i-maxclump+1;
+        j=(j>0) ? j : 0;
+        // compute p which is divided by logminp
         for (; j<i;j++) {
             p+=(i-j)*(theta[(i-j-1)*DSTRANDED]+theta[(i-j-1)*DSTRANDED +1])*
-                cp[j];
+                exp(cp[j]-logminp);
         }
-        cp[i]=lambda/((double)i)*p;
+        // compute log(cp)
+        cp[i]=log(lambda/((double)i))+log(p)+logminp;
     }
-    for (i=0; i<maxhit; i++) normalize+=cp[i];
-    for (i=0; i<maxhit; i++) cp[i]/=normalize;
+    maxcp=cp[i];
+    for (i=0; i<=maxhit; i++) {
+        if (maxcp<cp[i]) {
+            maxcp=cp[i];
+        }
+    }
+    for (i=0; i<=maxhit; i++) cp[i]=exp(cp[i]-maxcp);
+    for (i=0; i<=maxhit; i++) normalize+=cp[i];
+    for (i=0; i<=maxhit; i++) cp[i]/=normalize;
     
 
 }
@@ -273,22 +295,44 @@ void computeCompoundPoissonDistributionKempSingleStranded(double lambda,
     int i, j;
     double p;
     double normalize=0.0;
+    double logminp, maxcp;
 
     #ifdef DEBUG
     Rprintf( "lambda=%f\n",lambda);
     #endif
-    cp[0]=exp(-lambda);
+    cp[0]=-lambda;
 
-    for (i=1;i<maxhit;i++) {
+    // compute the compound poisson distribution according to
+    // Kemp in log-space
+    for (i=1;i<=maxhit;i++) {
         p=0.0;
         j=i-maxclump+1;
         j=(j>0) ? j : 0;
+        // find the smallest logp
+        logminp=cp[j];
         for (; j<i;j++) {
-            p+=(i-j)*theta[i-j-1]*cp[j];
+            if (logminp>cp[j]) {
+                logminp = cp[j];
+            }
         }
-        cp[i]=lambda/((double)i)*p;
+        j=i-maxclump+1;
+        j=(j>0) ? j : 0;
+        // compute p which is divided by logminp
+        for (; j<i;j++) {
+            p+=(i-j)*theta[i-j-1]*exp(cp[j]-logminp);
+        }
+        // compute log(cp)
+        cp[i]=log(lambda/((double)i))+log(p)+logminp;
     }
-    for (i=0; i<maxhit; i++) normalize+=cp[i];
-    for (i=0; i<maxhit; i++) cp[i]/=normalize;
+    // determine maxcp which is still in log-space
+    maxcp=cp[i];
+    for (i=0; i<=maxhit; i++) {
+        if (maxcp<cp[i]) {
+            maxcp=cp[i];
+        }
+    }
+    for (i=0; i<=maxhit; i++) cp[i]=exp(cp[i]-maxcp);
+    for (i=0; i<=maxhit; i++) normalize+=cp[i];
+    for (i=0; i<=maxhit; i++) cp[i]/=normalize;
 }
 
