@@ -3,8 +3,6 @@ context("Compound Poisson approx")
 test_that("compound", {
     alpha=0.01
     gran=0.1
-    seqlen=20
-    numofseqs=100
     maxhits=200
     motifcounterOption(alpha, gran)
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")
@@ -27,11 +25,17 @@ test_that("compound", {
             method="kopp")$dist),1)
         expect_equal(sum(compoundPoissonDist(seqlen,
             op,method="pape")$dist),1)
+        
+        # test accuracy of the compound Poisson model
+        dist=compoundPoissonDist(seqlen, op, method="kopp")$dist
+        expect_equal(sum(dist*seq(0,length(dist)-1)),op$alpha*2*length(seqlen)*(seqlen[1]-ncol(motif)+1))
 
         op=probOverlapHit(motif, bg,singlestranded=TRUE)
         expect_equal(sum(compoundPoissonDist(seqlen,
             op, method="kopp")$dist),1)
         expect_error(compoundPoissonDist(seqlen, op,method="pape"))
 
+        dist=compoundPoissonDist(seqlen, op, method="kopp")$dist
+        expect_equal(sum(dist*seq(0,length(dist)-1)),op$alpha*length(seqlen)*(seqlen[1]-ncol(motif)+1))
     }
 })
