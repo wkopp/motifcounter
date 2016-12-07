@@ -26,7 +26,7 @@ double computePoissonParameter(int seqlen, int mlen,
     for (i=0; i<maxclump; i++) {
         ec+=(theta[i*DSTRANDED] + theta[i*DSTRANDED+1])*(double)(i+1);
     }
-    return ((double)2*(seqlen-mlen+1)*(alpha))/(ec);
+    return ((double)2*(seqlen)*(alpha))/(ec);
 }
 
 // This function determines the Poisson parameter
@@ -43,7 +43,7 @@ double computePoissonParameterSingleStranded(int seqlen, int mlen,
     for (i=0; i<maxclump; i++) {
         ec+=(theta[i])*(double)(i+1);
     }
-    return ((double)(seqlen-mlen+1)*(alpha))/(ec);
+    return ((double)(seqlen)*(alpha))/(ec);
 }
 
 // allocate the memory required to compute the clump size distribution
