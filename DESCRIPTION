@@ -10,6 +10,7 @@ Suggests:
     rmarkdown,
     testthat,
     MotifDb,
+    seqLogo,
     prettydoc
 Imports:
     Biostrings

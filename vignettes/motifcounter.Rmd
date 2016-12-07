@@ -21,6 +21,7 @@ bibliography: literature.bib
 library(knitr)
 library(motifcounter)
 library(MotifDb)
+library(seqLogo)
 opts_chunk$set(fig.path="fig/")
 ```
 
@@ -141,8 +142,8 @@ For example, we retrieve the motif for the human *SP1* transcription factor from
 
 ```{r}
 library(MotifDb)
-motif=as.list(query(query(query(MotifDb,"hsapiens"),"pou5f1"),"jolma2013"))[[1]]
-motif
+oct4=as.list(query(query(query(MotifDb,"hsapiens"),"pou5f1"),"jolma2013"))[[1]]
+motif=oct4
 ```
 
 **NOTE:** `motifcounter` requires the PFMs be be matrices with strictly positive entries.
@@ -164,13 +165,13 @@ The user might change the stringency level of $\alpha$ by calling
 
 ```{r eval=FALSE}
 alpha=0.01
-motifcounter::option(alpha)
+motifcounterOption(alpha)
 ```
 
-`motifcounter::option` can also be used to adjust the score granularity, which is used
+`motifcounterOption` can also be used to adjust the score granularity, which is used
 to discretize the real-valued score range and to customise number of threads used
 for parallel computaion (if openMP is available).
-See `?motifcounter::option` for more information.
+See `?motifcounterOption` for more information.
 
 
 ## Retrieve position- and strand-specific scores and hits
@@ -251,38 +252,41 @@ loaded already as shown above, one can determine the
 motif hit enrichment test in several alternative ways
 
 ```{r eval=FALSE}
+motifcounterOption(0.001)
 
-# Fasta-sequence which shall be assessed for motif enrichment
-file=system.file("extdata","seq.fasta", package="motifcounter")
-non_oct4peaks=Biostrings::readDNAStringSet(file)
+seqs=generateDNAStringSet(rep(200,100),bg)
+
+motif=oct4
 
 # Enrichment test based on the compound Poisson distribution and
 # assuming both DNA strands are scanned for motif hits
-motifEnrichmentTest(non_oct4peaks, motif,bg,singlestranded=FALSE, method="compound")
+motifEnrichmentTest(seqs, motif,bg,singlestranded=FALSE, method="compound")
 
 # Enrichment test based on the compound Poisson distribution and
 # assuming a single DNA strands is scanned for motif hits
-motifEnrichmentTest(non_oct4peaks, motif,bg,singlestranded=TRUE, method="compound")
+motifEnrichmentTest(seqs, motif,bg,singlestranded=TRUE, method="compound")
 
 # Enrichment test based on the combinatorial model and
 # assuming a single DNA strands is scanned for motif hits
-motifEnrichmentTest(non_oct4peaks, motif,bg, singlestranded=FALSE, method="combinatorial")
+motifEnrichmentTest(seqs, motif,bg, singlestranded=FALSE, method="combinatorial")
 ```
 
 
 ```{r eval=FALSE}
+#take a subset of the oct4 peaks
+seqs=oct4peaks[1:100]
 
 # Enrichment test based on the compound Poisson distribution and
 # assuming both DNA strands are scanned for motif hits
-motifEnrichmentTest(oct4peaks, motif,bg,singlestranded=FALSE, method="compound")
+motifEnrichmentTest(seqs, motif,bg,singlestranded=FALSE, method="compound")
 
 # Enrichment test based on the compound Poisson distribution and
 # assuming a single DNA strands is scanned for motif hits
-motifEnrichmentTest(oct4peaks, motif,bg,singlestranded=TRUE, method="compound")
+motifEnrichmentTest(seqs, motif,bg,singlestranded=TRUE, method="compound")
 
 # Enrichment test based on the combinatorial model and
 # assuming a single DNA strands is scanned for motif hits
-motifEnrichmentTest(oct4peaks, motif,bg, singlestranded=FALSE, method="combinatorial")
+motifEnrichmentTest(seqs, motif,bg, singlestranded=FALSE, method="combinatorial")
 ```
 
 The 'combinatorial' and the 'compound' Poisson model are two alternative
@@ -307,6 +311,46 @@ On the other hand, the 'combinatorial' model can be used in most situations
 3. The set of DNA sequences needs to contain sequences of equal length
 
 ### Inspect the Compound Poisson approximation
+
+Inspecting the distribution of the number of motif hits might be of interest in order
+to assess the effect size of motif enrichment. For example, what are the quantiles of the distribution
+and how does the observed number of motif hits related to that?
+
+In this section, we investigate the compound Poisson approximation more closely,
+by looking at the distribution of the number of motif hits for a perfectly palindromic
+motif. In case, we scan both DNA strands for hits of this motif (at $\alpha=0.001§),
+we observe that the only even numbers of hits are possible. This is the case, because
+whenever a hit is observe on one strand, it also has to be present on the other strand.
+
+
+```{r fig.show=TRUE, fig.cap="Palindromic motif", fig.show='hold'}
+
+regions=rep(100,100)
+#regions=100*(100-12+1)
+#regions=10000
+motiffile=system.file("extdata",as.character("x32.tab"),
+                    package="motifcounter")
+
+motif=t(as.matrix(read.table(motiffile)))
+# generate an empirical distribution using 100 samples of 1kb sequences each
+simdist=simulateNumHitsDist(motif,bg,regions,100,singlestranded=FALSE)
+
+
+op=probOverlapHit(motif,bg,singlestranded=FALSE)
+dist=compoundPoissonDist(regions,op)
+maxhits=100
+seqLogo(motif)
+plot(0:(maxhits+1), dist$dist[1:(maxhits++2)],col="blue",ylab="Probability",xlab="Num. of hits")
+
+points(simdist$dist,col="gray")
+legend(50,0.08,c("comp. Poiss.", "empirical"), col=c("blue","gray"),lty=c(1,1))
+
+```
+
+The plot also contains the empirical distribution of the number of motif hits
+which was generated by sampling 100 sequences of length 10kb, to show the similarity
+between the distributions.
+
 ### Inspect the combinatorial approximation
 
 
