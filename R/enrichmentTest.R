@@ -68,10 +68,6 @@ motifEnrichmentTest=function(seqs, pfm,bg,
     } else {
         stop("method must be 'compound' or 'combinatorial'")
     }
-    if (sum(observations$numofhits)>length(dist$dist)-1) {
-        p=0.0;
-    } else {
-        p=1-sum(dist$dist[1:sum(observations$numofhits)])
-    }
+    p=sum(dist$dist[(sum(observations$numofhits)+1):length(dist$dist)])
     return (p)
 }
