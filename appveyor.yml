@@ -29,11 +29,12 @@ environment:
 
   - R_VERSION: stable
 
-  - R_VERSION: patched
+# The following R versions fail when loading MotifDb
+#  - R_VERSION: patched
 
-  - R_VERSION: oldrel
-    RTOOLS_VERSION: 32
-    CRAN: http://cran.rstudio.com
+#  - R_VERSION: oldrel
+#    RTOOLS_VERSION: 32
+#    CRAN: http://cran.rstudio.com
 
 build_script:
   - travis-tool.sh install_bioc_deps
