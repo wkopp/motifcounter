@@ -33,13 +33,14 @@ motifValid=function(pfm) {
     }
 }
 
-#' Add pseudo-count to PFM
+#' Normalizes a PFM
 #' 
-#' This function can be used to prevent the PFM from
-#' containing zero-value entries.
+#' This function normalizes a PFM and optionally
+#' adds pseudo-evidence to each entry of the matrix.
 #' 
 #' @param pfm A position frequency matrix
-#' @param pseudo Small pseudo-value that is added to each entry in the PFM
+#' @param pseudo Small pseudo-value that is added 
+#' to each entry in the PFM. Default: pseudo = 0.01
 #' @return None
 #' 
 #' @examples

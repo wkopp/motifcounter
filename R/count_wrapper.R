@@ -1,14 +1,14 @@
 #' Motif hit observations
 #'
-#' This function computes the observed motif hits in a given DNA sequence
+#' This function determines motif hits in a given DNA sequence
 #'
 #' @param seq A DNAString
 #' @param pfm A position frequency matrix
 #' @param bg A Background object
 #' @return List containing
 #' \describe{
-#' \item{fhits}{Motif hits on the forward strand}
-#' \item{rhits}{Motif hits on the reverse strand}
+#' \item{fhits}{Vector of motif hits on the forward strand}
+#' \item{rhits}{Vector of motif hits on the reverse strand}
 #' }
 #'
 #' @examples
@@ -49,7 +49,7 @@ motifHits=function(seq,pfm,bg) {
 #' Motif hit profile across multiple sequences
 #'
 #' This function computes the average motif hit 
-#' profile across a set of DNA sequences.
+#' profile across a set of fixed-length DNA sequences.
 #'
 #' @param pfm A position frequency matrix
 #' @param seqs DNAStringSet
@@ -70,13 +70,13 @@ motifHits=function(seq,pfm,bg) {
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #' seqs=seqs[1:10]
 #'
-#' # Load the order-1 background model from the DNA sequence
+#' # Estimate the background model
 #' bg=readBackground(seqs,1)
 #'
 #' # Load the motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # Compute the score distribution
+#' # Compute the motif hit profile
 #' motifHitProfile(seqs,motif,bg)
 #'
 #' @export
@@ -104,18 +104,17 @@ motifHitProfile=function(seqs,pfm,bg) {
 
 #' Number of motif hits in a given DNA sequence
 #'
-#' This function scans the DNA sequences contained in the fasta file
-#' and counts the number of motif hits using the score threshold
-#' that is associated with the false positive probability 'alpha'
-#' (see \code{\link{motifcounterOption}}. The function can be used
-#' to count motif hits on one or both strands, respectively.
+#' This function counts the number of motif hits that
+#' are found in the supplied DNA sequences.
+#' It can be used to count motif hits on 
+#' one or both strands, respectively.
 #'
 #'
 #' @param seqs A DNAString or a DNAStringSet object
 #' @param pfm A position frequency matrix
 #' @param bg A Background object
 #' @param singlestranded Boolian flag that indicates whether a single strand or
-#' both strands shall be scanned for motif hits
+#' both strands shall be scanned for motif hits. Default: singlestranded=FALSE.
 #' @return A list containing
 #' \describe{
 #' \item{nseq}{Number of individual sequences}
@@ -123,9 +122,6 @@ motifHitProfile=function(seqs,pfm,bg) {
 #' \item{numofhits}{Vector of the number of hits in each individual sequence}
 #' }
 #' @examples
-#'
-#' # Estimate first order Markov model based on the sequence provided
-#' # in seq.fasta
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' motiffile=system.file("extdata","x31.tab", package="motifcounter")
@@ -135,16 +131,16 @@ motifHitProfile=function(seqs,pfm,bg) {
 #' alpha=0.001
 #' motifcounterOption(alpha)
 #'
-#' # Estimate order-1 background model
+#' # Estimate an order-1 background model
 #' bg=readBackground(seq,1)
 #' # read PFM from file
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # scan the given sequence on both strands for the motif occurances
+#' # scan the given sequence on both strands for the motif occurrences
 #' noc=numMotifHits(seq,motif,bg)
 #' noc
 #'
-#' # scan the given sequence on a single strand for the motif occurances
+#' # scan the given sequence on a single strand for the motif occurences
 #' noc=numMotifHits(seq,motif,bg,singlestranded=TRUE)
 #' noc
 #'

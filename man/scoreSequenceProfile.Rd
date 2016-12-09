@@ -16,13 +16,13 @@ scoreSequenceProfile(seqs, pfm, bg)
 \value{
 List containing
 \describe{
-\item{fscores}{Average forward strand scores}
-\item{rscores}{Average reverse strand scores}
+\item{fscores}{Vector of per-position average forward strand scores}
+\item{rscores}{Vector of per-position average reverse strand scores}
 }
 }
 \description{
-This function computes the average score 
-profile across a set of DNA sequences.
+This function computes the per-position and per-strand 
+average score profiles across a set of DNA sequences.
 }
 \examples{
 
@@ -34,13 +34,13 @@ motiffile=system.file("extdata","x31.tab",package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 seqs=seqs[1:10]
 
-# Load the order-1 background model from the DNA sequence
+# Load an order-1 background model
 bg=readBackground(seqs,1)
 
-# Load the motif from the motiffile
+# Load a motif
 motif=t(as.matrix(read.table(motiffile)))
 
-# Compute the score distribution
+# Compute the score profile
 scoreSequenceProfile(seqs,motif,bg)
 
 }

@@ -8,16 +8,16 @@ motifcounterOption(alpha, gran = 0.1, ncores = 1)
 }
 \arguments{
 \item{alpha}{Significance level for calling
-motif hits. E.g. alpha=0.001 amounts to calling 1 in 1000 positions
-in the DNA motif hit by chance if a single DNA strand is scanned.}
+motif hits. E.g. alpha=0.001 amounts to calling one motif hit per strand
+by chance in a sequence of length 1000.}
 
 \item{gran}{The score granularity which is used
 for discretizing the score range. Decreasing gran values
-result an increased number
-of discrete bins that represent the real-valued score range
-and consequently mmomre accurate score distribution approximations.
-On the other hand, decreasing gran incurs higher computations costs.
-Default: gran=0.1}
+will increase number
+of discrete bins that represent the real-valued score range.
+This will yield more a accurate score distribution due to less
+discretization noise, however, it incurs an increase of the computational
+runtime.  Default: gran=0.1}
 
 \item{ncores}{Number of cores used for parallel processing if openMP is
 available. Default: ncores=1.}

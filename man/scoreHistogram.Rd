@@ -17,11 +17,11 @@ scoreHistogram(seq, pfm, bg)
 List containing
 \describe{
 \item{score}{Vector of score bins}
-\item{probability}{Frequencies}
+\item{probability}{Empirical frequencies associated with each score}
 }
 }
 \description{
-This function computes the observed score histogram
+This function computes the score histogram
 for a given sequence
 }
 \examples{
@@ -38,10 +38,12 @@ bg=readBackground(seqs,1)
 
 # Load a motif from the motiffile
 motif=t(as.matrix(read.table(motiffile)))
-seq=generateDNAString(1000,bg)
 
 # generate the simulated score distribution on
 # sequences of length 1kb using 1000 samples
+seq=generateDNAString(1000,bg)
+
+# Compute the empirical score histogram
 scoreHistogram(seqs,motif,bg)
 
 }

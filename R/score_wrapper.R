@@ -23,7 +23,7 @@
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #'
-#' # Load the order-1 background model from the DNA sequence
+#' # Load an order-1 background model
 #' bg=readBackground(seqs,1)
 #'
 #' # Load the motif from the motiffile
@@ -56,11 +56,11 @@ scoreDist=function(pfm,bg) {
 
 #' Score distribution
 #'
-#' This function computes the score distribution for the provided PFM and
-#' background model. The result is identical to \code{\link{scoreDist}},
+#' This function computes the score distribution for a given PFM and
+#' a background model. The result is identical to \code{\link{scoreDist}},
 #' however, the method employs a less efficient algorithm that
 #' enumerates all DNA sequences of the length of the motif.
-#' This function is only used for debugging purposes
+#' This function is only used for debugging and testing purposes
 #' and might require substantial computational
 #' resources for long motifs. Therefore, use \code{\link{scoreDist}} instead.
 #'
@@ -84,10 +84,10 @@ scoreDist=function(pfm,bg) {
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #'
-#' # Load the order-1 background model from the DNA sequence
+#' # Load an order-1 background model
 #' bg=readBackground(seqs,1)
 #'
-#' # Load the motif from the motiffile
+#' # Load a motif
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score distribution
@@ -115,15 +115,16 @@ scoreDistBf=function(pfm,bg) {
 
 #' Score observations
 #'
-#' This function computes the observed score in a given DNA sequence
+#' This function computes the per-position and per-strand 
+#' score in a given DNA sequence
 #'
 #' @param pfm A position frequency matrix
 #' @param seq DNAString
 #' @param bg A Background object
 #' @return List containing
 #' \describe{
-#' \item{fscores}{Scores on the forward strand}
-#' \item{rscores}{Scores on the reverse strand}
+#' \item{fscores}{Vector of scores on the forward strand}
+#' \item{rscores}{Vector of scores on the reverse strand}
 #' }
 #'
 #' @examples
@@ -137,13 +138,13 @@ scoreDistBf=function(pfm,bg) {
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
-#' # Load the order-1 background model from the DNA sequence
+#' # Load an order-1 background model
 #' bg=readBackground(seqs,1)
 #'
-#' # Load the motif from the motiffile
+#' # Load a motif
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # Compute the score distribution
+#' # Compute the per-position and per-strand scores
 #' scoreSequence(seqs[[1]],motif,bg)
 #'
 #' @export
@@ -178,16 +179,16 @@ scoreSequence=function(seq,pfm,bg) {
 
 #' Score profile across multiple sequences
 #'
-#' This function computes the average score 
-#' profile across a set of DNA sequences.
+#' This function computes the per-position and per-strand 
+#' average score profiles across a set of DNA sequences.
 #'
 #' @param pfm A position frequency matrix
 #' @param seqs DNAStringSet
 #' @param bg A Background object
 #' @return List containing
 #' \describe{
-#' \item{fscores}{Average forward strand scores}
-#' \item{rscores}{Average reverse strand scores}
+#' \item{fscores}{Vector of per-position average forward strand scores}
+#' \item{rscores}{Vector of per-position average reverse strand scores}
 #' }
 #'
 #' @examples
@@ -200,13 +201,13 @@ scoreSequence=function(seq,pfm,bg) {
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #' seqs=seqs[1:10]
 #'
-#' # Load the order-1 background model from the DNA sequence
+#' # Load an order-1 background model
 #' bg=readBackground(seqs,1)
 #'
-#' # Load the motif from the motiffile
+#' # Load a motif
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # Compute the score distribution
+#' # Compute the score profile
 #' scoreSequenceProfile(seqs,motif,bg)
 #'
 #' @export
@@ -234,7 +235,7 @@ scoreSequenceProfile=function(seqs,pfm,bg) {
 
 #' Score histogram on a single sequence
 #'
-#' This function computes the observed score histogram
+#' This function computes the score histogram
 #' for a given sequence
 #'
 #'
@@ -244,30 +245,10 @@ scoreSequenceProfile=function(seqs,pfm,bg) {
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of score bins}
-#' \item{probability}{Frequencies}
+#' \item{probability}{Empirical frequencies associated with each score}
 #' }
-#' @examples
 #'
-#' # Set the the significance level and the score granularity
-#' motifcounterOption(alpha=0.01, gran=0.1)
 #'
-#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' seqs=Biostrings::readDNAStringSet(seqfile)
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
-#'
-#' # Load an order-1 background model
-#' bg=readBackground(seqs,1)
-#'
-#' # Load a motif from the motiffile
-#' motif=t(as.matrix(read.table(motiffile)))
-#' seq=generateDNAString(1000,bg)
-#'
-#' # generate the simulated score distribution on
-#' # sequences of length 1kb using 1000 samples
-#' scoreHistogram(seq,motif,bg)
-#'
-#' @seealso \code{\link{scoreDist}}
-#' @export
 scoreHistogramSingleSeq=function(seq,pfm, bg) {
     motifValid(pfm)
     backgroundValid(bg)
@@ -300,7 +281,7 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
 
 #' Score histogram
 #'
-#' This function computes the observed score histogram
+#' This function computes the score histogram
 #' for a given sequence
 #'
 #'
@@ -310,7 +291,7 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of score bins}
-#' \item{probability}{Frequencies}
+#' \item{probability}{Empirical frequencies associated with each score}
 #' }
 #' @examples
 #'
@@ -326,10 +307,12 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
 #'
 #' # Load a motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
-#' seq=generateDNAString(1000,bg)
 #'
 #' # generate the simulated score distribution on
 #' # sequences of length 1kb using 1000 samples
+#' seq=generateDNAString(1000,bg)
+#'
+#' # Compute the empirical score histogram
 #' scoreHistogram(seqs,motif,bg)
 #'
 #' @seealso \code{\link{scoreDist}}
@@ -385,11 +368,10 @@ scoreHistogram=function(seq,pfm,bg) {
 #' # Load an order-1 background model
 #' bg=readBackground(seqs,1)
 #'
-#' # Load a motif from the motiffile
+#' # Load a motif
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # generate the simulated score distribution on
-#' # sequences of length 1kb using 1000 samples
+#' # Compute the score threshold
 #' scoreThreshold(motif,bg)
 #'
 #' @seealso \code{\link{scoreDist}}

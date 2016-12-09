@@ -15,8 +15,8 @@ generateDNAStringSet(len, bg)
 DNAStringSet
 }
 \description{
-This function generates a DNAStringSet
-by sampling from the background model.
+This function generates a DNAStringSet-object
+by sampling a set of sequences from the background model.
 }
 \examples{
 
@@ -29,7 +29,7 @@ seqs=Biostrings::readDNAStringSet(seqfile)
 # Load an order-1 background model
 bg=readBackground(seqs,1)
 
-# generates sequences of various lengths
+# generate sequences of various lengths
 generateDNAStringSet(10:50,bg)
 
 }

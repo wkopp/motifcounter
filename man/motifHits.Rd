@@ -16,12 +16,12 @@ motifHits(seq, pfm, bg)
 \value{
 List containing
 \describe{
-\item{fhits}{Motif hits on the forward strand}
-\item{rhits}{Motif hits on the reverse strand}
+\item{fhits}{Vector of motif hits on the forward strand}
+\item{rhits}{Vector of motif hits on the reverse strand}
 }
 }
 \description{
-This function computes the observed motif hits in a given DNA sequence
+This function determines motif hits in a given DNA sequence
 }
 \examples{
 

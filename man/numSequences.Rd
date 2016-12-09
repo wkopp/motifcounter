@@ -13,20 +13,7 @@ numSequences(seqs)
 The number of sequences
 }
 \description{
-The function parses a fasta file and returns the number of individual
-sequence that it contains.
-}
-\examples{
-
-# Estimate first order Markov model based on the sequence provided
-# in seq.fasta
-
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
-
-# scan the given sequence for the motif occurances
-nseq=numSequences(seqs)
-nseq
-
+The function returns the number of individual
+sequence.
 }
 

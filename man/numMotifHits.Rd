@@ -14,7 +14,7 @@ numMotifHits(seqs, pfm, bg, singlestranded = FALSE)
 \item{bg}{A Background object}
 
 \item{singlestranded}{Boolian flag that indicates whether a single strand or
-both strands shall be scanned for motif hits}
+both strands shall be scanned for motif hits. Default: singlestranded=FALSE.}
 }
 \value{
 A list containing
@@ -25,16 +25,12 @@ A list containing
 }
 }
 \description{
-This function scans the DNA sequences contained in the fasta file
-and counts the number of motif hits using the score threshold
-that is associated with the false positive probability 'alpha'
-(see \code{\link{motifcounterOption}}. The function can be used
-to count motif hits on one or both strands, respectively.
+This function counts the number of motif hits that
+are found in the supplied DNA sequences.
+It can be used to count motif hits on 
+one or both strands, respectively.
 }
 \examples{
-
-# Estimate first order Markov model based on the sequence provided
-# in seq.fasta
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 motiffile=system.file("extdata","x31.tab", package="motifcounter")
@@ -44,16 +40,16 @@ seq=Biostrings::readDNAStringSet(seqfile)
 alpha=0.001
 motifcounterOption(alpha)
 
-# Estimate order-1 background model
+# Estimate an order-1 background model
 bg=readBackground(seq,1)
 # read PFM from file
 motif=t(as.matrix(read.table(motiffile)))
 
-# scan the given sequence on both strands for the motif occurances
+# scan the given sequence on both strands for the motif occurrences
 noc=numMotifHits(seq,motif,bg)
 noc
 
-# scan the given sequence on a single strand for the motif occurances
+# scan the given sequence on a single strand for the motif occurences
 noc=numMotifHits(seq,motif,bg,singlestranded=TRUE)
 noc
 

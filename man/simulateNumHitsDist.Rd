@@ -20,14 +20,18 @@ sequence lengths.}
 both strands shall be scanned for motif hits.}
 }
 \value{
-Empirical number of motif hits distribution
+A List that contains
+\describe{
+\item{dist}{Empirical number of motif hits distribution}
+}
 }
 \description{
-This function simulates random DNA sequences according to
+This function repeatedly simulates random DNA sequences according to
 the background model and
-subsequently counts how many motif hits occur in them.
-Doing that repeatedly eventually established the empirical
-distribution of the number of motif hits.
+subsequently counts how many motif hits occur in them, 
+which gives rise to the empirical distribution of the number of motif
+hits.
+This function is only used for benchmarking analysis.
 }
 \examples{
 

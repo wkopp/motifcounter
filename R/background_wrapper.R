@@ -1,8 +1,8 @@
 #' Estimates the background model from a set of DNA sequences
 #'
 #' Given a set of DNA sequences and an order, this function
-#' estimates a higher-order Markov model which is used as a
-#' background model.
+#' estimates an order-d Markov model which is used to characterize
+#' random DNA sequences.
 #'
 #'
 #' @param seqs DNAStringSet
@@ -13,8 +13,7 @@
 #'
 #' @examples
 #'
-#' # Estimate first order Markov model based on the sequence provided
-#' # in seq.fasta
+#' # Estimate an order-1 Markov model based from a set of sequences
 #'
 #' file=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(file)
@@ -61,7 +60,7 @@ readBackground=function(seqs, order=1) {
 #' Check valididity of Background model
 #'
 #' This function checks if the Background model is valid. The function throws
-#' an error if the obejct does not represent a Background model.
+#' an error if the object does not represent a Background model.
 #'
 #' @param bg A Background object
 #' @return None
@@ -71,7 +70,6 @@ readBackground=function(seqs, order=1) {
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
-#' # estimate background model from seqfile
 #' bg=readBackground(seqs,1)
 #' backgroundValid(bg)
 #'

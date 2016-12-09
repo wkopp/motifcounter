@@ -4,6 +4,7 @@
 #' by simulating random DNA sequences based on the
 #' background model. Subsequently, the random sequences are scanned
 #' with the scoring measure which yields the score distribution.
+#' This function is only used for benchmarking analysis.
 #'
 #'
 #' @param pfm A position frequency matrix
@@ -28,7 +29,7 @@
 #' # Load an order-1 background model
 #' bg=readBackground(seqs,1)
 #'
-#' # Load a motif from the motiffile
+#' # Load a motif
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # generate the simulated score distribution on
@@ -50,7 +51,7 @@ scoreDistEmpirical=function(pfm,bg,seqlen, nsim) {
 #' Generate DNAString
 #'
 #' This function generates a DNAString
-#' by sampling from the the background model.
+#' by sampling a sequence from the the background model.
 #'
 #' @param len Length of the sequence
 #' @param bg A Background object
@@ -69,7 +70,7 @@ scoreDistEmpirical=function(pfm,bg,seqlen, nsim) {
 #' bg=readBackground(seqs,1)
 #'
 #' # generates a sequences of length 1kb
-#' generateDNAString(100,bg)
+#' generateDNAString(1000,bg)
 #'
 #' @export
 generateDNAString=function(len,bg) {
@@ -94,8 +95,8 @@ generateDNAString=function(len,bg) {
 
 #' Generate DNAStringSet
 #'
-#' This function generates a DNAStringSet
-#' by sampling from the background model.
+#' This function generates a DNAStringSet-object
+#' by sampling a set of sequences from the background model.
 #'
 #'
 #' @param len Vector of individual sequence lengths
@@ -114,7 +115,7 @@ generateDNAString=function(len,bg) {
 #' # Load an order-1 background model
 #' bg=readBackground(seqs,1)
 #'
-#' # generates sequences of various lengths
+#' # generate sequences of various lengths
 #' generateDNAStringSet(10:50,bg)
 #'
 #' @export
@@ -130,11 +131,12 @@ generateDNAStringSet=function(len,bg) {
 
 #' Empirical number of motif hits distribution
 #'
-#' This function simulates random DNA sequences according to
+#' This function repeatedly simulates random DNA sequences according to
 #' the background model and
-#' subsequently counts how many motif hits occur in them.
-#' Doing that repeatedly eventually established the empirical
-#' distribution of the number of motif hits.
+#' subsequently counts how many motif hits occur in them, 
+#' which gives rise to the empirical distribution of the number of motif
+#' hits.
+#' This function is only used for benchmarking analysis.
 #'
 #' @param pfm A position frequency matrix
 #' @param bg A Background object
@@ -143,7 +145,10 @@ generateDNAStringSet=function(len,bg) {
 #' @param nsim Number of random samples.
 #' @param singlestranded Boolian flag that indicates whether a single strand or
 #' both strands shall be scanned for motif hits.
-#' @return Empirical number of motif hits distribution
+#' @return A List that contains
+#' \describe{
+#' \item{dist}{Empirical number of motif hits distribution}
+#' }
 #' @examples
 #'
 #'

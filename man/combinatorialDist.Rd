@@ -9,13 +9,12 @@ combinatorialDist(seqlen, overlap)
 \arguments{
 \item{seqlen}{Integer-valued vector that defines the lengths of the
 individual sequences. This information can be extracted for
-given DNA sequence of interest using \code{\link{numMotifHits}}.
-Note that as the combinatorial model only supports the analysis
-of a set of sequences of equal length, each element `seqlen`
-must be the same.}
+given DNA sequence of interest using \code{\link{numMotifHits}} or
+\code{\link{lenSequences}}.}
 
-\item{overlap}{List that contains the overlapping hit probabilities which
-are determined by \code{\link{probOverlapHit}}}
+\item{overlap}{Overlap-object that contains the overlapping 
+hit probabilities. An Overlap-object is created by 
+\code{\link{probOverlapHit}}}
 }
 \value{
 List that contains
@@ -25,12 +24,12 @@ List that contains
 }
 \description{
 This function approxmiates the distribution of the number of motif hits.
-It is determined by efficiently
-summing over all combinations of obtaining k hits in a given sequence.
-This function can be viewed as an alternative analytical approximation
-to \code{\link{compoundPoissonDist}}.
-Currently, the combinatorial model approximation is only supported
-for scanning both strands of the DNA.
+It sums over all combinations of obtaining k hits in a random sequence
+of a given length using and efficient dynamic programming algorithm.
+This function is an alternative to \code{\link{compoundPoissonDist}}.
+However, it requires fixed-length sequences and currently
+only supports the distribution of the number of hits when both
+DNA strands are scanned for motif hits.
 }
 \examples{
 
@@ -41,10 +40,10 @@ motiffile=system.file("extdata","x31.tab", package="motifcounter")
 alpha=0.001
 motifcounterOption(alpha)
 
-# estimate background model from seqfile
+# estimate a background model
 bg=readBackground(seqs,1)
 
-# load motif model from motiffile
+# load a motif from motiffile
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute overlap probabilities

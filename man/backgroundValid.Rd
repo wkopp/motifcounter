@@ -14,14 +14,13 @@ None
 }
 \description{
 This function checks if the Background model is valid. The function throws
-an error if the obejct does not represent a Background model.
+an error if the object does not represent a Background model.
 }
 \examples{
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 
-# estimate background model from seqfile
 bg=readBackground(seqs,1)
 backgroundValid(bg)
 

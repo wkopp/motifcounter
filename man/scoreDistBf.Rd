@@ -19,11 +19,11 @@ List containing
 }
 }
 \description{
-This function computes the score distribution for the provided PFM and
-background model. The result is identical to \code{\link{scoreDist}},
+This function computes the score distribution for a given PFM and
+a background model. The result is identical to \code{\link{scoreDist}},
 however, the method employs a less efficient algorithm that
 enumerates all DNA sequences of the length of the motif.
-This function is only used for debugging purposes
+This function is only used for debugging and testing purposes
 and might require substantial computational
 resources for long motifs. Therefore, use \code{\link{scoreDist}} instead.
 }
@@ -38,10 +38,10 @@ seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
-# Load the order-1 background model from the DNA sequence
+# Load an order-1 background model
 bg=readBackground(seqs,1)
 
-# Load the motif from the motiffile
+# Load a motif
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the score distribution

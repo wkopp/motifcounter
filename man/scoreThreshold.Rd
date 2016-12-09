@@ -37,11 +37,10 @@ seqs=Biostrings::readDNAStringSet(seqfile)
 # Load an order-1 background model
 bg=readBackground(seqs,1)
 
-# Load a motif from the motiffile
+# Load a motif
 motif=t(as.matrix(read.table(motiffile)))
 
-# generate the simulated score distribution on
-# sequences of length 1kb using 1000 samples
+# Compute the score threshold
 scoreThreshold(motif,bg)
 
 }

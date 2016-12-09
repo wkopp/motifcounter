@@ -2,21 +2,22 @@
 % Please edit documentation in R/forground_wrapper.R
 \name{normalizeMotif}
 \alias{normalizeMotif}
-\title{Add pseudo-count to PFM}
+\title{Normalizes a PFM}
 \usage{
 normalizeMotif(pfm, pseudo = 0.01)
 }
 \arguments{
 \item{pfm}{A position frequency matrix}
 
-\item{pseudo}{Small pseudo-value that is added to each entry in the PFM}
+\item{pseudo}{Small pseudo-value that is added 
+to each entry in the PFM. Default: pseudo = 0.01}
 }
 \value{
 None
 }
 \description{
-This function can be used to prevent the PFM from
-containing zero-value entries.
+This function normalizes a PFM and optionally
+adds pseudo-evidence to each entry of the matrix.
 }
 \examples{
 

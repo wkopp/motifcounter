@@ -17,13 +17,12 @@ A Background object
 }
 \description{
 Given a set of DNA sequences and an order, this function
-estimates a higher-order Markov model which is used as a
-background model.
+estimates an order-d Markov model which is used to characterize
+random DNA sequences.
 }
 \examples{
 
-# Estimate first order Markov model based on the sequence provided
-# in seq.fasta
+# Estimate an order-1 Markov model based from a set of sequences
 
 file=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(file)

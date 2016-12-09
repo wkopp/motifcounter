@@ -1,15 +1,17 @@
 #' Overlapping motif hit probabilities
 #'
-#' This function computes the self-overlapping probabilites of the motif for
-#' the current PFM and background based on two-dimensional score distributions.
-#' Subsequently, the overlapping hit probabilities are corrected for motif hits
-#' that would arise in between the shifted positions.
-#'
+#' This function computes a set of self-overlapping probabilites for a
+#' motif and background model.
+#' The `gamma`s are determined based on two-dimensional score 
+#' distributions (similar as described in Pape et al. 2008), 
+#' while the `beta`s represent overlapping hit probabilities
+#' that were corrected for intermediate hits.
+#' 
 #' @param pfm A position frequency matrix
 #' @param bg A Background object
 #' @param singlestranded Boolian which defines whether the overlapping hit
 #' probabilities shall be computed with respect to scanning both DNA strands or
-#' only one strand.  Default: Both strands are scanned for DNA sequences.
+#' only one strand.  Default: singlestranded=FALSE.
 #' @return A list containing various overlapping hit probabilities.
 #' The list contains the following entries
 #'     \describe{
@@ -30,10 +32,8 @@
 #'             motif hits.}
 #'     \item{gamma}{Vector of overlapping hit probabilities across
 #'             all configurations. In contrast to beta, beta3p and beta5p,
-#'             gamma is not corrected for intermediate motif hit events.
-#'             only used for the compound Poisson variant according to Pape
-#'             et al. 2008.}
-#'     \item{singlestranded}{returns to singlestranded flag}
+#'             gamma is not corrected for intermediate motif hit events.}
+#'     \item{singlestranded}{The singlestranded flag}
 #'     }
 #'
 #' @examples
@@ -46,10 +46,10 @@
 #' gran=0.1
 #' motifcounterOption(alpha, gran)
 #'
-#' # estimate background model from seqs
+#' # estimate a background model from seqs
 #' bg=readBackground(seqs,1)
 #'
-#' # load motif model from motiffile
+#' # load a motif
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # compute the overlap probabilities for scanning both DNA strands
@@ -92,7 +92,7 @@ probOverlapHit=function(pfm,bg,singlestranded=FALSE) {
 }
 
 
-#' Check valididity of Overlap
+#' Check validity of Overlap
 #'
 #' This function checks if the Overlap object is valid. The function throws
 #' an error if the obejct does not represent a Overlap object.

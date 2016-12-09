@@ -17,35 +17,11 @@ scoreHistogramSingleSeq(seq, pfm, bg)
 List containing
 \describe{
 \item{score}{Vector of score bins}
-\item{probability}{Frequencies}
+\item{probability}{Empirical frequencies associated with each score}
 }
 }
 \description{
-This function computes the observed score histogram
+This function computes the score histogram
 for a given sequence
-}
-\examples{
-
-# Set the the significance level and the score granularity
-motifcounterOption(alpha=0.01, gran=0.1)
-
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
-
-# Load an order-1 background model
-bg=readBackground(seqs,1)
-
-# Load a motif from the motiffile
-motif=t(as.matrix(read.table(motiffile)))
-seq=generateDNAString(1000,bg)
-
-# generate the simulated score distribution on
-# sequences of length 1kb using 1000 samples
-scoreHistogram(seq,motif,bg)
-
-}
-\seealso{
-\code{\link{scoreDist}}
 }
 

@@ -28,6 +28,7 @@ This function estimates the empirical score distribution
 by simulating random DNA sequences based on the
 background model. Subsequently, the random sequences are scanned
 with the scoring measure which yields the score distribution.
+This function is only used for benchmarking analysis.
 }
 \examples{
 
@@ -41,7 +42,7 @@ motiffile=system.file("extdata","x31.tab",package="motifcounter")
 # Load an order-1 background model
 bg=readBackground(seqs,1)
 
-# Load a motif from the motiffile
+# Load a motif
 motif=t(as.matrix(read.table(motiffile)))
 
 # generate the simulated score distribution on

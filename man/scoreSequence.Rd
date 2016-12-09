@@ -16,12 +16,13 @@ scoreSequence(seq, pfm, bg)
 \value{
 List containing
 \describe{
-\item{fscores}{Scores on the forward strand}
-\item{rscores}{Scores on the reverse strand}
+\item{fscores}{Vector of scores on the forward strand}
+\item{rscores}{Vector of scores on the reverse strand}
 }
 }
 \description{
-This function computes the observed score in a given DNA sequence
+This function computes the per-position and per-strand 
+score in a given DNA sequence
 }
 \examples{
 
@@ -34,13 +35,13 @@ seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 
-# Load the order-1 background model from the DNA sequence
+# Load an order-1 background model
 bg=readBackground(seqs,1)
 
-# Load the motif from the motiffile
+# Load a motif
 motif=t(as.matrix(read.table(motiffile)))
 
-# Compute the score distribution
+# Compute the per-position and per-strand scores
 scoreSequence(seqs[[1]],motif,bg)
 
 }

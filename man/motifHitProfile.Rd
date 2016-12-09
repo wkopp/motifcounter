@@ -22,7 +22,7 @@ List containing
 }
 \description{
 This function computes the average motif hit 
-profile across a set of DNA sequences.
+profile across a set of fixed-length DNA sequences.
 }
 \examples{
 
@@ -34,13 +34,13 @@ motiffile=system.file("extdata","x31.tab",package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 seqs=seqs[1:10]
 
-# Load the order-1 background model from the DNA sequence
+# Estimate the background model
 bg=readBackground(seqs,1)
 
 # Load the motif from the motiffile
 motif=t(as.matrix(read.table(motiffile)))
 
-# Compute the score distribution
+# Compute the motif hit profile
 motifHitProfile(seqs,motif,bg)
 
 }

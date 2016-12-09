@@ -2,7 +2,7 @@
 % Please edit documentation in R/overlap.R
 \name{overlapValid}
 \alias{overlapValid}
-\title{Check valididity of Overlap}
+\title{Check validity of Overlap}
 \usage{
 overlapValid(overlap)
 }

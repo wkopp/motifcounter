@@ -34,7 +34,7 @@ seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
-# Load the order-1 background model from the DNA sequence
+# Load an order-1 background model
 bg=readBackground(seqs,1)
 
 # Load the motif from the motiffile

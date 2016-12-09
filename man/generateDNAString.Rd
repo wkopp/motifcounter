@@ -16,7 +16,7 @@ DNAString
 }
 \description{
 This function generates a DNAString
-by sampling from the the background model.
+by sampling a sequence from the the background model.
 }
 \examples{
 
@@ -30,7 +30,7 @@ seqs=Biostrings::readDNAStringSet(seqfile)
 bg=readBackground(seqs,1)
 
 # generates a sequences of length 1kb
-generateDNAString(100,bg)
+generateDNAString(1000,bg)
 
 }
 

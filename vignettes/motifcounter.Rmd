@@ -2,10 +2,10 @@
 title: "Introduction to the `motifcounter` package"
 author: "Wolfgang Kopp"
 date: "`r Sys.Date()`"
-output: 
+output:
     prettydoc::html_pretty:
         toc: TRUE
-        theme: hpstr
+        number_sections: TRUE
         fig_caption: yes
         fig_height: 4
         fig_width: 6
@@ -19,6 +19,12 @@ bibliography: literature.bib
 
 ```{r include=FALSE}
 library(knitr)
+knit_hooks$set(plot = function(x, options) {
+  paste('<figure><img src="',
+        opts_knit$get('base.url'), paste(x, collapse = '.'),
+        '"><figcaption>', options$fig.cap, '</figcaption></figure>',
+        sep = '')
+})
 library(motifcounter)
 library(MotifDb)
 library(seqLogo)
@@ -26,13 +32,25 @@ opts_chunk$set(fig.path="fig/")
 ```
 
 
+This software package grew out of the work that I did to obtain my PhD.
+If it is of help for your analysis, please cite
+```
+@Manual{,
+    title = {motifcounter: R package for analysing TFBSs in DNA sequences},
+    author = {Wolfgang Kopp},
+    year = {2016},
+    note = {R package version 0.99.0},
+}
+```
+
 # Introduction
+
 
 ## Biological background
 
 Transcription factors (TFs) play a crucial role in gene regulation.
 They function by recognising and binding to specific DNA stretches
-that are usually 5-30bp in length 
+that are usually 5-30bp in length
 which are referred to as *transcription factor binding sites* (TFBSs).
 TF-binding acts on the neighbouring
 genes by up- or downregulating their gene expression levels.
@@ -45,84 +63,112 @@ the presence and location of TFBSs and the enrichment of TFBSs.
 
 The main ingredients for an analysis with `motifcounter` consist of
 
-    1. a position frequency matrix (PFM) (also called TF motif)
-    2. a background model
-    3. a set of DNA sequences of interest
-    4. the false positive probability to obtain a motif hit.
+1. a position frequency matrix (PFM) (also called TF motif)
+2. a background model
+3. a set of DNA sequences that should be scanned for TFBSs
+4. a *false positive probability* $\alpha$ to obtain a motif hit in a random sequence
 
-The PFM represents the affinity of a TF to bind a certain DNA segment, while
-the background model defines a stochastic process that generates random DNA
-sequences.
-A specialty of `motifcounter` is that it supports the use of **order-$d$ Markov models**
- as background models, which is crucial for studying real DNA sequences that are rich in 
- higher-order sequence features (e.g. CpGs).
- 
-The statistical tests computed by `motifcounter` are based on the
-**motif score**, which is defined to be the log-likelihood ratio between
-a PFM and background model for a piece of DNA and
- which represents a measure that indicates whether a TF binds at a specific position
-and strand of a DNA segment.
+A **PFM** represents the affinity of a TF to bind a certain DNA segment. A
+large set of known PFMs can be acquired e.g. from 
+the `MotifDb` package [@motifdb].
+On the other hand,
+the **background model** defines the properties of random DNA sequences.
+`motifcounter` implements the background model as an
+**order-$d$ Markov model**, where the order $d$ is chosen by the user.
+The advantage of using higher-order background models is that they
+are able to capture higher-order sequence features which is crucial
+for studying real DNA sequences that are rich in
+higher-order sequence features (e.g. in CpGs islands).
 
-Based on the motif scores that are observed in a DNA segment, 
-`motifcounter` determines **motif hits** (e.g. putative TFBSs) 
-using a pre-determined **score threshold**.
-`motifcounter` established the **score threshold** automatically based on 1) the
-**score distribution** and 2) the
-probability to observe a motif hit in a random DNA sequence (**false positive probability**).
-The score distribution that is induced by the background model is computed 
-by an efficient dynamic programming algorithm [@rahmann, @rsat1, @koppdiss].
+Using the PFM and the background model, `motifcounter` computes
+the **motif score** for a give DNA sequence,
+which is defined to be the log-likelihood ratio between the PFM and the background.
+The motif score represents a measure that indicates whether a certain
+position in the DNA sequence is bound or unbound by the TF. Intuitively, 
+the higher the score, the more like the location is a TFBSs.
 
-Testing for **motif hit enrichment** in `motifcounter` is based on the **number
-of motif hits** that are observed in a set of DNA sequences.
-In order to judge for statistical significance, one needs to determine the 
-**distribution of the number of motif hits** in a set of random DNA sequences.
+The motif scores are also used to determine
+**motif hits** (e.g. putative TFBSs) in the DNA sequence.
+To this end, `motifcounter`
+uses a pre-determined **score threshold** upon which it is decided
+whether a position in the DNA sequence represents a putative TFBS or not.
+`motifcounter` establishes the **score threshold**
+automatically based on 1) the
+**score distribution** and 2) $\alpha$ (the
+probability to observe a motif hit in a random DNA sequence).
+In `motifcounter`, the score distribution is determined by
+an efficient dynamic programming algorithm for general order-$d$
+background models, similar as described in [@rahmann, @rsat1].
 
-`motifcounter` provides two highly accurate analytical
-approximations of the distribution of the number of motif hits.
+Testing for **motif hit enrichment** in `motifcounter` is based
+on the **number of motif hits** that are observed in a set of DNA sequences.
+Consequently, the statistical significance for the notif enrichment is based on the
+**distribution of the number of motif hits** 
+in a set of random DNA sequences.
+
+`motifcounter` provides two fast and accurate analytical
+approximations of the distribution of the number of motif hits:
 
 1. A compound Poisson approximation
 2. a combinatorial model
 
 
-The main advantage of those two models, as opposed to using a simple binomial approximation [@rsat1,@rahmann],
-is that they account for **motif hit clumping**, which influences the distribution
-of the number of motif hits.
-**Clumping** is induced by **overlapping motif hits** which are
-characteristic for self-overlapping motifs,
-including repeat-like motifs or palindromic motifs.
+The main advantage of those two models (as opposed to using a
+simple binomial approximation [@rsat1,@rahmann])
+is that they account for the coupling of motif hits due to
+mutually **overlapping motif hits**, which are referred to as
+**clumps** [@reinert].
+**Clumping** is particularly  characteristic for self-overlapping motifs,
+including repeat-like motifs or palindromic motifs. It is necessary
+to account for clumping, as it influences the distribution
+of the number of motif hits and thereby the motif hit enrichment test.
 
-The compound Poisson model is based on an improvement of [@pape] which was discussed in detail
-in [@koppdiss]. The combinatorial model is based on a dynamic programming algorithm
-that determines the probability of obtaining $k$ hits in a finite-length sequence
-by summing over all permutations of positioning the $k$ hits in the sequence [@koppdiss].
-The latter approach is similar to [@...], however, it does not require to enumerate over 
-all compatible words of a TF motif.
-`motifcounter` not only accounts for clumps of motif hits on a single DNA strand, but
+The compound Poisson model in `motifcounter` is based
+on an improvement upon [@pape], which was extended to support order-$d$
+background models and uses a refined way to determine the clump size distribution.
+
+On the other hand,
+the combinatorial model is based on summing over all permutations of
+placing the $k$ hits in a finite-length sequence, which computed
+based on a dynamic programming strategy and is related
+to the approach proposed by [@zhang]^[`motifcounter`, however, 
+does not seek to enumerate all compatible words that give rise to
+a motif hit, but is rather based on a fast approximation
+of overlapping hit probabilities. This makes the combinatorial approximation
+applicable for arbitrary lengths and structures of motifs as well as rather
+relaxed choices of $\alpha$].
+
+`motifcounter` not only accounts for clumps of motif hits
+on a single DNA strand, but
 also for clumps that result from scanning both DNA strands for motif hits.
 
 
 # Getting started
 ## Preliminary steps
 ### Acquire a background model
-The background model is used to specify the theoretical properties of random DNA sequences.
-`motifcounter` uses the background model to derive the *score distribution*
-and the *distribution of the number of motif hits* for a given motif that emerges on random DNA sequences.
-These distributions are then the basis of e.g. the motif hit enrichment test.
+The background model is used to specify the 
+theoretical properties of random DNA sequences.
+`motifcounter` uses the background model to 
+derive the theoretical *score distribution*
+and the *distribution of the number of motif hits* 
+for a given motif (and $\alpha$) in a random DNA sequence.
 
-In `motifcounter`, background model of the DNA sequence is given by an order-$d$ Markov model.
-Rather than, providing one fixed background model to the user (e.g. genomic mononucleotide composition),
-`motifcounter` offers some flexibility with respect specififying an appropriate background model
-for the respective analysis: 
+In `motifcounter`, the background model is implemented 
+as an order-$d$ Markov model. A background model is obtained 
+from a given set of DNA sequences. Ideally, the DNA sequence for 
+estimating the background model should be representative (or even the same)
+as the sequences that are latter analysed (e.g. for motif hit enrichment).
 
-1. The background model is determined on a set of DNA sequences that
-must be provided by the user.
+Furthermore, `motifcounter` allows the user to choose the order $d$ of the 
+background model that should be used for the analysis.
+While, higher-order models tend to be more accurate for representing the real
+DNA sequence, they come at a higher computational cost. 
+Therefore, as a compromise, we recommend to use orders $d=1$ or $d=2$. 
 
-2. `motifcounter` allows to choose the order $d$ for the Markov model.
-For example, when confronted with analysing CpG islands for motif hits, the order should be at least
-$d=1$ to capture dinucleotide frequencies accurately.
 
-The following code chunk examplifies how a first-order Markov model is estimated from 
-a given set of DNA sequences. To this end, the set of DNA sequences must be supplied as
+The following code fragment examplifies how an order-$1$ 
+background model is estimated from a given set of DNA sequences. 
+To this end, the set of DNA sequences must be supplied as
 an `DNAStringSet` object from the `Biostrings` bioconductor package.
 ```{r}
 order=1
@@ -132,26 +178,30 @@ bg=readBackground(seqs,order)
 ```
 
 ### Acquire a motif
-`motifcounter` handles motifs in terms of *position frequency matrices* (PFMs), which are commonly
+`motifcounter` handles motifs in terms of 
+*position frequency matrices* (PFMs), which are commonly
 used to represent the binding affinity of transcription factors (TFs).
 
-A convenient source of known motifs is the `MotifDb` bioconductor package, 
+A convenient source of known motifs is the `MotifDb` bioconductor package,
 which shall be the basis for our tutorial.
-For example, we retrieve the motif for the human *SP1* transcription factor from JASPAR as follows
+For example, we retrieve the motif for the human *Pou5f1* (or *Oct4*) 
+transcription factor as follows
 
 
 ```{r}
 library(MotifDb)
-oct4=as.list(query(query(query(MotifDb,"hsapiens"),"pou5f1"),"jolma2013"))[[1]]
+oct4=as.list(query(query(query(MotifDb,
+            "hsapiens"),"pou5f1"),"jolma2013"))[[1]]
 motif=oct4
 ```
 
-**NOTE:** `motifcounter` requires the PFMs be be matrices with strictly positive entries.
-If this is not the case, the package provides the function `normalizeMotif`, which adds
+**NOTE:** `motifcounter` requires the PFMs be be matrices 
+with strictly positive entries.
+If this is not the case, the package provides the 
+function `normalizeMotif`, which adds
 pseudo-observations to each element of the matrix and renormalize the columns:
 
 ```{r eval=FALSE}
-# motifValid(motif) # causes an error
 motif=normalizeMotif(motif)
 motifValid(motif)
 motif
@@ -160,23 +210,24 @@ motif
 
 ### Optional settings
 
-By default the false positive probability to obtain a motif hit is set to $\alpha=0.001$.
-The user might change the stringency level of $\alpha$ by calling
+By default the false positive probability $\alpha$ to obtain
+a motif hit is set to $\alpha=0.001$. The user might change
+the stringency level of $\alpha$  using the `motifcounterOption`.
 
 ```{r eval=FALSE}
 alpha=0.01
 motifcounterOption(alpha)
 ```
 
-`motifcounterOption` can also be used to adjust the score granularity, which is used
-to discretize the real-valued score range and to customise number of threads used
-for parallel computaion (if openMP is available).
-See `?motifcounterOption` for more information.
+Please consult `?motifcounterOption` for more information.
+
 
 
 ## Retrieve position- and strand-specific scores and hits
 
-For the following example, we explore a set of *Oct4*-ChIP-seq peaks in human *hESC* that were downloaded from the ENCODE project [@encode]. The peak regions were trimmed to 200 bps.
+For the following example, we explore the DNA sequences of 
+a set of *Oct4*-ChIP-seq peaks that were obtained in human *hESC* by 
+the ENCODE project [@encode2012]. The peak regions were trimmed to 200 bps.
 
 ```{r}
 file=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
@@ -185,12 +236,12 @@ oct4peaks=Biostrings::readDNAStringSet(file)
 
 ### Analysis of individual DNA sequences
 
-The `motifcounter` package provides functions for exploring position- and strand-specific
-putative TFBSs in individual DNA sequences. 
-To this end, `scoreSequence` returns the scores at each position and strand for a given
- `Biostring::DNAString`-object:
+The `motifcounter` package provides functions for exploring 
+position- and strand-specific putative TFBSs in individual DNA sequences.
+To this end, `scoreSequence` returns the scores at each 
+position and strand for a given `Biostring::DNAString`-object:
 
-```{r fig.show=TRUE, fig.height=4,fig.width=6, fig.cap="Figure 1. per-position scores"}
+```{r fig.show=TRUE, fig.cap="Per-position and strand scores"}
 seq=oct4peaks[[1]]
 scores=scoreSequence(seq,motif,bg)
 plot(1:length(scores$fscores),scores$fscores, type="l",
@@ -200,24 +251,26 @@ legend(0,0,c("forward", "reverse"), col=c("blue","red"),lty=c(1,1))
 ```
 
 Alternatively, `motifcounter` provides an analogous function for determining
-the per-position and per-strand motif hit occurrences using `motifHits`, based on the
-automatically determined score threshold
+the per-position and per-strand motif hit occurrences 
+using `motifHits` that emerge with a stringency level $\alpha$
 
 ```{r eval=FALSE}
 seq=oct4peaks[[1]]
 mhits=motifHits(seq,motif,bg)
 ```
 
+
 ### Analysis of a set of DNA sequences
 
-While, `scoreSequence` and `motifHits` can be applied to study TFBSs for a single DNA sequence,
-one might also be interested in the average score or motif hit profiles across multiple sequences of equal length.
-This might reveal positional constraints of the motif occurrences with respect to e.g. the TSS, or
-the middle or mode of a ChIP-seq peak, etc.
-To this end, `motifcounter` provides the `scoreSequenceProfile` method which can be applied for a
-`Biostrings::DNAStringSet`-object.
+While, `scoreSequence` and `motifHits` can be applied to study 
+TFBSs in `DNAString`-objects, one might also be interested in the 
+average score or motif hit profiles across multiple sequences of equal length.
+This might reveal positional constraints of the motif occurrences 
+with respect to e.g. the TSS, or the middle or summit of the ChIP-seq peaks.
+To this end, `motifcounter` provides the `scoreSequenceProfile` 
+method which can be applied for a `Biostrings::DNAStringSet`-object.
 
-```{r fig.show=TRUE, fig.cap="Figure 2. Average score profile"}
+```{r fig.show=TRUE, fig.cap="Average score profile"}
 # determine the average score profile across a set of aligned sequences
 scores=scoreSequenceProfile(oct4peaks,motif,bg)
 plot(1:length(scores$fscores),scores$fscores, type="l",
@@ -226,10 +279,10 @@ points(scores$rscores,col="red",type="l")
 legend(-10.8,0,c("forward", "reverse"), col=c("blue","red"),lty=c(1,1))
 ```
 
-Alternatively, `motifHitProfile` constructs a similar profile over the motif hits across the sequences
-in a `Biostrings::DNAStringSet`-object.
+Alternatively, `motifHitProfile` constructs a similar profile on the basis of
+the motif hits 
 
-```{r fig.show=TRUE, fig.cap="Figure 3. Average motif hit profile"}
+```{r fig.show=TRUE, fig.cap="Average motif hit profile"}
 # determine the average motif hit profile across a set of aligned sequences
 mhits=motifHitProfile(oct4peaks,motif,bg)
 plot(1:length(mhits$fhits),mhits$fhits, type="l",
@@ -241,116 +294,122 @@ legend(0,0,c("forward", "reverse"), col=c("blue","red"),lty=c(1,1))
 
 ## Test for motif hit enrichment
 
-Motif hit enrichment based on the number of motif hits can be carried out 
-via 
+A fundamental task in Bioinformatics concerns the task of determining
+statistically enriched TFBS occurrences in DNA sequences.
+To this end, `motifcounter` determines a fast and accurate approximation
+of the *distribution of the number of motif hits* based on either
 the **compound Poisson distribution** or the **combinatorial distribution**.
 
-The simplest method to determine motif hit enrichment is by
-invoking the high-level function `motifEnrichment`.
-In this case, assuming the PFM and the background model have been
-loaded already as shown above, one can determine the
-motif hit enrichment test in several alternative ways
+Motif hit enrichment can be determined using the function `motifEnrichment`,
+which requires a set of DNA sequences of interest, a PFM and a background model.
 
-```{r eval=FALSE}
-motifcounterOption(0.001)
-
-seqs=generateDNAStringSet(rep(200,100),bg)
-
-motif=oct4
-
-# Enrichment test based on the compound Poisson distribution and
-# assuming both DNA strands are scanned for motif hits
-motifEnrichmentTest(seqs, motif,bg,singlestranded=FALSE, method="compound")
-
-# Enrichment test based on the compound Poisson distribution and
-# assuming a single DNA strands is scanned for motif hits
-motifEnrichmentTest(seqs, motif,bg,singlestranded=TRUE, method="compound")
-
-# Enrichment test based on the combinatorial model and
-# assuming a single DNA strands is scanned for motif hits
-motifEnrichmentTest(seqs, motif,bg, singlestranded=FALSE, method="combinatorial")
-```
-
-
-```{r eval=FALSE}
+```{r}
 #take a subset of the oct4 peaks
 seqs=oct4peaks[1:100]
 
-# Enrichment test based on the compound Poisson distribution and
-# assuming both DNA strands are scanned for motif hits
-motifEnrichmentTest(seqs, motif,bg,singlestranded=FALSE, method="compound")
-
-# Enrichment test based on the compound Poisson distribution and
-# assuming a single DNA strands is scanned for motif hits
-motifEnrichmentTest(seqs, motif,bg,singlestranded=TRUE, method="compound")
-
-# Enrichment test based on the combinatorial model and
-# assuming a single DNA strands is scanned for motif hits
-motifEnrichmentTest(seqs, motif,bg, singlestranded=FALSE, method="combinatorial")
+# Enrichment of Oct4 in Oct4-ChIP-seq peaks
+result=motifEnrichment(seqs, motif,bg)
+result
 ```
 
-The 'combinatorial' and the 'compound' Poisson model are two alternative
-ways for approximating the distribution of the number of motif hits.
-Each comes with advantages and disadvantages. We recommend to use
-the 'compound' option for the following situations:
+The result of this analysis is a list that contains 
+`pvalue` as well as `fold`, where `fold`
+represents the fold-enrichment of motif hits with respect to the 
+expected number of hits that emerge in random DNA sequences of the
+same length. 
 
-1. A single or a both DNA strands is scanned for enrichment.
-2. A set of variable-length sequences should be scanned for enrichment.
-3. The false positive probability of obtaining motif hits should be less than
-    1%. For relaxed significance levels, the compound Poisson model
-    might yield conservative p-value estimates, because the assumption
-    of 'rare motif hit occurrences' is not met any longer.
+**Note:** Be aware that if the expected number of motif hits very high
+(e.g. >1000), the *P-values* that are produced will almost always tend 
+towards zero, because the distribution of the number of motif hits
+becomes very narrow. In this case, the fold-enrichment gives an indication
+as to how strongly the DNA is enriched for motif hits, nevertheless.
 
-On the other hand, the 'combinatorial' model can be used in most situations
-
-1. The combinatorial model work particularly well for relaxed 
-    choices of the false positive probability for obtaining a motif hit,
-    e.g. 5%.
-2. At the moment, the 'combinatorial' model is only supported for scanning
-    both DNA strands.
-3. The set of DNA sequences needs to contain sequences of equal length
-
-### Inspect the Compound Poisson approximation
-
-Inspecting the distribution of the number of motif hits might be of interest in order
-to assess the effect size of motif enrichment. For example, what are the quantiles of the distribution
-and how does the observed number of motif hits related to that?
-
-In this section, we investigate the compound Poisson approximation more closely,
-by looking at the distribution of the number of motif hits for a perfectly palindromic
-motif. In case, we scan both DNA strands for hits of this motif (at $\alpha=0.001§),
-we observe that the only even numbers of hits are possible. This is the case, because
-whenever a hit is observe on one strand, it also has to be present on the other strand.
+By default, `motifEnrichment` scans both DNA strands for motif hits and  
+draws its statistical conclusions based on the compound Poisson model.
+Please consult `?motifEnrichment` if only a single strand should be scanned
+for enrichment or if the combinatorial model should be invoked for the
+analysis.
 
 
-```{r fig.show=TRUE, fig.cap="Palindromic motif", fig.show='hold'}
+### When to use the combinatorial or the compound Poisson model
 
-regions=rep(100,100)
-#regions=100*(100-12+1)
-#regions=10000
+The combinatorial model and the compound Poisson approximation both aim
+towards modelling the distribution of the number of motif hits and
+will mostly yield similar results, but they come advantages and disadvantages as well.
+In this section, we describe in which cases each approximation is expected to
+yield accurate results and in which cases the underlying assumptions for each 
+method might be violated. In the latter case, the results of the enrichment 
+analysis might be misleading.
+
+If there is no strong preference in changing the default parameters,
+the compound Poisson approxmiation is most likely your the method of choice.
+
+The compound Poisson approximation is based on the assumption that motif hits
+occur rarely in random sequences. This is also referred to as the Poisson 
+assumption.  This means that one should use rather stringent 
+false positive probabilities $\alpha=0.001$ or smaller.  Relaxed 
+stringency levels result in a conservative *P-value* estimates, 
+as in this case the approximation tends to over-estimation of 
+the number of motif hits.
+
+The main benefit of the combinatorial model is that it does not presume 
+a rare number of hits, because of the different algorithmic approach.
+Therefore, it can be used for rather relaxed choices 
+of $\alpha$ (e.g. even $\alpha=0.05$). However, the combinatorial model 
+also serves as an accurate model for fairly stringent choices of $\alpha$, 
+in which the results are very similar to the compound Poisson approximation.
+The downside of the combinatorial model is, however, the 
+comparably high computational burden. Moreover, the combinatorial 
+model is restricted to analysing only fixed-length sequences  
+and at the moment only supports scanning for motif hits
+in both DNA strands.
+
+### Inspect the distribution of the number of motif hits
+
+Inspecting the distribution of the number of motif hits 
+might be of interest in order to assess the effect size of motif enrichment.
+For example, how do the quantiles of the distribution
+relate to the observed number of motif hits?
+
+In this section, we investigate the compound Poisson 
+approximation, the combinatorial model and the empirical distribution 
+for a perfectly palindromic motif. 
+```{r fig.show=TRUE, fig.width=4, fig.height=3, fig.cap="Palindromic motif"}
 motiffile=system.file("extdata",as.character("x32.tab"),
                     package="motifcounter")
 
 motif=t(as.matrix(read.table(motiffile)))
+seqLogo(motif)
+
+```
+
+The distribution of the number of motif hits for a set of 100 sequences
+of length 100 bp each are shown in the following
+
+```{r fig.show=TRUE, fig.cap="Distribution of the number of hits"}
+
+regions=rep(100,100)
 # generate an empirical distribution using 100 samples of 1kb sequences each
 simdist=simulateNumHitsDist(motif,bg,regions,100,singlestranded=FALSE)
 
 
 op=probOverlapHit(motif,bg,singlestranded=FALSE)
-dist=compoundPoissonDist(regions,op)
-maxhits=100
-seqLogo(motif)
-plot(0:(maxhits+1), dist$dist[1:(maxhits++2)],col="blue",ylab="Probability",xlab="Num. of hits")
+cpdist=compoundPoissonDist(regions,op)
+combdist=combinatorialDist(regions,op)
+maxhits=80
 
-points(simdist$dist,col="gray")
-legend(50,0.08,c("comp. Poiss.", "empirical"), col=c("blue","gray"),lty=c(1,1))
+plot(0:(maxhits+1), cpdist$dist[1:(maxhits+2)],
+        col="blue",ylab="Probability",xlab="Num. of hits")
+points(0:(maxhits+1),combdist$dist[1:(maxhits+2)],col="red")
+points(0:(maxhits+1),simdist$dist[1:(maxhits+2)],col="gray")
+legend(50,0.08,c("comp. Poiss.", "combinatorial", "empirical"), 
+        col=c("blue","red","gray"), lty=c(1,1,1))
 
 ```
 
-The plot also contains the empirical distribution of the number of motif hits
-which was generated by sampling 100 sequences of length 10kb, to show the similarity
-between the distributions.
-
-### Inspect the combinatorial approximation
-
+**Note:** Scanning both DNA strands for motif hits (at $\alpha=0.001$) can only
+yield an even number of motif hits, as a hit on the forward 
+strand is always coupled with a hit on the reverse strand. 
+Therefore, odd numbers of motif hits are associated 
+with a probability of (almost) zero.
 
