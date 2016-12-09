@@ -17,7 +17,7 @@
 #' Default: method='compound'
 #'
 #' @return Result list that contains
-#' \described{
+#' \describe{
 #' \item{pvalue}{P-value for the enrichment test}
 #' \item{fold}{Fold-enrichment with respect to the expected number of hits}
 #' }
