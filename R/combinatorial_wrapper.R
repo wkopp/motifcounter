@@ -77,5 +77,17 @@ combinatorialDist=function(seqlen, overlap) {
         as.integer(maxhits), as.integer(length(seqlen)),
         length(overlap$beta),
         as.integer(overlap$singlestranded),PACKAGE="motifcounter")
+    
+    if (is.na(sum(ret[[5]]))) {
+        # This might be the case if too stringent
+        # and too long or too many sequences shall be
+        # assessed for significant enrichment.
+        # In this case, the combinatorial model is pushed
+        # to its limits
+        stop("The combinatorial model experienced numerical issues,
+             please try to reduce the number or length of the DNA sequences,
+             reduce the false positive probability using motifcounterOption
+             or try the 'compound Poisson approximation'.")
+    }
     return(list(dist=ret[[5]]))
 }

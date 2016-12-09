@@ -28,7 +28,8 @@ test_that("compound", {
         
         # test accuracy of the compound Poisson model
         dist=compoundPoissonDist(seqlen, op, method="kopp")$dist
-        expect_equal(sum(dist*seq(0,length(dist)-1)),op$alpha*2*length(seqlen)*(seqlen[1]-ncol(motif)+1))
+        expect_equal(sum(dist*seq(0,length(dist)-1)),
+                     op$alpha*2*length(seqlen)*(seqlen[1]-ncol(motif)+1))
 
         op=probOverlapHit(motif, bg,singlestranded=TRUE)
         expect_equal(sum(compoundPoissonDist(seqlen,
@@ -36,6 +37,39 @@ test_that("compound", {
         expect_error(compoundPoissonDist(seqlen, op,method="pape"))
 
         dist=compoundPoissonDist(seqlen, op, method="kopp")$dist
-        expect_equal(sum(dist*seq(0,length(dist)-1)),op$alpha*length(seqlen)*(seqlen[1]-ncol(motif)+1))
+        expect_equal(sum(dist*seq(0,length(dist)-1)),
+                     op$alpha*length(seqlen)*(seqlen[1]-ncol(motif)+1))
     }
+})
+
+test_that("jaspar motif tests", {
+    library(MotifDb)
+    motifs=as.list(query(query(MotifDb,"hsapiens"),"JASPAR_CORE"))
+
+    alpha=0.001
+    gran=0.1
+    seqlen=10000
+    motifcounterOption(alpha, gran)
+    seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+    seqs=Biostrings::readDNAStringSet(seqfile)
+    bg=readBackground(seqs,1)
+
+    for (motif in motifs) {
+        motif=normalizeMotif(motif,0.001)
+
+        # check scanning both strands
+        op=probOverlapHit(motif, bg,singlestranded=FALSE)
+        dist=compoundPoissonDist(seqlen, op, method="kopp")$dist
+        expect_equal(sum(dist),1)
+        expect_equal(sum(dist*seq(0,length(dist)-1)),
+                     op$alpha*2*length(seqlen)*(seqlen[1]-ncol(motif)+1))
+
+        # check scanning a single strand
+        op=probOverlapHit(motif, bg,singlestranded=TRUE)
+        dist=compoundPoissonDist(seqlen, op, method="kopp")$dist
+        expect_equal(sum(dist),1)
+        expect_equal(sum(dist*seq(0,length(dist)-1)),
+                     op$alpha*length(seqlen)*(seqlen[1]-ncol(motif)+1))
+    }
+
 })
