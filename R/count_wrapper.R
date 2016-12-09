@@ -48,7 +48,8 @@ motifHits=function(seq,pfm,bg) {
 
 #' Motif hit profile across multiple sequences
 #'
-#' This function computes the average motif hit profile across a set of DNA sequences.
+#' This function computes the average motif hit 
+#' profile across a set of DNA sequences.
 #'
 #' @param pfm A position frequency matrix
 #' @param seqs DNAStringSet
@@ -80,25 +81,25 @@ motifHits=function(seq,pfm,bg) {
 #'
 #' @export
 motifHitProfile=function(seqs,pfm,bg) {
-  motifValid(pfm)
-  backgroundValid(bg)
-  if (class(seqs)!="DNAStringSet") {
-    stop("seq must be a DNAString object")
-  }
-  if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
-    stop("all sequences must be equally long")
-  }
-  
-  fhits=sapply(seqs, function(seq,pfm,bg) {
-    motifHits(seq,pfm,bg)$fhits}, 
-    pfm,bg)
-  fhits=apply(fhits,1,mean)
-  
-  rhits=sapply(seqs, function(seq,pfm,bg) {
-    motifHits(seq,pfm,bg)$rhits}, 
-    pfm,bg)
-  rhits=apply(rhits,1,mean)
-  return (list(fhits=fhits,rhits=rhits))
+    motifValid(pfm)
+    backgroundValid(bg)
+    if (class(seqs)!="DNAStringSet") {
+        stop("seq must be a DNAString object")
+    }
+    if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
+        stop("all sequences must be equally long")
+    }
+    
+    fhits=sapply(seqs, function(seq,pfm,bg) {
+        motifHits(seq,pfm,bg)$fhits}, 
+        pfm,bg)
+    fhits=apply(fhits,1,mean)
+    
+    rhits=sapply(seqs, function(seq,pfm,bg) {
+        motifHits(seq,pfm,bg)$rhits}, 
+        pfm,bg)
+    rhits=apply(rhits,1,mean)
+    return (list(fhits=fhits,rhits=rhits))
 }
 
 #' Number of motif hits in a given DNA sequence

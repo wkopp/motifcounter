@@ -178,7 +178,8 @@ scoreSequence=function(seq,pfm,bg) {
 
 #' Score profile across multiple sequences
 #'
-#' This function computes the average score profile across a set of DNA sequences.
+#' This function computes the average score 
+#' profile across a set of DNA sequences.
 #'
 #' @param pfm A position frequency matrix
 #' @param seqs DNAStringSet
@@ -210,25 +211,25 @@ scoreSequence=function(seq,pfm,bg) {
 #'
 #' @export
 scoreSequenceProfile=function(seqs,pfm,bg) {
-  motifValid(pfm)
-  backgroundValid(bg)
-  if (class(seqs)!="DNAStringSet") {
-    stop("seq must be a DNAString object")
-  }
-  if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
-    stop("all sequences must be equally long")
-  }
+    motifValid(pfm)
+    backgroundValid(bg)
+    if (class(seqs)!="DNAStringSet") {
+        stop("seq must be a DNAString object")
+    }
+    if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
+        stop("all sequences must be equally long")
+    }
 
-  fscores=sapply(seqs, function(seq,pfm,bg) {
-    scoreSequence(seq,pfm,bg)$fscores}, 
-    pfm,bg)
-  fscores=apply(fscores,1,mean)
+    fscores=sapply(seqs, function(seq,pfm,bg) {
+        scoreSequence(seq,pfm,bg)$fscores}, 
+        pfm,bg)
+    fscores=apply(fscores,1,mean)
 
-  rscores=sapply(seqs, function(seq,pfm,bg) {
-    scoreSequence(seq,pfm,bg)$rscores}, 
-    pfm,bg)
-  rscores=apply(rscores,1,mean)
-  return (list(fscores=fscores,rscores=rscores))
+    rscores=sapply(seqs, function(seq,pfm,bg) {
+        scoreSequence(seq,pfm,bg)$rscores}, 
+        pfm,bg)
+    rscores=apply(rscores,1,mean)
+    return (list(fscores=fscores,rscores=rscores))
 }
 
 #' Score histogram on a single sequence
@@ -349,7 +350,6 @@ scoreHistogram=function(seq,pfm,bg) {
         his=matrix(his,nrange,nseq)
         his=apply(his,1,sum)
         freq=his
-
         result=list(score=scores, frequency=freq)
     } else {
         stop("seq must be a DNAString or a DNAStringSet object")

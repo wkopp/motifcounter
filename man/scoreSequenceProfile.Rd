@@ -21,7 +21,8 @@ List containing
 }
 }
 \description{
-This function computes the average score profile across a set of DNA sequences.
+This function computes the average score 
+profile across a set of DNA sequences.
 }
 \examples{
 

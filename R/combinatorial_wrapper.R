@@ -85,9 +85,9 @@ combinatorialDist=function(seqlen, overlap) {
         # In this case, the combinatorial model is pushed
         # to its limits
         stop("The combinatorial model experienced numerical issues,
-             please try to reduce the number or length of the DNA sequences,
-             reduce the false positive probability using motifcounterOption
-             or try the 'compound Poisson approximation'.")
+            please try to reduce the number or length of the DNA sequences,
+            reduce the false positive probability using motifcounterOption
+            or try the 'compound Poisson approximation'.")
     }
     return(list(dist=ret[[5]]))
 }
