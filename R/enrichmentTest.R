@@ -16,7 +16,11 @@
 #' the 'compound' Poisson approximation' or the 'combinatorial' model.
 #' Default: method='compound'
 #'
-#' @return P-value for the enrichment test
+#' @return Result list that contains
+#' \described{
+#' \item{pvalue}{P-value for the enrichment test}
+#' \item{fold}{Fold-enrichment with respect to the expected number of hits}
+#' }
 #' @examples
 #'
 #'
@@ -36,23 +40,23 @@
 #' ### 1 ) Compute the distribution for scanning a *single* DNA strand
 #' # based on the 'Compound Poisson model'
 #'
-#' pvalue=motifEnrichmentTest(seqs,motif,bg,
+#' result=motifEnrichment(seqs,motif,bg,
 #'             singlestranded=TRUE,method="compound")
 #'
 #' ### 2 ) Compute the distribution for scanning *both* DNA strand
 #' # based on the 'Compound Poisson model'
 #'
-#' pvalue=motifEnrichmentTest(seqs,motif, bg, method="compound")
+#' result=motifEnrichment(seqs,motif, bg, method="compound")
 #'
 #' ### 3 ) Compute the distribution for scanning *both* DNA strand
 #' # based on the *combinatorial model*
 #'
-#' pvalue=motifEnrichmentTest(seqs,motif, bg,singlestranded=FALSE,
+#' result=motifEnrichment(seqs,motif, bg,singlestranded=FALSE,
 #'             method="combinatorial")
 #'
 #' @seealso \code{\link{compoundPoissonDist}}, \code{\link{combinatorialDist}}
 #' @export
-motifEnrichmentTest=function(seqs, pfm,bg,
+motifEnrichment=function(seqs, pfm,bg,
     singlestranded=FALSE,method="compound") {
     motifValid(pfm)
     backgroundValid(bg)
@@ -69,5 +73,7 @@ motifEnrichmentTest=function(seqs, pfm,bg,
         stop("method must be 'compound' or 'combinatorial'")
     }
     p=sum(dist$dist[(sum(observations$numofhits)+1):length(dist$dist)])
-    return (p)
+
+    return (list(pvalue=p,fold=sum(observations$numofhits)/
+            sum(dist$dist*seq(0,length(dist$dist)-1))))
 }

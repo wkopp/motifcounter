@@ -99,17 +99,17 @@
 #' # Obtain the number of motif hits in the given sequence
 #' numhits=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
 #' op=probOverlapHit(motif,bg, singlestranded=TRUE)
-#' pvalue=motifEnrichmentTest(seqs,motif,bg,
+#' result=motifEnrichment(seqs,motif,bg,
 #'             singlestranded=TRUE,method="compound")
 #'
 #' numhits=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
 #' op=probOverlapHit(motif,bg,singlestranded=FALSE)
-#' pvalue=motifEnrichmentTest(seqs,motif,bg,
+#' result=motifEnrichment(seqs,motif,bg,
 #'             singlestranded=FALSE,method="compound")
 #'
 #' numhits=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
 #' op=probOverlapHit(motif,bg,singlestranded=FALSE)
-#' pvalue=motifEnrichmentTest(seqs,motif,bg,singlestranded=FALSE,
+#' result=motifEnrichment(seqs,motif,bg,singlestranded=FALSE,
 #' method="combinatorial")
 #'
 #'

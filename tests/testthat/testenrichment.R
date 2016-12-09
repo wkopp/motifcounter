@@ -16,11 +16,11 @@ test_that("enrichment", {
     bg=readBackground(seqs,1)
     motif=t(as.matrix(read.table(motiffile)))
 
-    motifEnrichmentTest(seqs,motif,bg)
-    motifEnrichmentTest(seqs,motif,bg,singlestranded=TRUE)
-    motifEnrichmentTest(seqs,motif,bg,method="combinatorial")
-    expect_error(motifEnrichmentTest(seqs,motif,bg,singlestranded=TRUE,
+    motifEnrichment(seqs,motif,bg)
+    motifEnrichment(seqs,motif,bg,singlestranded=TRUE)
+    motifEnrichment(seqs,motif,bg,method="combinatorial")
+    expect_error(motifEnrichment(seqs,motif,bg,singlestranded=TRUE,
                     method="combinatorial"))
-    expect_error(motifEnrichmentTest(seqs,motif,bg,singlestranded=TRUE,
+    expect_error(motifEnrichment(seqs,motif,bg,singlestranded=TRUE,
                     method="tata"))
 })
