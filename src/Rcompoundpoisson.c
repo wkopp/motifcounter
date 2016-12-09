@@ -78,6 +78,7 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
     for (i=0; i<*nseq; i++) {
         seqlen+=lseq[i]-motiflen[0]+1;
     }
+    //Rprintf("nseq=%d, seqlen=%d\n",*nseq,seqlen);
     //init the maximal clump size and the max number of hits
     maxclumpsize=(double)mclump[0];
     maxhits=(double)mhit[0];
@@ -126,7 +127,7 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
 
         lambda=computePoissonParameter(seqlen, motiflen[0], maxclumpsize,
                                 alpha[0],theta);
-
+        //Rprintf("lambda=%e\n",lambda);
         computeCompoundPoissonDistributionKemp(lambda, maxhits, maxclumpsize,
                                 theta, hitdistribution);
     }
