@@ -277,7 +277,7 @@ void computeCompoundPoissonDistributionKemp(double lambda,
         // compute log(cp)
         cp[i]=log(lambda/((double)i))+log(p)+logminp;
     }
-    maxcp=cp[i];
+    maxcp=cp[0];
     for (i=0; i<=maxhit; i++) {
         if (maxcp<cp[i]) {
             maxcp=cp[i];
@@ -325,7 +325,7 @@ void computeCompoundPoissonDistributionKempSingleStranded(double lambda,
         cp[i]=log(lambda/((double)i))+log(p)+logminp;
     }
     // determine maxcp which is still in log-space
-    maxcp=cp[i];
+    maxcp=cp[0];
     for (i=0; i<=maxhit; i++) {
         if (maxcp<cp[i]) {
             maxcp=cp[i];
