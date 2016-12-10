@@ -1,5 +1,5 @@
 .onLoad=function(libpath,pkgname) {
-    motifcounterOption(0.001,0.1)
+    motifcounterOption()
 }
 
 .onUnload=function(pkgpath) {}

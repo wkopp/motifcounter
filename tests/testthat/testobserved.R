@@ -18,6 +18,8 @@ test_that("observation", {
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
     expect_equal(nom$nseq,3)
     expect_equal(as.vector(nom$lseq),c(23,10,0))
+    nom=numMotifHits(seqs[[1]],motif,bg,singlestranded=TRUE)
+    nom=numMotifHits(seqs[[3]],motif,bg,singlestranded=TRUE)
 
 
     nom=numMotifHits(seqs[[1]],motif,bg,singlestranded=TRUE) # using DNAString

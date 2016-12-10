@@ -5,6 +5,7 @@ test_that("Background Syntax check", {
     # syntax errors
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
+    expect_error(backgroundValid(seqs)) # not a Background object
     for ( m in 0:3) {
 
         bg=readBackground(seqs,m)
@@ -28,6 +29,9 @@ test_that("Background correctness", {
     expect_equal(readBackground(seq,1)$counts,
         c(2,2,1,2,2,2,2,1,1,2,2,2,2,1,2,2))
     expect_error(readBackground(seq,2)) #zero entries
+    expect_error(readBackground(seq[[1]],2)) # not DNAStringSet object
+    expect_error(readBackground(Biostrings:DNAStringSet("a"),2)) #short sequence
+    expect_error(readBackground(seq,-1)) # negative order
 
     seqfile=system.file("extdata","test.fa", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
@@ -47,7 +51,5 @@ test_that("Background correctness", {
     correct=correct/apply(correct,1,sum)
     expect_that(all(t(matrix(bg$trans,4,4))==correct), is_true())
 
-    # there are zero-value entries, an error occurs
-    expect_error(readBackground(seqs,2))
-
 })
+

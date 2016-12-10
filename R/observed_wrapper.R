@@ -1,20 +1,3 @@
-#' Number of sequences in a given fasta file
-#'
-#' The function returns the number of individual
-#' sequence.
-#'
-#'
-#' @param seqs DNAStringSet
-#' @return The number of sequences
-numSequences=function(seqs) {
-    if (class(seqs)!="DNAStringSet") {
-        stop("seqs must be a DNAStringSet")
-    }
-    length(seqs)
-}
-
-
-
 #' Length of sequences in a given fasta file
 #'
 #' The function returns a vector containing the lengths
@@ -26,16 +9,24 @@ numSequences=function(seqs) {
 #' @param seqs DNAStringSet
 #' @return A vector containing the lengths of each individual sequences
 lenSequences=function(seqs) {
-    if (class(seqs)!="DNAStringSet") {
-        stop("seqs must be a DNAStringSet")
-    }
-    lseq=sapply(seqs, function(seq) {
-        if (Biostrings::countPattern("N",seq)>0 ||
-            Biostrings::countPattern("n",seq)>0) {
-            return (0)
+    if (class(seqs)=="DNAStringSet") {
+        lseq=sapply(seqs, function(seq) {
+            if (Biostrings::countPattern("N",seq)>0 ||
+                Biostrings::countPattern("n",seq)>0) {
+                return (0)
+            } else {
+                return(length(seq))
+            }
+        })
+    } else if (class(seqs)=="DNAString") {
+        if (Biostrings::countPattern("N",seqs)>0 ||
+            Biostrings::countPattern("n",seqs)>0) {
+            lseq=0
         } else {
-            return(length(seq))
+            lseq=length(seqs)
         }
-    })
+    } else {
+        stop("seqs must be a DNAStringSet or a DNAString")
+    }
     return(as.vector(lseq))
 }

@@ -162,24 +162,15 @@ numMotifHits=function(seqs, pfm, bg, singlestranded=FALSE) {
         noh=unlist(x)
         # retrieve the individual sequence lengths
         # sequences containing "N" or "n" are assigned length zero
-        lseq=sapply(seqs, function(seq) {
-            if (Biostrings::countPattern("N",seq)>0 ||
-                Biostrings::countPattern("n",seq)>0) {
-                return (0)
-            } else {
-                return(length(seq))
-            }
-        })
+        lseq=lenSequences(seqs)
 
         nseq=length(seqs)
     } else if (class(seqs)=="DNAString") {
         nseq=1
-        if (Biostrings::countPattern("N",seqs)>0 ||
-            Biostrings::countPattern("n",seqs)>0) {
-            lseq=0
+        lseq=lenSequences(seqs)
+        if (lseq==0) {
             noh=0
-        } else {
-            lseq=length(seqs)
+        } else  {
             ret=motifHits(seqs,pfm,bg)
             if (singlestranded==FALSE) {
                 noh=sum(ret[[1]]+ret[[2]])

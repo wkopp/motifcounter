@@ -164,8 +164,7 @@ scoreSequence=function(seq,pfm,bg) {
     fscores=rep(-1e10,slen)
     rscores=rep(-1e10,slen)
 
-    if (Biostrings::countPattern("N",seq)>0 ||
-        Biostrings::countPattern("n",seq)>0) {
+    if (lenSequences(seq)<=0) {
         return(list(fscores=fscores,rscores=rscores))
     } else {
         ret=.C("motifcounter_scoresequence",

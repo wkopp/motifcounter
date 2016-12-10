@@ -23,4 +23,6 @@ test_that("simulate DNA", {
     generateDNAString(100,bg) # after background loading everything should work
 
     expect_error(generateDNAString(0,bg)) # positive length
+    bg=readBackground(seqs,2)
+    expect_error(generateDNAString(1,bg)) # too short sequence
 })

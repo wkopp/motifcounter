@@ -67,6 +67,9 @@ test_that("scorehistogram", {
 
     sh=scoreHistogram(seqs,motif,bg)
     expect_equal(sum(sh$frequency),(30-ncol(motif)+1)*100) # number of observed
+
+    bg=readBackground(seqs,2)
+    expect_error(scoreHistogram(seqs[[1]][1],motif,bg))
 })
 
 test_that("scoresequence", {
@@ -76,6 +79,7 @@ test_that("scoresequence", {
     # Load the order-1 background model from the DNA sequence
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
+    expect_error(scoreSequence(seqs,motif,bg))
     bg=readBackground(seqs,1)
 
 
@@ -89,8 +93,9 @@ test_that("scoresequence", {
 
     # Compute the score distribution
     scores=scoreSequence(seq,motif,bg)
+    expect_error(scoreSequence(generateDNAString(ncol(motif)-1,bg),motif,bg))
 
-    # same number of score on both strands
+    # same number of score on both strands because its a palindrome
     expect_equal(length(scores$fscores),length(scores$rscores))
 
     # Nscores= Nseq-Nmotif+1
@@ -99,7 +104,7 @@ test_that("scoresequence", {
     seq=Biostrings::replaceLetterAt(seq,3,"N")
     sh=scoreHistogram(seq,motif,bg)
     scores=scoreSequence(seq,motif,bg)
-    expect_equal(scores$fscores,scores$rscores) # both should be very small
+    expect_equal(scores$fscores,scores$rscores) # both should be negative
                                                 # and equal
 
 

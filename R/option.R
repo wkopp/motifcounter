@@ -6,7 +6,7 @@
 #'
 #' @param alpha Significance level for calling
 #' motif hits. E.g. alpha=0.001 amounts to calling one motif hit per strand
-#' by chance in a sequence of length 1000.
+#' by chance in a sequence of length 1000. Default: alpha=0.001
 #' @param gran The score granularity which is used
 #' for discretizing the score range. Decreasing gran values
 #' will increase number
@@ -24,18 +24,18 @@
 #' motifcounterOption(alpha=0.001)
 #'
 #' @export
-motifcounterOption=function(alpha, gran=0.1, ncores=1) {
-    if (!is.numeric(alpha)) {
-        stop("alpha must be numeric")
-    }
+motifcounterOption=function(alpha=0.001, gran=0.1, ncores=1) {
     if (alpha<=0.0 || alpha>1.0) {
         stop("alpha must be a probability")
     }
-    if (!is.numeric(gran)) {
-        stop("gran must be numeric")
-    }
     if (gran<=0.0) {
         stop("gran must be positive")
+    }
+    if (alpha>0.05) {
+        warning("alpha is chosen high. This might cause
+                biased and therefore misleading results 
+                when using the motifEntrichent, compoundPoissonDist
+                or combinatorialDist. A better choice for alpha is e.g. 0.001.")
     }
     dummy=.C("motifcounter_option",
         as.numeric(alpha),

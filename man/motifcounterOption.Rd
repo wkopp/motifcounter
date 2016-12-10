@@ -4,12 +4,12 @@
 \alias{motifcounterOption}
 \title{Set parameters for the enrichment analysis}
 \usage{
-motifcounterOption(alpha, gran = 0.1, ncores = 1)
+motifcounterOption(alpha = 0.001, gran = 0.1, ncores = 1)
 }
 \arguments{
 \item{alpha}{Significance level for calling
 motif hits. E.g. alpha=0.001 amounts to calling one motif hit per strand
-by chance in a sequence of length 1000.}
+by chance in a sequence of length 1000. Default: alpha=0.001}
 
 \item{gran}{The score granularity which is used
 for discretizing the score range. Decreasing gran values

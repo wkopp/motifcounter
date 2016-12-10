@@ -76,12 +76,6 @@ scoreDistEmpirical=function(pfm,bg,seqlen, nsim) {
 generateDNAString=function(len,bg) {
     len=as.integer(len)
     backgroundValid(bg)
-    if (is.na(len)) {
-        stop("len must be a positive integer")
-    }
-    if (len<=0) {
-        stop("len must be a positive integer")
-    }
     if (len<bg$order) {
         stop(sprintf("len must be at least %d",bg$order))
     }

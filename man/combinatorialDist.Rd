@@ -9,8 +9,7 @@ combinatorialDist(seqlen, overlap)
 \arguments{
 \item{seqlen}{Integer-valued vector that defines the lengths of the
 individual sequences. This information can be extracted for
-given DNA sequence of interest using \code{\link{numMotifHits}} or
-\code{\link{lenSequences}}.}
+given DNA sequence of interest using \code{\link{numMotifHits}}.}
 
 \item{overlap}{Overlap-object that contains the overlapping 
 hit probabilities. An Overlap-object is created by 

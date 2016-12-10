@@ -20,7 +20,7 @@ bibliography: literature.bib
 ```{r include=FALSE}
 library(knitr)
 knit_hooks$set(plot = function(x, options) {
-  paste('<figure><img src="',
+    paste('<figure><img src="',
         opts_knit$get('base.url'), paste(x, collapse = '.'),
         '"><figcaption>', options$fig.cap, '</figcaption></figure>',
         sep = '')
@@ -66,7 +66,8 @@ The main ingredients for an analysis with `motifcounter` consist of
 1. a position frequency matrix (PFM) (also called TF motif)
 2. a background model
 3. a set of DNA sequences that should be scanned for TFBSs
-4. a *false positive probability* $\alpha$ to obtain a motif hit in a random sequence
+4. a *false positive probability* $\alpha$ to obtain a motif hit 
+    in a random sequence
 
 A **PFM** represents the affinity of a TF to bind a certain DNA segment. A
 large set of known PFMs can be acquired e.g. from 
@@ -82,7 +83,8 @@ higher-order sequence features (e.g. in CpGs islands).
 
 Using the PFM and the background model, `motifcounter` computes
 the **motif score** for a give DNA sequence,
-which is defined to be the log-likelihood ratio between the PFM and the background.
+which is defined to be the log-likelihood ratio 
+between the PFM and the background.
 The motif score represents a measure that indicates whether a certain
 position in the DNA sequence is bound or unbound by the TF. Intuitively, 
 the higher the score, the more like the location is a TFBSs.
@@ -102,7 +104,8 @@ background models, similar as described in [@rahmann, @rsat1].
 
 Testing for **motif hit enrichment** in `motifcounter` is based
 on the **number of motif hits** that are observed in a set of DNA sequences.
-Consequently, the statistical significance for the notif enrichment is based on the
+Consequently, the statistical significance for 
+the notif enrichment is based on the
 **distribution of the number of motif hits** 
 in a set of random DNA sequences.
 
@@ -125,7 +128,8 @@ of the number of motif hits and thereby the motif hit enrichment test.
 
 The compound Poisson model in `motifcounter` is based
 on an improvement upon [@pape], which was extended to support order-$d$
-background models and uses a refined way to determine the clump size distribution.
+background models and uses a refined way to 
+determine the clump size distribution.
 
 On the other hand,
 the combinatorial model is based on summing over all permutations of
@@ -182,7 +186,8 @@ bg=readBackground(seqs,order)
 *position frequency matrices* (PFMs), which are commonly
 used to represent the binding affinity of transcription factors (TFs).
 
-A convenient source of known motifs is the `MotifDb` bioconductor package,
+A convenient source of known motifs is the `MotifDb` 
+bioconductor package [@motifdb],
 which shall be the basis for our tutorial.
 For example, we retrieve the motif for the human *Pou5f1* (or *Oct4*) 
 transcription factor as follows
@@ -335,7 +340,8 @@ analysis.
 
 The combinatorial model and the compound Poisson approximation both aim
 towards modelling the distribution of the number of motif hits and
-will mostly yield similar results, but they come advantages and disadvantages as well.
+will mostly yield similar results, but they come 
+advantages and disadvantages as well.
 In this section, we describe in which cases each approximation is expected to
 yield accurate results and in which cases the underlying assumptions for each 
 method might be violated. In the latter case, the results of the enrichment 
