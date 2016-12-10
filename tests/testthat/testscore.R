@@ -93,6 +93,7 @@ test_that("scoresequence", {
 
     # Compute the score distribution
     scores=scoreSequence(seq,motif,bg)
+    # expect error with too short sequence
     expect_error(scoreSequence(generateDNAString(ncol(motif)-1,bg),motif,bg))
 
     # same number of score on both strands because its a palindrome
@@ -104,10 +105,7 @@ test_that("scoresequence", {
     seq=Biostrings::replaceLetterAt(seq,3,"N")
     sh=scoreHistogram(seq,motif,bg)
     scores=scoreSequence(seq,motif,bg)
-    expect_equal(scores$fscores,scores$rscores) # both should be negative
-                                                # and equal
-
-
+    expect_equal(scores$fscores,scores$rscores) # both should be equal 
 })
 
 test_that("score correctness", {
@@ -149,18 +147,17 @@ test_that("score correctness", {
 
         if (m==0) {
             #simluate score distribution
-            sims=scoreDistEmpirical(as.matrix(motif[,1]), bg,1,10000)
+            sims=scoreDistEmpirical(as.matrix(motif[,1]), bg,1,1600)
             #compute exact score distribution
             dp=scoreDist(as.matrix(motif[,1]),bg)
             bf=scoreDistBf(as.matrix(motif[,1]),bg)
 
         } else {
             #simluate score distribution
-            sims=scoreDistEmpirical(as.matrix(motif[,1:m]),bg,m,10000)
+            sims=scoreDistEmpirical(as.matrix(motif[,1:m]),bg,m,1600)
             #compute exact score distribution
             dp=scoreDist(as.matrix(motif[,1:m]),bg)
             bf=scoreDistBf(as.matrix(motif[,1:m]),bg)
-
         }
 
         expect_equal(sum(dp[[2]]),1)
@@ -171,13 +168,6 @@ test_that("score correctness", {
         expect_equal(length(sims[[1]]),length(dp[[1]]))
         expect_equal(sims[[1]],dp[[1]])
         expect_true(all(!xor(sims[[2]]==0,dp[[2]]==0)))
-        # This test is incorrect
-        # Due to rounding differences of scores collected on either
-        # DNA strand, this condition might actually be wrong
-        #if (dp[[2]][1]<=0 || dp[[2]][length(dp[[2]])]<=0) {
-        #  stop(paste("The first and the last
-        #             score entry must be greater than zero: ",m))
-        #}
     }
 
     # test whether the range is equally long
@@ -188,7 +178,6 @@ test_that("score correctness", {
 
 
         #simluate score distribution
-        sims=scoreDistEmpirical(motif[,1:(m+1)],bg,m+1,10000)
         #compute exact score distribution
         dp=scoreDist(motif[,1:(m+1)],bg)
         bf=scoreDistBf(motif[,1:(m+1)],bg)
@@ -199,9 +188,42 @@ test_that("score correctness", {
         expect_equal(bf[[1]],dp[[1]])
         expect_equal(length(bf[[2]]),length(dp[[2]]))
         expect_equal(bf[[2]],dp[[2]])
+
+        sims=scoreDistEmpirical(motif[,1:(m+1)],bg,m+1,3000)
         expect_equal(length(sims[[1]]),length(dp[[1]]))
         expect_equal(sims[[1]],dp[[1]])
         expect_true(all(!xor(sims[[2]]==0,dp[[2]]==0)))
 
     }
+})
+
+test_that("score correctness with jaspar motifs", {
+    library(MotifDb)
+    motifs=as.list(query(query(MotifDb,"hsapiens"),"JASPAR_CORE"))
+
+    seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+    seqs=Biostrings::readDNAStringSet(seqfile)
+
+    bg=readBackground(seqs, 1)
+
+    for ( motif in motifs ) {
+        motif=normalizeMotif(motif)
+        if (ncol(motif)>4) {
+            motif=motif[, 1:4]
+        }
+        dp=scoreDist(as.matrix(motif),bg)
+        bf=scoreDistBf(as.matrix(motif),bg)
+
+        expect_equal(dp$probability, bf$probability)
+        expect_equal(sum(dp$probability),1)
+
+        expect_true(dp$probability[1]>0)
+        expect_true(dp$probability[length(dp[[2]])]>0)
+    }
+
+    logp1=round(log(motif[,1]/bg$station)*10)
+    logp2=round(log(rep(motif[,2],4)/bg$trans)*10)
+    score=as.vector(matrix(logp2,4,4)+t(matrix(rep(logp1,4),4,4)))
+    p1=bg$station
+    p12=as.vector(matrix(rep(bg$station,4)*bg$trans,4,4))
 })

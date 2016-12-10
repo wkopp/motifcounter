@@ -20,6 +20,9 @@ void Rscoresequence(double *pfm_, int *nrow, int *ncol, char **seq,
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
     cpfm.data=Calloc(nrow[0]*ncol[0],double);
+    if (pfm.data==NULL || cpfm.data==NULL) {
+        error("Rscoresequence: Memory allocation failed");
+    }
     // Rcol and c-col are swapped
     pfm.ncol=nrow[0];
     cpfm.ncol=nrow[0];
@@ -46,10 +49,9 @@ void RscoreHistogram(double *pfm_, int *nrow, int *ncol, char **seq, int *slen,
     double *scorebins,  double *frequency,
     double *station, double *trans, int *order) {
     int i;
-    ExtremalScore fescore, rescore;
-    int fmins,fmaxs, rmins,rmaxs;
+    ExtremalScore fescore;
     int mins, maxs, noscores;
-    DMatrix pfm, cpfm;
+    DMatrix pfm;
 
     if (Rgran==0.0) {
         error("call mdistOption  first");
@@ -58,31 +60,21 @@ void RscoreHistogram(double *pfm_, int *nrow, int *ncol, char **seq, int *slen,
 
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
-    cpfm.data=Calloc(nrow[0]*ncol[0],double);
+    if (pfm.data==NULL) {
+        error("RscoreHistogram: Memory allocation failed");
+    }
     // Rcol and c-col are swapped
     pfm.ncol=nrow[0];
-    cpfm.ncol=nrow[0];
     pfm.nrow=ncol[0];
-    cpfm.nrow=ncol[0];
     memcpy(pfm.data,pfm_,nrow[0]*ncol[0]*sizeof(double));
-    for (i=1; i<=nrow[0]*ncol[0];i++) {
-        cpfm.data[i-1]=pfm.data[nrow[0]*ncol[0]-i];
-    }
 
     initExtremalScore(&fescore, Rgran, pfm.nrow, order[0]);
-    initExtremalScore(&rescore, Rgran, cpfm.nrow, order[0]);
 
     loadMinMaxScores(&pfm, station, trans, &fescore);
-    loadMinMaxScores(&cpfm, station, trans, &rescore);
     loadIntervalSize(&fescore, NULL);
-    loadIntervalSize(&rescore, NULL);
 
-    fmins=getTotalScoreLowerBound(&fescore);
-    rmins=getTotalScoreLowerBound(&rescore);
-    fmaxs=getTotalScoreUpperBound(&fescore);
-    rmaxs=getTotalScoreUpperBound(&rescore);
-    maxs=(fmaxs>rmaxs) ? fmaxs : rmaxs;
-    mins=(fmins>rmins) ? fmins : rmins;
+    mins=getTotalScoreLowerBound(&fescore);
+    maxs=getTotalScoreUpperBound(&fescore);
 
     // if the sequence contains any N's, do not process the scores
     noscores=0;
@@ -100,8 +92,6 @@ void RscoreHistogram(double *pfm_, int *nrow, int *ncol, char **seq, int *slen,
         scorebins[i]= (double)(mins+i)*Rgran;
     }
     deleteExtremalScore(&fescore);
-    deleteExtremalScore(&rescore);
 
     Free(pfm.data);
-    Free(cpfm.data);
 }
