@@ -7,41 +7,38 @@
 motifHits(seq, pfm, bg)
 }
 \arguments{
-\item{seq}{A DNAString}
+\item{seq}{A DNAString object}
 
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 }
 \value{
 List containing
 \describe{
-\item{fhits}{Vector of motif hits on the forward strand}
-\item{rhits}{Vector of motif hits on the reverse strand}
+\item{fhits}{Per-position motif hits on the forward strand}
+\item{rhits}{Per-position motif hits on the reverse strand}
 }
 }
 \description{
-This function determines motif hits in a given DNA sequence
+This function determines per-position motif hits in a given DNA sequence
 }
 \examples{
 
 
-# Set the significance level and granularity for the score computation
-motifcounterOption(alpha=0.01,gran=0.1)
-
-# Load the DNA sequence and a Motif
+# Load DNA sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
 seq=Biostrings::readDNAStringSet(seqfile)
 
-# Load the order-1 background model from the DNA sequence
+# Load a background model
 bg=readBackground(seq,1)
 
-# Load the motif from the motiffile
+# Load a motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
-# Compute the score distribution
-scoreSequence(seq[[1]],motif,bg)
+# Determine the motif hits
+motifHits(seq[[1]],motif,bg)
 
 }
 

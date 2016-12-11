@@ -7,7 +7,8 @@
 overlapValid(overlap)
 }
 \arguments{
-\item{overlap}{An Overlap object}
+\item{overlap}{An Overlap object which is created by
+\code{\link{probOverlapHit}}.}
 }
 \value{
 None
@@ -15,5 +16,22 @@ None
 \description{
 This function checks if the Overlap object is valid. The function throws
 an error if the obejct does not represent a Overlap object.
+}
+\examples{
+
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
+
+# estimate a background model
+bg=readBackground(seqs,1)
+
+# load a motif
+motif=t(as.matrix(read.table(motiffile)))
+
+# compute the overlap probabilities for scanning both DNA strands
+op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
+motifcounter:::overlapValid(op)
+
 }
 

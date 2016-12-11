@@ -7,11 +7,7 @@
 #' while the `beta`s represent overlapping hit probabilities
 #' that were corrected for intermediate hits.
 #' 
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
-#' @param singlestranded Boolian which defines whether the overlapping hit
-#' probabilities shall be computed with respect to scanning both DNA strands or
-#' only one strand.  Default: singlestranded=FALSE.
+#' @inheritParams numMotifHits
 #' @return A list containing various overlapping hit probabilities.
 #' The list contains the following entries
 #'     \describe{
@@ -53,12 +49,11 @@
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # compute the overlap probabilities for scanning both DNA strands
-#' op=probOverlapHit(motif,bg,singlestranded=FALSE)
+#' op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
 #'
 #' # compute the overlap probabilities for scanning a single DNA strand
-#' op=probOverlapHit(motif,bg,singlestranded=TRUE)
+#' op=motifcounter:::probOverlapHit(motif,bg,singlestranded=TRUE)
 #'
-#' @export
 probOverlapHit=function(pfm,bg,singlestranded=FALSE) {
     #check if pfm is a matrix
     motifValid(pfm)
@@ -97,8 +92,25 @@ probOverlapHit=function(pfm,bg,singlestranded=FALSE) {
 #' This function checks if the Overlap object is valid. The function throws
 #' an error if the obejct does not represent a Overlap object.
 #'
-#' @param overlap An Overlap object
+#' @param overlap An Overlap object which is created by
+#' \code{\link{probOverlapHit}}.
 #' @return None
+#'
+#' @examples
+#' 
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
+#'
+#' # estimate a background model
+#' bg=readBackground(seqs,1)
+#'
+#' # load a motif
+#' motif=t(as.matrix(read.table(motiffile)))
+#'
+#' # compute the overlap probabilities for scanning both DNA strands
+#' op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
+#' motifcounter:::overlapValid(op)
 #'
 overlapValid=function(overlap) {
     if (class(overlap)!="Overlap") {

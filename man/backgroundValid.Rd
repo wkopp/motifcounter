@@ -22,7 +22,7 @@ seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 
 bg=readBackground(seqs,1)
-backgroundValid(bg)
+motifcounter:::backgroundValid(bg)
 
 }
 

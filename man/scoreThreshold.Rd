@@ -7,7 +7,7 @@
 scoreThreshold(pfm, bg)
 }
 \arguments{
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 }
@@ -41,10 +41,7 @@ bg=readBackground(seqs,1)
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the score threshold
-scoreThreshold(motif,bg)
+motifcounter:::scoreThreshold(motif,bg)
 
-}
-\seealso{
-\code{\link{scoreDist}}
 }
 

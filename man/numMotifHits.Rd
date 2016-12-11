@@ -7,14 +7,15 @@
 numMotifHits(seqs, pfm, bg, singlestranded = FALSE)
 }
 \arguments{
-\item{seqs}{A DNAString or a DNAStringSet object}
+\item{seqs}{A DNAStringSet object}
 
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 
-\item{singlestranded}{Boolian flag that indicates whether a single strand or
-both strands shall be scanned for motif hits. Default: singlestranded=FALSE.}
+\item{singlestranded}{Boolean that indicates whether a single strand or
+both strands shall be scanned for motif hits. 
+Default: singlestranded = FALSE.}
 }
 \value{
 A list containing
@@ -46,11 +47,11 @@ bg=readBackground(seq,1)
 motif=t(as.matrix(read.table(motiffile)))
 
 # scan the given sequence on both strands for the motif occurrences
-noc=numMotifHits(seq,motif,bg)
+noc=motifcounter:::numMotifHits(seq,motif,bg)
 noc
 
 # scan the given sequence on a single strand for the motif occurences
-noc=numMotifHits(seq,motif,bg,singlestranded=TRUE)
+noc=motifcounter:::numMotifHits(seq,motif,bg,singlestranded=TRUE)
 noc
 
 }

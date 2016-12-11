@@ -7,7 +7,7 @@
 motifValid(pfm)
 }
 \arguments{
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 }
 \value{
 None
@@ -20,7 +20,7 @@ an error if the R matrix does not represent a PFM.
 
 motiffile=system.file("extdata","x1.tab", package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
-motifValid(motif)
+motifcounter:::motifValid(motif)
 
 }
 

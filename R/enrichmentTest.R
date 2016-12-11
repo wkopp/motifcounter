@@ -2,18 +2,19 @@
 #'
 #' This function determines whether a given motif is enriched in a given
 #' DNA sequences. Enrichment is tested by comparing the observed 
-#' number of motif hits against the distribution of the number
+#' number of motif hits against a theoretical distribution of the number
 #' of motif hits in random DNA sequences.
-#' The function approximates the distribution of the number of motif
-#' hits using either a 'compound Poisson approximation' 
+#'
+#' Optionally, the theoretical distribution of the number of motif
+#' hits can be evaluated by either a 'compound Poisson model' 
 #' or the 'combinatorial model'.
+#' Additionally, the enrichment test can be conducted with respect
+#' to scanning only the forward strand or both strands of the DNA
+#' sequences. The latter option is only available for the
+#' 'compound Poisson model'
+#' @include count_wrapper.R
 #'
-#'
-#' @param seqs DNAString or DNAStringSet
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
-#' @param singlestranded Boolean flag that indicates whether one or both
-#'      strands are scanned for motif hits
+#' @inheritParams numMotifHits
 #' @param method String that defines whether to use
 #' the 'compound' Poisson approximation' or the 'combinatorial' model.
 #' Default: method='compound'.
@@ -33,24 +34,24 @@
 #' gran=0.1
 #' motifcounterOption(alpha, gran)
 #'
-#' # estimate the background model
+#' # Estimate the background model
 #' bg=readBackground(seqs,1)
 #'
-#' # load a motif
+#' # Load a motif
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' ### 1 ) Compute the distribution for scanning a *single* DNA strand
+#' ### 1 ) Motif enrichment test w.r.t. scanning a *single* DNA strand
 #' # based on the 'Compound Poisson model'
 #'
 #' result=motifEnrichment(seqs,motif,bg,
 #'             singlestranded=TRUE,method="compound")
 #'
-#' ### 2 ) Compute the distribution for scanning *both* DNA strand
+#' ### 2 ) Motif enrichment test w.r.t. scanning *both* DNA strand
 #' # based on the 'Compound Poisson model'
 #'
 #' result=motifEnrichment(seqs,motif, bg, method="compound")
 #'
-#' ### 3 ) Compute the distribution for scanning *both* DNA strand
+#' ### 3 ) Motif enrichment test w.r.t. scanning *both* DNA strand
 #' # based on the *combinatorial model*
 #'
 #' result=motifEnrichment(seqs,motif, bg,singlestranded=FALSE,

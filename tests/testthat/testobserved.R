@@ -18,14 +18,11 @@ test_that("observation", {
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
     expect_equal(nom$nseq,3)
     expect_equal(as.vector(nom$lseq),c(23,10,0))
-    nom=numMotifHits(seqs[[1]],motif,bg,singlestranded=TRUE)
-    nom=numMotifHits(seqs[[3]],motif,bg,singlestranded=TRUE)
 
 
-    nom=numMotifHits(seqs[[1]],motif,bg,singlestranded=TRUE) # using DNAString
-    nom=numMotifHits(seqs[[1]],motif,bg,singlestranded=FALSE) #using DNAString
     # no DNAString
     expect_error(numMotifHits(seqfile,motif,bg,singlestranded=TRUE))
+    expect_error(numMotifHits(seq[[1]],motif,bg,singlestranded=TRUE))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE) #Using DNAStringSet
     expect_equal(as.vector(nom$numofhits),c(1,0,0))

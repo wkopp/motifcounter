@@ -48,11 +48,11 @@ test_that("scorehistogram", {
     # Load the motif from the motiffile
     motif=t(as.matrix(read.table(motiffile)))
 
-    expect_error(scoreHistogram(seqfile,motif,bg)) # not a DNAString[Set]
+    expect_error(scoreHistogram(seqfile,motif,bg)) # not a DNAStringSet
 
     # scoreHistogram same range as scoreDist
     dp=scoreDist(as.matrix(motif),bg)
-    sh=scoreHistogram(seq,motif,bg)
+    sh=scoreHistogram(Biostrings::DNAStringSet(seq),motif,bg)
 
     expect_equal(sh[[1]],dp[[1]])
 
@@ -60,7 +60,7 @@ test_that("scorehistogram", {
     expect_equal(sum(sh$frequency),10-ncol(motif)+1)
 
     seq=Biostrings::replaceLetterAt(seq,3,"N")
-    sh=scoreHistogram(seq,motif,bg)
+    sh=scoreHistogram(Biostrings::DNAStringSet(seq),motif,bg)
     expect_equal(sum(sh$frequency),0)
 
     seqs=generateDNAStringSet(rep(30,100),bg)
@@ -103,7 +103,6 @@ test_that("scoresequence", {
     expect_equal(length(scores$fscores),10-ncol(motif)+1)
 
     seq=Biostrings::replaceLetterAt(seq,3,"N")
-    sh=scoreHistogram(seq,motif,bg)
     scores=scoreSequence(seq,motif,bg)
     expect_equal(scores$fscores,scores$rscores) # both should be equal 
 })

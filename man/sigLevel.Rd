@@ -13,4 +13,8 @@ False positive motif hit probability
 This function returns the current false positive level for
 calling motif hits in random sequences.
 }
+\examples{
+motifcounter:::sigLevel()
+
+}
 

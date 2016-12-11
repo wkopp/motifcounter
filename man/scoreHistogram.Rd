@@ -4,12 +4,12 @@
 \alias{scoreHistogram}
 \title{Score histogram}
 \usage{
-scoreHistogram(seq, pfm, bg)
+scoreHistogram(seqs, pfm, bg)
 }
 \arguments{
-\item{seq}{DNAString or DNAStringSet}
+\item{seqs}{A DNAStringSet object}
 
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 }
@@ -21,8 +21,12 @@ List containing
 }
 }
 \description{
-This function computes the score histogram
-for a given sequence
+This function computes the empirical score
+distribution for a given DNAStringSet object.
+}
+\details{
+It can be used to compare the empirical score
+distribution against the theoretical one (see \code{\link{scoreDist}}).
 }
 \examples{
 
@@ -39,9 +43,6 @@ bg=readBackground(seqs,1)
 # Load a motif from the motiffile
 motif=t(as.matrix(read.table(motiffile)))
 
-# generate the simulated score distribution on
-# sequences of length 1kb using 1000 samples
-seq=generateDNAString(1000,bg)
 
 # Compute the empirical score histogram
 scoreHistogram(seqs,motif,bg)

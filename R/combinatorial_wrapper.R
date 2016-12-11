@@ -2,25 +2,20 @@
 #'
 #' This function approxmiates the distribution of the number of motif hits.
 #' It sums over all combinations of obtaining k hits in a random sequence
-#' of a given length using and efficient dynamic programming algorithm.
+#' of a given length using an efficient dynamic programming algorithm.
+#'
 #' This function is an alternative to \code{\link{compoundPoissonDist}}.
 #' However, it requires fixed-length sequences and currently
-#' only supports the distribution of the number of hits when both
+#' only supports the computation of 
+#' the distribution of the number of hits when both
 #' DNA strands are scanned for motif hits.
+#' @include comppoiss_wrapper.R
 #'
-#'
-#' @param seqlen Integer-valued vector that defines the lengths of the
-#' individual sequences. This information can be extracted for
-#' given DNA sequence of interest using \code{\link{numMotifHits}}.
-#' @param overlap Overlap-object that contains the overlapping 
-#' hit probabilities. An Overlap-object is created by 
-#' \code{\link{probOverlapHit}}
-#' @return List that contains
-#' \describe{
-#' \item{dist}{Distribution of the number of motif hits}
-#' }
+#' @inheritParams compoundPoissonDist
 #'
 #' @seealso \code{\link{compoundPoissonDist}}
+#' @seealso \code{\link{numMotifHits}}
+#' @seealso \code{\link{probOverlapHit}}
 #' @examples
 #'
 #'
@@ -37,12 +32,14 @@
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute overlap probabilities
-#' op=probOverlapHit(motif,bg,singlestranded=FALSE)
-#' seqlen=rep(100,1)
-#' # Computes the distribution of the number of motif hits
-#' dist=combinatorialDist(seqlen, op)
+#' op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
 #'
-#' @export
+#' # 2 sequences of length 100 bp
+#' seqlen=rep(100,2) 
+#'
+#' # Computes the distribution of the number of motif hits
+#' dist=motifcounter:::combinatorialDist(seqlen, op)
+#'
 combinatorialDist=function(seqlen, overlap) {
     overlapValid(overlap)
 

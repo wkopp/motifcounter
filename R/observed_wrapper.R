@@ -6,8 +6,14 @@
 #' set to length zero.
 #'
 #'
-#' @param seqs DNAStringSet
+#' @param seqs A DNAStringSet object
 #' @return A vector containing the lengths of each individual sequences
+#'
+#' @examples
+#' file=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(file)
+#' motifcounter:::lenSequences(seqs)
+#'
 lenSequences=function(seqs) {
     if (class(seqs)=="DNAStringSet") {
         lseq=sapply(seqs, function(seq) {

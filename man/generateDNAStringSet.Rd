@@ -4,24 +4,24 @@
 \alias{generateDNAStringSet}
 \title{Generate DNAStringSet}
 \usage{
-generateDNAStringSet(len, bg)
+generateDNAStringSet(seqlen, bg)
 }
 \arguments{
-\item{len}{Vector of individual sequence lengths}
+\item{seqlen}{Integer-valued vector that defines the lengths of the
+individual sequences. For a given DNAStringSet, 
+this information can be retrieved using \code{\link{numMotifHits}}.}
 
 \item{bg}{A Background object}
 }
 \value{
-DNAStringSet
+A DNAStringSet object
 }
 \description{
-This function generates a DNAStringSet-object
-by sampling a set of sequences from the background model.
+This function generates a DNAStringSet-object of given
+individual sequence lengths
+by sampling from the background model.
 }
 \examples{
-
-# Set the the significance level and the score granularity
-motifcounterOption(alpha=0.01, gran=0.1)
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
@@ -30,7 +30,10 @@ seqs=Biostrings::readDNAStringSet(seqfile)
 bg=readBackground(seqs,1)
 
 # generate sequences of various lengths
-generateDNAStringSet(10:50,bg)
+motifcounter:::generateDNAStringSet(10:50,bg)
 
+}
+\seealso{
+\code{\link{generateDNAStringSet}}
 }
 

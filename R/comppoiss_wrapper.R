@@ -1,34 +1,37 @@
 #' Compound Poisson Approximation
 #'
 #' This function computes the distribution of the number of motif hits
-#' that would be observes in a random DNA sequence of a given length.
-#' The distribution can be determine in two alternative ways:
+#' that emerges from a random DNA sequence of a given length.
+#' The distribution can be determined in two alternative ways:
 #' 1) We provide a re-implemented version of the algorithm that was
 #' described in Pape et al. \emph{Compound poisson approximation
 #' of the number of occurrences of a position
 #' frequency matrix (PFM) on both strands.} 2008. 
-#' The main purpose of this method was for benchmarking the improved 
+#' The main purpose of this method concerns benchmarking an improved 
 #' approximation.
 #' In contrast to the original model, this implementation 
-#' can be used with higher-order
-#' background models. To invoke this method use method='pape'.
+#' can be used with general order-d Markov models.
+#' To invoke this method use method='pape'.
 #' 2) We provide an improved compound Poisson approximation that
 #' uses more appropriate statistical assumptions concerning
-#' overlapping motif hits and that can be used with higher-order
+#' overlapping motif hits and that can be used with order-d
 #' background models as well. The improved version is used by default
 #' with method='kopp'.
+#' Note: Only method='kopp' supports the computation
+#' of the distribution of the number of motif hits w.r.t. scanning
+#' a single DNA strand (see \code{\link{probOverlapHit}}).
 #'
-#'
-#' @param seqlen Integer-valued vector that defines the lengths of the
-#' individual sequences. This information can be extracted for
-#' given DNA sequence of interest using \code{\link{numMotifHits}}.
+#' An Overlap-object is created by 
+#' \code{\link{probOverlapHit}}
 #' In contrast to \code{\link{combinatorialDist}}, this function
 #' supports variable-length DNA sequence.
-#' @param overlap Overlap-object that contains the overlapping 
-#' hit probabilities. An Overlap-object is created by 
-#' \code{\link{probOverlapHit}}
+#'
+#' @param seqlen Integer-valued vector that defines the lengths of the
+#' individual sequences. For a given DNAStringSet, 
+#' this information can be retrieved using \code{\link{numMotifHits}}.
+#' @inheritParams overlapValid
 #' @param method String that defines which method shall be invoked: 'pape' or
-#' 'kopp' (see description). Default: method='kopp'
+#' 'kopp' (see description). Default: method='kopp'.
 #'
 #' @return List containing
 #' \describe{
@@ -47,29 +50,28 @@
 #' # estimate a background model
 #' bg=readBackground(seqs,1)
 #'
-#' # load motif model from motiffile
+#' # load a motif
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # compute the distribution for scanning a single DNA strand
-#' #Compute overlapping probabilities
-#' op=probOverlapHit(motif,bg,singlestranded=TRUE)
-#'
-#' # Computes the distribution of the number of motif hits
+#' # Compute the distribution for scanning the forward DNA strand
+#' # of 100 individual 150 bp sequences
 #' seqlen=rep(150,100)
-#' dist=compoundPoissonDist(seqlen, op)
+#'
+#' # Compute overlapping probabilities
+#' op=motifcounter:::probOverlapHit(motif,bg,singlestranded=TRUE)
+#'
+#' # Computes  the distribution of the number of motif hits
+#' dist=motifcounter:::compoundPoissonDist(seqlen, op)
 #' #plot(1:length(dist$dist)-1, dist$dist)
 #'
-#' # compute the distribution for scanning both DNA strands
-#' #Compute overlapping probabilities
-#' op=probOverlapHit(motif,bg,singlestranded=FALSE)
-#'
-#' # Computes the distribution of the number of motif hits
-#' seqlen=rep(150,100)
-#' dist=compoundPoissonDist(seqlen, op)
+#' # Proceed similarly for scanning both DNA strands
+#' op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
+#' dist=motifcounter:::compoundPoissonDist(seqlen, op)
 #' #plot(1:length(dist$dist)-1, dist$dist)
 #'
 #' @seealso \code{\link{combinatorialDist}}
-#' @export
+#' @seealso \code{\link{probOverlapHit}}
+#' @seealso \code{\link{numMotifHits}}
 compoundPoissonDist=function(seqlen, overlap,method="kopp") {
     overlapValid(overlap)
     # for all practical purposes, a maximal clump size of 60

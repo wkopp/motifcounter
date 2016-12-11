@@ -3,25 +3,27 @@
 #' This function sets some parameters that are necessary for
 #' the computations of the `motifcounter` package.
 #'
-#'
-#' @param alpha Significance level for calling
-#' motif hits. E.g. alpha=0.001 amounts to calling one motif hit per strand
-#' by chance in a sequence of length 1000. Default: alpha=0.001
-#' @param gran The score granularity which is used
-#' for discretizing the score range. Decreasing gran values
+#' E.g. alpha=0.001 amounts to calling one motif hit per strand
+#' by chance in a sequence of length 1000. 
+#' Decreasing gran values
 #' will increase number
 #' of discrete bins that represent the real-valued score range.
 #' This will yield more a accurate score distribution due to less
 #' discretization noise, however, it incurs an increase of the computational
-#' runtime.  Default: gran=0.1
-#' @param ncores Number of cores used for parallel processing if openMP is
-#' available. Default: ncores=1.
+#' runtime.
+#' 
+#' @param alpha Numeric significance level for calling
+#' motif hits. Default: alpha=0.001
+#' @param gran Numeric score granularity which is used
+#' for discretizing the score range. Default: gran=0.1
+#' @param ncores Interger number of cores used for parallel processing,
+#' if openMP is available. Default: ncores=1
 #'
 #' @return None
 #' @examples
 #'
 #'
-#' motifcounterOption(alpha=0.001)
+#' motifcounterOption(alpha=0.001, gran=0.1, ncores=1)
 #'
 #' @export
 motifcounterOption=function(alpha=0.001, gran=0.1, ncores=1) {
@@ -50,6 +52,9 @@ motifcounterOption=function(alpha=0.001, gran=0.1, ncores=1) {
 #'
 #'
 #' @return False positive motif hit probability
+#'
+#' @examples
+#' motifcounter:::sigLevel()
 #'
 sigLevel=function() {
     alpha=0.0

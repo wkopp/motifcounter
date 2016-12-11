@@ -7,17 +7,19 @@
 simulateNumHitsDist(pfm, bg, seqlen, nsim, singlestranded = FALSE)
 }
 \arguments{
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 
-\item{seqlen}{Integer-valued vector contanting the individual
-sequence lengths.}
+\item{seqlen}{Integer-valued vector that defines the lengths of the
+individual sequences. For a given DNAStringSet, 
+this information can be retrieved using \code{\link{numMotifHits}}.}
 
-\item{nsim}{Number of random samples.}
+\item{nsim}{Integer number of random samples.}
 
-\item{singlestranded}{Boolian flag that indicates whether a single strand or
-both strands shall be scanned for motif hits.}
+\item{singlestranded}{Boolean that indicates whether a single strand or
+both strands shall be scanned for motif hits. 
+Default: singlestranded = FALSE.}
 }
 \value{
 A List that contains
@@ -45,9 +47,9 @@ bg=readBackground(seqs,1)
 motif=t(as.matrix(read.table(motiffile)))
 
 seqlen=rep(150,1)
-simc=simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=FALSE)
+simc=motifcounter:::simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=FALSE)
 
-simc=simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=TRUE)
+simc=motifcounter:::simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=TRUE)
 
 }
 \seealso{

@@ -7,9 +7,9 @@
 scoreSequence(seq, pfm, bg)
 }
 \arguments{
-\item{seq}{DNAString}
+\item{seq}{A DNAString object}
 
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 }

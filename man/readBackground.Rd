@@ -7,7 +7,7 @@
 readBackground(seqs, order = 1)
 }
 \arguments{
-\item{seqs}{DNAStringSet}
+\item{seqs}{A DNAStringSet object}
 
 \item{order}{Order of the Markov models that shall be used as the
 background model. Default: order=1.}

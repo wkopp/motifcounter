@@ -7,14 +7,15 @@
 scoreDistEmpirical(pfm, bg, seqlen, nsim)
 }
 \arguments{
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 
-\item{seqlen}{Length of the sequence to be
-simulated.}
+\item{seqlen}{Integer-valued vector that defines the lengths of the
+individual sequences. For a given DNAStringSet, 
+this information can be retrieved using \code{\link{numMotifHits}}.}
 
-\item{nsim}{Number of samples to be generated.}
+\item{nsim}{Integer number of random samples.}
 }
 \value{
 List containing
@@ -47,7 +48,7 @@ motif=t(as.matrix(read.table(motiffile)))
 
 # generate the simulated score distribution on
 # sequences of length 1kb using 1000 samples
-scoreDistEmpirical(motif,bg,seqlen= 1000,nsim=1000)
+motifcounter:::scoreDistEmpirical(motif,bg,seqlen= 1000,nsim=1000)
 
 }
 \seealso{

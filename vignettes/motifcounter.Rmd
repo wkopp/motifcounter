@@ -206,18 +206,16 @@ If this is not the case, the package provides the
 function `normalizeMotif`, which adds
 pseudo-observations to each element of the matrix and renormalize the columns:
 
-```{r eval=FALSE}
-motif=normalizeMotif(motif)
-motifValid(motif)
-motif
+```{r}
+new_motif=normalizeMotif(motif)
 ```
 
 
 ### Optional settings
 
 By default the false positive probability $\alpha$ to obtain
-a motif hit is set to $\alpha=0.001$. The user might change
-the stringency level of $\alpha$  using the `motifcounterOption`.
+a motif hit in random sequences is set to $\alpha=0.001$. The user might change
+the stringency level of $\alpha$ globally using the `motifcounterOption`.
 
 ```{r eval=FALSE}
 alpha=0.01
@@ -243,27 +241,69 @@ oct4peaks=Biostrings::readDNAStringSet(file)
 
 The `motifcounter` package provides functions for exploring 
 position- and strand-specific putative TFBSs in individual DNA sequences.
-To this end, `scoreSequence` returns the scores at each 
-position and strand for a given `Biostring::DNAString`-object:
+One way to explore the a given DNA sequence for TFBSs is by 
+utilizing `scoreSequence`. This function returns the scores at each 
+position and strand for a given `Biostring::DNAString`-object (left panel below).
+To put the observed scores into perspective, the right panel shows
+the theoretical score distribution in random sequences, which
+is obtained by `scoreDist`. Scores at the tail of the distribution 
+occur very rarely by chance:
 
 ```{r fig.show=TRUE, fig.cap="Per-position and strand scores"}
 seq=oct4peaks[[1]]
+# Determine the per-position and per-strand scores
 scores=scoreSequence(seq,motif,bg)
+# As a comparison, compute the theoretical score distribution
+sd=scoreDist(motif,bg)
+par(mfrow=c(1,2))
 plot(1:length(scores$fscores),scores$fscores, type="l",
-    col="blue",xlab="position",ylab="score")
+    col="blue",xlab="position",ylab="score",
+    ylim=c(min(sd$score),max(sd$score)),xlim=c(1,250))
 points(scores$rscores,col="red",type="l")
-legend(0,0,c("forward", "reverse"), col=c("blue","red"),lty=c(1,1))
+legend(120,11,c("forw.", "rev."), col=c("blue","red"),lty=c(1,1))
+
+# plot the the score distribution for the comparison
+plot(sd$probability,sd$score, type="l",xlab="probability",ylab="")
 ```
 
 Alternatively, `motifcounter` provides an analogous function for determining
 the per-position and per-strand motif hit occurrences 
-using `motifHits` that emerge with a stringency level $\alpha$
+using `motifHits` that emerge with a stringency level $\alpha=0.001$ 
+(`motifcounter`'s default setting).
 
-```{r eval=FALSE}
+```{r}
 seq=oct4peaks[[1]]
 mhits=motifHits(seq,motif,bg)
+fhitpos=which(mhits$fhits==1)
+rhitpos=which(mhits$rhits==1)
+fhitpos
+rhitpos
+```
+In the given sequence, we obtain no motif hit on the forward strand and 
+one motif hit on the reverse strand at position 94. 
+The underlying DNA sequence at this hit can be retrieved by
+
+```{r}
+seq[rhitpos:(rhitpos+ncol(motif)-1)]
 ```
 
+Relaxing stringency for obtaining motif hits
+(e.g. to a false positive probability of $\alpha=0.01$ 
+via `motifcounterOption`)
+will tend to produce more motif hits.
+
+```{r}
+motifcounterOption(alpha=0.01)
+
+mhits=motifHits(seq,motif,bg)
+
+fhitpos=which(mhits$fhits==1)
+rhitpos=which(mhits$rhits==1)
+fhitpos
+rhitpos
+```
+For example, now we observe four hits on either strand 
+in the same sequence which was used above.
 
 ### Analysis of a set of DNA sequences
 
@@ -272,24 +312,27 @@ TFBSs in `DNAString`-objects, one might also be interested in the
 average score or motif hit profiles across multiple sequences of equal length.
 This might reveal positional constraints of the motif occurrences 
 with respect to e.g. the TSS, or the middle or summit of the ChIP-seq peaks.
-To this end, `motifcounter` provides the `scoreSequenceProfile` 
+To study positional constrains, `motifcounter` provides the `scoreSequenceProfile` 
 method which can be applied for a `Biostrings::DNAStringSet`-object.
 
 ```{r fig.show=TRUE, fig.cap="Average score profile"}
-# determine the average score profile across a set of aligned sequences
+
 scores=scoreSequenceProfile(oct4peaks,motif,bg)
+
 plot(1:length(scores$fscores),scores$fscores, type="l",
     col="blue",xlab="position",ylab="score")
 points(scores$rscores,col="red",type="l")
 legend(-10.8,0,c("forward", "reverse"), col=c("blue","red"),lty=c(1,1))
 ```
 
-Alternatively, `motifHitProfile` constructs a similar profile on the basis of
-the motif hits 
+Furthermore, `motifHitProfile` constructs a similar profile by computing
+the position and strand specific mean motif hit frequency
 
 ```{r fig.show=TRUE, fig.cap="Average motif hit profile"}
-# determine the average motif hit profile across a set of aligned sequences
+motifcounterOption() # lets use the default alpha again
+
 mhits=motifHitProfile(oct4peaks,motif,bg)
+
 plot(1:length(mhits$fhits),mhits$fhits, type="l",
     col="blue",xlab="position",ylab="score")
 points(mhits$rhits,col="red",type="l")
@@ -310,7 +353,7 @@ which requires a set of DNA sequences of interest, a PFM and a background model.
 
 ```{r}
 #take a subset of the oct4 peaks
-seqs=oct4peaks[1:100]
+seqs=oct4peaks[1:10]
 
 # Enrichment of Oct4 in Oct4-ChIP-seq peaks
 result=motifEnrichment(seqs, motif,bg)
@@ -370,52 +413,4 @@ model is restricted to analysing only fixed-length sequences
 and at the moment only supports scanning for motif hits
 in both DNA strands.
 
-### Inspect the distribution of the number of motif hits
-
-Inspecting the distribution of the number of motif hits 
-might be of interest in order to assess the effect size of motif enrichment.
-For example, how do the quantiles of the distribution
-relate to the observed number of motif hits?
-
-In this section, we investigate the compound Poisson 
-approximation, the combinatorial model and the empirical distribution 
-for a perfectly palindromic motif. 
-```{r fig.show=TRUE, fig.width=4, fig.height=3, fig.cap="Palindromic motif"}
-motiffile=system.file("extdata",as.character("x32.tab"),
-                    package="motifcounter")
-
-motif=t(as.matrix(read.table(motiffile)))
-seqLogo(motif)
-
-```
-
-The distribution of the number of motif hits for a set of 100 sequences
-of length 100 bp each are shown in the following
-
-```{r fig.show=TRUE, fig.cap="Distribution of the number of hits"}
-
-regions=rep(100,100)
-# generate an empirical distribution using 100 samples of 1kb sequences each
-simdist=simulateNumHitsDist(motif,bg,regions,100,singlestranded=FALSE)
-
-
-op=probOverlapHit(motif,bg,singlestranded=FALSE)
-cpdist=compoundPoissonDist(regions,op)
-combdist=combinatorialDist(regions,op)
-maxhits=80
-
-plot(0:(maxhits+1), cpdist$dist[1:(maxhits+2)],
-        col="blue",ylab="Probability",xlab="Num. of hits")
-points(0:(maxhits+1),combdist$dist[1:(maxhits+2)],col="red")
-points(0:(maxhits+1),simdist$dist[1:(maxhits+2)],col="gray")
-legend(50,0.08,c("comp. Poiss.", "combinatorial", "empirical"), 
-        col=c("blue","red","gray"), lty=c(1,1,1))
-
-```
-
-**Note:** Scanning both DNA strands for motif hits (at $\alpha=0.001$) can only
-yield an even number of motif hits, as a hit on the forward 
-strand is always coupled with a hit on the reverse strand. 
-Therefore, odd numbers of motif hits are associated 
-with a probability of (almost) zero.
 

@@ -7,13 +7,13 @@
 probOverlapHit(pfm, bg, singlestranded = FALSE)
 }
 \arguments{
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 
-\item{singlestranded}{Boolian which defines whether the overlapping hit
-probabilities shall be computed with respect to scanning both DNA strands or
-only one strand.  Default: singlestranded=FALSE.}
+\item{singlestranded}{Boolean that indicates whether a single strand or
+both strands shall be scanned for motif hits. 
+Default: singlestranded = FALSE.}
 }
 \value{
 A list containing various overlapping hit probabilities.
@@ -65,10 +65,10 @@ bg=readBackground(seqs,1)
 motif=t(as.matrix(read.table(motiffile)))
 
 # compute the overlap probabilities for scanning both DNA strands
-op=probOverlapHit(motif,bg,singlestranded=FALSE)
+op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
 
 # compute the overlap probabilities for scanning a single DNA strand
-op=probOverlapHit(motif,bg,singlestranded=TRUE)
+op=motifcounter:::probOverlapHit(motif,bg,singlestranded=TRUE)
 
 }
 

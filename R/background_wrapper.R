@@ -5,7 +5,7 @@
 #' random DNA sequences.
 #'
 #'
-#' @param seqs DNAStringSet
+#' @inheritParams lenSequences
 #' @param order Order of the Markov models that shall be used as the
 #' background model. Default: order=1.
 #'
@@ -71,9 +71,8 @@ readBackground=function(seqs, order=1) {
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
 #' bg=readBackground(seqs,1)
-#' backgroundValid(bg)
+#' motifcounter:::backgroundValid(bg)
 #'
-#' @export
 backgroundValid=function(bg) {
     if (class(bg)!="Background") {
         stop("bg must be a Background object.

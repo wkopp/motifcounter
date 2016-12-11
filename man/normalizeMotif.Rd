@@ -7,10 +7,11 @@
 normalizeMotif(pfm, pseudo = 0.01)
 }
 \arguments{
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
-\item{pseudo}{Small pseudo-value that is added 
-to each entry in the PFM. Default: pseudo = 0.01}
+\item{pseudo}{Small numeric pseudo-value that is added 
+to each entry in the PFM in order to ensure strictly positive entries.
+Default: pseudo = 0.01}
 }
 \value{
 None

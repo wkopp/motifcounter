@@ -1,67 +1,15 @@
-#' Empirical score distribution
-#'
-#' This function estimates the empirical score distribution
-#' by simulating random DNA sequences based on the
-#' background model. Subsequently, the random sequences are scanned
-#' with the scoring measure which yields the score distribution.
-#' This function is only used for benchmarking analysis.
-#'
-#'
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
-#' @param seqlen Length of the sequence to be
-#' simulated.
-#' @param nsim Number of samples to be generated.
-#' @return List containing
-#' \describe{
-#' \item{score}{Vector of scores}
-#' \item{probability}{Vector of score probabilities}
-#' }
-#' @examples
-#'
-#' # Set the the significance level and the score granularity
-#' motifcounterOption(alpha=0.01, gran=0.1)
-#'
-#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' seqs=Biostrings::readDNAStringSet(seqfile)
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
-#'
-#' # Load an order-1 background model
-#' bg=readBackground(seqs,1)
-#'
-#' # Load a motif
-#' motif=t(as.matrix(read.table(motiffile)))
-#'
-#' # generate the simulated score distribution on
-#' # sequences of length 1kb using 1000 samples
-#' scoreDistEmpirical(motif,bg,seqlen= 1000,nsim=1000)
-#'
-#' @seealso \code{\link{scoreDist}}
-#' @export
-scoreDistEmpirical=function(pfm,bg,seqlen, nsim) {
-    motifValid(pfm)
-    backgroundValid(bg)
-    seqs=generateDNAStringSet(rep(seqlen,nsim),bg)
-    sh=scoreHistogram(seqs,pfm,bg)
-
-    probs=sh$frequency/sum(sh$frequency)
-    return(list(score=sh$score, probability=probs))
-}
 
 #' Generate DNAString
 #'
-#' This function generates a DNAString
-#' by sampling a sequence from the the background model.
+#' This function generates a random DNAString of a given length
+#' by sampling from the given background model.
 #'
-#' @param len Length of the sequence
-#' @param bg A Background object
+#' @param len Integer length of the sequence
+#' @inheritParams backgroundValid
 #'
-#' @return DNAString
+#' @return A DNAString object
 #
 #' @examples
-#'
-#' # Set the the significance level and the score granularity
-#' motifcounterOption(alpha=0.01, gran=0.1)
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
@@ -69,10 +17,10 @@ scoreDistEmpirical=function(pfm,bg,seqlen, nsim) {
 #' # Load an order-1 background model
 #' bg=readBackground(seqs,1)
 #'
-#' # generates a sequences of length 1kb
-#' generateDNAString(1000,bg)
+#' # generates a 1 kb sequence
+#' motifcounter:::generateDNAString(1000,bg)
 #'
-#' @export
+#' @seealso \code{\link{generateDNAStringSet}}
 generateDNAString=function(len,bg) {
     len=as.integer(len)
     backgroundValid(bg)
@@ -89,19 +37,17 @@ generateDNAString=function(len,bg) {
 
 #' Generate DNAStringSet
 #'
-#' This function generates a DNAStringSet-object
-#' by sampling a set of sequences from the background model.
+#' This function generates a DNAStringSet-object of given
+#' individual sequence lengths
+#' by sampling from the background model.
 #'
 #'
-#' @param len Vector of individual sequence lengths
-#' @param bg A Background object
+#' @inheritParams compoundPoissonDist
+#' @inheritParams backgroundValid
 #'
-#' @return DNAStringSet
+#' @return A DNAStringSet object
 #
 #' @examples
-#'
-#' # Set the the significance level and the score granularity
-#' motifcounterOption(alpha=0.01, gran=0.1)
 #'
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
@@ -110,14 +56,14 @@ generateDNAString=function(len,bg) {
 #' bg=readBackground(seqs,1)
 #'
 #' # generate sequences of various lengths
-#' generateDNAStringSet(10:50,bg)
+#' motifcounter:::generateDNAStringSet(10:50,bg)
 #'
-#' @export
-generateDNAStringSet=function(len,bg) {
+#' @seealso \code{\link{generateDNAStringSet}}
+generateDNAStringSet=function(seqlen,bg) {
     backgroundValid(bg)
     seqs=c()
-    for (i in 1:length(len)) {
-        seqs=c(seqs,generateDNAString(len[i],bg))
+    for (i in 1:length(seqlen)) {
+        seqs=c(seqs,generateDNAString(seqlen[i],bg))
     }
 
     return(Biostrings::DNAStringSet(seqs))
@@ -132,13 +78,9 @@ generateDNAStringSet=function(len,bg) {
 #' hits.
 #' This function is only used for benchmarking analysis.
 #'
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
-#' @param seqlen Integer-valued vector contanting the individual
-#' sequence lengths.
-#' @param nsim Number of random samples.
-#' @param singlestranded Boolian flag that indicates whether a single strand or
-#' both strands shall be scanned for motif hits.
+#' @inheritParams numMotifHits
+#' @inheritParams compoundPoissonDist
+#' @param nsim Integer number of random samples.
 #' @return A List that contains
 #' \describe{
 #' \item{dist}{Empirical number of motif hits distribution}
@@ -155,12 +97,11 @@ generateDNAStringSet=function(len,bg) {
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' seqlen=rep(150,1)
-#' simc=simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=FALSE)
+#' simc=motifcounter:::simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=FALSE)
 #'
-#' simc=simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=TRUE)
+#' simc=motifcounter:::simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=TRUE)
 #'
 #' @seealso \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
-#' @export
 simulateNumHitsDist=function(pfm,bg,seqlen, nsim, singlestranded=FALSE) {
     motifValid(pfm)
     backgroundValid(bg)
@@ -183,4 +124,49 @@ simulateNumHitsDist=function(pfm,bg,seqlen, nsim, singlestranded=FALSE) {
     }
     freq=freq/sum(freq)
     return(list(dist=freq))
+}
+
+#' Empirical score distribution
+#'
+#' This function estimates the empirical score distribution
+#' by simulating random DNA sequences based on the
+#' background model. Subsequently, the random sequences are scanned
+#' with the scoring measure which yields the score distribution.
+#' This function is only used for benchmarking analysis.
+#' 
+#'
+#' @inheritParams simulateNumHitsDist
+#' @return List containing
+#' \describe{
+#' \item{score}{Vector of scores}
+#' \item{probability}{Vector of score probabilities}
+#' }
+#' @examples
+#'
+#' # Set the the significance level and the score granularity
+#' motifcounterOption(alpha=0.01, gran=0.1)
+#'
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
+#'
+#' # Load an order-1 background model
+#' bg=readBackground(seqs,1)
+#'
+#' # Load a motif
+#' motif=t(as.matrix(read.table(motiffile)))
+#'
+#' # generate the simulated score distribution on
+#' # sequences of length 1kb using 1000 samples
+#' motifcounter:::scoreDistEmpirical(motif,bg,seqlen= 1000,nsim=1000)
+#'
+#' @seealso \code{\link{scoreDist}}
+scoreDistEmpirical=function(pfm,bg,seqlen, nsim) {
+  motifValid(pfm)
+  backgroundValid(bg)
+  seqs=generateDNAStringSet(rep(seqlen,nsim),bg)
+  sh=scoreHistogram(seqs,pfm,bg)
+  
+  probs=sh$frequency/sum(sh$frequency)
+  return(list(score=sh$score, probability=probs))
 }

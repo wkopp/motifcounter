@@ -4,8 +4,8 @@
 #' background. The Score distribution is computed based on an efficient
 #' dynamic programming algorithm.
 #'
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
+#' @inheritParams motifValid
+#' @inheritParams backgroundValid
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of motif scores}
@@ -64,8 +64,7 @@ scoreDist=function(pfm,bg) {
 #' and might require substantial computational
 #' resources for long motifs. Therefore, use \code{\link{scoreDist}} instead.
 #'
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
+#' @inheritParams scoreDist
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of motif scores}
@@ -91,9 +90,8 @@ scoreDist=function(pfm,bg) {
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score distribution
-#' dp=scoreDistBf(motif,bg)
+#' dp=motifcounter:::scoreDistBf(motif,bg)
 #'
-#' @export
 scoreDistBf=function(pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
@@ -118,9 +116,8 @@ scoreDistBf=function(pfm,bg) {
 #' This function computes the per-position and per-strand 
 #' score in a given DNA sequence
 #'
-#' @param pfm A position frequency matrix
-#' @param seq DNAString
-#' @param bg A Background object
+#' @inheritParams scoreDist
+#' @param seq A DNAString object
 #' @return List containing
 #' \describe{
 #' \item{fscores}{Vector of scores on the forward strand}
@@ -181,9 +178,9 @@ scoreSequence=function(seq,pfm,bg) {
 #' This function computes the per-position and per-strand 
 #' average score profiles across a set of DNA sequences.
 #'
-#' @param pfm A position frequency matrix
-#' @param seqs DNAStringSet
-#' @param bg A Background object
+#' @inheritParams scoreDist
+#' @param seqs A DNAStringSet object
+#' 
 #' @return List containing
 #' \describe{
 #' \item{fscores}{Vector of per-position average forward strand scores}
@@ -214,7 +211,7 @@ scoreSequenceProfile=function(seqs,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
     if (class(seqs)!="DNAStringSet") {
-        stop("seq must be a DNAString object")
+        stop("seq must be a DNAStringSet object")
     }
     if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
         stop("all sequences must be equally long")
@@ -238,9 +235,7 @@ scoreSequenceProfile=function(seqs,pfm,bg) {
 #' for a given sequence
 #'
 #'
-#' @param seq DNAString
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
+#' @inheritParams scoreSequence
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of score bins}
@@ -252,7 +247,7 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
     motifValid(pfm)
     backgroundValid(bg)
     if (class(seq)!="DNAString") {
-        stop("seq must be a DNAString or a DNAStringSet object")
+        stop("seq must be a DNAString object")
     }
     if (length(seq)<ncol(pfm)) {
         stop("length(seq) must be at least as long as the motif")
@@ -280,13 +275,13 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
 
 #' Score histogram
 #'
-#' This function computes the score histogram
-#' for a given sequence
+#' This function computes the empirical score
+#' distribution for a given DNAStringSet object.
 #'
+#' It can be used to compare the empirical score
+#' distribution against the theoretical one (see \code{\link{scoreDist}}).
 #'
-#' @param pfm A position frequency matrix
-#' @param seq DNAString or DNAStringSet
-#' @param bg A Background object
+#' @inheritParams scoreSequenceProfile
 #' @return List containing
 #' \describe{
 #' \item{score}{Vector of score bins}
@@ -307,23 +302,18 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
 #' # Load a motif from the motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # generate the simulated score distribution on
-#' # sequences of length 1kb using 1000 samples
-#' seq=generateDNAString(1000,bg)
 #'
 #' # Compute the empirical score histogram
 #' scoreHistogram(seqs,motif,bg)
 #'
 #' @seealso \code{\link{scoreDist}}
 #' @export
-scoreHistogram=function(seq,pfm,bg) {
+scoreHistogram=function(seqs,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
 
-    if (class(seq)=="DNAString") {
-        result=scoreHistogramSingleSeq(seq,pfm,bg)
-    } else if (class(seq)=="DNAStringSet") {
-        his=lapply(seq, scoreHistogramSingleSeq,pfm,bg)
+    if (class(seqs)=="DNAStringSet") {
+        his=lapply(seqs, scoreHistogramSingleSeq,pfm,bg)
         nseq=length(his)
         scores=his[[1]]$score
         nrange=length(his[[1]]$frequency)
@@ -334,7 +324,7 @@ scoreHistogram=function(seq,pfm,bg) {
         freq=his
         result=list(score=scores, frequency=freq)
     } else {
-        stop("seq must be a DNAString or a DNAStringSet object")
+        stop("seq must be a DNAStringSet object")
     }
 
     return(result)
@@ -348,8 +338,7 @@ scoreHistogram=function(seq,pfm,bg) {
 #' from the one that is set in \code{\link{motifcounterOption}}, because
 #' of the discrete nature of the sequences.
 #'
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
+#' @inheritParams scoreDist
 #' @return List containing
 #' \describe{
 #' \item{threshold}{Score threshold}
@@ -371,10 +360,8 @@ scoreHistogram=function(seq,pfm,bg) {
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score threshold
-#' scoreThreshold(motif,bg)
+#' motifcounter:::scoreThreshold(motif,bg)
 #'
-#' @seealso \code{\link{scoreDist}}
-#' @export
 scoreThreshold=function(pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)

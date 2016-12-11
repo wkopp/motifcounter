@@ -7,37 +7,37 @@
 motifHitProfile(seqs, pfm, bg)
 }
 \arguments{
-\item{seqs}{DNAStringSet}
+\item{seqs}{A DNAStringSet object}
 
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 }
 \value{
 List containing
 \describe{
-\item{fscores}{Average forward strand motif hits}
-\item{rscores}{Average reverse strand motif hits}
+\item{fscores}{Per-position average forward strand motif hits}
+\item{rscores}{Per-position average reverse strand motif hits}
 }
 }
 \description{
-This function computes the average motif hit 
+This function computes the per-position average motif hit 
 profile across a set of fixed-length DNA sequences.
 }
 \examples{
 
 
 
-# Load the DNA sequence and a Motif
+# Load DNA sequences
 seqfile=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 seqs=seqs[1:10]
 
-# Estimate the background model
+# Estimate a background model
 bg=readBackground(seqs,1)
 
-# Load the motif from the motiffile
+# Load a motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the motif hit profile

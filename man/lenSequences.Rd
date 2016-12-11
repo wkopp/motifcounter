@@ -7,7 +7,7 @@
 lenSequences(seqs)
 }
 \arguments{
-\item{seqs}{DNAStringSet}
+\item{seqs}{A DNAStringSet object}
 }
 \value{
 A vector containing the lengths of each individual sequences
@@ -17,5 +17,11 @@ The function returns a vector containing the lengths
 of each individual sequence contained in seqs. Sequences
 containing 'N' or 'n' are skipped from the analysis and are
 set to length zero.
+}
+\examples{
+file=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(file)
+motifcounter:::lenSequences(seqs)
+
 }
 

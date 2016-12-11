@@ -7,21 +7,18 @@
 generateDNAString(len, bg)
 }
 \arguments{
-\item{len}{Length of the sequence}
+\item{len}{Integer length of the sequence}
 
 \item{bg}{A Background object}
 }
 \value{
-DNAString
+A DNAString object
 }
 \description{
-This function generates a DNAString
-by sampling a sequence from the the background model.
+This function generates a random DNAString of a given length
+by sampling from the given background model.
 }
 \examples{
-
-# Set the the significance level and the score granularity
-motifcounterOption(alpha=0.01, gran=0.1)
 
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
@@ -29,8 +26,11 @@ seqs=Biostrings::readDNAStringSet(seqfile)
 # Load an order-1 background model
 bg=readBackground(seqs,1)
 
-# generates a sequences of length 1kb
-generateDNAString(1000,bg)
+# generates a 1 kb sequence
+motifcounter:::generateDNAString(1000,bg)
 
+}
+\seealso{
+\code{\link{generateDNAStringSet}}
 }
 

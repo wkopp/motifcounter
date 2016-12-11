@@ -3,16 +3,15 @@
 #' This function checks if the PFM is valid. The function throws
 #' an error if the R matrix does not represent a PFM.
 #' 
-#' @param pfm A position frequency matrix
+#' @param pfm An R matrix that represents a position frequency matrix
 #' @return None
 #' 
 #' @examples
 #' 
 #' motiffile=system.file("extdata","x1.tab", package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
-#' motifValid(motif)
+#' motifcounter:::motifValid(motif)
 #' 
-#' @export
 motifValid=function(pfm) {
     if (!is.matrix(pfm)) {
         stop("pfm must be a matrix")
@@ -38,9 +37,10 @@ motifValid=function(pfm) {
 #' This function normalizes a PFM and optionally
 #' adds pseudo-evidence to each entry of the matrix.
 #' 
-#' @param pfm A position frequency matrix
-#' @param pseudo Small pseudo-value that is added 
-#' to each entry in the PFM. Default: pseudo = 0.01
+#' @inheritParams motifValid
+#' @param pseudo Small numeric pseudo-value that is added 
+#' to each entry in the PFM in order to ensure strictly positive entries.
+#' Default: pseudo = 0.01
 #' @return None
 #' 
 #' @examples
