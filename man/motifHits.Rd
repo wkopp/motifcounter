@@ -21,19 +21,19 @@ List containing
 }
 }
 \description{
-This function determines per-position motif hits in a given DNA sequence
+This function determines per-position motif hits in a given DNA sequence.
 }
 \examples{
 
 
-# Load DNA sequences
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seq=Biostrings::readDNAStringSet(seqfile)
 
-# Load a background model
+# Load background
 bg=readBackground(seq,1)
 
-# Load a motif
+# Load motif
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 

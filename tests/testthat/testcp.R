@@ -4,7 +4,7 @@ test_that("compound", {
     alpha=0.01
     gran=0.1
     maxhits=200
-    motifcounterOption(alpha, gran)
+    motifcounterOptions(alpha, gran)
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
 
@@ -32,14 +32,18 @@ test_that("compound", {
                      op$alpha*2*length(seqlen)*(seqlen[1]-ncol(motif)+1))
 
         op=probOverlapHit(motif, bg,singlestranded=TRUE)
-        expect_equal(sum(compoundPoissonDist(seqlen,
-            op, method="kopp")$dist),1)
         expect_error(compoundPoissonDist(seqlen, op,method="pape"))
 
         dist=compoundPoissonDist(seqlen, op, method="kopp")$dist
+        expect_equal(sum(dist),1)
+
         expect_equal(sum(dist*seq(0,length(dist)-1)),
                      op$alpha*length(seqlen)*(seqlen[1]-ncol(motif)+1))
     }
+    
+    # Check combinatorial sequence length
+    expect_error(compoundPoissonDist(0,op)) # too short sequence
+    expect_error(compoundPoissonDist(ncol(motif)-1,op)) # too short sequence
 })
 
 test_that("jaspar motif tests", {
@@ -49,7 +53,7 @@ test_that("jaspar motif tests", {
     alpha=0.001
     gran=0.1
     seqlen=10000
-    motifcounterOption(alpha, gran)
+    motifcounterOptions(alpha, gran)
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
     bg=readBackground(seqs,1)

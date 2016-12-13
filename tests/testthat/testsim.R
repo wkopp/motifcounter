@@ -14,6 +14,10 @@ test_that("simulate numhits", {
     expect_equal(sum(ret$dist),1)
     ret=simulateNumHitsDist(motif,bg,rep(10,10),nsim=100,singlestranded=FALSE)
     expect_equal(sum(ret$dist),1)
+    
+    # test short sequences
+    expect_error(simulateNumHitsDist(motif,bg,rep(10,10),nsim=0))
+    expect_error(simulateNumHitsDist(motif,bg,rep(ncol(motif)-1,10),nsim=1))
 })
 
 test_that("simulate DNA", {

@@ -3,7 +3,7 @@ context("Observation")
 test_that("observation", {
     alpha=0.01
     gran=0.1
-    motifcounterOption(alpha, gran)
+    motifcounterOptions(alpha, gran)
 
     seqfile=system.file("extdata","test2.fa", package="motifcounter")
     name="x3.tab"
@@ -44,4 +44,6 @@ test_that("observation", {
     nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
     expect_equal(as.vector(nom$numofhits),c(0,1,0))
 
+    # Check too short sequence
+    expect_error(motifHits(seqs[1:(ncol(motif)-1)],motif,bg))
 })

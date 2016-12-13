@@ -20,7 +20,7 @@ Description: The package contains methods to investigate
 License: GPL-2
 biocViews: Transcription,MotifAnnotation,SequenceMatching,Software
 Packaged: 2016-11-24 14:30:57 UTC; kopp
-RoxygenNote: 5.0.1
+RoxygenNote: 5.0.0
 VignetteBuilder: knitr
 NeedsCompilation: yes
 Collate:

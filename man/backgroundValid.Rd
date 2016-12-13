@@ -18,10 +18,14 @@ an error if the object does not represent a Background model.
 }
 \examples{
 
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 
+# Load background
 bg=readBackground(seqs,1)
+
+# Validate Background object
 motifcounter:::backgroundValid(bg)
 
 }

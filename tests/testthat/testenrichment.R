@@ -5,7 +5,7 @@ test_that("enrichment", {
     gran=0.1
     seqlen=100
     numofseqs=10
-    motifcounterOption(alpha, gran)
+    motifcounterOptions(alpha, gran)
 
     pwmname="x3.tab"
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")

@@ -2,7 +2,7 @@
 % Please edit documentation in R/background_wrapper.R
 \name{readBackground}
 \alias{readBackground}
-\title{Estimates the background model from a set of DNA sequences}
+\title{Estimates a background model from a set of DNA sequences}
 \usage{
 readBackground(seqs, order = 1)
 }
@@ -22,10 +22,11 @@ random DNA sequences.
 }
 \examples{
 
-# Estimate an order-1 Markov model based from a set of sequences
-
+# Load sequences
 file=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(file)
+
+# Estimate an order-1 Markov model
 bg=readBackground(seqs,1)
 
 }

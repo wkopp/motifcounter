@@ -12,32 +12,29 @@ scoreDist(pfm, bg)
 \item{bg}{A Background object}
 }
 \value{
-List containing
+List that contains
 \describe{
-\item{score}{Vector of motif scores}
-\item{probability}{Score probabilities}
+\item{scores}{Vector of scores}
+\item{dist}{Score distribution}
 }
 }
 \description{
-This function computes the score distribution for the provided PFM and
+This function computes the score distribution for the given PFM and
 background. The Score distribution is computed based on an efficient
 dynamic programming algorithm.
 }
 \examples{
 
 
-# Set the significance level and granularity for the score computation
-motifcounterOption(alpha=0.01,gran=0.1)
-
-# Load the DNA sequence and a Motif
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
-# Load an order-1 background model
+# Load background
 bg=readBackground(seqs,1)
 
-# Load the motif from the motiffile
+# Load motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the score distribution

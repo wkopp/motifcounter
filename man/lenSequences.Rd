@@ -14,13 +14,17 @@ A vector containing the lengths of each individual sequences
 }
 \description{
 The function returns a vector containing the lengths
-of each individual sequence contained in seqs. Sequences
+of each sequence contained in a set of sequences. Sequences
 containing 'N' or 'n' are skipped from the analysis and are
 set to length zero.
 }
 \examples{
+
+# Load sequences
 file=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(file)
+
+# Retrieve sequence lengths
 motifcounter:::lenSequences(seqs)
 
 }

@@ -8,7 +8,7 @@ test_that("overlap probs", {
 
     alpha=0.001
     gran=0.1
-    motifcounterOption(alpha, gran)
+    motifcounterOptions(alpha, gran)
 
     # estimate background model from seqfile
     bg=readBackground(seqs,1)

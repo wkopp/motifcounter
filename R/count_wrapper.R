@@ -1,6 +1,6 @@
 #' Motif hit observations
 #'
-#' This function determines per-position motif hits in a given DNA sequence
+#' This function determines per-position motif hits in a given DNA sequence.
 #' @include score_wrapper.R
 #' @inheritParams scoreSequence
 #' @return List containing
@@ -12,14 +12,14 @@
 #' @examples
 #'
 #'
-#' # Load DNA sequences
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seq=Biostrings::readDNAStringSet(seqfile)
 #'
-#' # Load a background model
+#' # Load background
 #' bg=readBackground(seq,1)
 #'
-#' # Load a motif
+#' # Load motif
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
@@ -30,6 +30,7 @@
 motifHits=function(seq,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
+    motifAndBackgroundValid(pfm,bg)
 
     sth=scoreThreshold(pfm,bg)
     scores=scoreSequence(seq,pfm,bg)
@@ -45,6 +46,8 @@ motifHits=function(seq,pfm,bg) {
 #'
 #' This function computes the per-position average motif hit 
 #' profile across a set of fixed-length DNA sequences.
+#' It can be used to reveal positional constraints
+#' of TFBSs.
 #'
 #' @inheritParams scoreSequenceProfile
 #'
@@ -58,15 +61,15 @@ motifHits=function(seq,pfm,bg) {
 #'
 #'
 #'
-#' # Load DNA sequences
+#' # Load sequences
 #' seqfile=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #' seqs=seqs[1:10]
 #'
-#' # Estimate a background model
+#' # Load background
 #' bg=readBackground(seqs,1)
 #'
-#' # Load a motif
+#' # Load motif
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
@@ -77,11 +80,12 @@ motifHits=function(seq,pfm,bg) {
 motifHitProfile=function(seqs,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
-    if (class(seqs)!="DNAStringSet") {
-        stop("seq must be a DNAString object")
-    }
+    motifAndBackgroundValid(pfm,bg)
+    
+    stopifnot(class(seqs)=="DNAStringSet")
+
     if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
-        stop("all sequences must be equally long")
+        stop("Sequences must be equally long")
     }
     
     fhits=sapply(seqs, function(seq,pfm,bg) {
@@ -96,11 +100,12 @@ motifHitProfile=function(seqs,pfm,bg) {
     return (list(fhits=fhits,rhits=rhits))
 }
 
-#' Number of motif hits in a given DNA sequence
+#' Number of motif hits in a set of DNA sequences
 #'
 #' This function counts the number of motif hits that
-#' are found in the supplied DNA sequences.
-#' It can be used to count motif hits on 
+#' are found in a given set of DNA sequences.
+#' 
+#' Optionally, it can be used to count motif hits on 
 #' one or both strands, respectively.
 #'
 #'
@@ -116,50 +121,53 @@ motifHitProfile=function(seqs,pfm,bg) {
 #' }
 #' @examples
 #'
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' seq=Biostrings::readDNAStringSet(seqfile)
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
-#' # Set false positive probability
-#' alpha=0.001
-#' motifcounterOption(alpha)
-#'
-#' # Estimate an order-1 background model
-#' bg=readBackground(seq,1)
-#' # read PFM from file
+#' # Load background
+#' bg=readBackground(seqs,1)
+#' 
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # scan the given sequence on both strands for the motif occurrences
-#' noc=motifcounter:::numMotifHits(seq,motif,bg)
-#' noc
+#' # Count motif hits both strands
+#' noc=motifcounter:::numMotifHits(seqs,motif,bg)
+#' noc$numofhits
 #'
-#' # scan the given sequence on a single strand for the motif occurences
-#' noc=motifcounter:::numMotifHits(seq,motif,bg,singlestranded=TRUE)
-#' noc
+#' # Count motif hits on a single strand
+#' noc=motifcounter:::numMotifHits(seqs,motif,bg,singlestranded=TRUE)
+#' noc$numofhits
 #'
 numMotifHits=function(seqs, pfm, bg, singlestranded=FALSE) {
     motifValid(pfm)
     backgroundValid(bg)
-    if (class(seqs)=="DNAStringSet") {
-        # retrieve the number of motif hits
-        x=lapply(seqs, function(seq,pfm,bg,singlestranded) {
-            ret=motifHits(seq,pfm,bg)
-            if (singlestranded==FALSE) {
-                return(sum(ret[[1]]+ret[[2]]))
-            } else {
-                return(sum(ret[[1]]))
-            }
-        }, pfm,bg,singlestranded)
+    motifAndBackgroundValid(pfm,bg)
+    
+    stopifnot(class(seqs)=="DNAStringSet")
+    
+    # retrieve the number of motif hits
+    x=lapply(seqs, function(seq,pfm,bg,singlestranded) {
+        # handle too short sequences
+        if (length(seq)<ncol(pfm) || length(seq)<bg$order) {
+            return(0)
+        }
+        ret=motifHits(seq,pfm,bg)
+        if (singlestranded==FALSE) {
+            return(sum(ret[[1]]+ret[[2]]))
+        } else {
+            return(sum(ret[[1]]))
+        }
+    }, pfm,bg,singlestranded)
 
-        noh=unlist(x)
-        # retrieve the individual sequence lengths
-        # sequences containing "N" or "n" are assigned length zero
-        lseq=lenSequences(seqs)
+    noh=unlist(x)
+    # retrieve the individual sequence lengths
+    # sequences containing "N" or "n" are assigned length zero
+    lseq=lenSequences(seqs)
 
-        nseq=length(seqs)
-    } else {
-        stop("seqs must be a DNAStringSet object")
-    }
+    nseq=length(seqs)
+
     return (list(nseq=nseq, lseq=lseq,
         numofhits=noh))
 }

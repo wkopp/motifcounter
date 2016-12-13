@@ -14,40 +14,45 @@ this information can be retrieved using \code{\link{numMotifHits}}.}
 \item{overlap}{An Overlap object which is created by
 \code{\link{probOverlapHit}}.}
 }
+\value{
+List containing
+\describe{
+\item{dist}{Distribution of the number of hits}
+}
+}
 \description{
 This function approxmiates the distribution of the number of motif hits.
-It sums over all combinations of obtaining k hits in a random sequence
-of a given length using an efficient dynamic programming algorithm.
+To this end, it sums over all combinations of obtaining k hits 
+in a random sequence of a given length using an efficient 
+dynamic programming algorithm.
 }
 \details{
-This function is an alternative to \code{\link{compoundPoissonDist}}.
-However, it requires fixed-length sequences and currently
+This function is an alternative to \code{\link{compoundPoissonDist}}
+which requires fixed-length sequences and currently
 only supports the computation of 
 the distribution of the number of hits when both
 DNA strands are scanned for motif hits.
 }
 \examples{
 
-
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
+
+# Load motif
 motiffile=system.file("extdata","x31.tab", package="motifcounter")
-alpha=0.001
-motifcounterOption(alpha)
-
-# estimate a background model
-bg=readBackground(seqs,1)
-
-# load a motif from motiffile
 motif=t(as.matrix(read.table(motiffile)))
+
+# Load background model
+bg=readBackground(seqs,1)
 
 # Compute overlap probabilities
 op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
 
-# 2 sequences of length 100 bp
+# Use 2 sequences of length 100 bp each
 seqlen=rep(100,2) 
 
-# Computes the distribution of the number of motif hits
+# Computes the combinatorial distribution of the number of motif hits
 dist=motifcounter:::combinatorialDist(seqlen, op)
 
 }

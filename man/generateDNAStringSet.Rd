@@ -17,19 +17,20 @@ this information can be retrieved using \code{\link{numMotifHits}}.}
 A DNAStringSet object
 }
 \description{
-This function generates a DNAStringSet-object of given
-individual sequence lengths
+This function generates a DNAStringSet-object of the
+given individual sequence lengths
 by sampling from the background model.
 }
 \examples{
 
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 
-# Load an order-1 background model
+# Load background
 bg=readBackground(seqs,1)
 
-# generate sequences of various lengths
+# Generate random sequences of various lengths
 motifcounter:::generateDNAStringSet(10:50,bg)
 
 }

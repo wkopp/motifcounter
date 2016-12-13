@@ -1,32 +1,29 @@
 #' Score distribution
 #'
-#' This function computes the score distribution for the provided PFM and
+#' This function computes the score distribution for the given PFM and
 #' background. The Score distribution is computed based on an efficient
 #' dynamic programming algorithm.
 #'
 #' @inheritParams motifValid
 #' @inheritParams backgroundValid
-#' @return List containing
+#' @return List that contains
 #' \describe{
-#' \item{score}{Vector of motif scores}
-#' \item{probability}{Score probabilities}
+#' \item{scores}{Vector of scores}
+#' \item{dist}{Score distribution}
 #' }
 #'
 #' @examples
 #'
 #'
-#' # Set the significance level and granularity for the score computation
-#' motifcounterOption(alpha=0.01,gran=0.1)
-#'
-#' # Load the DNA sequence and a Motif
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #'
-#' # Load an order-1 background model
+#' # Load background
 #' bg=readBackground(seqs,1)
 #'
-#' # Load the motif from the motiffile
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score distribution
@@ -36,6 +33,7 @@
 scoreDist=function(pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
+    motifAndBackgroundValid(pfm,bg)
 
     scorerange=integer(1)
     scorerange=.C("motifcounter_scorerange",
@@ -50,43 +48,41 @@ scoreDist=function(pfm,bg) {
         as.numeric(dist),
         bg$station,bg$trans,as.integer(bg$order),
         PACKAGE="motifcounter")
-    return(list(score=ret[[4]], probability=ret[[5]]))
+    return(list(scores=ret[[4]], dist=ret[[5]]))
 }
 
 
 #' Score distribution
 #'
 #' This function computes the score distribution for a given PFM and
-#' a background model. The result is identical to \code{\link{scoreDist}},
+#' a background model.
+#' 
+#' The result of this function is identical to \code{\link{scoreDist}},
 #' however, the method employs a less efficient algorithm that
 #' enumerates all DNA sequences of the length of the motif.
 #' This function is only used for debugging and testing purposes
 #' and might require substantial computational
-#' resources for long motifs. Therefore, use \code{\link{scoreDist}} instead.
+#' resources for long motifs.
 #'
 #' @inheritParams scoreDist
 #' @return List containing
 #' \describe{
-#' \item{score}{Vector of motif scores}
-#' \item{probability}{Score probabilities}
+#' \item{scores}{Vector of scores}
+#' \item{dist}{Score distribution}
 #' }
 #'
 #' @seealso \code{\link{scoreDist}}
 #' @examples
 #'
-#'
-#' # Set the significance level and granularity for the score computation
-#' motifcounterOption(alpha=0.01,gran=0.1)
-#'
-#' # Load the DNA sequence and a Motif
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #'
-#' # Load an order-1 background model
+#' # Load background
 #' bg=readBackground(seqs,1)
 #'
-#' # Load a motif
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score distribution
@@ -95,7 +91,8 @@ scoreDist=function(pfm,bg) {
 scoreDistBf=function(pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
-
+    motifAndBackgroundValid(pfm,bg)
+    
     scorerange=integer(1)
     scorerange=.C("motifcounter_scorerange",
                 as.numeric(pfm),nrow(pfm),ncol(pfm),
@@ -108,13 +105,13 @@ scoreDistBf=function(pfm,bg) {
         as.numeric(scores),
         as.numeric(dist),bg$station,bg$trans,as.integer(bg$order),
         PACKAGE="motifcounter")
-    return(list(score=ret[[4]], probability=ret[[5]]))
+    return(list(scores=ret[[4]], dist=ret[[5]]))
 }
 
 #' Score observations
 #'
 #' This function computes the per-position and per-strand 
-#' score in a given DNA sequence
+#' score in a given DNA sequence.
 #'
 #' @inheritParams scoreDist
 #' @param seq A DNAString object
@@ -127,18 +124,15 @@ scoreDistBf=function(pfm,bg) {
 #' @examples
 #'
 #'
-#' # Set the significance level and granularity for the score computation
-#' motifcounterOption(alpha=0.01,gran=0.1)
-#'
-#' # Load the DNA sequence and a Motif
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
-#' # Load an order-1 background model
+#' # Load background
 #' bg=readBackground(seqs,1)
 #'
-#' # Load a motif
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the per-position and per-strand scores
@@ -148,12 +142,14 @@ scoreDistBf=function(pfm,bg) {
 scoreSequence=function(seq,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
-    if (class(seq)!="DNAString") {
-        stop("seq must be a DNAString object")
-    }
-    if (length(seq)<ncol(pfm)) {
-        stop("length(seq) must be at least as long as the motif")
-    }
+    motifAndBackgroundValid(pfm,bg)
+    
+    # Check class
+    stopifnot(class(seq)=="DNAString")
+    
+    # Check original sequence length
+    stopifnot(length(seq)>=ncol(pfm))
+    
     # allocate the scores per position
     slen=length(seq)-ncol(pfm)+1
 
@@ -161,7 +157,8 @@ scoreSequence=function(seq,pfm,bg) {
     fscores=rep(-1e10,slen)
     rscores=rep(-1e10,slen)
 
-    if (lenSequences(seq)<=0) {
+    if (lenSequences(Biostrings::DNAStringSet(seq))==0) {
+        # this case entered only if the sequence contains 'N's
         return(list(fscores=fscores,rscores=rscores))
     } else {
         ret=.C("motifcounter_scoresequence",
@@ -177,6 +174,8 @@ scoreSequence=function(seq,pfm,bg) {
 #'
 #' This function computes the per-position and per-strand 
 #' average score profiles across a set of DNA sequences.
+#' It can be used to reveal positional constraints
+#' of TFBSs.
 #'
 #' @inheritParams scoreDist
 #' @param seqs A DNAStringSet object
@@ -190,17 +189,15 @@ scoreSequence=function(seq,pfm,bg) {
 #' @examples
 #'
 #'
-#'
-#' # Load the DNA sequence and a Motif
-#' seqfile=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
+#' # Load sequences
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
-#' seqs=seqs[1:10]
 #'
-#' # Load an order-1 background model
+#' # Load background
 #' bg=readBackground(seqs,1)
 #'
-#' # Load a motif
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score profile
@@ -210,11 +207,11 @@ scoreSequence=function(seq,pfm,bg) {
 scoreSequenceProfile=function(seqs,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
-    if (class(seqs)!="DNAStringSet") {
-        stop("seq must be a DNAStringSet object")
-    }
+    stopifnot (class(seqs)=="DNAStringSet")
+
     if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
-        stop("all sequences must be equally long")
+        stop("Sequences must be equally long. 
+             Please trim the sequnces.")
     }
 
     fscores=sapply(seqs, function(seq,pfm,bg) {
@@ -231,27 +228,40 @@ scoreSequenceProfile=function(seqs,pfm,bg) {
 
 #' Score histogram on a single sequence
 #'
-#' This function computes the score histogram
-#' for a given sequence
+#' This function computes the empirical score
+#' distribution by normalizing the observed score histogram
+#' for a given sequence.
 #'
 #'
 #' @inheritParams scoreSequence
 #' @return List containing
 #' \describe{
-#' \item{score}{Vector of score bins}
-#' \item{probability}{Empirical frequencies associated with each score}
+#' \item{scores}{Vector of scores}
+#' \item{dist}{Score distribution}
 #' }
 #'
+#' @examples
+#' 
+#' # Load sequences
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
+#' # Load background
+#' bg=readBackground(seqs,1)
+#'
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
+#' motif=t(as.matrix(read.table(motiffile)))
+#'
+#' # Compute the per-position and per-strand scores
+#' motifcounter:::scoreHistogramSingleSeq(seqs[[1]],motif,bg)
+#' 
 scoreHistogramSingleSeq=function(seq,pfm, bg) {
     motifValid(pfm)
     backgroundValid(bg)
-    if (class(seq)!="DNAString") {
-        stop("seq must be a DNAString object")
-    }
-    if (length(seq)<ncol(pfm)) {
-        stop("length(seq) must be at least as long as the motif")
-    }
+    stopifnot(class(seq)=="DNAString")
+    motifAndBackgroundValid(pfm,bg)
+
     scorerange=integer(1)
     scorerange=.C("motifcounter_scorerange",
                 as.numeric(pfm),nrow(pfm),ncol(pfm),
@@ -259,16 +269,18 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
                 bg$station,bg$trans,as.integer(bg$order),
                 PACKAGE="motifcounter")[[4]]
     scores=numeric(scorerange); dist=numeric(scorerange)
-    length(scores)
 
-    ret=.C("motifcounter_scorehistogram",
-        as.numeric(pfm),nrow(pfm),ncol(pfm),
-        toString(seq),as.integer(length(seq)),
-        as.numeric(scores), as.numeric(dist),
-        bg$station,bg$trans,as.integer(bg$order),
-        PACKAGE="motifcounter")
-    result=list(score=ret[[6]], frequency=ret[[7]])
-
+    if (length(seq)<ncol(pfm)) {
+        result=list(scores=scores, dist=dist)
+    } else {
+        ret=.C("motifcounter_scorehistogram",
+            as.numeric(pfm),nrow(pfm),ncol(pfm),
+            toString(seq),as.integer(length(seq)),
+            as.numeric(scores), as.numeric(dist),
+            bg$station,bg$trans,as.integer(bg$order),
+            PACKAGE="motifcounter")
+        result=list(scores=ret[[6]], dist=ret[[7]])
+    }
     return(result)
 }
 
@@ -276,7 +288,7 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
 #' Score histogram
 #'
 #' This function computes the empirical score
-#' distribution for a given DNAStringSet object.
+#' distribution for a given set of DNA sequences.
 #'
 #' It can be used to compare the empirical score
 #' distribution against the theoretical one (see \code{\link{scoreDist}}).
@@ -284,24 +296,21 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
 #' @inheritParams scoreSequenceProfile
 #' @return List containing
 #' \describe{
-#' \item{score}{Vector of score bins}
-#' \item{probability}{Empirical frequencies associated with each score}
+#' \item{scores}{Vector of scores}
+#' \item{dist}{Score distribution}
 #' }
 #' @examples
 #'
-#' # Set the the significance level and the score granularity
-#' motifcounterOption(alpha=0.01, gran=0.1)
-#'
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
-#' # Load an order-1 background model
+#' # Load background
 #' bg=readBackground(seqs,1)
 #'
-#' # Load a motif from the motiffile
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
-#'
 #'
 #' # Compute the empirical score histogram
 #' scoreHistogram(seqs,motif,bg)
@@ -311,21 +320,18 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
 scoreHistogram=function(seqs,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
+    stopifnot(class(seqs)=="DNAStringSet")
 
-    if (class(seqs)=="DNAStringSet") {
-        his=lapply(seqs, scoreHistogramSingleSeq,pfm,bg)
-        nseq=length(his)
-        scores=his[[1]]$score
-        nrange=length(his[[1]]$frequency)
-        his=lapply(his,function(x) {x$frequency})
-        his=unlist(his)
-        his=matrix(his,nrange,nseq)
-        his=apply(his,1,sum)
-        freq=his
-        result=list(score=scores, frequency=freq)
-    } else {
-        stop("seq must be a DNAStringSet object")
-    }
+    his=lapply(seqs, scoreHistogramSingleSeq, pfm, bg)
+    nseq=length(his)
+    scores=his[[1]]$scores
+    nrange=length(his[[1]]$dist)
+    his=lapply(his,function(x) {x$dist})
+    his=unlist(his)
+    his=matrix(his,nrange,nseq)
+    his=apply(his,1,sum)
+    freq=his
+    result=list(scores=scores, dist=freq)
 
     return(result)
 }
@@ -333,9 +339,11 @@ scoreHistogram=function(seqs,pfm,bg) {
 #' Score threshold
 #'
 #' This function computes the score threshold for a desired
-#' false positive rate to obtain a motif hit.
-#' The returned false positive rate usually differs slightly
-#' from the one that is set in \code{\link{motifcounterOption}}, because
+#' false positive probability `alpha`.
+#' 
+#' Note that the returned alpha usually differs slightly
+#' from the one that is prescribed using 
+#' \code{\link{motifcounterOptions}}, because
 #' of the discrete nature of the sequences.
 #'
 #' @inheritParams scoreDist
@@ -346,17 +354,15 @@ scoreHistogram=function(seqs,pfm,bg) {
 #' }
 #' @examples
 #'
-#' # Set the the significance level and the score granularity
-#' motifcounterOption(alpha=0.01, gran=0.1)
-#'
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
-#' # Load an order-1 background model
+#' # Load background
 #' bg=readBackground(seqs,1)
 #'
-#' # Load a motif
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score threshold
@@ -365,20 +371,24 @@ scoreHistogram=function(seqs,pfm,bg) {
 scoreThreshold=function(pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
+    
     scoredist=scoreDist(pfm,bg)
 
     # find quantile
-    ind=which(1-cumsum(scoredist$probability)<=sigLevel())
+    ind=which(1-cumsum(scoredist$dist)<=sigLevel())
     if (length(ind)<=1) {
         stop("The significance level is too stringent for the given motif.
-            There won't be any motif hits at that level.
-            Use motifcounterOption() to prescribe a less stringent alpha")
+            Motif hits are impossible to occur at that level.
+            Use 'motifcounterOptions' to prescribe a less stringent 
+            value for 'alpha'.")
     }
     ind=ind[2:length(ind)]
-    alpha=sum(scoredist$probability[ind])
+    alpha=sum(scoredist$dist[ind])
 
     ind=min(ind)
-    threshold=scoredist$score[ind]
+    threshold=scoredist$scores[ind]
 
     return(list(threshold=threshold, alpha=alpha))
 }
+
+

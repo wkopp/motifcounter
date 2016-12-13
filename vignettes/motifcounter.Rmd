@@ -215,14 +215,14 @@ new_motif=normalizeMotif(motif)
 
 By default the false positive probability $\alpha$ to obtain
 a motif hit in random sequences is set to $\alpha=0.001$. The user might change
-the stringency level of $\alpha$ globally using the `motifcounterOption`.
+the stringency level of $\alpha$ globally using the `motifcounterOptions`.
 
 ```{r eval=FALSE}
 alpha=0.01
-motifcounterOption(alpha)
+motifcounterOptions(alpha)
 ```
 
-Please consult `?motifcounterOption` for more information.
+Please consult `?motifcounterOptions` for more information.
 
 
 
@@ -263,7 +263,7 @@ points(scores$rscores,col="red",type="l")
 legend(120,11,c("forw.", "rev."), col=c("blue","red"),lty=c(1,1))
 
 # plot the the score distribution for the comparison
-plot(sd$probability,sd$score, type="l",xlab="probability",ylab="")
+plot(sd$dist,sd$scores, type="l",xlab="probability",ylab="")
 ```
 
 Alternatively, `motifcounter` provides an analogous function for determining
@@ -289,11 +289,11 @@ seq[rhitpos:(rhitpos+ncol(motif)-1)]
 
 Relaxing stringency for obtaining motif hits
 (e.g. to a false positive probability of $\alpha=0.01$ 
-via `motifcounterOption`)
+via `motifcounterOptions`)
 will tend to produce more motif hits.
 
 ```{r}
-motifcounterOption(alpha=0.01)
+motifcounterOptions(alpha=0.01)
 
 mhits=motifHits(seq,motif,bg)
 
@@ -329,7 +329,7 @@ Furthermore, `motifHitProfile` constructs a similar profile by computing
 the position and strand specific mean motif hit frequency
 
 ```{r fig.show=TRUE, fig.cap="Average motif hit profile"}
-motifcounterOption() # lets use the default alpha again
+motifcounterOptions() # lets use the default alpha again
 
 mhits=motifHitProfile(oct4peaks,motif,bg)
 

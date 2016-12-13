@@ -24,31 +24,40 @@ Default: singlestranded = FALSE.}
 \value{
 A List that contains
 \describe{
-\item{dist}{Empirical number of motif hits distribution}
+\item{dist}{Empirical distribution of the number of motif hits}
 }
 }
 \description{
 This function repeatedly simulates random DNA sequences according to
 the background model and
-subsequently counts how many motif hits occur in them, 
-which gives rise to the empirical distribution of the number of motif
-hits.
+subsequently counts how many motif hits occur in them.
+Thus, this function gives rise to the empirical 
+distribution of the number of motif hits.
 This function is only used for benchmarking analysis.
 }
 \examples{
 
 
-motifcounterOption(0.01, 0.01)
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
+# Load background
 bg=readBackground(seqs,1)
+
+# Load motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
+# Study the counts in one sequence of length 150 bp
 seqlen=rep(150,1)
+
+# Compute empirical distribution of the number of motif hits
+# by scanning both strands using 100 samples
 simc=motifcounter:::simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=FALSE)
 
+# Compute empirical distribution of the number of motif hits
+# by scanning a single strand using 100 samples
 simc=motifcounter:::simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=TRUE)
 
 }

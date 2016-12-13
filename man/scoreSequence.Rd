@@ -22,23 +22,20 @@ List containing
 }
 \description{
 This function computes the per-position and per-strand 
-score in a given DNA sequence
+score in a given DNA sequence.
 }
 \examples{
 
 
-# Set the significance level and granularity for the score computation
-motifcounterOption(alpha=0.01,gran=0.1)
-
-# Load the DNA sequence and a Motif
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 
-# Load an order-1 background model
+# Load background
 bg=readBackground(seqs,1)
 
-# Load a motif
+# Load motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the per-position and per-strand scores

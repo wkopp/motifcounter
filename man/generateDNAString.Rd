@@ -16,17 +16,18 @@ A DNAString object
 }
 \description{
 This function generates a random DNAString of a given length
-by sampling from the given background model.
+by sampling from the background model.
 }
 \examples{
 
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 
-# Load an order-1 background model
+# Load background
 bg=readBackground(seqs,1)
 
-# generates a 1 kb sequence
+# Generate a 1 kb random sequence
 motifcounter:::generateDNAString(1000,bg)
 
 }

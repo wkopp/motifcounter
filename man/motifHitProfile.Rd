@@ -23,20 +23,22 @@ List containing
 \description{
 This function computes the per-position average motif hit 
 profile across a set of fixed-length DNA sequences.
+It can be used to reveal positional constraints
+of TFBSs.
 }
 \examples{
 
 
 
-# Load DNA sequences
+# Load sequences
 seqfile=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 seqs=seqs[1:10]
 
-# Estimate a background model
+# Load background
 bg=readBackground(seqs,1)
 
-# Load a motif
+# Load motif
 motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 

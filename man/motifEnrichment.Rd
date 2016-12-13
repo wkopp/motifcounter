@@ -22,7 +22,7 @@ the 'compound' Poisson approximation' or the 'combinatorial' model.
 Default: method='compound'.}
 }
 \value{
-Result list that contains
+List that contains
 \describe{
 \item{pvalue}{P-value for the enrichment test}
 \item{fold}{Fold-enrichment with respect to the expected number of hits}
@@ -30,11 +30,12 @@ Result list that contains
 }
 \description{
 This function determines whether a given motif is enriched in a given
-DNA sequences. Enrichment is tested by comparing the observed 
-number of motif hits against a theoretical distribution of the number
-of motif hits in random DNA sequences.
+DNA sequences.
 }
 \details{
+Enrichment is tested by comparing the observed 
+number of motif hits against a theoretical distribution of the number
+of motif hits in random DNA sequences.
 Optionally, the theoretical distribution of the number of motif
 hits can be evaluated by either a 'compound Poisson model' 
 or the 'combinatorial model'.
@@ -46,31 +47,29 @@ sequences. The latter option is only available for the
 \examples{
 
 
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
-motiffile=system.file("extdata","x31.tab", package="motifcounter")
-alpha=0.001
-gran=0.1
-motifcounterOption(alpha, gran)
 
-# Estimate the background model
+# Load background
 bg=readBackground(seqs,1)
 
-# Load a motif
+# Load motif
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
-### 1 ) Motif enrichment test w.r.t. scanning a *single* DNA strand
+# 1 ) Motif enrichment test w.r.t. scanning a *single* DNA strand
 # based on the 'Compound Poisson model'
 
 result=motifEnrichment(seqs,motif,bg,
             singlestranded=TRUE,method="compound")
 
-### 2 ) Motif enrichment test w.r.t. scanning *both* DNA strand
+# 2 ) Motif enrichment test w.r.t. scanning *both* DNA strand
 # based on the 'Compound Poisson model'
 
 result=motifEnrichment(seqs,motif, bg, method="compound")
 
-### 3 ) Motif enrichment test w.r.t. scanning *both* DNA strand
+# 3 ) Motif enrichment test w.r.t. scanning *both* DNA strand
 # based on the *combinatorial model*
 
 result=motifEnrichment(seqs,motif, bg,singlestranded=FALSE,

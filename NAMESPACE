@@ -3,7 +3,7 @@
 export(motifEnrichment)
 export(motifHitProfile)
 export(motifHits)
-export(motifcounterOption)
+export(motifcounterOptions)
 export(normalizeMotif)
 export(readBackground)
 export(scoreDist)

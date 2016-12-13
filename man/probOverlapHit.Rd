@@ -19,55 +19,53 @@ Default: singlestranded = FALSE.}
 A list containing various overlapping hit probabilities.
 The list contains the following entries
     \describe{
-    \item{alpha}{False positive motif hit probability}
+    \item{alpha}{False positive probability}
     \item{beta}{Vector of overlapping hit probability for hits
             occurring on the same strand. Each element corresponds to
-            relative distance of the starting positions between the
-            motif hits.}
+            relative distance of the starts of the two hits.}
     \item{beta3p}{Vector of overlapping hit probability for a
             forward strand hit that is followed by a reverse strand
             hit. Each element corresponds to
-            relative distance of the starting positions between the
-            motif hits.}
+            relative distance of the starts of the two hits.}
     \item{beta5p}{Vector of overlapping hit probability for a
             reverse strand hit that is followed by a forward strand
             hit. Each element corresponds to
-            relative distance of the starting positions between the
-            motif hits.}
+            relative distance of the starts of the two hits.}
     \item{gamma}{Vector of overlapping hit probabilities across
             all configurations. In contrast to beta, beta3p and beta5p,
             gamma is not corrected for intermediate motif hit events.}
-    \item{singlestranded}{The singlestranded flag}
+    \item{singlestranded}{singlestranded flag that is prescribed 
+            as input argument.}
     }
 }
 \description{
 This function computes a set of self-overlapping probabilites for a
 motif and background model.
+}
+\details{
 The `gamma`s are determined based on two-dimensional score 
-distributions (similar as described in Pape et al. 2008), 
-while the `beta`s represent overlapping hit probabilities
+distributions (similar as described in Pape et al. 2008),
+however, they are computed based on an order-d background model.
+On the other hand, the `beta`s represent overlapping hit probabilities
 that were corrected for intermediate hits.
 }
 \examples{
 
-
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
-motiffile=system.file("extdata","x31.tab", package="motifcounter")
-alpha=0.001
-gran=0.1
-motifcounterOption(alpha, gran)
 
-# estimate a background model from seqs
+# Load background
 bg=readBackground(seqs,1)
 
-# load a motif
+# Load motif
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
-# compute the overlap probabilities for scanning both DNA strands
+# Compute overlapping hit probabilities for scanning both DNA strands
 op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
 
-# compute the overlap probabilities for scanning a single DNA strand
+# Compute overlapping hit probabilities for scanning a single DNA strand
 op=motifcounter:::probOverlapHit(motif,bg,singlestranded=TRUE)
 
 }

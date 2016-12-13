@@ -5,7 +5,7 @@ test_that("combinatorial", {
     gran=0.1
     seqlen=100
     numofseqs=10
-    motifcounterOption(alpha, gran)
+    motifcounterOptions(alpha, gran)
 
     pwmname="x3.tab"
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")
@@ -21,9 +21,12 @@ test_that("combinatorial", {
     expect_equal(sum(combinatorialDist(rep(seqlen,numofseqs),
             op)$dist),1) # multiple sequences
     expect_error(combinatorialDist(30:100,op)) # variable length sequences
-    expect_warning(combinatorialDist(30,op)) # sequence too short warning
+    expect_warning(combinatorialDist(29,op)) # sequence too short warning
 
     op=probOverlapHit(motif,bg,singlestranded=TRUE)
     expect_error(combinatorialDist(seqlen,op)) # single strand not supported
 
+    # Check combinatorial sequence length
+    expect_error(combinatorialDist(0,op)) # too short sequence
+    expect_error(combinatorialDist(ncol(motif)-1,op)) # too short sequence
 })

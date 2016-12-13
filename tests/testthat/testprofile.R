@@ -1,9 +1,9 @@
 context("Profiles")
 
-test_that("score profile", {
+test_that("profiles", {
     alpha=0.01
     gran=0.1
-    motifcounterOption(alpha, gran)
+    motifcounterOptions(alpha, gran)
 
     seqfile=system.file("extdata","test2.fa", package="motifcounter")
     # palindrom
@@ -27,6 +27,17 @@ test_that("score profile", {
     expect_equal(length(profile[[1]]),length(seqs[[1]])-ncol(motif)+1)
     expect_equal(length(profile[[2]]),length(seqs[[1]])-ncol(motif)+1)
 
+    #too short string
+    expect_error(motifHitProfile(Biostrings::DNAStringSet(
+        seqs[[1]][1:(ncol(motif)-1)]),motif,bg))
+    expect_error(scoreSequenceProfile(Biostrings::DNAStringSet(
+      seqs[[1]][1:(ncol(motif)-1)]),motif,bg))
+    
+    #too short string
+    expect_error(motifHitProfile(Biostrings::DNAStringSet(""),motif,bg))
+    expect_error(scoreSequenceProfile(Biostrings::DNAStringSet(""),motif,bg))
+
+    
     expect_equal(profile[[1]],profile[[2]])
     x=rep(0,20)
     x[13]=1  # at this position there should be a hit

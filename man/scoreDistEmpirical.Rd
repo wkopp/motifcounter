@@ -20,33 +20,31 @@ this information can be retrieved using \code{\link{numMotifHits}}.}
 \value{
 List containing
 \describe{
-\item{score}{Vector of scores}
-\item{probability}{Vector of score probabilities}
+\item{scores}{Vector of scores}
+\item{dist}{Score distribution}
 }
 }
 \description{
 This function estimates the empirical score distribution
-by simulating random DNA sequences based on the
-background model. Subsequently, the random sequences are scanned
-with the scoring measure which yields the score distribution.
+on a set of randomly generated DNA sequences based on the
+background model.
 This function is only used for benchmarking analysis.
 }
 \examples{
 
-# Set the the significance level and the score granularity
-motifcounterOption(alpha=0.01, gran=0.1)
-
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
-# Load an order-1 background model
+# Load background
 bg=readBackground(seqs,1)
 
-# Load a motif
+# Load motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
-# generate the simulated score distribution on
+
+# Compoute the empirical score distribution in
 # sequences of length 1kb using 1000 samples
 motifcounter:::scoreDistEmpirical(motif,bg,seqlen= 1000,nsim=1000)
 

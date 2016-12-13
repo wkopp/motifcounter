@@ -10,17 +10,18 @@ The package provides functions for determining the positions
 of motif hits as well as motif hit
 enrichment for a given position frequency matrix (PFM)
 in a DNA sequence of interest.
-To this end, the user is required to provide 1) a PFM,
+The following examples guides you through the main 
+functions of the `motifcounter` package.
+}
+\details{
+For an analysis with `motifcounter`,
+the user is required to provide 1) a PFM,
 2) a DNA sequence which is used to estimate
 a background model (see \code{link{readBackground}}),
 3) a DNA sequence of interest that shall be scanned for motif hits
 (can be the same as the one used for point 2),
-and 4) a desired false positive probability of motif hits in
-random DNA sequences (see \code{\link{motifcounterOption}}).
-}
-\details{
-The following examples guides you through the main 
-functions of the `motifcounter` package.
+and 4) (optionally) a desired false positive probability of motif hits in
+random DNA sequences (see \code{\link{motifcounterOptions}}).
 
 \tabular{ll}{ Package: \tab motifcounter\cr
 Type: \tab Package\cr Version: \tab
@@ -28,38 +29,41 @@ Type: \tab Package\cr Version: \tab
 }
 \examples{
 
-# Generate a background model
-order=1
+# Load sequences
 file=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(file)
+
+# Estimate an order-1 background model
+order=1
 bg=readBackground(seqs,order)
 
-# Load a PFM model and normalize it
-# Normalization is sometimes necessary to prevent zeros in
-# the PFM
+# Load motif
 motiffile=system.file("extdata","x31.tab", package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
+
+# Normalize the motif
+# Normalization is sometimes necessary to prevent zeros in
+# the motif
 motif=normalizeMotif(motif)
 
-# Run examples for a subset of the sequences
+# Use subset of the sequences
 seqs=seqs[1:10]
 
-# Set the false positive probability for motif hits in random sequences
-# (This already done for the default settings upon package loading)
-#alpha=0.001
-#motifcounterOption(alpha)
+# Optionally, set the false positive probability
+#alpha=0.001 # is also the default
+#motifcounterOptions(alpha) 
 
 # Investigate the per-position and per-strand scores in a given sequence
 scores=scoreSequence(seqs[[1]],motif,bg)
 
 # Investigate the per-position and per-strand motif hits in a given sequence
-scores=motifHits(seqs[[1]],motif,bg)
+hits=motifHits(seqs[[1]],motif,bg)
 
 # Determine the average score profile across a set of sequences
 scores=scoreSequenceProfile(seqs,motif,bg)
 
 # Determine the average motif hit profile across a set of sequences
-scores=motifHitProfile(seqs,motif,bg)
+hits=motifHitProfile(seqs,motif,bg)
 
 # Determine the empirical score distribution
 scoreHistogram(seqs,motif,bg)

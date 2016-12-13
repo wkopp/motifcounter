@@ -15,22 +15,25 @@ None
 }
 \description{
 This function checks if the Overlap object is valid. The function throws
-an error if the obejct does not represent a Overlap object.
+an error if the object does not represent an Overlap object.
 }
 \examples{
 
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
-motiffile=system.file("extdata","x31.tab", package="motifcounter")
 
-# estimate a background model
+# Load background
 bg=readBackground(seqs,1)
 
-# load a motif
+# Load motif
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
-# compute the overlap probabilities for scanning both DNA strands
+# Compute overlapping hit probabilities for scanning both DNA strands
 op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
+
+# Check valididity
 motifcounter:::overlapValid(op)
 
 }

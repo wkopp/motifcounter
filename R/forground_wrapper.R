@@ -8,27 +8,28 @@
 #' 
 #' @examples
 #' 
+#' # Load motif
 #' motiffile=system.file("extdata","x1.tab", package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
+#' 
+#' # Check validity
 #' motifcounter:::motifValid(motif)
 #' 
 motifValid=function(pfm) {
-    if (!is.matrix(pfm)) {
-        stop("pfm must be a matrix")
-    }
+    stopifnot(is.matrix(pfm))
+  
     #check if matrix has four rows
-    if (nrow(pfm)!=4) {
-        stop("pfm ncol must equal 4")
-    }
+    stopifnot(nrow(pfm)==4)
+    
     #check if all entries are positive
     if (!all(pfm>0)) {
         stop("pfm must be strictly positive.
-            add a small pseudocount in case they are not")
+            Use 'normalizeMotif'.")
     }
     #check if all columns sum to one
     if (!all(abs(1-apply(pfm,2,sum))<0.0000001)) {
-        stop("all columns must sum to one, which seems not
-            to be the case")
+        stop("Columns must sum to one.
+            Use 'normalizeMotif'.")
     }
 }
 
@@ -41,13 +42,15 @@ motifValid=function(pfm) {
 #' @param pseudo Small numeric pseudo-value that is added 
 #' to each entry in the PFM in order to ensure strictly positive entries.
 #' Default: pseudo = 0.01
-#' @return None
+#' @return A normalized PFM
 #' 
 #' @examples
 #' 
-#' 
+#' # Load motif
 #' motiffile=system.file("extdata","x1.tab", package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
+#' 
+#' # Normalize motif
 #' new_motif=normalizeMotif(motif)
 #' 
 #' @export
@@ -57,3 +60,34 @@ normalizeMotif=function(pfm,pseudo=0.01) {
     return(pfm)
 }
 
+#' Check valididity of PFM with background
+#' 
+#' This function checks if the PFM x background combination is valid.
+#' The function throws an error if this is not the case.
+#' 
+#' @inheritParams motifValid
+#' @inheritParams backgroundValid
+#' @return None
+#' 
+#' @examples
+#' 
+#' # Load sequences
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
+#'
+#' # Load background
+#' bg=readBackground(seqs,1)
+#' 
+#' # Load motif
+#' motiffile=system.file("extdata","x1.tab", package="motifcounter")
+#' motif=t(as.matrix(read.table(motiffile)))
+#' 
+#' # Check validity
+#' motifcounter:::motifAndBackgroundValid(motif,bg)
+#' 
+motifAndBackgroundValid=function(pfm,bg) {
+  if (ncol(pfm)<bg$order) {
+    stop("The motif must be at least as long
+          possible using 'readBackground'.")
+  }
+}
