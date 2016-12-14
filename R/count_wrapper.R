@@ -84,20 +84,26 @@ motifHitProfile=function(seqs,pfm,bg) {
     
     stopifnot(class(seqs)=="DNAStringSet")
 
-    if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
-        stop("Sequences must be equally long")
+    if (any(lenSequences(seqs)!=lenSequences(seqs)[1])) {
+        stop("Sequences must be equally long.
+            Please trim the sequnces.")
     }
+    slen=lenSequences(seqs)[1]
     
-    fhits=sapply(seqs, function(seq,pfm,bg) {
-        motifHits(seq,pfm,bg)$fhits}, 
-        pfm,bg)
-    fhits=apply(fhits,1,mean)
+    fhits=lapply(seqs, function(seq,pfm,bg) {
+        return(motifHits(seq,pfm,bg)$fhits)
+    }, pfm,bg)
     
-    rhits=sapply(seqs, function(seq,pfm,bg) {
-        motifHits(seq,pfm,bg)$rhits}, 
-        pfm,bg)
-    rhits=apply(rhits,1,mean)
-    return (list(fhits=fhits,rhits=rhits))
+    fhits=unlist(fhits)
+    fhits=apply(as.matrix(fhits,slen,length(fhits)/slen),1,mean)
+
+    rhits=lapply(seqs, function(seq,pfm,bg) {
+        mh=motifHits(seq,pfm,bg)$rhits
+    }, pfm,bg)
+
+    rhits=unlist(rhits)
+    rhits=apply(as.matrix(rhits,slen,length(rhits)/slen),1,mean)
+    return (list(fhits=as.vector(fhits),rhits=as.vector(rhits)))
 }
 
 #' Number of motif hits in a set of DNA sequences
@@ -149,10 +155,6 @@ numMotifHits=function(seqs, pfm, bg, singlestranded=FALSE) {
     
     # retrieve the number of motif hits
     x=lapply(seqs, function(seq,pfm,bg,singlestranded) {
-        # handle too short sequences
-        if (length(seq)<ncol(pfm) || length(seq)<bg$order) {
-            return(0)
-        }
         ret=motifHits(seq,pfm,bg)
         if (singlestranded==FALSE) {
             return(sum(ret[[1]]+ret[[2]]))

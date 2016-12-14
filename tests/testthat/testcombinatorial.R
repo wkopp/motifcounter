@@ -1,32 +1,46 @@
 context("Combinatorial model")
 
-test_that("combinatorial", {
+test_that("combinatorialDist", {
+    # inital settings
+
     alpha=0.01
     gran=0.1
-    seqlen=100
-    numofseqs=10
     motifcounterOptions(alpha, gran)
 
-    pwmname="x3.tab"
+    # Obtain background
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
-    motiffile=system.file("extdata",pwmname, package="motifcounter")
-
     bg=readBackground(seqs,1)
+
+    # Obtain motif
+    pwmname="x3.tab"
+    motiffile=system.file("extdata",pwmname, package="motifcounter")
     motif=t(as.matrix(read.table(motiffile)))
 
+    # overlapping hit probs
     op=probOverlapHit(motif,bg)
 
-    expect_equal(sum(combinatorialDist(seqlen, op)$dist),1) # single sequence
-    expect_equal(sum(combinatorialDist(rep(seqlen,numofseqs),
-            op)$dist),1) # multiple sequences
+    # Dist must sum to one
+    # single seq
+    expect_equal(sum(combinatorialDist(100, op)$dist),1)
+    expect_true(combinatorialDist(100, op)$dist[1]<1)
+    # multiple seqs
+    expect_equal(sum(combinatorialDist(rep(100,10), op)$dist),1) 
+    expect_true(combinatorialDist(rep(100,10), op)$dist[1]<1) 
+
+    # Error with variable length seq
     expect_error(combinatorialDist(30:100,op)) # variable length sequences
+
+    # Warning with short seqs
     expect_warning(combinatorialDist(29,op)) # sequence too short warning
 
-    op=probOverlapHit(motif,bg,singlestranded=TRUE)
-    expect_error(combinatorialDist(seqlen,op)) # single strand not supported
+    # Error with too short sequences
+    expect_equal(combinatorialDist(ncol(motif)-1,op)$dist[1],1)
+    expect_equal(combinatorialDist(-1,op)$dist[1],1)
+    expect_equal(combinatorialDist(0,op)$dist[1],1)
 
-    # Check combinatorial sequence length
-    expect_error(combinatorialDist(0,op)) # too short sequence
-    expect_error(combinatorialDist(ncol(motif)-1,op)) # too short sequence
+    # Single stranded not supported
+    op=probOverlapHit(motif,bg,singlestranded=TRUE)
+    expect_error(combinatorialDist(10,op)) # single strand not supported
+
 })

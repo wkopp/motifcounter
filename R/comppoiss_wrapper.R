@@ -75,7 +75,10 @@ compoundPoissonDist=function(seqlen, overlap,method="kopp") {
     overlapValid(overlap)
   
     # Length must be at least as long as the motif
-    stopifnot (length(seqlen)*(seqlen[1]-length(overlap$beta)+1)>0)
+    sl=sum(sapply(seqlen,function(sl, ml) { sl-ml +1}, ml=length(overlap$beta)))
+    if (sl<=0) {
+        return (list(dist=1))
+    }
 
     # for all practical purposes, a maximal clump size of 60
     # should be enough

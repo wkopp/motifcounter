@@ -243,7 +243,8 @@ The `motifcounter` package provides functions for exploring
 position- and strand-specific putative TFBSs in individual DNA sequences.
 One way to explore the a given DNA sequence for TFBSs is by 
 utilizing `scoreSequence`. This function returns the scores at each 
-position and strand for a given `Biostring::DNAString`-object (left panel below).
+position and strand for a given `Biostring::DNAString`-object 
+(left panel below).
 To put the observed scores into perspective, the right panel shows
 the theoretical score distribution in random sequences, which
 is obtained by `scoreDist`. Scores at the tail of the distribution 
@@ -312,7 +313,8 @@ TFBSs in `DNAString`-objects, one might also be interested in the
 average score or motif hit profiles across multiple sequences of equal length.
 This might reveal positional constraints of the motif occurrences 
 with respect to e.g. the TSS, or the middle or summit of the ChIP-seq peaks.
-To study positional constrains, `motifcounter` provides the `scoreSequenceProfile` 
+To study positional constrains, 
+`motifcounter` provides the `scoreSequenceProfile` 
 method which can be applied for a `Biostrings::DNAStringSet`-object.
 
 ```{r fig.show=TRUE, fig.cap="Average score profile"}

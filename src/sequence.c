@@ -84,7 +84,7 @@ void getAssignmentFromIndex(int index, int length, int *ret) {
     return;
 }
 
-int getIndexFromAssignment(char *ass, int length) {
+int getIndexFromAssignment(const char *ass, int length) {
     int index=0;
     int i;
 
@@ -94,7 +94,7 @@ int getIndexFromAssignment(char *ass, int length) {
     return index;
 }
 
-int getIndexFromReverseAssignment(char *ass, int length) {
+int getIndexFromReverseAssignment(const char *ass, int length) {
     int index=0;
     int i;
 
@@ -104,7 +104,7 @@ int getIndexFromReverseAssignment(char *ass, int length) {
     return index;
 }
 
-int getIndexFromComplementaryAssignment(char *ass, int length) {
+int getIndexFromComplementaryAssignment(const char *ass, int length) {
     int index=0;
     int i;
 
@@ -114,7 +114,7 @@ int getIndexFromComplementaryAssignment(char *ass, int length) {
     return index;
 }
 
-int getIndexFromReverseComplementaryAssignment(char *ass, int length) {
+int getIndexFromReverseComplementaryAssignment(const char *ass, int length) {
     int index=0;
     int i;
 
@@ -123,4 +123,16 @@ int getIndexFromReverseComplementaryAssignment(char *ass, int length) {
             power(ALPHABETSIZE,length-i-1);
     }
     return index;
+}
+
+int getSequenceLength(const char *seq, int slen) {
+    int j;
+
+    for (j=0; j<slen; j++) {
+        // if the sequence contains any N's, do not process the scores
+        if (getNucIndex(seq[j])<0) {
+            return -1;
+        }
+    }
+    return slen;
 }

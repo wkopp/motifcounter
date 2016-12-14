@@ -1,13 +1,12 @@
 context("Background")
 
-test_that("Background Syntax check", {
+test_that("readBackground", {
     # check if all the files can be loaded without
     # syntax errors
     # this file contains variable length sequences and 'N's
     seqfile=system.file("extdata","seq1.fasta", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
     
-    expect_error(backgroundValid(seqs)) # not a Background object
     
     # Check if all background models are plausible
     # all must represent probabilities
@@ -19,19 +18,30 @@ test_that("Background Syntax check", {
         # check if trans sums to one (for each prefix)
         expect_equal(sum(bg$trans),4^m)
     }
-})
 
-test_that("Background correctness", {
-    #some simple checks
+    # Check wrong order
+    expect_error(readBackground(seqs,-1)) # negative order
+    expect_error(readBackground(seqs,"a")) # wrong order type
+
+    # Check wrong seqs class
+    expect_error(readBackground(seq[[1]],2)) # not DNAStringSet object
+
+    # check short sequences
+    seqs=Biostrings::DNAStringSet("a")
+    
+    # not all nucleotids seen
+    expect_error(readBackground(Biostrings::DNAStringSet("a"),0)) 
+    expect_error(readBackground(Biostrings::DNAStringSet(""),0))
+    expect_error(readBackground("a",1)) # not a DNAStringSet
+    expect_error(readBackground("",2)) # not a DNAStringSet
+
+    # Check if the number of counts is correct
     seq=Biostrings::DNAStringSet("acgtaagg")
     expect_equal(readBackground(seq,0)$counts,rep(8,4))
     expect_equal(readBackground(seq,1)$counts,
         c(2,2,1,2,2,2,2,1,1,2,2,2,2,1,2,2))
-    expect_error(readBackground(seq,2)) #zero entries
-    expect_error(readBackground(seq[[1]],2)) # not DNAStringSet object
-    expect_error(readBackground(Biostrings:DNAStringSet("a"),2)) #short sequence
-    expect_error(readBackground(seq,-1)) # negative order
 
+    # Check order-0 background for another toy sequence
     seqfile=system.file("extdata","test.fa", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
     bg=readBackground(seqs,0)
@@ -41,6 +51,7 @@ test_that("Background correctness", {
     expect_equal(bg$counts,c(12,21,21,12)*2)
     expect_true(all(bg$station==correct))
 
+    # Check order-1 background for another toy sequence
     bg=readBackground(seqs,1)
 
     #the correct number of observations
@@ -52,14 +63,14 @@ test_that("Background correctness", {
 
 })
 
-test_that("sequence length checks", {
-  seqs=Biostrings::DNAStringSet("a")
-  
-  expect_error(readBackground(seqs,-1)) # negative order
-  
-  # Check background
-  expect_error(readBackground(seqs,0)) # not all nucleotids seen
-  expect_error(readBackground(Biostrings::DNAStringSet(""),0)) # too short
-  expect_error(readBackground(seqs,1)) # too short
-  expect_error(readBackground(seqs,2)) # too short
+test_that("backgroundValid", {
+
+    expect_error(backgroundValid("")) # not a Background object
+    seqfile=system.file("extdata","test.fa", package="motifcounter")
+    seqs=Biostrings::readDNAStringSet(seqfile)
+    bg=readBackground(seqs,0)
+    bg$order=1
+    # order and number of entries inconsistent
+    expect_error(backgroundValid(bg))
 })
+

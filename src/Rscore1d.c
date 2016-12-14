@@ -1,24 +1,26 @@
 #include <R.h>
+#include <Rinternals.h>
 #include "score1d.h"
 
 
 extern double Rsiglevel, Rgran;
 
-void Rscoredist(double *pfm_, int *nrow, int *ncol,
-    double *score, double *prob,double *station, double *trans, int *order) {
+SEXP Rscoredist(SEXP rpfm_, SEXP rnrow, SEXP rncol,
+    SEXP rstation, SEXP rtrans, SEXP rorder) {
     MotifScore1d null;
     ExtremalScore fescore;
     double dx;
-    //double pcomp;
+    double *xdist;
+    double *pfm_=REAL(rpfm_);
+    double *station=REAL(rstation);
+    double *trans=REAL(rtrans);
+    int *nrow=INTEGER(rnrow);
+    int *ncol=INTEGER(rncol);
+    int *order=INTEGER(rorder);
+    SEXP dist;
     int i, intervalsize,maxs,mins;
-    //int threshold;
     DMatrix pfm;
 
-
-    if (!score||!prob) {
-        error("parameters are null");
-        return;
-    }
     if (Rgran<=1e-10) { error("set granularity first! E.g. 0.1"); }
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
@@ -51,24 +53,35 @@ void Rscoredist(double *pfm_, int *nrow, int *ncol,
     computeScoreDistribution1d(&pfm, trans,  station,
             &null, &fescore, order[0]);
 
+    dist=PROTECT(allocVector(REALSXP, null.meta.xmax-null.meta.xmin + 1));
+    xdist=REAL(dist);
     for (i=0; i<null.meta.xmax-null.meta.xmin + 1; i++) {
-        score[i]=(double)(null.meta.xmin+i)*null.meta.dx;
-        prob[i]=null.totalScore.y[i];
+        xdist[i]=null.totalScore.y[i];
     }
     deleteExtremalScore(&fescore);
     deleteScoreDistribution1d(&null, order[0]);
 
     Free(pfm.data);
+    UNPROTECT(1);
+    return dist;
 }
 
-void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
-    double *score, double *prob, double *station, double *trans, int *order) {
+SEXP Rscoredist_bf(SEXP rpfm_, SEXP rnrow, SEXP rncol,
+            SEXP rstation, SEXP rtrans, SEXP rorder) {
     int i;
     MotifScore1d null;
     ExtremalScore fescore;
     double dx;
+    double *xdist;
+    double *pfm_=REAL(rpfm_);
+    double *station=REAL(rstation);
+    double *trans=REAL(rtrans);
+    int *nrow=INTEGER(rnrow);
+    int *ncol=INTEGER(rncol);
+    int *order=INTEGER(rorder);
     int mins,maxs;
     int intervalsize;
+    SEXP dist;
     DMatrix pfm;
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
@@ -81,7 +94,6 @@ void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
     memcpy(pfm.data,pfm_,nrow[0]*ncol[0]*sizeof(double));
 
     dx=Rgran;
-    //p=Rsiglevel;
 
     initExtremalScore(&fescore, dx, pfm.nrow, order[0]);
 
@@ -103,12 +115,15 @@ void Rscoredist_bf(double *pfm_, int *nrow, int *ncol,
     computeMarginalScoreDistribution1dBruteForce(&pfm, trans,
             station, &null, null.meta.xmin, order[0]);
 
-    for (i=0; i<null.meta.xmax-null.meta.xmin+1&& i<null.meta.length; i++) {
-        score[i]=(double)(null.meta.xmin+i)*null.meta.dx;
-        prob[i]=null.totalScore.y[i];
+    dist=PROTECT(allocVector(REALSXP, null.meta.xmax-null.meta.xmin + 1));
+    xdist=REAL(dist);
+    for (i=0; i<null.meta.xmax-null.meta.xmin + 1; i++) {
+      xdist[i]=null.totalScore.y[i];
     }
     deleteExtremalScore(&fescore);
     deleteScoreDistribution1d(&null, order[0]);
-
+    
     Free(pfm.data);
+    UNPROTECT(1);
+    return dist;
 }

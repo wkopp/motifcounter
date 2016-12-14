@@ -23,22 +23,17 @@
 #' @export
 readBackground=function(seqs, order=1) {
     stopifnot (class(seqs)=="DNAStringSet")
-
-    if (order<0) {
-        stop("order must be a positive integer")
-    }
+    stopifnot (order>=0)
 
     # collect k-mer frequencies from each individual sequence
     counts=lapply(seqs,function(seq,order) {
-        if (length(seq)<order) {
-            # if sequence is too short, do not attempt scan it
-            return(numeric(4^(order+1)))
-        } else {
-            counts=numeric(4^(order+1))
-            return(.C("motifcounter_countfreq", toString(seq), length(seq),
-                as.numeric(counts),as.integer(order),
-            PACKAGE="motifcounter")[[3]])
-        }
+
+        counts=numeric(4^(order+1))
+
+        return(.C("motifcounter_countfreq", toString(seq), length(seq),
+            as.numeric(counts),as.integer(order),
+        PACKAGE="motifcounter")[[3]])
+
     }, order)
     counts=matrix(unlist(counts),4^(order+1), length(seqs))
     counts=apply(counts,1,sum)

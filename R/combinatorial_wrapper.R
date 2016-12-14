@@ -48,18 +48,20 @@ combinatorialDist=function(seqlen, overlap) {
     overlapValid(overlap)
 
     # Length must be at least as long as the motif
-    stopifnot (seqlen[1]-length(overlap$beta)+1>0)
+    if (seqlen[1]-length(overlap$beta)+1<=0) {
+        return (list(dist=1))
+    }
     
     # The remaining sequence must be of equal length!
     if (!all(seqlen==seqlen[1])) {
         stop("Fixed sequence length required!
-             Trim the sequences to equal length if necessary.")
+            Trim the sequences to equal length if necessary.")
     }
 
     if (overlap$singlestranded==TRUE) {
         stop("The combinatorial model only supports scanning
-             of both DNA strands. Set 'singlestranded = FALSE'
-             or use the compound Poisson approximation.")
+            of both DNA strands. Set 'singlestranded = FALSE'
+            or use the compound Poisson approximation.")
     }
     # Analysing too short sequences might result in biases
     # of the model

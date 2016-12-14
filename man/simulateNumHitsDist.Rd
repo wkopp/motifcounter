@@ -54,11 +54,13 @@ seqlen=rep(150,1)
 
 # Compute empirical distribution of the number of motif hits
 # by scanning both strands using 100 samples
-simc=motifcounter:::simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=FALSE)
+simc=motifcounter:::simulateNumHitsDist(motif, bg, 
+    seqlen, nsim=100,singlestranded=FALSE)
 
 # Compute empirical distribution of the number of motif hits
 # by scanning a single strand using 100 samples
-simc=motifcounter:::simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=TRUE)
+simc=motifcounter:::simulateNumHitsDist(motif, bg, 
+    seqlen, nsim=100,singlestranded=TRUE)
 
 }
 \seealso{

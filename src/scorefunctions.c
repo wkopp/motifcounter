@@ -88,20 +88,18 @@ int initScoreMetaInfo (int smin, int smax, int intervalsize,
 
 
 void scoreSequence(double *station, double *trans,
-  DMatrix *pwm, char *seq, int seqlen, double *scores,
+  DMatrix *pwm, const char *seq, int seqlen, double *scores,
   double granularity, int order) {
     int i, j;
     int s, index;
     int score[power(ALPHABETSIZE, order+1)];
 
     // if the sequence contains any N's, do not process the scores
-    for (i=0; i<seqlen;i++) {
-        if (getNucIndex(seq[i])<0) {
-            return;
-        }
+    if (getSequenceLength(seq,seqlen) <0) {
+        return;
     }
 
-    for (i=0; i< seqlen; i++) {
+    for (i=0; i< seqlen-pwm->nrow+1; i++) {
         R_CheckUserInterrupt();
         index=0;
 
@@ -128,17 +126,15 @@ void scoreSequence(double *station, double *trans,
 }
 
 void scoreHistogram(double *station, double *trans,
-  DMatrix *pwm, char *seq, int seqlen,
+  DMatrix *pwm, const char *seq, int seqlen,
  double *dist, double granularity, int smin, int order) {
     int i, j;
     int s, index;
     int score[power(ALPHABETSIZE, order+1)];
 
     // if the sequence contains any N's, do not process the scores
-    for (i=0; i<seqlen;i++) {
-        if (getNucIndex(seq[i])<0) {
-            return;
-        }
+    if (getSequenceLength(seq,seqlen) <0) {
+        return;
     }
 
     for (i=0; i< seqlen-pwm->nrow+1; i++) {

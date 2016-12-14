@@ -21,12 +21,8 @@ lenSequences=function(seqs) {
     stopifnot(class(seqs)=="DNAStringSet")
 
     lseq=sapply(seqs, function(seq) {
-        if (Biostrings::countPattern("N",seq)>0 ||
-            Biostrings::countPattern("n",seq)>0) {
-            return (0)
-        } else {
-            return(length(seq))
-        }
+        return(.Call("motifcounter_slen",toString(seq),
+                PACKAGE="motifcounter"))
     })
 
     return(as.vector(lseq))

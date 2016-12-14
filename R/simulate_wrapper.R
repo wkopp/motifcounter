@@ -25,7 +25,8 @@ generateDNAString=function(len,bg) {
     len=as.integer(len)
     backgroundValid(bg)
     if (len<bg$order) {
-        stop(sprintf("len must be at least %d",bg$order))
+        warning(sprintf("len < %d: created empty sequence",bg$order))
+        return(Biostrings::DNAString(""))
     }
     seq=paste(rep("N",len),collapse="",sep="")
     ret=.C("motifcounter_generateRndSeq", as.character(seq),
@@ -105,11 +106,13 @@ generateDNAStringSet=function(seqlen,bg) {
 #' 
 #' # Compute empirical distribution of the number of motif hits
 #' # by scanning both strands using 100 samples
-#' simc=motifcounter:::simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=FALSE)
+#' simc=motifcounter:::simulateNumHitsDist(motif, bg, 
+#'     seqlen, nsim=100,singlestranded=FALSE)
 #'
 #' # Compute empirical distribution of the number of motif hits
 #' # by scanning a single strand using 100 samples
-#' simc=motifcounter:::simulateNumHitsDist(motif, bg, seqlen, nsim=100,singlestranded=TRUE)
+#' simc=motifcounter:::simulateNumHitsDist(motif, bg, 
+#'     seqlen, nsim=100,singlestranded=TRUE)
 #'
 #' @seealso \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
 simulateNumHitsDist=function(pfm,bg,seqlen, nsim, singlestranded=FALSE) {
@@ -172,10 +175,14 @@ scoreDistEmpirical=function(pfm,bg,seqlen, nsim) {
   motifValid(pfm)
   backgroundValid(bg)
   motifAndBackgroundValid(pfm,bg)
+  stopifnot(nsim>0)
+  if (seqlen<ncol(pfm)) {
+     warning("seqlen less than motif length")
+  }
   
   seqs=generateDNAStringSet(rep(seqlen,nsim),bg)
   sh=scoreHistogram(seqs,pfm,bg)
   
-  probs=sh$frequency/sum(sh$frequency)
+  probs=sh$dist/sum(sh$dist)
   return(list(scores=sh$score, dist=probs))
 }

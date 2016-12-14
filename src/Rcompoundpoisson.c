@@ -29,7 +29,9 @@ void RcompoundpoissonPape_useGamma(double *gamma,
 
     seqlen=0;
     for (i=0; i<*nseq; i++) {
-        seqlen+=lseq[i]-motiflen[0]+1;
+        if (lseq[i]-motiflen[0]+1 > 0) {
+            seqlen+=lseq[i]-motiflen[0]+1;
+        }
     }
     maxclumpsize=(double)mclump[0];
     maxhits=(double)mhit[0];

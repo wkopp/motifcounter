@@ -35,20 +35,17 @@ scoreDist=function(pfm,bg) {
     backgroundValid(bg)
     motifAndBackgroundValid(pfm,bg)
 
-    scorerange=integer(1)
-    scorerange=.C("motifcounter_scorerange",
+
+    scores=.Call("motifcounter_scorerange",
         as.numeric(pfm),nrow(pfm),ncol(pfm),
-        as.integer(scorerange),
-        bg$station,bg$trans,as.integer(bg$order),
-        PACKAGE="motifcounter")[[4]]
-    scores=numeric(scorerange); dist=numeric(scorerange)
-    ret=.C("motifcounter_scoredist",
-        as.numeric(pfm),nrow(pfm),ncol(pfm),
-        as.numeric(scores),
-        as.numeric(dist),
         bg$station,bg$trans,as.integer(bg$order),
         PACKAGE="motifcounter")
-    return(list(scores=ret[[4]], dist=ret[[5]]))
+
+    dist=.Call("motifcounter_scoredist",
+        as.numeric(pfm),nrow(pfm),ncol(pfm),
+        bg$station,bg$trans,as.integer(bg$order),
+        PACKAGE="motifcounter")
+    return(list(scores=scores, dist=dist))
 }
 
 
@@ -93,19 +90,64 @@ scoreDistBf=function(pfm,bg) {
     backgroundValid(bg)
     motifAndBackgroundValid(pfm,bg)
     
-    scorerange=integer(1)
-    scorerange=.C("motifcounter_scorerange",
+    scores=.Call("motifcounter_scorerange",
                 as.numeric(pfm),nrow(pfm),ncol(pfm),
-                as.integer(scorerange),
                 bg$station,bg$trans,as.integer(bg$order),
-                PACKAGE="motifcounter")[[4]]
-    scores=numeric(scorerange); dist=numeric(scorerange)
-    ret=.C("motifcounter_scoredist_bf",
+                PACKAGE="motifcounter")
+
+    dist=.Call("motifcounter_scoredist_bf",
         as.numeric(pfm),nrow(pfm),ncol(pfm),
-        as.numeric(scores),
-        as.numeric(dist),bg$station,bg$trans,as.integer(bg$order),
+        bg$station,bg$trans,as.integer(bg$order),
         PACKAGE="motifcounter")
-    return(list(scores=ret[[4]], dist=ret[[5]]))
+    return(list(scores=scores, dist=dist))
+}
+
+#' Score strand
+#'
+#' This function computes the per-position  
+#' score in a given DNA strand.
+#'
+#' The function returns the per-position scores
+#' for the given strand. If the sequence is too short,
+#' it contains an empty vector.
+#'
+#' @inheritParams scoreDist
+#' @param seq A DNAString object
+#' @return 
+#' \describe{
+#' \item{scores}{Vector of scores on the given strand}
+#' }
+#'
+#' @examples
+#'
+#'
+#' # Load sequences
+#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+#' seqs=Biostrings::readDNAStringSet(seqfile)
+#'
+#' # Load background
+#' bg=readBackground(seqs,1)
+#'
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
+#' motif=t(as.matrix(read.table(motiffile)))
+#'
+#' # Compute the per-position and per-strand scores
+#' motifcounter:::scoreStrand(seqs[[1]],motif,bg)
+#'
+scoreStrand=function(seq,pfm,bg) {
+    motifValid(pfm)
+    backgroundValid(bg)
+    motifAndBackgroundValid(pfm,bg)
+    
+    # Check class
+    stopifnot(class(seq)=="DNAString")
+    
+    scores=.Call("motifcounter_scoresequence",
+        as.numeric(pfm),nrow(pfm),ncol(pfm),toString(seq),
+        bg$station,bg$trans,as.integer(bg$order),
+        PACKAGE="motifcounter")
+    return(as.numeric(scores))
 }
 
 #' Score observations
@@ -147,27 +189,9 @@ scoreSequence=function(seq,pfm,bg) {
     # Check class
     stopifnot(class(seq)=="DNAString")
     
-    # Check original sequence length
-    stopifnot(length(seq)>=ncol(pfm))
-    
-    # allocate the scores per position
-    slen=length(seq)-ncol(pfm)+1
-
-    # Dirty at the moment. Init scores with very small values
-    fscores=rep(-1e10,slen)
-    rscores=rep(-1e10,slen)
-
-    if (lenSequences(Biostrings::DNAStringSet(seq))==0) {
-        # this case entered only if the sequence contains 'N's
-        return(list(fscores=fscores,rscores=rscores))
-    } else {
-        ret=.C("motifcounter_scoresequence",
-            as.numeric(pfm),nrow(pfm),ncol(pfm),toString(seq),
-            as.numeric(fscores),as.numeric(rscores),
-            as.integer(slen),bg$station,bg$trans,as.integer(bg$order),
-            PACKAGE="motifcounter")
-        return(list(fscores=ret[[5]],rscores=ret[[6]]))
-    }
+    fscores=scoreStrand(seq, pfm, bg)
+    rscores=scoreStrand(seq, revcompMotif(pfm), bg)
+    return(list(fscores=fscores,rscores=rscores))
 }
 
 #' Score profile across multiple sequences
@@ -209,21 +233,24 @@ scoreSequenceProfile=function(seqs,pfm,bg) {
     backgroundValid(bg)
     stopifnot (class(seqs)=="DNAStringSet")
 
-    if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
-        stop("Sequences must be equally long. 
-             Please trim the sequnces.")
+    if (any(lenSequences(seqs)!=lenSequences(seqs)[1])) {
+        stop("Sequences must be equally long.
+            Please trim the sequnces.")
     }
-
-    fscores=sapply(seqs, function(seq,pfm,bg) {
-        scoreSequence(seq,pfm,bg)$fscores}, 
+    slen=lenSequences(seqs)[1]
+    
+    fscores=lapply(seqs, function(seq,pfm,bg) {
+        s=scoreStrand(seq,pfm,bg) }, 
         pfm,bg)
-    fscores=apply(fscores,1,mean)
+    fscores=unlist(fscores)
+    fscores=apply(as.matrix(fscores,slen,length(fscores)/slen),1,mean)
 
     rscores=sapply(seqs, function(seq,pfm,bg) {
-        scoreSequence(seq,pfm,bg)$rscores}, 
+        s=scoreStrand(seq,revcompMotif(pfm),bg) }, 
         pfm,bg)
-    rscores=apply(rscores,1,mean)
-    return (list(fscores=fscores,rscores=rscores))
+    rscores=unlist(rscores)
+    rscores=apply(as.matrix(rscores,slen,length(rscores)/slen),1,mean)
+    return (list(fscores=as.vector(fscores),rscores=as.vector(rscores)))
 }
 
 #' Score histogram on a single sequence
@@ -262,25 +289,18 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
     stopifnot(class(seq)=="DNAString")
     motifAndBackgroundValid(pfm,bg)
 
-    scorerange=integer(1)
-    scorerange=.C("motifcounter_scorerange",
+    scores=.Call("motifcounter_scorerange",
                 as.numeric(pfm),nrow(pfm),ncol(pfm),
-                as.integer(scorerange),
                 bg$station,bg$trans,as.integer(bg$order),
-                PACKAGE="motifcounter")[[4]]
-    scores=numeric(scorerange); dist=numeric(scorerange)
+                PACKAGE="motifcounter")
 
-    if (length(seq)<ncol(pfm)) {
-        result=list(scores=scores, dist=dist)
-    } else {
-        ret=.C("motifcounter_scorehistogram",
+    dist=.Call("motifcounter_scorehistogram",
             as.numeric(pfm),nrow(pfm),ncol(pfm),
-            toString(seq),as.integer(length(seq)),
-            as.numeric(scores), as.numeric(dist),
+            toString(seq),
             bg$station,bg$trans,as.integer(bg$order),
             PACKAGE="motifcounter")
-        result=list(scores=ret[[6]], dist=ret[[7]])
-    }
+    result=list(scores=scores, dist=dist)
+
     return(result)
 }
 

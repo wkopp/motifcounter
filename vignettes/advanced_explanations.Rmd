@@ -71,7 +71,8 @@ of length 100 bp each are shown in the following
 
 regions=rep(100,100)
 # generate an empirical distribution using 100 samples of 1kb sequences each
-simdist=motifcounter:::simulateNumHitsDist(motif,bg,regions,100,singlestranded=FALSE)
+simdist=motifcounter:::simulateNumHitsDist(motif,bg,
+            regions,100,singlestranded=FALSE)
 
 
 op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)

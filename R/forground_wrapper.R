@@ -88,6 +88,29 @@ normalizeMotif=function(pfm,pseudo=0.01) {
 motifAndBackgroundValid=function(pfm,bg) {
   if (ncol(pfm)<bg$order) {
     stop("The motif must be at least as long
-          possible using 'readBackground'.")
+        possible using 'readBackground'.")
   }
+}
+
+#' Reverse complements a PFM
+#' 
+#' This function computes the reverse complement of a given PFM.
+#' 
+#' @inheritParams motifValid
+#' @return Reverse complemented PFM
+#' 
+#' @examples
+#' 
+#' # Load motif
+#' motiffile=system.file("extdata","x1.tab", package="motifcounter")
+#' motif=t(as.matrix(read.table(motiffile)))
+#' 
+#' # Reverse complement motif
+#' revcompmotif=motifcounter:::revcompMotif(motif)
+#' 
+revcompMotif=function(pfm) {
+  nrows=nrow(pfm)
+  ncols=ncol(pfm)
+  cpfm=matrix(rev(as.vector(pfm)),nrow=nrows,ncol=ncols)
+  return(cpfm)
 }
