@@ -7,47 +7,46 @@
 scoreDistEmpirical(pfm, bg, seqlen, nsim)
 }
 \arguments{
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 
-\item{seqlen}{Length of the sequence to be
-simulated.}
+\item{seqlen}{Integer-valued vector that defines the lengths of the
+individual sequences. For a given DNAStringSet, 
+this information can be retrieved using \code{\link{numMotifHits}}.}
 
-\item{nsim}{Number of samples to be generated.}
+\item{nsim}{Integer number of random samples.}
 }
 \value{
 List containing
 \describe{
-\item{score}{Vector of scores}
-\item{probability}{Vector of score probabilities}
+\item{scores}{Vector of scores}
+\item{dist}{Score distribution}
 }
 }
 \description{
 This function estimates the empirical score distribution
-by simulating random DNA sequences based on the
-background model. Subsequently, the random sequences are scanned
-with the scoring measure which yields the score distribution.
+on a set of randomly generated DNA sequences based on the
+background model.
 This function is only used for benchmarking analysis.
 }
 \examples{
 
-# Set the the significance level and the score granularity
-motifcounterOption(alpha=0.01, gran=0.1)
-
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
-# Load an order-1 background model
+# Load background
 bg=readBackground(seqs,1)
 
-# Load a motif
+# Load motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
-# generate the simulated score distribution on
+
+# Compoute the empirical score distribution in
 # sequences of length 1kb using 1000 samples
-scoreDistEmpirical(motif,bg,seqlen= 1000,nsim=1000)
+motifcounter:::scoreDistEmpirical(motif,bg,seqlen= 1000,nsim=1000)
 
 }
 \seealso{

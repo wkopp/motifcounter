@@ -7,13 +7,14 @@
 normalizeMotif(pfm, pseudo = 0.01)
 }
 \arguments{
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
-\item{pseudo}{Small pseudo-value that is added 
-to each entry in the PFM. Default: pseudo = 0.01}
+\item{pseudo}{Small numeric pseudo-value that is added 
+to each entry in the PFM in order to ensure strictly positive entries.
+Default: pseudo = 0.01}
 }
 \value{
-None
+A normalized PFM
 }
 \description{
 This function normalizes a PFM and optionally
@@ -21,9 +22,11 @@ adds pseudo-evidence to each entry of the matrix.
 }
 \examples{
 
-
+# Load motif
 motiffile=system.file("extdata","x1.tab", package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
+
+# Normalize motif
 new_motif=normalizeMotif(motif)
 
 }

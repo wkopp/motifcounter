@@ -7,21 +7,39 @@
 scoreHistogramSingleSeq(seq, pfm, bg)
 }
 \arguments{
-\item{seq}{DNAString}
+\item{seq}{A DNAString object}
 
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 }
 \value{
 List containing
 \describe{
-\item{score}{Vector of score bins}
-\item{probability}{Empirical frequencies associated with each score}
+\item{scores}{Vector of scores}
+\item{dist}{Score distribution}
 }
 }
 \description{
-This function computes the score histogram
-for a given sequence
+This function computes the empirical score
+distribution by normalizing the observed score histogram
+for a given sequence.
+}
+\examples{
+
+# Load sequences
+seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+seqs=Biostrings::readDNAStringSet(seqfile)
+
+# Load background
+bg=readBackground(seqs,1)
+
+# Load motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
+motif=t(as.matrix(read.table(motiffile)))
+
+# Compute the per-position and per-strand scores
+motifcounter:::scoreHistogramSingleSeq(seqs[[1]],motif,bg)
+
 }
 

@@ -1,11 +1,11 @@
-#' Estimates the background model from a set of DNA sequences
+#' Estimates a background model from a set of DNA sequences
 #'
 #' Given a set of DNA sequences and an order, this function
 #' estimates an order-d Markov model which is used to characterize
 #' random DNA sequences.
 #'
 #'
-#' @param seqs DNAStringSet
+#' @inheritParams lenSequences
 #' @param order Order of the Markov models that shall be used as the
 #' background model. Default: order=1.
 #'
@@ -13,32 +13,27 @@
 #'
 #' @examples
 #'
-#' # Estimate an order-1 Markov model based from a set of sequences
-#'
+#' # Load sequences
 #' file=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(file)
+#' 
+#' # Estimate an order-1 Markov model
 #' bg=readBackground(seqs,1)
 #'
 #' @export
 readBackground=function(seqs, order=1) {
-    if (class(seqs)!="DNAStringSet") {
-        stop("seqs must be a DNAStringSet")
-    }
-    if (order<0) {
-        stop("order must be a positive integer")
-    }
+    stopifnot (class(seqs)=="DNAStringSet")
+    stopifnot (order>=0)
 
     # collect k-mer frequencies from each individual sequence
     counts=lapply(seqs,function(seq,order) {
-        # if sequence is too short, do not attempt to count
-        if (length(seq)<order) {
-            return(numeric(4^(order+1)))
-        } else {
-            counts=numeric(4^(order+1))
-            return(.C("motifcounter_countfreq", toString(seq), length(seq),
-                as.numeric(counts),as.integer(order),
-            PACKAGE="motifcounter")[[3]])
-        }
+
+        counts=numeric(4^(order+1))
+
+        return(.C("motifcounter_countfreq", toString(seq), length(seq),
+            as.numeric(counts),as.integer(order),
+        PACKAGE="motifcounter")[[3]])
+
     }, order)
     counts=matrix(unlist(counts),4^(order+1), length(seqs))
     counts=apply(counts,1,sum)
@@ -67,23 +62,27 @@ readBackground=function(seqs, order=1) {
 #'
 #' @examples
 #'
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
+#' # Load background
 #' bg=readBackground(seqs,1)
-#' backgroundValid(bg)
+#' 
+#' # Validate Background object
+#' motifcounter:::backgroundValid(bg)
 #'
-#' @export
 backgroundValid=function(bg) {
     if (class(bg)!="Background") {
         stop("bg must be a Background object.
-            Use readBackground() to construct one.")
+            Use readBackground() to construct bg.")
     }
     if(length(bg)!=4) {
         stop("bg must contain 4 elements.
             Use readBackground() to construct bg.")
     }
     if(length(bg$trans)!= 4^(bg$order+1)) {
-        stop("bg$trans must contain 4^(order+1) elements")
+        stop("Inconsistent Background object.
+             Use readBackground() to construct bg.")
     }
 }

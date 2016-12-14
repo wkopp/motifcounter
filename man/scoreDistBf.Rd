@@ -7,45 +7,44 @@
 scoreDistBf(pfm, bg)
 }
 \arguments{
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 }
 \value{
 List containing
 \describe{
-\item{score}{Vector of motif scores}
-\item{probability}{Score probabilities}
+\item{scores}{Vector of scores}
+\item{dist}{Score distribution}
 }
 }
 \description{
 This function computes the score distribution for a given PFM and
-a background model. The result is identical to \code{\link{scoreDist}},
+a background model.
+}
+\details{
+The result of this function is identical to \code{\link{scoreDist}},
 however, the method employs a less efficient algorithm that
 enumerates all DNA sequences of the length of the motif.
 This function is only used for debugging and testing purposes
 and might require substantial computational
-resources for long motifs. Therefore, use \code{\link{scoreDist}} instead.
+resources for long motifs.
 }
 \examples{
 
-
-# Set the significance level and granularity for the score computation
-motifcounterOption(alpha=0.01,gran=0.1)
-
-# Load the DNA sequence and a Motif
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
 
-# Load an order-1 background model
+# Load background
 bg=readBackground(seqs,1)
 
-# Load a motif
+# Load motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the score distribution
-dp=scoreDistBf(motif,bg)
+dp=motifcounter:::scoreDistBf(motif,bg)
 
 }
 \seealso{

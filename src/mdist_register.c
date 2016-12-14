@@ -64,31 +64,8 @@ void Rfsiglevel(double *siglevel);
 static R_NativePrimitiveArgType siglevel_t[] = {
     REALSXP
 };
-void Rscorerange(double *,int*,int*,int *scorerange,
-double *,double *,int*);
-static R_NativePrimitiveArgType scorerange_t[] = {
-    REALSXP,INTSXP,INTSXP,INTSXP,REALSXP,REALSXP,INTSXP
-};
-void Rscoredist(double *,int*,int*, double *score, double *prob,
-double *,double *,int*);
-void Rscoredist_bf(double *,int*,int*, double *score, double *prob,
-double *,double *,int*);
-static R_NativePrimitiveArgType scoredist_t[] = {
-    REALSXP,INTSXP,INTSXP,REALSXP,REALSXP,REALSXP,REALSXP,INTSXP
-};
-void Rscoresequence(double *,int*,int*, char **,
-    double *fscore,double *rscore, int *len,
-double *,double *,int*);
-static R_NativePrimitiveArgType scoreseq_t[] = {
-    REALSXP,INTSXP,INTSXP,STRSXP,REALSXP,REALSXP,INTSXP,REALSXP,REALSXP,INTSXP
-};
-void RscoreHistogram(double *,int*,int*,char **, int *,
-            double *scores, double *freq,
-        double *,double *,int*);
-static R_NativePrimitiveArgType scorehist_t[] = {
-    REALSXP,INTSXP,INTSXP,STRSXP,INTSXP,REALSXP,REALSXP
-    ,REALSXP,REALSXP,INTSXP
-};
+
+
 
 static R_CMethodDef cMethods[] = {
     {"motifcounter_countfreq", (DL_FUNC) &Rcountfreq, 4, countfreq_t},
@@ -105,19 +82,34 @@ static R_CMethodDef cMethods[] = {
     {"motifcounter_generateRndSeq", (DL_FUNC) &RgenRndSeq, 5, num_seqs_t},
     {"motifcounter_option", (DL_FUNC) &Roption, 3, option_t},
     {"motifcounter_siglevel", (DL_FUNC) &Rfsiglevel, 1, siglevel_t},
-    {"motifcounter_scorerange", (DL_FUNC) &Rscorerange, 7, scorerange_t},
-    {"motifcounter_scoredist", (DL_FUNC) &Rscoredist, 8, scoredist_t},
-    {"motifcounter_scoresequence", (DL_FUNC) &Rscoresequence, 10, scoreseq_t},
-    {"motifcounter_scoredist_bf", (DL_FUNC) &Rscoredist_bf, 8, scoredist_t},
-    {"motifcounter_scorehistogram",
-            (DL_FUNC) &RscoreHistogram, 10, scorehist_t},
     {NULL, NULL, 0}
 };
 
+SEXP Rscoresequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
+    SEXP rstation, SEXP rtrans, SEXP rorder);
+SEXP Rscorerange(SEXP rpfm_, SEXP rnrow, SEXP rncol,
+                    SEXP rstation, SEXP rtrans, SEXP rorder);
+SEXP Rscoredist(SEXP rpfm_, SEXP rnrow, SEXP rncol,
+    SEXP rstation, SEXP rtrans, SEXP rorder);
+SEXP Rscoredist_bf(SEXP rpfm_, SEXP rnrow, SEXP rncol,
+    SEXP rstation, SEXP rtrans, SEXP rorder);
+SEXP RscoreHistogram(SEXP rpfm_, SEXP rnrow, SEXP rncol, 
+        SEXP rseq, SEXP rstation, SEXP rtrans, SEXP rorder);
+SEXP Rslen(SEXP rseq);
+
+static R_CallMethodDef callMethods[]  = {
+  {"motifcounter_slen", (DL_FUNC) &Rslen, 1},
+  {"motifcounter_scoresequence", (DL_FUNC) &Rscoresequence, 7},
+  {"motifcounter_scorerange", (DL_FUNC) &Rscorerange, 6},
+  {"motifcounter_scoredist", (DL_FUNC) &Rscoredist, 6},
+  {"motifcounter_scoredist_bf", (DL_FUNC) &Rscoredist_bf, 6},
+  {"motifcounter_scorehistogram", (DL_FUNC) &RscoreHistogram, 7},
+  {NULL, NULL, 0}
+};
 
 
 void R_init_motifcounter(DllInfo *info) {
-    R_registerRoutines(info, cMethods, NULL, NULL, NULL);
+    R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
 }
 
 void R_unload_motifcounter(DllInfo *info) {}

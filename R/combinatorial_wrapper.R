@@ -1,67 +1,74 @@
 #' Combinatrial model approximation of the number of motif hits
 #'
 #' This function approxmiates the distribution of the number of motif hits.
-#' It sums over all combinations of obtaining k hits in a random sequence
-#' of a given length using and efficient dynamic programming algorithm.
-#' This function is an alternative to \code{\link{compoundPoissonDist}}.
-#' However, it requires fixed-length sequences and currently
-#' only supports the distribution of the number of hits when both
+#' To this end, it sums over all combinations of obtaining k hits 
+#' in a random sequence of a given length using an efficient 
+#' dynamic programming algorithm.
+#'
+#' This function is an alternative to \code{\link{compoundPoissonDist}}
+#' which requires fixed-length sequences and currently
+#' only supports the computation of 
+#' the distribution of the number of hits when both
 #' DNA strands are scanned for motif hits.
+#' 
+#' @include comppoiss_wrapper.R
 #'
+#' @inheritParams compoundPoissonDist
 #'
-#' @param seqlen Integer-valued vector that defines the lengths of the
-#' individual sequences. This information can be extracted for
-#' given DNA sequence of interest using \code{\link{numMotifHits}}.
-#' @param overlap Overlap-object that contains the overlapping 
-#' hit probabilities. An Overlap-object is created by 
-#' \code{\link{probOverlapHit}}
-#' @return List that contains
+#' @return List containing
 #' \describe{
-#' \item{dist}{Distribution of the number of motif hits}
+#' \item{dist}{Distribution of the number of hits}
 #' }
-#'
 #' @seealso \code{\link{compoundPoissonDist}}
+#' @seealso \code{\link{numMotifHits}}
+#' @seealso \code{\link{probOverlapHit}}
 #' @examples
 #'
-#'
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
+#' 
+#' # Load motif
 #' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' alpha=0.001
-#' motifcounterOption(alpha)
-#'
-#' # estimate a background model
-#' bg=readBackground(seqs,1)
-#'
-#' # load a motif from motiffile
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # Compute overlap probabilities
-#' op=probOverlapHit(motif,bg,singlestranded=FALSE)
-#' seqlen=rep(100,1)
-#' # Computes the distribution of the number of motif hits
-#' dist=combinatorialDist(seqlen, op)
+#' # Load background model
+#' bg=readBackground(seqs,1)
 #'
-#' @export
+#' # Compute overlap probabilities
+#' op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
+#'
+#' # Use 2 sequences of length 100 bp each
+#' seqlen=rep(100,2) 
+#'
+#' # Computes the combinatorial distribution of the number of motif hits
+#' dist=motifcounter:::combinatorialDist(seqlen, op)
+#'
 combinatorialDist=function(seqlen, overlap) {
     overlapValid(overlap)
 
+    # Length must be at least as long as the motif
+    if (seqlen[1]-length(overlap$beta)+1<=0) {
+        return (list(dist=1))
+    }
+    
     # The remaining sequence must be of equal length!
     if (!all(seqlen==seqlen[1])) {
-        stop("The individual sequences must be of equal
-            length for dynamic programming!")
+        stop("Fixed sequence length required!
+            Trim the sequences to equal length if necessary.")
     }
 
     if (overlap$singlestranded==TRUE) {
-        stop("Currently the combinatorial model only supports scanning
-            of both DNA strands")
+        stop("The combinatorial model only supports scanning
+            of both DNA strands. Set 'singlestranded = FALSE'
+            or use the compound Poisson approximation.")
     }
     # Analysing too short sequences might result in biases
     # of the model
-    if (seqlen[1]<70) {
-        warning("The sequence length might be too short
-            which could cause an offset between the true distribution
-            and the combinatorial model of the number of hits")
+    if (seqlen[1]<30) {
+        warning("The sequence length too short.
+            Be aware that this might cause biases in the analysis.
+            Use longer sequences if possible.")
     }
     # the maximal number of hits is given by the sequence length
     maxhits=seqlen[1]
@@ -83,9 +90,8 @@ combinatorialDist=function(seqlen, overlap) {
         # In this case, the combinatorial model is pushed
         # to its limits
         stop("The combinatorial model experienced numerical issues,
-            please try to reduce the number or length of the DNA sequences,
-            reduce the false positive probability using motifcounterOption
-            or try the 'compound Poisson approximation'.")
+            please try to reduce the number or length of the DNA sequences
+            or try the 'compound Poisson approximation' instead.")
     }
     return(list(dist=ret[[5]]))
 }

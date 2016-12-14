@@ -8,17 +8,14 @@ compoundPoissonDist(seqlen, overlap, method = "kopp")
 }
 \arguments{
 \item{seqlen}{Integer-valued vector that defines the lengths of the
-individual sequences. This information can be extracted for
-given DNA sequence of interest using \code{\link{numMotifHits}}.
-In contrast to \code{\link{combinatorialDist}}, this function
-supports variable-length DNA sequence.}
+individual sequences. For a given DNAStringSet, 
+this information can be retrieved using \code{\link{numMotifHits}}.}
 
-\item{overlap}{Overlap-object that contains the overlapping 
-hit probabilities. An Overlap-object is created by 
-\code{\link{probOverlapHit}}}
+\item{overlap}{An Overlap object which is created by
+\code{\link{probOverlapHit}}.}
 
 \item{method}{String that defines which method shall be invoked: 'pape' or
-'kopp' (see description). Default: method='kopp'}
+'kopp' (see description). Default: method='kopp'.}
 }
 \value{
 List containing
@@ -27,60 +24,69 @@ List containing
 }
 }
 \description{
-This function computes the distribution of the number of motif hits
-that would be observes in a random DNA sequence of a given length.
-The distribution can be determine in two alternative ways:
-1) We provide a re-implemented version of the algorithm that was
+This function approximates the distribution of the number of motif hits
+that emerges from a random DNA sequence of a given length.
+}
+\details{
+The distribution can be determined in two alternative ways:
+\enumerate{
+\item A re-implemented version of the algorithm that was
 described in Pape et al. \emph{Compound poisson approximation
 of the number of occurrences of a position
-frequency matrix (PFM) on both strands.} 2008. 
-The main purpose of this method was for benchmarking the improved 
-approximation.
+frequency matrix (PFM) on both strands.} 2008
+can be invoked using method='pape'.
+The main purpose of this implementation concerns 
+benchmarking an improved approximation.
 In contrast to the original model, this implementation 
-can be used with higher-order
-background models. To invoke this method use method='pape'.
-2) We provide an improved compound Poisson approximation that
+can be used with general order-d Markov models.
+\item We provide an improved compound Poisson approximation that
 uses more appropriate statistical assumptions concerning
-overlapping motif hits and that can be used with higher-order
+overlapping motif hits and that can be used with order-d
 background models as well. The improved version is used by default
 with method='kopp'.
+Note: Only method='kopp' supports the computation
+of the distribution of the number of motif hits w.r.t. scanning
+a single DNA strand (see \code{\link{probOverlapHit}}).
+}
 }
 \examples{
 
-
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
+
+# Load motif
 motiffile=system.file("extdata","x31.tab", package="motifcounter")
-alpha=0.001
-gran=0.1
-motifcounterOption(alpha, gran)
-
-# estimate a background model
-bg=readBackground(seqs,1)
-
-# load motif model from motiffile
 motif=t(as.matrix(read.table(motiffile)))
 
-# compute the distribution for scanning a single DNA strand
-#Compute overlapping probabilities
-op=probOverlapHit(motif,bg,singlestranded=TRUE)
+# Load background model
+bg=readBackground(seqs,1)
 
-# Computes the distribution of the number of motif hits
+# Use 100 individual sequences of length 150 bp each
 seqlen=rep(150,100)
-dist=compoundPoissonDist(seqlen, op)
+
+# Compute overlapping probabilities
+# for scanning the forward DNA strand only
+op=motifcounter:::probOverlapHit(motif,bg,singlestranded=TRUE)
+
+# Computes  the compound Poisson distribution
+dist=motifcounter:::compoundPoissonDist(seqlen, op)
 #plot(1:length(dist$dist)-1, dist$dist)
 
-# compute the distribution for scanning both DNA strands
-#Compute overlapping probabilities
-op=probOverlapHit(motif,bg,singlestranded=FALSE)
+# Compute overlapping probabilities
+# for scanning the forward DNA strand only
+op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
 
-# Computes the distribution of the number of motif hits
-seqlen=rep(150,100)
-dist=compoundPoissonDist(seqlen, op)
+# Computes  the compound Poisson distribution
+dist=motifcounter:::compoundPoissonDist(seqlen, op)
 #plot(1:length(dist$dist)-1, dist$dist)
 
 }
 \seealso{
 \code{\link{combinatorialDist}}
+
+\code{\link{probOverlapHit}}
+
+\code{\link{numMotifHits}}
 }
 

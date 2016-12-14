@@ -1,20 +1,25 @@
 #include <R.h>
+#include <Rinternals.h>
 #include "minmaxscore.h"
 
 
 extern double Rgran;
 
-void Rscorerange(double *pfm_, int *nrow, int *ncol, int *scorerange,
-    double *station, double *trans, int *order) {
+SEXP Rscorerange(SEXP rpfm_, SEXP rnrow, SEXP rncol,
+                    SEXP rstation, SEXP rtrans, SEXP rorder) {
     ExtremalScore fescore;
     int mins, maxs;
     double dx;
+    double *xscores;
+    double *pfm_=REAL(rpfm_);
+    double *station=REAL(rstation);
+    double *trans=REAL(rtrans);
+    int *nrow=INTEGER(rnrow);
+    int *ncol=INTEGER(rncol);
+    int *order=INTEGER(rorder);
+    SEXP scores;
     int i;
     DMatrix pfm;
-
-    if (scorerange==NULL) {
-        error("scorerange is null");
-    }
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
     if (pfm.data==NULL) {
@@ -34,9 +39,16 @@ void Rscorerange(double *pfm_, int *nrow, int *ncol, int *scorerange,
     mins=getTotalScoreLowerBound(&fescore);
     maxs=getTotalScoreUpperBound(&fescore);
 
-    scorerange[0]=maxs-mins+1;
-
     deleteExtremalScore(&fescore);
 
     Free(pfm.data);
+    
+    scores=PROTECT(allocVector(REALSXP, maxs-mins + 1));
+    xscores=REAL(scores);
+    for (i=0; i<maxs-mins + 1; i++) {
+      xscores[i]=(double)(mins+i)*dx;
+    }
+    
+    UNPROTECT(1);
+    return scores;
 }

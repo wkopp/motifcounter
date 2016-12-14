@@ -7,7 +7,7 @@
 scoreThreshold(pfm, bg)
 }
 \arguments{
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 }
@@ -20,31 +20,29 @@ List containing
 }
 \description{
 This function computes the score threshold for a desired
-false positive rate to obtain a motif hit.
-The returned false positive rate usually differs slightly
-from the one that is set in \code{\link{motifcounterOption}}, because
+false positive probability `alpha`.
+}
+\details{
+Note that the returned alpha usually differs slightly
+from the one that is prescribed using 
+\code{\link{motifcounterOptions}}, because
 of the discrete nature of the sequences.
 }
 \examples{
 
-# Set the the significance level and the score granularity
-motifcounterOption(alpha=0.01, gran=0.1)
-
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
 
-# Load an order-1 background model
+# Load background
 bg=readBackground(seqs,1)
 
-# Load a motif
+# Load motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
 # Compute the score threshold
-scoreThreshold(motif,bg)
+motifcounter:::scoreThreshold(motif,bg)
 
-}
-\seealso{
-\code{\link{scoreDist}}
 }
 

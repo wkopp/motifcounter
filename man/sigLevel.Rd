@@ -2,15 +2,24 @@
 % Please edit documentation in R/option.R
 \name{sigLevel}
 \alias{sigLevel}
-\title{Retrieve the false positive level}
+\title{Retrieve the false positive probability}
 \usage{
 sigLevel()
 }
 \value{
-False positive motif hit probability
+False positive probability
 }
 \description{
 This function returns the current false positive level for
 calling motif hits in random sequences.
+}
+\details{
+The returned value is usually slightly smaller than
+the prescribed `alpha` in `motifcounterOptions`, because
+of the discrete nature of sequences.
+}
+\examples{
+motifcounter:::sigLevel()
+
 }
 

@@ -1,40 +1,36 @@
 #' Motif hit observations
 #'
-#' This function determines motif hits in a given DNA sequence
-#'
-#' @param seq A DNAString
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
+#' This function determines per-position motif hits in a given DNA sequence.
+#' @include score_wrapper.R
+#' @inheritParams scoreSequence
 #' @return List containing
 #' \describe{
-#' \item{fhits}{Vector of motif hits on the forward strand}
-#' \item{rhits}{Vector of motif hits on the reverse strand}
+#' \item{fhits}{Per-position motif hits on the forward strand}
+#' \item{rhits}{Per-position motif hits on the reverse strand}
 #' }
 #'
 #' @examples
 #'
 #'
-#' # Set the significance level and granularity for the score computation
-#' motifcounterOption(alpha=0.01,gran=0.1)
-#'
-#' # Load the DNA sequence and a Motif
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' seq=Biostrings::readDNAStringSet(seqfile)
 #'
-#' # Load the order-1 background model from the DNA sequence
+#' # Load background
 #' bg=readBackground(seq,1)
 #'
-#' # Load the motif from the motiffile
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # Compute the score distribution
-#' scoreSequence(seq[[1]],motif,bg)
+#' # Determine the motif hits
+#' motifHits(seq[[1]],motif,bg)
 #'
 #' @export
 motifHits=function(seq,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
+    motifAndBackgroundValid(pfm,bg)
 
     sth=scoreThreshold(pfm,bg)
     scores=scoreSequence(seq,pfm,bg)
@@ -48,32 +44,33 @@ motifHits=function(seq,pfm,bg) {
 
 #' Motif hit profile across multiple sequences
 #'
-#' This function computes the average motif hit 
+#' This function computes the per-position average motif hit 
 #' profile across a set of fixed-length DNA sequences.
+#' It can be used to reveal positional constraints
+#' of TFBSs.
 #'
-#' @param pfm A position frequency matrix
-#' @param seqs DNAStringSet
-#' @param bg A Background object
+#' @inheritParams scoreSequenceProfile
+#'
 #' @return List containing
 #' \describe{
-#' \item{fscores}{Average forward strand motif hits}
-#' \item{rscores}{Average reverse strand motif hits}
+#' \item{fscores}{Per-position average forward strand motif hits}
+#' \item{rscores}{Per-position average reverse strand motif hits}
 #' }
 #'
 #' @examples
 #'
 #'
 #'
-#' # Load the DNA sequence and a Motif
+#' # Load sequences
 #' seqfile=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
 #' seqs=seqs[1:10]
 #'
-#' # Estimate the background model
+#' # Load background
 #' bg=readBackground(seqs,1)
 #'
-#' # Load the motif from the motiffile
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the motif hit profile
@@ -83,38 +80,45 @@ motifHits=function(seq,pfm,bg) {
 motifHitProfile=function(seqs,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
-    if (class(seqs)!="DNAStringSet") {
-        stop("seq must be a DNAString object")
-    }
-    if (any(lenSequences(seqs)!=length(seqs[[1]]))) {
-        stop("all sequences must be equally long")
-    }
+    motifAndBackgroundValid(pfm,bg)
     
-    fhits=sapply(seqs, function(seq,pfm,bg) {
-        motifHits(seq,pfm,bg)$fhits}, 
-        pfm,bg)
-    fhits=apply(fhits,1,mean)
+    stopifnot(class(seqs)=="DNAStringSet")
+
+    if (any(lenSequences(seqs)!=lenSequences(seqs)[1])) {
+        stop("Sequences must be equally long.
+            Please trim the sequnces.")
+    }
+    slen=lenSequences(seqs)[1]
     
-    rhits=sapply(seqs, function(seq,pfm,bg) {
-        motifHits(seq,pfm,bg)$rhits}, 
-        pfm,bg)
-    rhits=apply(rhits,1,mean)
-    return (list(fhits=fhits,rhits=rhits))
+    fhits=lapply(seqs, function(seq,pfm,bg) {
+        return(motifHits(seq,pfm,bg)$fhits)
+    }, pfm,bg)
+    
+    fhits=unlist(fhits)
+    fhits=apply(as.matrix(fhits,slen,length(fhits)/slen),1,mean)
+
+    rhits=lapply(seqs, function(seq,pfm,bg) {
+        mh=motifHits(seq,pfm,bg)$rhits
+    }, pfm,bg)
+
+    rhits=unlist(rhits)
+    rhits=apply(as.matrix(rhits,slen,length(rhits)/slen),1,mean)
+    return (list(fhits=as.vector(fhits),rhits=as.vector(rhits)))
 }
 
-#' Number of motif hits in a given DNA sequence
+#' Number of motif hits in a set of DNA sequences
 #'
 #' This function counts the number of motif hits that
-#' are found in the supplied DNA sequences.
-#' It can be used to count motif hits on 
+#' are found in a given set of DNA sequences.
+#' 
+#' Optionally, it can be used to count motif hits on 
 #' one or both strands, respectively.
 #'
 #'
-#' @param seqs A DNAString or a DNAStringSet object
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
-#' @param singlestranded Boolian flag that indicates whether a single strand or
-#' both strands shall be scanned for motif hits. Default: singlestranded=FALSE.
+#' @inheritParams scoreSequenceProfile
+#' @param singlestranded Boolean that indicates whether a single strand or
+#' both strands shall be scanned for motif hits. 
+#' Default: singlestranded = FALSE.
 #' @return A list containing
 #' \describe{
 #' \item{nseq}{Number of individual sequences}
@@ -123,64 +127,49 @@ motifHitProfile=function(seqs,pfm,bg) {
 #' }
 #' @examples
 #'
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' seq=Biostrings::readDNAStringSet(seqfile)
+#' seqs=Biostrings::readDNAStringSet(seqfile)
 #'
-#' # Set false positive probability
-#' alpha=0.001
-#' motifcounterOption(alpha)
-#'
-#' # Estimate an order-1 background model
-#' bg=readBackground(seq,1)
-#' # read PFM from file
+#' # Load background
+#' bg=readBackground(seqs,1)
+#' 
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' # scan the given sequence on both strands for the motif occurrences
-#' noc=numMotifHits(seq,motif,bg)
-#' noc
+#' # Count motif hits both strands
+#' noc=motifcounter:::numMotifHits(seqs,motif,bg)
+#' noc$numofhits
 #'
-#' # scan the given sequence on a single strand for the motif occurences
-#' noc=numMotifHits(seq,motif,bg,singlestranded=TRUE)
-#' noc
+#' # Count motif hits on a single strand
+#' noc=motifcounter:::numMotifHits(seqs,motif,bg,singlestranded=TRUE)
+#' noc$numofhits
 #'
-#' @export
 numMotifHits=function(seqs, pfm, bg, singlestranded=FALSE) {
     motifValid(pfm)
     backgroundValid(bg)
-    if (class(seqs)=="DNAStringSet") {
-        # retrieve the number of motif hits
-        x=lapply(seqs, function(seq,pfm,bg,singlestranded) {
-            ret=motifHits(seq,pfm,bg)
-            if (singlestranded==FALSE) {
-                return(sum(ret[[1]]+ret[[2]]))
-            } else {
-                return(sum(ret[[1]]))
-            }
-        }, pfm,bg,singlestranded)
-
-        noh=unlist(x)
-        # retrieve the individual sequence lengths
-        # sequences containing "N" or "n" are assigned length zero
-        lseq=lenSequences(seqs)
-
-        nseq=length(seqs)
-    } else if (class(seqs)=="DNAString") {
-        nseq=1
-        lseq=lenSequences(seqs)
-        if (lseq==0) {
-            noh=0
-        } else  {
-            ret=motifHits(seqs,pfm,bg)
-            if (singlestranded==FALSE) {
-                noh=sum(ret[[1]]+ret[[2]])
-            } else {
-                noh=sum(ret[[1]])
-            }
+    motifAndBackgroundValid(pfm,bg)
+    
+    stopifnot(class(seqs)=="DNAStringSet")
+    
+    # retrieve the number of motif hits
+    x=lapply(seqs, function(seq,pfm,bg,singlestranded) {
+        ret=motifHits(seq,pfm,bg)
+        if (singlestranded==FALSE) {
+            return(sum(ret[[1]]+ret[[2]]))
+        } else {
+            return(sum(ret[[1]]))
         }
-    } else {
-        stop("seqs must be a DNAStringSet or DNAString object")
-    }
+    }, pfm,bg,singlestranded)
+
+    noh=unlist(x)
+    # retrieve the individual sequence lengths
+    # sequences containing "N" or "n" are assigned length zero
+    lseq=lenSequences(seqs)
+
+    nseq=length(seqs)
+
     return (list(nseq=nseq, lseq=lseq,
         numofhits=noh))
 }

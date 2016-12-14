@@ -2,19 +2,20 @@
 % Please edit documentation in R/count_wrapper.R
 \name{numMotifHits}
 \alias{numMotifHits}
-\title{Number of motif hits in a given DNA sequence}
+\title{Number of motif hits in a set of DNA sequences}
 \usage{
 numMotifHits(seqs, pfm, bg, singlestranded = FALSE)
 }
 \arguments{
-\item{seqs}{A DNAString or a DNAStringSet object}
+\item{seqs}{A DNAStringSet object}
 
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 
-\item{singlestranded}{Boolian flag that indicates whether a single strand or
-both strands shall be scanned for motif hits. Default: singlestranded=FALSE.}
+\item{singlestranded}{Boolean that indicates whether a single strand or
+both strands shall be scanned for motif hits. 
+Default: singlestranded = FALSE.}
 }
 \value{
 A list containing
@@ -26,32 +27,32 @@ A list containing
 }
 \description{
 This function counts the number of motif hits that
-are found in the supplied DNA sequences.
-It can be used to count motif hits on 
+are found in a given set of DNA sequences.
+}
+\details{
+Optionally, it can be used to count motif hits on 
 one or both strands, respectively.
 }
 \examples{
 
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-motiffile=system.file("extdata","x31.tab", package="motifcounter")
-seq=Biostrings::readDNAStringSet(seqfile)
+seqs=Biostrings::readDNAStringSet(seqfile)
 
-# Set false positive probability
-alpha=0.001
-motifcounterOption(alpha)
+# Load background
+bg=readBackground(seqs,1)
 
-# Estimate an order-1 background model
-bg=readBackground(seq,1)
-# read PFM from file
+# Load motif
+motiffile=system.file("extdata","x31.tab",package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
-# scan the given sequence on both strands for the motif occurrences
-noc=numMotifHits(seq,motif,bg)
-noc
+# Count motif hits both strands
+noc=motifcounter:::numMotifHits(seqs,motif,bg)
+noc$numofhits
 
-# scan the given sequence on a single strand for the motif occurences
-noc=numMotifHits(seq,motif,bg,singlestranded=TRUE)
-noc
+# Count motif hits on a single strand
+noc=motifcounter:::numMotifHits(seqs,motif,bg,singlestranded=TRUE)
+noc$numofhits
 
 }
 

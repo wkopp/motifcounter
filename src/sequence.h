@@ -7,9 +7,10 @@
 int getNucIndex(char c);
 char getNuc(int i);
 void getAssignmentFromIndex(int index, int length, int *ret);
-int getIndexFromReverseAssignment(char *ass, int length);
-int getIndexFromComplementaryAssignment(char *ass, int length);
-int getIndexFromAssignment(char *ass, int length);
-int getIndexFromReverseComplementaryAssignment(char *ass, int length);
+int getIndexFromReverseAssignment(const char *ass, int length);
+int getIndexFromComplementaryAssignment(const char *ass, int length);
+int getIndexFromAssignment(const char *ass, int length);
+int getIndexFromReverseComplementaryAssignment(const char *ass, int length);
+int getSequenceLength(const char *seq, int slen);
 
 #endif

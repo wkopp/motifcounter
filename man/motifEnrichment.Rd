@@ -7,21 +7,22 @@
 motifEnrichment(seqs, pfm, bg, singlestranded = FALSE, method = "compound")
 }
 \arguments{
-\item{seqs}{DNAString or DNAStringSet}
+\item{seqs}{A DNAStringSet object}
 
-\item{pfm}{A position frequency matrix}
+\item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
 
-\item{singlestranded}{Boolean flag that indicates whether one or both
-strands are scanned for motif hits}
+\item{singlestranded}{Boolean that indicates whether a single strand or
+both strands shall be scanned for motif hits. 
+Default: singlestranded = FALSE.}
 
 \item{method}{String that defines whether to use
 the 'compound' Poisson approximation' or the 'combinatorial' model.
 Default: method='compound'.}
 }
 \value{
-Result list that contains
+List that contains
 \describe{
 \item{pvalue}{P-value for the enrichment test}
 \item{fold}{Fold-enrichment with respect to the expected number of hits}
@@ -29,41 +30,46 @@ Result list that contains
 }
 \description{
 This function determines whether a given motif is enriched in a given
-DNA sequences. Enrichment is tested by comparing the observed 
-number of motif hits against the distribution of the number
+DNA sequences.
+}
+\details{
+Enrichment is tested by comparing the observed 
+number of motif hits against a theoretical distribution of the number
 of motif hits in random DNA sequences.
-The function approximates the distribution of the number of motif
-hits using either a 'compound Poisson approximation' 
+Optionally, the theoretical distribution of the number of motif
+hits can be evaluated by either a 'compound Poisson model' 
 or the 'combinatorial model'.
+Additionally, the enrichment test can be conducted with respect
+to scanning only the forward strand or both strands of the DNA
+sequences. The latter option is only available for the
+'compound Poisson model'
 }
 \examples{
 
 
+# Load sequences
 seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(seqfile)
-motiffile=system.file("extdata","x31.tab", package="motifcounter")
-alpha=0.001
-gran=0.1
-motifcounterOption(alpha, gran)
 
-# estimate the background model
+# Load background
 bg=readBackground(seqs,1)
 
-# load a motif
+# Load motif
+motiffile=system.file("extdata","x31.tab", package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
 
-### 1 ) Compute the distribution for scanning a *single* DNA strand
+# 1 ) Motif enrichment test w.r.t. scanning a *single* DNA strand
 # based on the 'Compound Poisson model'
 
 result=motifEnrichment(seqs,motif,bg,
             singlestranded=TRUE,method="compound")
 
-### 2 ) Compute the distribution for scanning *both* DNA strand
+# 2 ) Motif enrichment test w.r.t. scanning *both* DNA strand
 # based on the 'Compound Poisson model'
 
 result=motifEnrichment(seqs,motif, bg, method="compound")
 
-### 3 ) Compute the distribution for scanning *both* DNA strand
+# 3 ) Motif enrichment test w.r.t. scanning *both* DNA strand
 # based on the *combinatorial model*
 
 result=motifEnrichment(seqs,motif, bg,singlestranded=FALSE,

@@ -23,3 +23,17 @@ Packaged: 2016-11-24 14:30:57 UTC; kopp
 RoxygenNote: 5.0.0
 VignetteBuilder: knitr
 NeedsCompilation: yes
+Collate:
+    'background_wrapper.R'
+    'comppoiss_wrapper.R'
+    'combinatorial_wrapper.R'
+    'score_wrapper.R'
+    'count_wrapper.R'
+    'enrichmentTest.R'
+    'forground_wrapper.R'
+    'motifcounter-package.R'
+    'observed_wrapper.R'
+    'option.R'
+    'overlap.R'
+    'simulate_wrapper.R'
+    'wrapper.R'

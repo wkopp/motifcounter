@@ -1,24 +1,26 @@
 #' Enrichment of motif hits
 #'
 #' This function determines whether a given motif is enriched in a given
-#' DNA sequences. Enrichment is tested by comparing the observed 
-#' number of motif hits against the distribution of the number
+#' DNA sequences. 
+#' 
+#' Enrichment is tested by comparing the observed 
+#' number of motif hits against a theoretical distribution of the number
 #' of motif hits in random DNA sequences.
-#' The function approximates the distribution of the number of motif
-#' hits using either a 'compound Poisson approximation' 
+#' Optionally, the theoretical distribution of the number of motif
+#' hits can be evaluated by either a 'compound Poisson model' 
 #' or the 'combinatorial model'.
+#' Additionally, the enrichment test can be conducted with respect
+#' to scanning only the forward strand or both strands of the DNA
+#' sequences. The latter option is only available for the
+#' 'compound Poisson model'
+#' @include count_wrapper.R
 #'
-#'
-#' @param seqs DNAString or DNAStringSet
-#' @param pfm A position frequency matrix
-#' @param bg A Background object
-#' @param singlestranded Boolean flag that indicates whether one or both
-#'      strands are scanned for motif hits
+#' @inheritParams numMotifHits
 #' @param method String that defines whether to use
 #' the 'compound' Poisson approximation' or the 'combinatorial' model.
 #' Default: method='compound'.
 #'
-#' @return Result list that contains
+#' @return List that contains
 #' \describe{
 #' \item{pvalue}{P-value for the enrichment test}
 #' \item{fold}{Fold-enrichment with respect to the expected number of hits}
@@ -26,31 +28,29 @@
 #' @examples
 #'
 #'
+#' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
-#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' alpha=0.001
-#' gran=0.1
-#' motifcounterOption(alpha, gran)
-#'
-#' # estimate the background model
+#' 
+#' # Load background
 #' bg=readBackground(seqs,1)
-#'
-#' # load a motif
+#' 
+#' # Load motif
+#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
-#' ### 1 ) Compute the distribution for scanning a *single* DNA strand
+#' # 1 ) Motif enrichment test w.r.t. scanning a *single* DNA strand
 #' # based on the 'Compound Poisson model'
-#'
+#' 
 #' result=motifEnrichment(seqs,motif,bg,
 #'             singlestranded=TRUE,method="compound")
 #'
-#' ### 2 ) Compute the distribution for scanning *both* DNA strand
+#' # 2 ) Motif enrichment test w.r.t. scanning *both* DNA strand
 #' # based on the 'Compound Poisson model'
-#'
+#' 
 #' result=motifEnrichment(seqs,motif, bg, method="compound")
 #'
-#' ### 3 ) Compute the distribution for scanning *both* DNA strand
+#' # 3 ) Motif enrichment test w.r.t. scanning *both* DNA strand
 #' # based on the *combinatorial model*
 #'
 #' result=motifEnrichment(seqs,motif, bg,singlestranded=FALSE,
@@ -62,6 +62,8 @@ motifEnrichment=function(seqs, pfm,bg,
     singlestranded=FALSE,method="compound") {
     motifValid(pfm)
     backgroundValid(bg)
+    motifAndBackgroundValid(pfm,bg)
+    
     #compute overlapping hit probs
     overlap=probOverlapHit(pfm,bg,singlestranded)
 

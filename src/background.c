@@ -14,11 +14,8 @@ void getNucleotideFrequencyFromSequence(char *seq, int slen,
         double *counts, int order) {
     int j;
 
-    for (j=0; j<slen; j++) {
-        // if the sequence contains any N's, do not process the scores
-        if (getNucIndex(seq[j])<0) {
-            return;
-        }
+    if (getSequenceLength(seq, slen)<0) {
+        return;
     }
 
     for (j=order; j<slen; j++) {

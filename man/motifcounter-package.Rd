@@ -10,123 +10,91 @@ The package provides functions for determining the positions
 of motif hits as well as motif hit
 enrichment for a given position frequency matrix (PFM)
 in a DNA sequence of interest.
-To this end, the user is required to provide 1) a PFM,
-2) a DNA sequence which is used to create
-the sequence background model (see \code{link{readBackground}}),
-3) a DNA sequence of interest that shall be scanned for motif hits
-(can be the same as the one used for 2)),
-and 4) a desired false positive probability of motif hits in
-random DNA sequences (see \code{\link{motifcounterOption}}.
-}
-\details{
 The following examples guides you through the main 
 functions of the `motifcounter` package.
 }
+\details{
+For an analysis with `motifcounter`,
+the user is required to provide 1) a PFM,
+2) a DNA sequence which is used to estimate
+a background model (see \code{link{readBackground}}),
+3) a DNA sequence of interest that shall be scanned for motif hits
+(can be the same as the one used for point 2),
+and 4) (optionally) a desired false positive probability of motif hits in
+random DNA sequences (see \code{\link{motifcounterOptions}}).
+
+\tabular{ll}{ Package: \tab motifcounter\cr
+Type: \tab Package\cr Version: \tab
+1.0\cr Date: \tab 2016-11-04\cr License: \tab GPL-2\cr }
+}
 \examples{
 
-# generate a background model
-order=1
+# Load sequences
 file=system.file("extdata","seq.fasta", package="motifcounter")
 seqs=Biostrings::readDNAStringSet(file)
+
+# Estimate an order-1 background model
+order=1
 bg=readBackground(seqs,order)
 
-# Load a PFM model and normalize it
+# Load motif
 motiffile=system.file("extdata","x31.tab", package="motifcounter")
 motif=t(as.matrix(read.table(motiffile)))
+
+# Normalize the motif
+# Normalization is sometimes necessary to prevent zeros in
+# the motif
 motif=normalizeMotif(motif)
 
-# use only a subset of the sequences
+# Use subset of the sequences
 seqs=seqs[1:10]
 
-# set the false positive probability for motif hits in random sequences
-alpha=0.001
-motifcounterOption(alpha)
+# Optionally, set the false positive probability
+#alpha=0.001 # is also the default
+#motifcounterOptions(alpha) 
 
-####
 # Investigate the per-position and per-strand scores in a given sequence
 scores=scoreSequence(seqs[[1]],motif,bg)
 
-####
 # Investigate the per-position and per-strand motif hits in a given sequence
-scores=motifHits(seqs[[1]],motif,bg)
+hits=motifHits(seqs[[1]],motif,bg)
 
-####
 # Determine the average score profile across a set of sequences
 scores=scoreSequenceProfile(seqs,motif,bg)
 
-####
 # Determine the average motif hit profile across a set of sequences
-scores=motifHitProfile(seqs,motif,bg)
+hits=motifHitProfile(seqs,motif,bg)
 
-#####
-# Compute the overlap probabilities with respect to scanning both
-# DNA strands. They are necessary for the
-# distribution of the number of motif hits and the enrichment test
-op=probOverlapHit(motif,bg,singlestranded=FALSE)
+# Determine the empirical score distribution
+scoreHistogram(seqs,motif,bg)
 
-seqlen=numMotifHits(seqs,motif,bg)$lseq
+# Determine the theoretical score distribution in random sequences
+scoreDist(motif,bg)
 
-# Compound poisson approximation of the motif hits distribution
-# in random sequences
-cpdist=compoundPoissonDist(seqlen, op)
 
-# combinatorial approximation of the motif hits distribution
-# in random sequences
-combdist=combinatorialDist(seqlen, op)
-
-#####
-# Determine the motif enrichment in a set of DNA sequences
-# Use the compound Poisson approximation
-#    scan only a single strand
+# Determine the motif hit enrichment in a set of DNA sequences
+# 1. Use the compound Poisson approximation
+#    and scan only a single strand for motif hits
 result=motifEnrichment(seqs,motif,bg,
             singlestranded=TRUE,method="compound")
 
-# Use the compound Poisson approximation
-#    scan both strands
+# Determine the motif hit enrichment in a set of DNA sequences
+# 2. Use the compound Poisson approximation
+#    and scan both strands for motif hits
 result=motifEnrichment(seqs,motif,bg,
             singlestranded=FALSE,method="compound")
 
-# Use the combinatorial approximation
-#    scan both strands
+# Determine the motif hit enrichment in a set of DNA sequences
+# 3. Use the combinatorial model
+#    and scan both strands for motif hits
 result=motifEnrichment(seqs,motif,bg,singlestranded=FALSE,
             method="combinatorial")
-
-#####
-# Compute the overlap probabilities 
-# w.r.t. scanning a single strand
-op=probOverlapHit(motif,bg,singlestranded=TRUE)
-# w.r.t. scanning both strands
-op=probOverlapHit(motif,bg,singlestranded=FALSE)
-
-# Compute the compound poisson approximation
-cpdist=compoundPoissonDist(seqlen, op)
-
-# Compute the combinatorial approximation
-combdist=combinatorialDist(seqlen, op)
-
-# Obtain the number of motif hits in the given sequence
-numhits=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
-
-numhits=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
-
-numhits=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
-
-# Score distribution is determined analytically using  dynamic programming
-scoredist=scoreDist(motif,bg)
-plot(scoredist$score,scoredist$probability, col="green")
-
 
 }
 \author{
 Wolfgang Kopp
 
 Maintainer: Wolfgang Kopp <kopp@molgen.mpg.de>
-}
-\seealso{
-\code{\link{compoundPoissonDist}}, \code{\link{combinatorialDist}}
-\tabular{ll}{ Package: \tab motifcounter\cr
-Type: \tab Package\cr Version: \tab
-1.0\cr Date: \tab 2016-11-04\cr License: \tab GPL-2\cr }
 }
 \keyword{MotifEnrichment}
 \keyword{PFM,}
