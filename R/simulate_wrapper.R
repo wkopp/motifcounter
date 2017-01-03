@@ -76,7 +76,7 @@ generateDNAStringSet=function(seqlen,bg) {
 #' This function repeatedly simulates random DNA sequences according to
 #' the background model and
 #' subsequently counts how many motif hits occur in them.
-#' Thus, this function gives rise to the empirical 
+#' Thus, this function gives rise to the empirical
 #' distribution of the number of motif hits.
 #' This function is only used for benchmarking analysis.
 #'
@@ -100,18 +100,18 @@ generateDNAStringSet=function(seqlen,bg) {
 #' # Load motif
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
-#' 
+#'
 #' # Study the counts in one sequence of length 150 bp
 #' seqlen=rep(150,1)
-#' 
+#'
 #' # Compute empirical distribution of the number of motif hits
 #' # by scanning both strands using 100 samples
-#' simc=motifcounter:::simulateNumHitsDist(motif, bg, 
+#' simc=motifcounter:::simulateNumHitsDist(motif, bg,
 #'     seqlen, nsim=100,singlestranded=FALSE)
 #'
 #' # Compute empirical distribution of the number of motif hits
 #' # by scanning a single strand using 100 samples
-#' simc=motifcounter:::simulateNumHitsDist(motif, bg, 
+#' simc=motifcounter:::simulateNumHitsDist(motif, bg,
 #'     seqlen, nsim=100,singlestranded=TRUE)
 #'
 #' @seealso \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
@@ -144,7 +144,7 @@ simulateNumHitsDist=function(pfm,bg,seqlen, nsim, singlestranded=FALSE) {
 #' on a set of randomly generated DNA sequences based on the
 #' background model.
 #' This function is only used for benchmarking analysis.
-#' 
+#'
 #'
 #' @inheritParams simulateNumHitsDist
 #' @return List containing
@@ -164,7 +164,7 @@ simulateNumHitsDist=function(pfm,bg,seqlen, nsim, singlestranded=FALSE) {
 #' # Load motif
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
-#' 
+#'
 #'
 #' # Compoute the empirical score distribution in
 #' # sequences of length 1kb using 1000 samples
@@ -179,10 +179,10 @@ scoreDistEmpirical=function(pfm,bg,seqlen, nsim) {
   if (seqlen<ncol(pfm)) {
      warning("seqlen less than motif length")
   }
-  
+
   seqs=generateDNAStringSet(rep(seqlen,nsim),bg)
   sh=scoreHistogram(seqs,pfm,bg)
-  
+
   probs=sh$dist/sum(sh$dist)
   return(list(scores=sh$score, dist=probs))
 }

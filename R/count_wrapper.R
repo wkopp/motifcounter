@@ -44,7 +44,7 @@ motifHits=function(seq,pfm,bg) {
 
 #' Motif hit profile across multiple sequences
 #'
-#' This function computes the per-position average motif hit 
+#' This function computes the per-position average motif hit
 #' profile across a set of fixed-length DNA sequences.
 #' It can be used to reveal positional constraints
 #' of TFBSs.
@@ -81,7 +81,7 @@ motifHitProfile=function(seqs,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
     motifAndBackgroundValid(pfm,bg)
-    
+
     stopifnot(class(seqs)=="DNAStringSet")
 
     if (any(lenSequences(seqs)!=lenSequences(seqs)[1])) {
@@ -89,20 +89,20 @@ motifHitProfile=function(seqs,pfm,bg) {
             Please trim the sequnces.")
     }
     slen=lenSequences(seqs)[1]
-    
+
     fhits=lapply(seqs, function(seq,pfm,bg) {
         return(motifHits(seq,pfm,bg)$fhits)
     }, pfm,bg)
-    
+
     fhits=unlist(fhits)
-    fhits=apply(as.matrix(fhits,slen,length(fhits)/slen),1,mean)
+    fhits=rowMeans(as.matrix(fhits,slen,length(fhits)/slen))
 
     rhits=lapply(seqs, function(seq,pfm,bg) {
         mh=motifHits(seq,pfm,bg)$rhits
     }, pfm,bg)
 
     rhits=unlist(rhits)
-    rhits=apply(as.matrix(rhits,slen,length(rhits)/slen),1,mean)
+    rhits=rowMeans(as.matrix(rhits,slen,length(rhits)/slen))
     return (list(fhits=as.vector(fhits),rhits=as.vector(rhits)))
 }
 
@@ -110,14 +110,14 @@ motifHitProfile=function(seqs,pfm,bg) {
 #'
 #' This function counts the number of motif hits that
 #' are found in a given set of DNA sequences.
-#' 
-#' Optionally, it can be used to count motif hits on 
+#'
+#' Optionally, it can be used to count motif hits on
 #' one or both strands, respectively.
 #'
 #'
 #' @inheritParams scoreSequenceProfile
 #' @param singlestranded Boolean that indicates whether a single strand or
-#' both strands shall be scanned for motif hits. 
+#' both strands shall be scanned for motif hits.
 #' Default: singlestranded = FALSE.
 #' @return A list containing
 #' \describe{
@@ -133,7 +133,7 @@ motifHitProfile=function(seqs,pfm,bg) {
 #'
 #' # Load background
 #' bg=readBackground(seqs,1)
-#' 
+#'
 #' # Load motif
 #' motiffile=system.file("extdata","x31.tab",package="motifcounter")
 #' motif=t(as.matrix(read.table(motiffile)))
@@ -150,20 +150,19 @@ numMotifHits=function(seqs, pfm, bg, singlestranded=FALSE) {
     motifValid(pfm)
     backgroundValid(bg)
     motifAndBackgroundValid(pfm,bg)
-    
+
     stopifnot(class(seqs)=="DNAStringSet")
-    
+
     # retrieve the number of motif hits
-    x=lapply(seqs, function(seq,pfm,bg,singlestranded) {
+    noh=vapply(seqs, function(seq,pfm,bg,singlestranded) {
         ret=motifHits(seq,pfm,bg)
         if (singlestranded==FALSE) {
             return(sum(ret[[1]]+ret[[2]]))
         } else {
             return(sum(ret[[1]]))
         }
-    }, pfm,bg,singlestranded)
+    }, numeric(1), pfm,bg,singlestranded)
 
-    noh=unlist(x)
     # retrieve the individual sequence lengths
     # sequences containing "N" or "n" are assigned length zero
     lseq=lenSequences(seqs)

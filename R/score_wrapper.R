@@ -35,7 +35,6 @@ scoreDist=function(pfm,bg) {
     backgroundValid(bg)
     motifAndBackgroundValid(pfm,bg)
 
-
     scores=.Call("motifcounter_scorerange",
         as.numeric(pfm),nrow(pfm),ncol(pfm),
         bg$station,bg$trans,as.integer(bg$order),
@@ -53,7 +52,7 @@ scoreDist=function(pfm,bg) {
 #'
 #' This function computes the score distribution for a given PFM and
 #' a background model.
-#' 
+#'
 #' The result of this function is identical to \code{\link{scoreDist}},
 #' however, the method employs a less efficient algorithm that
 #' enumerates all DNA sequences of the length of the motif.
@@ -89,7 +88,7 @@ scoreDistBf=function(pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
     motifAndBackgroundValid(pfm,bg)
-    
+
     scores=.Call("motifcounter_scorerange",
                 as.numeric(pfm),nrow(pfm),ncol(pfm),
                 bg$station,bg$trans,as.integer(bg$order),
@@ -104,7 +103,7 @@ scoreDistBf=function(pfm,bg) {
 
 #' Score strand
 #'
-#' This function computes the per-position  
+#' This function computes the per-position
 #' score in a given DNA strand.
 #'
 #' The function returns the per-position scores
@@ -113,7 +112,7 @@ scoreDistBf=function(pfm,bg) {
 #'
 #' @inheritParams scoreDist
 #' @param seq A DNAString object
-#' @return 
+#' @return
 #' \describe{
 #' \item{scores}{Vector of scores on the given strand}
 #' }
@@ -139,10 +138,10 @@ scoreStrand=function(seq,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
     motifAndBackgroundValid(pfm,bg)
-    
+
     # Check class
     stopifnot(class(seq)=="DNAString")
-    
+
     scores=.Call("motifcounter_scoresequence",
         as.numeric(pfm),nrow(pfm),ncol(pfm),toString(seq),
         bg$station,bg$trans,as.integer(bg$order),
@@ -152,7 +151,7 @@ scoreStrand=function(seq,pfm,bg) {
 
 #' Score observations
 #'
-#' This function computes the per-position and per-strand 
+#' This function computes the per-position and per-strand
 #' score in a given DNA sequence.
 #'
 #' @inheritParams scoreDist
@@ -185,10 +184,10 @@ scoreSequence=function(seq,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
     motifAndBackgroundValid(pfm,bg)
-    
+
     # Check class
     stopifnot(class(seq)=="DNAString")
-    
+
     fscores=scoreStrand(seq, pfm, bg)
     rscores=scoreStrand(seq, revcompMotif(pfm), bg)
     return(list(fscores=fscores,rscores=rscores))
@@ -196,14 +195,14 @@ scoreSequence=function(seq,pfm,bg) {
 
 #' Score profile across multiple sequences
 #'
-#' This function computes the per-position and per-strand 
+#' This function computes the per-position and per-strand
 #' average score profiles across a set of DNA sequences.
 #' It can be used to reveal positional constraints
 #' of TFBSs.
 #'
 #' @inheritParams scoreDist
 #' @param seqs A DNAStringSet object
-#' 
+#'
 #' @return List containing
 #' \describe{
 #' \item{fscores}{Vector of per-position average forward strand scores}
@@ -238,15 +237,15 @@ scoreSequenceProfile=function(seqs,pfm,bg) {
             Please trim the sequnces.")
     }
     slen=lenSequences(seqs)[1]
-    
+
     fscores=lapply(seqs, function(seq,pfm,bg) {
-        s=scoreStrand(seq,pfm,bg) }, 
+        s=scoreStrand(seq,pfm,bg) },
         pfm,bg)
     fscores=unlist(fscores)
     fscores=apply(as.matrix(fscores,slen,length(fscores)/slen),1,mean)
 
     rscores=sapply(seqs, function(seq,pfm,bg) {
-        s=scoreStrand(seq,revcompMotif(pfm),bg) }, 
+        s=scoreStrand(seq,revcompMotif(pfm),bg) },
         pfm,bg)
     rscores=unlist(rscores)
     rscores=apply(as.matrix(rscores,slen,length(rscores)/slen),1,mean)
@@ -268,7 +267,7 @@ scoreSequenceProfile=function(seqs,pfm,bg) {
 #' }
 #'
 #' @examples
-#' 
+#'
 #' # Load sequences
 #' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(seqfile)
@@ -282,7 +281,7 @@ scoreSequenceProfile=function(seqs,pfm,bg) {
 #'
 #' # Compute the per-position and per-strand scores
 #' motifcounter:::scoreHistogramSingleSeq(seqs[[1]],motif,bg)
-#' 
+#'
 scoreHistogramSingleSeq=function(seq,pfm, bg) {
     motifValid(pfm)
     backgroundValid(bg)
@@ -360,9 +359,9 @@ scoreHistogram=function(seqs,pfm,bg) {
 #'
 #' This function computes the score threshold for a desired
 #' false positive probability `alpha`.
-#' 
+#'
 #' Note that the returned alpha usually differs slightly
-#' from the one that is prescribed using 
+#' from the one that is prescribed using
 #' \code{\link{motifcounterOptions}}, because
 #' of the discrete nature of the sequences.
 #'
@@ -391,7 +390,7 @@ scoreHistogram=function(seqs,pfm,bg) {
 scoreThreshold=function(pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
-    
+
     scoredist=scoreDist(pfm,bg)
 
     # find quantile
@@ -399,7 +398,7 @@ scoreThreshold=function(pfm,bg) {
     if (length(ind)<=1) {
         stop("The significance level is too stringent for the given motif.
             Motif hits are impossible to occur at that level.
-            Use 'motifcounterOptions' to prescribe a less stringent 
+            Use 'motifcounterOptions' to prescribe a less stringent
             value for 'alpha'.")
     }
     ind=ind[2:length(ind)]

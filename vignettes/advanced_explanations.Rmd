@@ -47,19 +47,18 @@ In this section, we investigate the compound Poisson
 approximation, the combinatorial model and the empirical distribution 
 for a perfectly palindromic motif. 
 
-As usual we start by obtaining a background model
+As usual, we start by obtaining a background model
 ```{r}
-order=1
-file=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(file)
-bg=readBackground(seqs,order)
+order <- 1
+file <- system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs <- Biostrings::readDNAStringSet(file)
+bg <- readBackground(seqs, order)
 ```
 
 ```{r fig.show=TRUE, fig.width=4, fig.height=3, fig.cap="Palindromic motif"}
-motiffile=system.file("extdata",as.character("x32.tab"),
-                    package="motifcounter")
+motiffile <- system.file("extdata", as.character("x32.tab"), package = "motifcounter")
 
-motif=t(as.matrix(read.table(motiffile)))
+motif <- t(as.matrix(read.table(motiffile)))
 seqLogo(motif)
 
 ```
@@ -69,23 +68,22 @@ of length 100 bp each are shown in the following
 
 ```{r fig.show=TRUE, fig.cap="Distribution of the number of hits"}
 
-regions=rep(100,100)
+regions <- rep(100, 100)
 # generate an empirical distribution using 100 samples of 1kb sequences each
-simdist=motifcounter:::simulateNumHitsDist(motif,bg,
-            regions,100,singlestranded=FALSE)
+simdist <- motifcounter:::simulateNumHitsDist(motif, bg, regions, 100,
+					      singlestranded = FALSE)
 
+op <- motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
+cpdist <- motifcounter:::compoundPoissonDist(regions, op)
+combdist <- motifcounter:::combinatorialDist(regions, op)
+maxhits <- 80
 
-op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
-cpdist=motifcounter:::compoundPoissonDist(regions,op)
-combdist=motifcounter:::combinatorialDist(regions,op)
-maxhits=80
-
-plot(0:(maxhits+1), cpdist$dist[1:(maxhits+2)],
-        col="blue",ylab="Probability",xlab="Num. of hits")
-points(0:(maxhits+1),combdist$dist[1:(maxhits+2)],col="red")
-points(0:(maxhits+1),simdist$dist[1:(maxhits+2)],col="gray")
-legend(50,0.08,c("comp. Poiss.", "combinatorial", "empirical"), 
-        col=c("blue","red","gray"), lty=c(1,1,1))
+plot(0:(maxhits + 1), cpdist$dist[1:(maxhits + 2)], col = "blue", ylab = "Probability", 
+  xlab = "Num. of hits")
+points(0:(maxhits + 1), combdist$dist[1:(maxhits + 2)], col = "red")
+points(0:(maxhits + 1), simdist$dist[1:(maxhits + 2)], col = "gray")
+legend(50, 0.08, c("comp. Poiss.", "combinatorial", "empirical"), col = c("blue", 
+  "red", "gray"), lty = c(1, 1, 1))
 
 ```
 
