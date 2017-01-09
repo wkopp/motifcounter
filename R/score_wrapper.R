@@ -236,19 +236,23 @@ scoreSequenceProfile=function(seqs,pfm,bg) {
         stop("Sequences must be equally long.
             Please trim the sequnces.")
     }
-    slen=lenSequences(seqs)[1]
+    slen=lenSequences(seqs[1])
+    
+    if (slen <= ncol(pfm) -1) {
+        return (list(fscores = integer(0), rscores = integer(0)))
+    }
 
-    fscores=lapply(seqs, function(seq,pfm,bg) {
+    fscores=vapply(seqs, function(seq,pfm,bg) {
         s=scoreStrand(seq,pfm,bg) },
+        FUN.VALUE=numeric(slen - ncol(pfm) + 1),
         pfm,bg)
-    fscores=unlist(fscores)
-    fscores=apply(as.matrix(fscores,slen,length(fscores)/slen),1,mean)
+    fscores=rowMeans(as.matrix(fscores))
 
-    rscores=sapply(seqs, function(seq,pfm,bg) {
+    rscores=vapply(seqs, function(seq,pfm,bg) {
         s=scoreStrand(seq,revcompMotif(pfm),bg) },
+        FUN.VALUE=numeric(slen - ncol(pfm) + 1),
         pfm,bg)
-    rscores=unlist(rscores)
-    rscores=apply(as.matrix(rscores,slen,length(rscores)/slen),1,mean)
+    rscores=rowMeans(as.matrix(rscores))
     return (list(fscores=as.vector(fscores),rscores=as.vector(rscores)))
 }
 
@@ -341,15 +345,17 @@ scoreHistogram=function(seqs,pfm,bg) {
     backgroundValid(bg)
     stopifnot(class(seqs)=="DNAStringSet")
 
-    his=lapply(seqs, scoreHistogramSingleSeq, pfm, bg)
+    # First, extract the score range
+    his=lapply(seqs[1], scoreHistogramSingleSeq, pfm, bg)
     nseq=length(his)
     scores=his[[1]]$scores
-    nrange=length(his[[1]]$dist)
-    his=lapply(his,function(x) {x$dist})
-    his=unlist(his)
-    his=matrix(his,nrange,nseq)
-    his=apply(his,1,sum)
-    freq=his
+
+    # Then extract the histogram
+    his=vapply(seqs,function(seq, pfm, bg) {
+        scoreHistogramSingleSeq(seq, pfm, bg)$dist
+    }, FUN.VALUE=numeric(length(scores)), pfm, bg)
+
+    freq=rowSums(his)
     result=list(scores=scores, dist=freq)
 
     return(result)

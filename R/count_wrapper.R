@@ -34,12 +34,12 @@ motifHits=function(seq,pfm,bg) {
 
     sth=scoreThreshold(pfm,bg)
     scores=scoreSequence(seq,pfm,bg)
-    fhits=rep(0,length(scores$fscores))
-    rhits=rep(0,length(scores$rscores))
+    fhits=integer(length(scores$fscores))
+    rhits=integer(length(scores$rscores))
     fhits[scores$fscores>=sth$threshold]=1
     rhits[scores$rscores>=sth$threshold]=1
 
-    return(list(fhits=fhits,rhits=rhits))
+    return(list(fhits=as.integer(fhits), rhits=as.integer(rhits)))
 }
 
 #' Motif hit profile across multiple sequences
@@ -88,21 +88,22 @@ motifHitProfile=function(seqs,pfm,bg) {
         stop("Sequences must be equally long.
             Please trim the sequnces.")
     }
-    slen=lenSequences(seqs)[1]
+    slen=lenSequences(seqs[1])
+    if (slen <= ncol(pfm) -1) {
+        return (list(fhits = integer(0), rhits = integer(0)))
+    }
 
-    fhits=lapply(seqs, function(seq,pfm,bg) {
+    fhits=vapply(seqs, function(seq,pfm,bg) {
         return(motifHits(seq,pfm,bg)$fhits)
-    }, pfm,bg)
+    }, FUN.VALUE=integer(slen-ncol(pfm)+1), pfm, bg)
 
-    fhits=unlist(fhits)
-    fhits=rowMeans(as.matrix(fhits,slen,length(fhits)/slen))
+    fhits=rowMeans(as.matrix(fhits))
 
-    rhits=lapply(seqs, function(seq,pfm,bg) {
+    rhits=vapply(seqs, function(seq,pfm,bg) {
         mh=motifHits(seq,pfm,bg)$rhits
-    }, pfm,bg)
+    }, FUN.VALUE=integer(slen - ncol(pfm) + 1), pfm, bg)
 
-    rhits=unlist(rhits)
-    rhits=rowMeans(as.matrix(rhits,slen,length(rhits)/slen))
+    rhits=rowMeans(as.matrix(rhits))
     return (list(fhits=as.vector(fhits),rhits=as.vector(rhits)))
 }
 
@@ -161,7 +162,7 @@ numMotifHits=function(seqs, pfm, bg, singlestranded=FALSE) {
         } else {
             return(sum(ret[[1]]))
         }
-    }, numeric(1), pfm,bg,singlestranded)
+    }, integer(1), pfm,bg,singlestranded)
 
     # retrieve the individual sequence lengths
     # sequences containing "N" or "n" are assigned length zero

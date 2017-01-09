@@ -10,10 +10,8 @@ test_that("generateDNAString", {
     expect_error(generateDNAString(1,1))
 
     # too short sequence
-    expect_warning(generateDNAString(-1,bg))
-    expect_warning(generateDNAString(bg$order-1,bg))
-    expect_equal(length(generateDNAString(-1,bg)),0)
-    expect_equal(length(generateDNAString(bg$order-1,bg)),0)
+    expect_warning(expect_equal(length(generateDNAString(-1,bg)),0))
+    expect_warning(expect_equal(length(generateDNAString(bg$order-1,bg)),0))
 
     # Normal sequence
     expect_equal(length(generateDNAString(10,bg)),10)
@@ -29,10 +27,11 @@ test_that("generateDNAStringSet", {
     expect_error(generateDNAStringSet(1,1))
 
     # too short sequence
-    expect_warning(generateDNAStringSet(-1,bg))
-    expect_warning(generateDNAStringSet(bg$order-1,bg))
-    expect_equal(length(generateDNAStringSet(-1,bg)[[1]]),0)
-    expect_equal(length(generateDNAStringSet(bg$order-1,bg)[[1]]),0)
+    #expect_warning(generateDNAStringSet(-1,bg))
+    #expect_warning(generateDNAStringSet(bg$order-1,bg))
+    expect_warning(expect_equal(length(generateDNAStringSet(-1,bg)[[1]]),0))
+    expect_warning(expect_equal(
+        length(generateDNAStringSet(bg$order-1,bg)[[1]]),0))
 
     # Normal sequences
     expect_equal(length(generateDNAStringSet(10,bg)),1)
@@ -61,9 +60,11 @@ test_that("simulateNumHitsDist", {
         expect_equal(sum(ret$dist),1)
 
         # too short sequences
-        ret=simulateNumHitsDist(motif,bg,0,nsim=100,singlestranded=ss)
-        expect_equal(sum(ret$dist),1)
-        expect_equal(ret$dist[1],1)
+        expect_warning({
+            ret=simulateNumHitsDist(motif,bg,0,nsim=100,singlestranded=ss)
+            expect_equal(sum(ret$dist),1)
+            expect_equal(ret$dist[1],1)
+        })
 
         # too short sequences
         ret=simulateNumHitsDist(motif,bg,ncol(motif)-1,
@@ -94,10 +95,16 @@ test_that("scoreDistEmpirical", {
     expect_equal(sum(scoreDistEmpirical(motif,bg,100,10)[[2]]),1)
     expect_equal(length(scoreDistEmpirical(motif,bg,100,10)[[2]]),
                  length(scoreDistEmpirical(motif,bg,100,10)[[1]]))
+    expect_equal(sum(scoreDistEmpirical(motif,bg,ncol(motif),10)[[2]]),1)
 
     # Check too short sequence
-    expect_true(is.na(sum(scoreDistEmpirical(motif,bg,0,10)[[2]])))
-    expect_true(is.na(sum(scoreDistEmpirical(motif,bg,ncol(motif)-1,10)[[2]])))
+    expect_warning({
+        expect_true(is.na(sum(scoreDistEmpirical(motif,bg,0,10)[[2]])))
+    })
+    expect_warning({
+        expect_true(is.na(sum(
+            scoreDistEmpirical(motif,bg,ncol(motif)-1,10)[[2]])))
+    })
 
     #expect warning due to short sequence length
     expect_warning(scoreDistEmpirical(motif,bg,0,10))

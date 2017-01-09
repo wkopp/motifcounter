@@ -20,10 +20,10 @@
 lenSequences=function(seqs) {
     stopifnot(class(seqs)=="DNAStringSet")
 
-    lseq=sapply(seqs, function(seq) {
+    lseq=vapply(seqs, function(seq) {
         return(.Call("motifcounter_slen",toString(seq),
                 PACKAGE="motifcounter"))
-    })
+    }, FUN.VALUE=integer(1))
 
     return(as.vector(lseq))
 }

@@ -27,7 +27,7 @@ motifValid=function(pfm) {
             Use 'normalizeMotif'.")
     }
     #check if all columns sum to one
-    if (!all(abs(1-apply(pfm,2,sum))<0.0000001)) {
+    if (!all(abs(1-colSums(pfm))<0.0000001)) {
         stop("Columns must sum to one.
             Use 'normalizeMotif'.")
     }
