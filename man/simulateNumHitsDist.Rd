@@ -18,7 +18,7 @@ this information can be retrieved using \code{\link{numMotifHits}}.}
 \item{nsim}{Integer number of random samples.}
 
 \item{singlestranded}{Boolean that indicates whether a single strand or
-both strands shall be scanned for motif hits. 
+both strands shall be scanned for motif hits.
 Default: singlestranded = FALSE.}
 }
 \value{
@@ -31,7 +31,7 @@ A List that contains
 This function repeatedly simulates random DNA sequences according to
 the background model and
 subsequently counts how many motif hits occur in them.
-Thus, this function gives rise to the empirical 
+Thus, this function gives rise to the empirical
 distribution of the number of motif hits.
 This function is only used for benchmarking analysis.
 }
@@ -54,12 +54,12 @@ seqlen=rep(150,1)
 
 # Compute empirical distribution of the number of motif hits
 # by scanning both strands using 100 samples
-simc=motifcounter:::simulateNumHitsDist(motif, bg, 
+simc=motifcounter:::simulateNumHitsDist(motif, bg,
     seqlen, nsim=100,singlestranded=FALSE)
 
 # Compute empirical distribution of the number of motif hits
 # by scanning a single strand using 100 samples
-simc=motifcounter:::simulateNumHitsDist(motif, bg, 
+simc=motifcounter:::simulateNumHitsDist(motif, bg,
     seqlen, nsim=100,singlestranded=TRUE)
 
 }

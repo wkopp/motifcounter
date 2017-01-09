@@ -21,7 +21,7 @@ List containing
 }
 }
 \description{
-This function computes the per-position average motif hit 
+This function computes the per-position average motif hit
 profile across a set of fixed-length DNA sequences.
 It can be used to reveal positional constraints
 of TFBSs.

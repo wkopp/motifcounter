@@ -21,7 +21,7 @@ List containing
 }
 }
 \description{
-This function computes the per-position and per-strand 
+This function computes the per-position and per-strand
 score in a given DNA sequence.
 }
 \examples{

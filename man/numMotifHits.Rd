@@ -14,7 +14,7 @@ numMotifHits(seqs, pfm, bg, singlestranded = FALSE)
 \item{bg}{A Background object}
 
 \item{singlestranded}{Boolean that indicates whether a single strand or
-both strands shall be scanned for motif hits. 
+both strands shall be scanned for motif hits.
 Default: singlestranded = FALSE.}
 }
 \value{
@@ -30,7 +30,7 @@ This function counts the number of motif hits that
 are found in a given set of DNA sequences.
 }
 \details{
-Optionally, it can be used to count motif hits on 
+Optionally, it can be used to count motif hits on
 one or both strands, respectively.
 }
 \examples{

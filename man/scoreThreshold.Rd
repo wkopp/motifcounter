@@ -24,7 +24,7 @@ false positive probability `alpha`.
 }
 \details{
 Note that the returned alpha usually differs slightly
-from the one that is prescribed using 
+from the one that is prescribed using
 \code{\link{motifcounterOptions}}, because
 of the discrete nature of the sequences.
 }

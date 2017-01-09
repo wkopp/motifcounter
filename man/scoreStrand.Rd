@@ -19,7 +19,7 @@ scoreStrand(seq, pfm, bg)
 }
 }
 \description{
-This function computes the per-position  
+This function computes the per-position
 score in a given DNA strand.
 }
 \details{

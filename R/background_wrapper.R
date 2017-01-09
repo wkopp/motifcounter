@@ -27,11 +27,10 @@ readBackground=function(seqs, order=1) {
 
     trans=numeric(4^(order+1))
     # collect k-mer frequencies from each individual sequence
-    counts=lapply(seqs,function(seq,order,trans) {
+    counts=vapply(seqs,function(seq,order,trans) {
         return(.C("motifcounter_countfreq", toString(seq), length(seq),
             trans, as.integer(order), PACKAGE="motifcounter")[[3]])
-    }, order, trans)
-    counts=matrix(unlist(counts),trans, length(seqs))
+    }, FUN.VALUE=trans, order, trans)
     counts=rowSums(counts)
     if (order==0) {
         station=numeric(4)
