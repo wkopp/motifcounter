@@ -21,7 +21,7 @@ List containing
 }
 }
 \description{
-This function computes the per-position and per-strand 
+This function computes the per-position and per-strand
 average score profiles across a set of DNA sequences.
 It can be used to reveal positional constraints
 of TFBSs.

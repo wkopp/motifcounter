@@ -175,10 +175,10 @@ background model is estimated from a given set of DNA sequences.
 To this end, the set of DNA sequences must be supplied as
 an `DNAStringSet` object from the `Biostrings` bioconductor package.
 ```{r}
-order=1
-file=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(file)
-bg=readBackground(seqs,order)
+order <- 1
+file <- system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs <- Biostrings::readDNAStringSet(file)
+bg <- readBackground(seqs, order)
 ```
 
 ### Acquire a motif
@@ -195,19 +195,18 @@ transcription factor as follows
 
 ```{r}
 library(MotifDb)
-oct4=as.list(query(query(query(MotifDb,
-            "hsapiens"),"pou5f1"),"jolma2013"))[[1]]
-motif=oct4
+oct4 <- as.list(query(query(query(MotifDb, "hsapiens"), "pou5f1"), "jolma2013"))[[1]]
+motif <- oct4
 ```
 
-**NOTE:** `motifcounter` requires the PFMs be be matrices 
+**NOTE:** `motifcounter` requires the PFMs to be matrices 
 with strictly positive entries.
 If this is not the case, the package provides the 
 function `normalizeMotif`, which adds
 pseudo-observations to each element of the matrix and renormalize the columns:
 
 ```{r}
-new_motif=normalizeMotif(motif)
+new_motif <- normalizeMotif(motif)
 ```
 
 
@@ -218,7 +217,7 @@ a motif hit in random sequences is set to $\alpha=0.001$. The user might change
 the stringency level of $\alpha$ globally using the `motifcounterOptions`.
 
 ```{r eval=FALSE}
-alpha=0.01
+alpha <- 0.01
 motifcounterOptions(alpha)
 ```
 
@@ -233,15 +232,15 @@ a set of *Oct4*-ChIP-seq peaks that were obtained in human *hESC* by
 the ENCODE project [@encode2012]. The peak regions were trimmed to 200 bps.
 
 ```{r}
-file=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
-oct4peaks=Biostrings::readDNAStringSet(file)
+file <- system.file("extdata", "oct4_chipseq.fa", package = "motifcounter")
+oct4peaks <- Biostrings::readDNAStringSet(file)
 ```
 
 ### Analysis of individual DNA sequences
 
 The `motifcounter` package provides functions for exploring 
 position- and strand-specific putative TFBSs in individual DNA sequences.
-One way to explore the a given DNA sequence for TFBSs is by 
+One way to explore a given DNA sequence for TFBSs is by 
 utilizing `scoreSequence`. This function returns the scores at each 
 position and strand for a given `Biostring::DNAString`-object 
 (left panel below).
@@ -251,20 +250,19 @@ is obtained by `scoreDist`. Scores at the tail of the distribution
 occur very rarely by chance:
 
 ```{r fig.show=TRUE, fig.cap="Per-position and strand scores"}
-seq=oct4peaks[[1]]
+seq <- oct4peaks[[1]]
 # Determine the per-position and per-strand scores
-scores=scoreSequence(seq,motif,bg)
+scores <- scoreSequence(seq, motif, bg)
 # As a comparison, compute the theoretical score distribution
-sd=scoreDist(motif,bg)
-par(mfrow=c(1,2))
-plot(1:length(scores$fscores),scores$fscores, type="l",
-    col="blue",xlab="position",ylab="score",
-    ylim=c(min(sd$score),max(sd$score)),xlim=c(1,250))
-points(scores$rscores,col="red",type="l")
-legend(120,11,c("forw.", "rev."), col=c("blue","red"),lty=c(1,1))
+sd <- scoreDist(motif, bg)
+par(mfrow = c(1, 2))
+plot(1:length(scores$fscores), scores$fscores, type = "l", col = "blue", xlab = "position", 
+  ylab = "score", ylim = c(min(sd$score), max(sd$score)), xlim = c(1, 250))
+points(scores$rscores, col = "red", type = "l")
+legend(120, 11, c("forw.", "rev."), col = c("blue", "red"), lty = c(1, 1))
 
 # plot the the score distribution for the comparison
-plot(sd$dist,sd$scores, type="l",xlab="probability",ylab="")
+plot(sd$dist, sd$scores, type = "l", xlab = "probability", ylab = "")
 ```
 
 Alternatively, `motifcounter` provides an analogous function for determining
@@ -273,10 +271,10 @@ using `motifHits` that emerge with a stringency level $\alpha=0.001$
 (`motifcounter`'s default setting).
 
 ```{r}
-seq=oct4peaks[[1]]
-mhits=motifHits(seq,motif,bg)
-fhitpos=which(mhits$fhits==1)
-rhitpos=which(mhits$rhits==1)
+seq <- oct4peaks[[1]]
+mhits <- motifHits(seq, motif, bg)
+fhitpos <- which(mhits$fhits == 1)
+rhitpos <- which(mhits$rhits == 1)
 fhitpos
 rhitpos
 ```
@@ -285,7 +283,7 @@ one motif hit on the reverse strand at position 94.
 The underlying DNA sequence at this hit can be retrieved by
 
 ```{r}
-seq[rhitpos:(rhitpos+ncol(motif)-1)]
+seq[rhitpos:(rhitpos + ncol(motif) - 1)]
 ```
 
 Relaxing stringency for obtaining motif hits
@@ -294,12 +292,12 @@ via `motifcounterOptions`)
 will tend to produce more motif hits.
 
 ```{r}
-motifcounterOptions(alpha=0.01)
+motifcounterOptions(alpha = 0.01)
 
-mhits=motifHits(seq,motif,bg)
+mhits <- motifHits(seq, motif, bg)
 
-fhitpos=which(mhits$fhits==1)
-rhitpos=which(mhits$rhits==1)
+fhitpos <- which(mhits$fhits == 1)
+rhitpos <- which(mhits$rhits == 1)
 fhitpos
 rhitpos
 ```
@@ -319,26 +317,26 @@ method which can be applied for a `Biostrings::DNAStringSet`-object.
 
 ```{r fig.show=TRUE, fig.cap="Average score profile"}
 
-scores=scoreSequenceProfile(oct4peaks,motif,bg)
+scores <- scoreSequenceProfile(oct4peaks, motif, bg)
 
-plot(1:length(scores$fscores),scores$fscores, type="l",
-    col="blue",xlab="position",ylab="score")
-points(scores$rscores,col="red",type="l")
-legend(-10.8,0,c("forward", "reverse"), col=c("blue","red"),lty=c(1,1))
+plot(1:length(scores$fscores), scores$fscores, type = "l", col = "blue", xlab = "position", 
+  ylab = "score")
+points(scores$rscores, col = "red", type = "l")
+legend("bottomleft", legend = c("forward", "reverse"), col = c("blue", "red"), lty = c(1, 1))
 ```
 
 Furthermore, `motifHitProfile` constructs a similar profile by computing
 the position and strand specific mean motif hit frequency
 
 ```{r fig.show=TRUE, fig.cap="Average motif hit profile"}
-motifcounterOptions() # lets use the default alpha again
+motifcounterOptions()  # let's use the default alpha again
 
-mhits=motifHitProfile(oct4peaks,motif,bg)
+mhits <- motifHitProfile(oct4peaks, motif, bg)
 
-plot(1:length(mhits$fhits),mhits$fhits, type="l",
-    col="blue",xlab="position",ylab="score")
-points(mhits$rhits,col="red",type="l")
-legend(0,0,c("forward", "reverse"), col=c("blue","red"),lty=c(1,1))
+plot(1:length(mhits$fhits), mhits$fhits, type = "l", col = "blue", xlab = "position", 
+  ylab = "score")
+points(mhits$rhits, col = "red", type = "l")
+legend("bottomleft", legend = c("forward", "reverse"), col = c("blue", "red"), lty = c(1, 1))
 ```
 
 
@@ -355,10 +353,10 @@ which requires a set of DNA sequences of interest, a PFM and a background model.
 
 ```{r}
 #take a subset of the oct4 peaks
-seqs=oct4peaks[1:10]
+seqs <- oct4peaks[1:10]
 
 # Enrichment of Oct4 in Oct4-ChIP-seq peaks
-result=motifEnrichment(seqs, motif,bg)
+result <- motifEnrichment(seqs, motif, bg)
 result
 ```
 
@@ -396,7 +394,7 @@ If there is no strong preference in changing the default parameters,
 the compound Poisson approxmiation is most likely your the method of choice.
 
 The compound Poisson approximation is based on the assumption that motif hits
-occur rarely in random sequences. This is also referred to as the Poisson 
+rarely occur in random sequences. This is also referred to as the Poisson 
 assumption.  This means that one should use rather stringent 
 false positive probabilities $\alpha=0.001$ or smaller.  Relaxed 
 stringency levels result in a conservative *P-value* estimates, 

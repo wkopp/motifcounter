@@ -16,7 +16,7 @@
 #' # Load sequences
 #' file=system.file("extdata","seq.fasta", package="motifcounter")
 #' seqs=Biostrings::readDNAStringSet(file)
-#' 
+#'
 #' # Estimate an order-1 Markov model
 #' bg=readBackground(seqs,1)
 #'
@@ -25,19 +25,13 @@ readBackground=function(seqs, order=1) {
     stopifnot (class(seqs)=="DNAStringSet")
     stopifnot (order>=0)
 
-    # collect k-mer frequencies from each individual sequence
-    counts=lapply(seqs,function(seq,order) {
-
-        counts=numeric(4^(order+1))
-
-        return(.C("motifcounter_countfreq", toString(seq), length(seq),
-            as.numeric(counts),as.integer(order),
-        PACKAGE="motifcounter")[[3]])
-
-    }, order)
-    counts=matrix(unlist(counts),4^(order+1), length(seqs))
-    counts=apply(counts,1,sum)
     trans=numeric(4^(order+1))
+    # collect k-mer frequencies from each individual sequence
+    counts=vapply(seqs,function(seq,order,trans) {
+        return(.C("motifcounter_countfreq", toString(seq), length(seq),
+            trans, as.integer(order), PACKAGE="motifcounter")[[3]])
+    }, FUN.VALUE=trans, order, trans)
+    counts=rowSums(counts)
     if (order==0) {
         station=numeric(4)
     } else {
@@ -45,7 +39,7 @@ readBackground=function(seqs, order=1) {
     }
     dummy=.C("motifcounter_bgfromfreq", as.numeric(counts),
             as.numeric(station), as.numeric(trans),
-            as.integer(order),PACKAGE="motifcounter")
+            as.integer(order), PACKAGE="motifcounter")
     background=list(station=dummy[[2]],trans=dummy[[3]],
             counts=dummy[[1]],order=order)
     class(background)="Background"
@@ -68,7 +62,7 @@ readBackground=function(seqs, order=1) {
 #'
 #' # Load background
 #' bg=readBackground(seqs,1)
-#' 
+#'
 #' # Validate Background object
 #' motifcounter:::backgroundValid(bg)
 #'

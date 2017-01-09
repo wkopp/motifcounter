@@ -14,7 +14,7 @@ motifEnrichment(seqs, pfm, bg, singlestranded = FALSE, method = "compound")
 \item{bg}{A Background object}
 
 \item{singlestranded}{Boolean that indicates whether a single strand or
-both strands shall be scanned for motif hits. 
+both strands shall be scanned for motif hits.
 Default: singlestranded = FALSE.}
 
 \item{method}{String that defines whether to use
