@@ -9,6 +9,9 @@ init:
 
 install:
   ps: Bootstrap
+  #- travis-tool.sh install_bioc Biostrings MotifDb seqLogo
+  - travis-tool.sh install_bioc_deps
+  - travis-tool.sh install_deps
 
 branches:
   only:
@@ -33,15 +36,6 @@ environment:
 
   - R_VERSION: stable
 
-# The following R versions fail when loading MotifDb
-#  - R_VERSION: patched
-
-#  - R_VERSION: oldrel
-#    RTOOLS_VERSION: 32
-#    CRAN: http://cran.rstudio.com
-
-build_script:
-  - travis-tool.sh install_bioc_deps
 
 test_script:
   - travis-tool.sh run_tests
