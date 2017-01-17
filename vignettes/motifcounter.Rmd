@@ -42,6 +42,36 @@ If it is of help for your analysis, please cite
     note = {R package version 0.99.0},
 }
 ```
+# Quick start
+
+```{r eval=FALSE}
+# Estimate a background model on a set of sequences
+bg <- readBackground(sequences, order)
+```
+```{r eval=FALSE}
+# Normalize a given PFM
+new_motif <- normalizeMotif(motif)
+```
+```{r eval=FALSE}
+# Evaluate the scores along a given sequence
+scores <- scoreSequence(sequence, motif, bg)
+```
+```{r eval=FALSE}
+# Evaluate the motif hits along a given sequence
+scores <- motifHits(sequence, motif, bg)
+```
+```{r eval=FALSE}
+# Evaluate the average score profile
+scores <- scoreSequenceProfile(sequences, motif, bg)
+```
+```{r eval=FALSE}
+# Evaluate the average motif hit profile
+scores <- motifHitProfile(sequences, motif, bg)
+```
+```{r eval=FALSE}
+# Compute the motif hit enrichment
+scores <- motifEnrichment(sequences, motif, bg)
+```
 
 # Introduction
 
