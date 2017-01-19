@@ -178,7 +178,7 @@ test_that("scoreSequence", {
     expect_equal(length(scores$rscores),0) # length=0
 })
 
-test_that("scoreSequenceProfile", {
+test_that("scoreProfile", {
     # init
     alpha=0.01
     gran=0.1
@@ -197,43 +197,43 @@ test_that("scoreSequenceProfile", {
     motif=t(as.matrix(read.table(file)))
 
     # error because it is no DNAStringSet
-    expect_error(scoreSequenceProfile(seqs[[1]],motif,bg)) 
+    expect_error(scoreProfile(seqs[[1]],motif,bg)) 
 
     # error because unequal sequence length
-    expect_error(scoreSequenceProfile(seqs[1:2],motif,bg))
+    expect_error(scoreProfile(seqs[1:2],motif,bg))
 
     # Check too short sequence
-    expect_equal(length(scoreSequenceProfile(
+    expect_equal(length(scoreProfile(
                 Biostrings::DNAStringSet(""),motif,bg)[[1]]),0)
-    expect_equal(length(scoreSequenceProfile(
+    expect_equal(length(scoreProfile(
                 Biostrings::DNAStringSet(""),motif,bg)[[2]]),0)
-    expect_equal(length(scoreSequenceProfile(
+    expect_equal(length(scoreProfile(
                 generateDNAStringSet(ncol(motif)-1,bg),motif,bg)[[1]]),0)
-    expect_equal(length(scoreSequenceProfile(
+    expect_equal(length(scoreProfile(
                 generateDNAStringSet(ncol(motif)-1,bg),motif,bg)[[2]]),0)
 
     # check motif shorter than bg order
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")
     seqs2=Biostrings::readDNAStringSet(seqfile)
     bg=readBackground(seqs2,2)
-    expect_error(scoreSequenceProfile(seqs,as.matrix(motif[, 1]),bg)[[1]])
+    expect_error(scoreProfile(seqs,as.matrix(motif[, 1]),bg)[[1]])
 
     # Reload background
     bg=readBackground(seqs,1)
 
     # Test correct hit positions
-    mh=scoreSequenceProfile(seqs[1], motif,bg)
+    mh=scoreProfile(seqs[1], motif,bg)
     # because it is a palindrome
     expect_equal(mh[[1]],mh[[2]])
     expect_equal(which(mh[[1]]==max(mh[[1]])),13)
     
     # no hit in the second sequence
-    mh=scoreSequenceProfile(seqs[2], motif,bg)
+    mh=scoreProfile(seqs[2], motif,bg)
     expect_equal(mh[[1]],mh[[2]])
     expect_equal(length(mh[[1]]),length(seqs[[2]])-ncol(motif)+1)
 
     # zero length sequence, due to 'N'
-    mh=scoreSequenceProfile(seqs[3], motif,bg)
+    mh=scoreProfile(seqs[3], motif,bg)
     expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(0,0))
 
     # Check with aaa repeat motif
@@ -241,7 +241,7 @@ test_that("scoreSequenceProfile", {
     file=system.file("extdata",name, package="motifcounter")
     motif=t(as.matrix(read.table(file)))
 
-    profile=scoreSequenceProfile(seqs[2],motif,bg)
+    profile=scoreProfile(seqs[2],motif,bg)
     expect_equal(length(profile[[2]]),length(profile[[1]]))
     expect_equal(length(profile[[1]]),length(seqs[[2]])-ncol(motif)+1)
     # in the forward strand one hit

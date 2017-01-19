@@ -224,10 +224,10 @@ scoreSequence=function(seq,pfm,bg) {
 #' motif=t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the score profile
-#' scoreSequenceProfile(seqs,motif,bg)
+#' scoreProfile(seqs,motif,bg)
 #'
 #' @export
-scoreSequenceProfile=function(seqs,pfm,bg) {
+scoreProfile=function(seqs,pfm,bg) {
     motifValid(pfm)
     backgroundValid(bg)
     stopifnot (class(seqs)=="DNAStringSet")
@@ -316,7 +316,7 @@ scoreHistogramSingleSeq=function(seq,pfm, bg) {
 #' It can be used to compare the empirical score
 #' distribution against the theoretical one (see \code{\link{scoreDist}}).
 #'
-#' @inheritParams scoreSequenceProfile
+#' @inheritParams scoreProfile
 #' @return List containing
 #' \describe{
 #' \item{scores}{Vector of scores}

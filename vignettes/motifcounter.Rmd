@@ -62,7 +62,7 @@ scores <- motifHits(sequence, motif, bg)
 ```
 ```{r eval=FALSE}
 # Evaluate the average score profile
-scores <- scoreSequenceProfile(sequences, motif, bg)
+scores <- scoreProfile(sequences, motif, bg)
 ```
 ```{r eval=FALSE}
 # Evaluate the average motif hit profile
@@ -342,12 +342,12 @@ average score or motif hit profiles across multiple sequences of equal length.
 This might reveal positional constraints of the motif occurrences 
 with respect to e.g. the TSS, or the middle or summit of the ChIP-seq peaks.
 To study positional constrains, 
-`motifcounter` provides the `scoreSequenceProfile` 
+`motifcounter` provides the `scoreProfile` 
 method which can be applied for a `Biostrings::DNAStringSet`-object.
 
 ```{r fig.show=TRUE, fig.cap="Average score profile"}
 
-scores <- scoreSequenceProfile(oct4peaks, motif, bg)
+scores <- scoreProfile(oct4peaks, motif, bg)
 
 plot(1:length(scores$fscores), scores$fscores, type = "l", col = "blue", xlab = "position", 
   ylab = "score")

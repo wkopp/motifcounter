@@ -60,7 +60,7 @@ scores=scoreSequence(seqs[[1]],motif,bg)
 hits=motifHits(seqs[[1]],motif,bg)
 
 # Determine the average score profile across a set of sequences
-scores=scoreSequenceProfile(seqs,motif,bg)
+scores=scoreProfile(seqs,motif,bg)
 
 # Determine the average motif hit profile across a set of sequences
 hits=motifHitProfile(seqs,motif,bg)

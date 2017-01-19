@@ -49,7 +49,7 @@ motifHits=function(seq,pfm,bg) {
 #' It can be used to reveal positional constraints
 #' of TFBSs.
 #'
-#' @inheritParams scoreSequenceProfile
+#' @inheritParams scoreProfile
 #'
 #' @return List containing
 #' \describe{
@@ -116,7 +116,7 @@ motifHitProfile=function(seqs,pfm,bg) {
 #' one or both strands, respectively.
 #'
 #'
-#' @inheritParams scoreSequenceProfile
+#' @inheritParams scoreProfile
 #' @param singlestranded Boolean that indicates whether a single strand or
 #' both strands shall be scanned for motif hits.
 #' Default: singlestranded = FALSE.
