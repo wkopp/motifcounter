@@ -19,8 +19,8 @@ an error if the R matrix does not represent a PFM.
 \examples{
 
 # Load motif
-motiffile=system.file("extdata","x1.tab", package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x1.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Check validity
 motifcounter:::motifValid(motif)

@@ -21,18 +21,18 @@ The function throws an error if this is not the case.
 \examples{
 
 # Load sequences
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(seqfile)
 
 # Load background
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 # Load motif
-motiffile=system.file("extdata","x1.tab", package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x1.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Check validity
-motifcounter:::motifAndBackgroundValid(motif,bg)
+motifcounter:::motifAndBackgroundValid(motif, bg)
 
 }
 

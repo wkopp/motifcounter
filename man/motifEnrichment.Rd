@@ -48,32 +48,32 @@ sequences. The latter option is only available for the
 
 
 # Load sequences
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(seqfile)
 
 # Load background
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 # Load motif
-motiffile=system.file("extdata","x31.tab", package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # 1 ) Motif enrichment test w.r.t. scanning a *single* DNA strand
 # based on the 'Compound Poisson model'
 
-result=motifEnrichment(seqs,motif,bg,
-            singlestranded=TRUE,method="compound")
+result = motifEnrichment(seqs, motif, bg,
+            singlestranded = TRUE, method = "compound")
 
 # 2 ) Motif enrichment test w.r.t. scanning *both* DNA strand
 # based on the 'Compound Poisson model'
 
-result=motifEnrichment(seqs,motif, bg, method="compound")
+result = motifEnrichment(seqs, motif, bg, method = "compound")
 
 # 3 ) Motif enrichment test w.r.t. scanning *both* DNA strand
 # based on the *combinatorial model*
 
-result=motifEnrichment(seqs,motif, bg,singlestranded=FALSE,
-            method="combinatorial")
+result = motifEnrichment(seqs, motif, bg, singlestranded = FALSE,
+            method = "combinatorial")
 
 }
 \seealso{

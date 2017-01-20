@@ -36,22 +36,22 @@ one or both strands, respectively.
 \examples{
 
 # Load sequences
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(seqfile)
 
 # Load background
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 # Load motif
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Count motif hits both strands
-noc=motifcounter:::numMotifHits(seqs,motif,bg)
+noc = motifcounter:::numMotifHits(seqs, motif, bg)
 noc$numofhits
 
 # Count motif hits on a single strand
-noc=motifcounter:::numMotifHits(seqs,motif,bg,singlestranded=TRUE)
+noc = motifcounter:::numMotifHits(seqs, motif, bg, singlestranded = TRUE)
 noc$numofhits
 
 }

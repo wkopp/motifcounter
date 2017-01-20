@@ -33,64 +33,64 @@
 #' @examples
 #'
 #' # Load sequences
-#' file=system.file("extdata","seq.fasta", package="motifcounter")
-#' seqs=Biostrings::readDNAStringSet(file)
+#' file = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seqs = Biostrings::readDNAStringSet(file)
 #' 
 #' # Estimate an order-1 background model
-#' order=1
-#' bg=readBackground(seqs,order)
+#' order = 1
+#' bg = readBackground(seqs, order)
 #' 
 #' # Load motif
-#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' motif=t(as.matrix(read.table(motiffile)))
+#' motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
 #' 
 #' # Normalize the motif
 #' # Normalization is sometimes necessary to prevent zeros in
 #' # the motif
-#' motif=normalizeMotif(motif)
+#' motif = normalizeMotif(motif)
 #'
 #' # Use subset of the sequences
-#' seqs=seqs[1:10]
+#' seqs = seqs[1:10]
 #'
 #' # Optionally, set the false positive probability
 #' #alpha=0.001 # is also the default
 #' #motifcounterOptions(alpha) 
 #'
 #' # Investigate the per-position and per-strand scores in a given sequence
-#' scores=scoreSequence(seqs[[1]],motif,bg)
+#' scores = scoreSequence(seqs[[1]], motif, bg)
 #'
 #' # Investigate the per-position and per-strand motif hits in a given sequence
-#' hits=motifHits(seqs[[1]],motif,bg)
+#' hits = motifHits(seqs[[1]], motif, bg)
 #'
 #' # Determine the average score profile across a set of sequences
-#' scores=scoreProfile(seqs,motif,bg)
+#' scores = scoreProfile(seqs, motif, bg)
 #'
 #' # Determine the average motif hit profile across a set of sequences
-#' hits=motifHitProfile(seqs,motif,bg)
+#' hits = motifHitProfile(seqs, motif, bg)
 #'
 #' # Determine the empirical score distribution
-#' scoreHistogram(seqs,motif,bg)
+#' scoreHistogram(seqs, motif, bg)
 #' 
 #' # Determine the theoretical score distribution in random sequences
-#' scoreDist(motif,bg)
+#' scoreDist(motif, bg)
 #' 
 #' 
 #' # Determine the motif hit enrichment in a set of DNA sequences
 #' # 1. Use the compound Poisson approximation
 #' #    and scan only a single strand for motif hits
-#' result=motifEnrichment(seqs,motif,bg,
-#'             singlestranded=TRUE,method="compound")
+#' result = motifEnrichment(seqs, motif, bg,
+#'             singlestranded = TRUE, method = "compound")
 #'
 #' # Determine the motif hit enrichment in a set of DNA sequences
 #' # 2. Use the compound Poisson approximation
 #' #    and scan both strands for motif hits
-#' result=motifEnrichment(seqs,motif,bg,
-#'             singlestranded=FALSE,method="compound")
+#' result = motifEnrichment(seqs, motif, bg,
+#'             singlestranded = FALSE, method = "compound")
 #'
 #' # Determine the motif hit enrichment in a set of DNA sequences
 #' # 3. Use the combinatorial model
 #' #    and scan both strands for motif hits
-#' result=motifEnrichment(seqs,motif,bg,singlestranded=FALSE,
-#'             method="combinatorial")
+#' result = motifEnrichment(seqs, motif, bg, singlestranded = FALSE,
+#'             method = "combinatorial")
 #' 
 NULL

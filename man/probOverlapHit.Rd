@@ -52,21 +52,21 @@ that were corrected for intermediate hits.
 \examples{
 
 # Load sequences
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(seqfile)
 
 # Load background
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 # Load motif
-motiffile=system.file("extdata","x31.tab", package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Compute overlapping hit probabilities for scanning both DNA strands
-op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
+op = motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
 
 # Compute overlapping hit probabilities for scanning a single DNA strand
-op=motifcounter:::probOverlapHit(motif,bg,singlestranded=TRUE)
+op = motifcounter:::probOverlapHit(motif, bg, singlestranded = TRUE)
 
 }
 

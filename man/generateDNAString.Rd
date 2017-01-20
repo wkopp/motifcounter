@@ -21,14 +21,14 @@ by sampling from the background model.
 \examples{
 
 # Load sequences
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(seqfile)
 
 # Load background
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 # Generate a 1 kb random sequence
-motifcounter:::generateDNAString(1000,bg)
+motifcounter:::generateDNAString(1000, bg)
 
 }
 \seealso{

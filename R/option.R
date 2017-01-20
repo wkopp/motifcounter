@@ -12,36 +12,42 @@
 #' increase of the computational burden.
 #' 
 #' @param alpha Numeric False positive probabililty for calling
-#' motif hits by chance. Default: alpha=0.001
+#' motif hits by chance. Default: alpha = 0.001
 #' @param gran Numeric score granularity which is used
-#' for discretizing the score range. Default: gran=0.1
+#' for discretizing the score range. Default: gran = 0.1
 #' @param ncores Interger number of cores used for parallel processing,
-#' if openMP is available. Default: ncores=1
+#' if openMP is available. Default: ncores = 1
 #'
 #' @return None
 #' @examples
 #'
 #' # Prescribe motifcounter Options
-#' motifcounterOptions(alpha=0.001, gran=0.1, ncores=1)
+#' motifcounterOptions(alpha = 0.001, gran = 0.1, ncores = 1)
 #'
 #' @export
-motifcounterOptions=function(alpha=0.001, gran=0.1, ncores=1) {
-    if (alpha<=0.0 || alpha>1.0) {
+motifcounterOptions = function(alpha = 0.001, gran = 0.1, ncores = 1) {
+    if (alpha <= 0.0 || alpha > 1.0) {
         stop("alpha must be a probability")
     }
-    if (gran<=0.0) {
+    if (gran <= 0.0) {
         stop("gran must be positive")
     }
-    if (alpha>0.05) {
-        warning("alpha is too chosen high. This might cause
-                biased and therefore misleading results 
-                when using the 'motifEntrichent', 'compoundPoissonDist'
-                or 'combinatorialDist'. 
-                If this was unintended please use 'motifcounterOptions()'.")
+    if (alpha > 0.05) {
+        warning(
+            "alpha is too chosen high. This might cause
+            biased and therefore misleading results
+            when using the 'motifEntrichent', 'compoundPoissonDist'
+            or 'combinatorialDist'.
+            If this was unintended please use 'motifcounterOptions()'."
+        )
     }
-    dummy=.C("motifcounter_option",
+    dummy = .C(
+        "motifcounter_option",
         as.numeric(alpha),
-        as.numeric(gran),as.integer(ncores),PACKAGE="motifcounter")
+        as.numeric(gran),
+        as.integer(ncores),
+        PACKAGE = "motifcounter"
+    )
 }
 
 #' Retrieve the false positive probability
@@ -59,8 +65,8 @@ motifcounterOptions=function(alpha=0.001, gran=0.1, ncores=1) {
 #' @examples
 #' motifcounter:::sigLevel()
 #'
-sigLevel=function() {
-    alpha=0.0
-    ret=.C("motifcounter_siglevel",alpha)
+sigLevel = function() {
+    alpha = 0.0
+    ret = .C("motifcounter_siglevel", alpha)
     return(ret[[1]])
 }

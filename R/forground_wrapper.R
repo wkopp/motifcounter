@@ -9,25 +9,25 @@
 #' @examples
 #'
 #' # Load motif
-#' motiffile=system.file("extdata","x1.tab", package="motifcounter")
-#' motif=t(as.matrix(read.table(motiffile)))
+#' motiffile = system.file("extdata", "x1.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
 #'
 #' # Check validity
 #' motifcounter:::motifValid(motif)
 #'
-motifValid=function(pfm) {
+motifValid = function(pfm) {
     stopifnot(is.matrix(pfm))
 
     #check if matrix has four rows
-    stopifnot(nrow(pfm)==4)
+    stopifnot(nrow(pfm) == 4)
 
     #check if all entries are positive
-    if (!all(pfm>0)) {
+    if (!all(pfm > 0)) {
         stop("pfm must be strictly positive.
             Use 'normalizeMotif'.")
     }
     #check if all columns sum to one
-    if (!all(abs(1-colSums(pfm))<0.0000001)) {
+    if (!all(abs(1 - colSums(pfm)) < 0.0000001)) {
         stop("Columns must sum to one.
             Use 'normalizeMotif'.")
     }
@@ -47,16 +47,16 @@ motifValid=function(pfm) {
 #' @examples
 #'
 #' # Load motif
-#' motiffile=system.file("extdata","x1.tab", package="motifcounter")
-#' motif=t(as.matrix(read.table(motiffile)))
+#' motiffile = system.file("extdata", "x1.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
 #'
 #' # Normalize motif
-#' new_motif=normalizeMotif(motif)
+#' new_motif = normalizeMotif(motif)
 #'
 #' @export
-normalizeMotif=function(pfm,pseudo=0.01) {
-    pfm=pfm+pseudo
-    pfm=t(t(pfm)/colSums(pfm))
+normalizeMotif = function(pfm, pseudo = 0.01) {
+    pfm = pfm + pseudo
+    pfm = t(t(pfm) / colSums(pfm))
     return(pfm)
 }
 
@@ -72,24 +72,24 @@ normalizeMotif=function(pfm,pseudo=0.01) {
 #' @examples
 #'
 #' # Load sequences
-#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' seqs=Biostrings::readDNAStringSet(seqfile)
+#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seqs = Biostrings::readDNAStringSet(seqfile)
 #'
 #' # Load background
-#' bg=readBackground(seqs,1)
+#' bg = readBackground(seqs, 1)
 #'
 #' # Load motif
-#' motiffile=system.file("extdata","x1.tab", package="motifcounter")
-#' motif=t(as.matrix(read.table(motiffile)))
+#' motiffile = system.file("extdata", "x1.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
 #'
 #' # Check validity
-#' motifcounter:::motifAndBackgroundValid(motif,bg)
+#' motifcounter:::motifAndBackgroundValid(motif, bg)
 #'
-motifAndBackgroundValid=function(pfm,bg) {
-  if (ncol(pfm)<bg$order) {
-    stop("The motif must be at least as long
-        possible using 'readBackground'.")
-  }
+motifAndBackgroundValid = function(pfm, bg) {
+    if (ncol(pfm) < bg$order) {
+        stop("The motif must be at least as long
+            possible using 'readBackground'.")
+    }
 }
 
 #' Reverse complements a PFM
@@ -102,15 +102,15 @@ motifAndBackgroundValid=function(pfm,bg) {
 #' @examples
 #'
 #' # Load motif
-#' motiffile=system.file("extdata","x1.tab", package="motifcounter")
-#' motif=t(as.matrix(read.table(motiffile)))
+#' motiffile = system.file("extdata", "x1.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
 #'
 #' # Reverse complement motif
-#' revcompmotif=motifcounter:::revcompMotif(motif)
+#' revcompmotif = motifcounter:::revcompMotif(motif)
 #'
-revcompMotif=function(pfm) {
-  nrows=nrow(pfm)
-  ncols=ncol(pfm)
-  cpfm=matrix(rev(as.vector(pfm)),nrow=nrows,ncol=ncols)
-  return(cpfm)
+revcompMotif = function(pfm) {
+    nrows = nrow(pfm)
+    ncols = ncol(pfm)
+    cpfm = matrix(rev(as.vector(pfm)), nrow = nrows, ncol = ncols)
+    return(cpfm)
 }

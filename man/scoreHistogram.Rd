@@ -31,18 +31,18 @@ distribution against the theoretical one (see \code{\link{scoreDist}}).
 \examples{
 
 # Load sequences
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(seqfile)
 
 # Load background
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 # Load motif
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Compute the empirical score histogram
-scoreHistogram(seqs,motif,bg)
+scoreHistogram(seqs, motif, bg)
 
 }
 \seealso{

@@ -21,8 +21,8 @@ set to length zero.
 \examples{
 
 # Load sequences
-file=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(file)
+file = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(file)
 
 # Retrieve sequence lengths
 motifcounter:::lenSequences(seqs)

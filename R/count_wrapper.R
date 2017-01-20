@@ -13,33 +13,33 @@
 #'
 #'
 #' # Load sequences
-#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' seq=Biostrings::readDNAStringSet(seqfile)
+#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seq = Biostrings::readDNAStringSet(seqfile)
 #'
 #' # Load background
-#' bg=readBackground(seq,1)
+#' bg = readBackground(seq, 1)
 #'
 #' # Load motif
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
-#' motif=t(as.matrix(read.table(motiffile)))
+#' motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
 #'
 #' # Determine the motif hits
-#' motifHits(seq[[1]],motif,bg)
+#' motifHits(seq[[1]], motif, bg)
 #'
 #' @export
-motifHits=function(seq,pfm,bg) {
+motifHits = function(seq, pfm, bg) {
     motifValid(pfm)
     backgroundValid(bg)
-    motifAndBackgroundValid(pfm,bg)
+    motifAndBackgroundValid(pfm, bg)
 
-    sth=scoreThreshold(pfm,bg)
-    scores=scoreSequence(seq,pfm,bg)
-    fhits=integer(length(scores$fscores))
-    rhits=integer(length(scores$rscores))
-    fhits[scores$fscores>=sth$threshold]=1
-    rhits[scores$rscores>=sth$threshold]=1
+    sth = scoreThreshold(pfm, bg)
+    scores = scoreSequence(seq, pfm, bg)
+    fhits = integer(length(scores$fscores))
+    rhits = integer(length(scores$rscores))
+    fhits[scores$fscores >= sth$threshold] = 1
+    rhits[scores$rscores >= sth$threshold] = 1
 
-    return(list(fhits=as.integer(fhits), rhits=as.integer(rhits)))
+    return(list(fhits = as.integer(fhits), rhits = as.integer(rhits)))
 }
 
 #' Motif hit profile across multiple sequences
@@ -62,49 +62,49 @@ motifHits=function(seq,pfm,bg) {
 #'
 #'
 #' # Load sequences
-#' seqfile=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
-#' seqs=Biostrings::readDNAStringSet(seqfile)
-#' seqs=seqs[1:10]
+#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seqs = Biostrings::readDNAStringSet(seqfile)
+#' seqs = seqs[1:10]
 #'
 #' # Load background
-#' bg=readBackground(seqs,1)
+#' bg = readBackground(seqs, 1)
 #'
 #' # Load motif
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
-#' motif=t(as.matrix(read.table(motiffile)))
+#' motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
 #'
 #' # Compute the motif hit profile
-#' motifHitProfile(seqs,motif,bg)
+#' motifHitProfile(seqs, motif, bg)
 #'
 #' @export
-motifHitProfile=function(seqs,pfm,bg) {
+motifHitProfile = function(seqs, pfm, bg) {
     motifValid(pfm)
     backgroundValid(bg)
-    motifAndBackgroundValid(pfm,bg)
+    motifAndBackgroundValid(pfm, bg)
 
-    stopifnot(class(seqs)=="DNAStringSet")
+    stopifnot(class(seqs) == "DNAStringSet")
 
-    if (any(lenSequences(seqs)!=lenSequences(seqs)[1])) {
+    if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
         stop("Sequences must be equally long.
             Please trim the sequnces.")
     }
-    slen=lenSequences(seqs[1])
-    if (slen <= ncol(pfm) -1) {
+    slen = lenSequences(seqs[1])
+    if (slen <= ncol(pfm) - 1) {
         return (list(fhits = integer(0), rhits = integer(0)))
     }
 
-    fhits=vapply(seqs, function(seq,pfm,bg) {
-        return(motifHits(seq,pfm,bg)$fhits)
-    }, FUN.VALUE=integer(slen-ncol(pfm)+1), pfm, bg)
+    fhits = vapply(seqs, function(seq, pfm, bg) {
+        return(motifHits(seq, pfm, bg)$fhits)
+    }, FUN.VALUE = integer(slen - ncol(pfm) + 1), pfm, bg)
 
-    fhits=rowMeans(as.matrix(fhits))
+    fhits = rowMeans(as.matrix(fhits))
 
-    rhits=vapply(seqs, function(seq,pfm,bg) {
-        mh=motifHits(seq,pfm,bg)$rhits
-    }, FUN.VALUE=integer(slen - ncol(pfm) + 1), pfm, bg)
+    rhits = vapply(seqs, function(seq, pfm, bg) {
+        mh = motifHits(seq, pfm, bg)$rhits
+    }, FUN.VALUE = integer(slen - ncol(pfm) + 1), pfm, bg)
 
-    rhits=rowMeans(as.matrix(rhits))
-    return (list(fhits=as.vector(fhits),rhits=as.vector(rhits)))
+    rhits = rowMeans(as.matrix(rhits))
+    return (list(fhits = as.vector(fhits), rhits = as.vector(rhits)))
 }
 
 #' Number of motif hits in a set of DNA sequences
@@ -129,47 +129,50 @@ motifHitProfile=function(seqs,pfm,bg) {
 #' @examples
 #'
 #' # Load sequences
-#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' seqs=Biostrings::readDNAStringSet(seqfile)
+#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seqs = Biostrings::readDNAStringSet(seqfile)
 #'
 #' # Load background
-#' bg=readBackground(seqs,1)
+#' bg = readBackground(seqs, 1)
 #'
 #' # Load motif
-#' motiffile=system.file("extdata","x31.tab",package="motifcounter")
-#' motif=t(as.matrix(read.table(motiffile)))
+#' motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
 #'
 #' # Count motif hits both strands
-#' noc=motifcounter:::numMotifHits(seqs,motif,bg)
+#' noc = motifcounter:::numMotifHits(seqs, motif, bg)
 #' noc$numofhits
 #'
 #' # Count motif hits on a single strand
-#' noc=motifcounter:::numMotifHits(seqs,motif,bg,singlestranded=TRUE)
+#' noc = motifcounter:::numMotifHits(seqs, motif, bg, singlestranded = TRUE)
 #' noc$numofhits
 #'
-numMotifHits=function(seqs, pfm, bg, singlestranded=FALSE) {
+numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE) {
     motifValid(pfm)
     backgroundValid(bg)
-    motifAndBackgroundValid(pfm,bg)
+    motifAndBackgroundValid(pfm, bg)
 
-    stopifnot(class(seqs)=="DNAStringSet")
+    stopifnot(class(seqs) == "DNAStringSet")
 
     # retrieve the number of motif hits
-    noh=vapply(seqs, function(seq,pfm,bg,singlestranded) {
-        ret=motifHits(seq,pfm,bg)
-        if (singlestranded==FALSE) {
-            return(sum(ret[[1]]+ret[[2]]))
+    noh = vapply(seqs, function(seq, pfm, bg, singlestranded) {
+        ret = motifHits(seq, pfm, bg)
+        if (singlestranded == FALSE) {
+            return(sum(ret[[1]] + ret[[2]]))
         } else {
             return(sum(ret[[1]]))
         }
-    }, integer(1), pfm,bg,singlestranded)
+    }, integer(1), pfm, bg, singlestranded)
 
     # retrieve the individual sequence lengths
     # sequences containing "N" or "n" are assigned length zero
-    lseq=lenSequences(seqs)
+    lseq = lenSequences(seqs)
 
-    nseq=length(seqs)
+    nseq = length(seqs)
 
-    return (list(nseq=nseq, lseq=lseq,
-        numofhits=noh))
+    return (list(
+        nseq = nseq,
+        lseq = lseq,
+        numofhits = noh
+    ))
 }

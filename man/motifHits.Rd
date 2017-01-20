@@ -27,18 +27,18 @@ This function determines per-position motif hits in a given DNA sequence.
 
 
 # Load sequences
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seq=Biostrings::readDNAStringSet(seqfile)
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seq = Biostrings::readDNAStringSet(seqfile)
 
 # Load background
-bg=readBackground(seq,1)
+bg = readBackground(seq, 1)
 
 # Load motif
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Determine the motif hits
-motifHits(seq[[1]],motif,bg)
+motifHits(seq[[1]], motif, bg)
 
 }
 

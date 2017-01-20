@@ -31,19 +31,19 @@ of TFBSs.
 
 
 # Load sequences
-seqfile=system.file("extdata","oct4_chipseq.fa", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
-seqs=seqs[1:10]
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(seqfile)
+seqs = seqs[1:10]
 
 # Load background
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 # Load motif
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Compute the motif hit profile
-motifHitProfile(seqs,motif,bg)
+motifHitProfile(seqs, motif, bg)
 
 }
 

@@ -10,7 +10,7 @@ readBackground(seqs, order = 1)
 \item{seqs}{A DNAStringSet object}
 
 \item{order}{Order of the Markov models that shall be used as the
-background model. Default: order=1.}
+background model. Default: order = 1.}
 }
 \value{
 A Background object
@@ -23,11 +23,11 @@ random DNA sequences.
 \examples{
 
 # Load sequences
-file=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(file)
+file = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(file)
 
 # Estimate an order-1 Markov model
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 }
 

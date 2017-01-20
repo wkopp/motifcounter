@@ -56,7 +56,8 @@ bg <- readBackground(seqs, order)
 ```
 
 ```{r fig.show=TRUE, fig.width=4, fig.height=3, fig.cap="Palindromic motif"}
-motiffile <- system.file("extdata", as.character("x32.tab"), package = "motifcounter")
+motiffile <- system.file("extdata", 
+    as.character("x32.tab"), package = "motifcounter")
 
 motif <- t(as.matrix(read.table(motiffile)))
 seqLogo(motif)
@@ -71,24 +72,23 @@ of length 100 bp each are shown in the following
 regions <- rep(100, 100)
 # generate an empirical distribution using 100 samples of 1kb sequences each
 simdist <- motifcounter:::simulateNumHitsDist(motif, bg, regions, 100,
-					      singlestranded = FALSE)
+                                                singlestranded = FALSE)
 
 op <- motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
 cpdist <- motifcounter:::compoundPoissonDist(regions, op)
 combdist <- motifcounter:::combinatorialDist(regions, op)
 maxhits <- 80
 
-plot(0:(maxhits + 1), cpdist$dist[1:(maxhits + 2)], col = "blue", ylab = "Probability", 
-  xlab = "Num. of hits")
+plot(0:(maxhits + 1), cpdist$dist[1:(maxhits + 2)], 
+    col = "blue", ylab = "Probability", xlab = "Num. of hits")
 points(0:(maxhits + 1), combdist$dist[1:(maxhits + 2)], col = "red")
 points(0:(maxhits + 1), simdist$dist[1:(maxhits + 2)], col = "gray")
-legend(50, 0.08, c("comp. Poiss.", "combinatorial", "empirical"), col = c("blue", 
-  "red", "gray"), lty = c(1, 1, 1))
-
+legend(50, 0.08, c("comp. Poiss.", "combinatorial", "empirical"), 
+    col = c("blue", "red", "gray"), lty = c(1, 1, 1))
 ```
 
-**Note:** Scanning both DNA strands for motif hits (at $\alpha=0.001$) can only
-yield an even number of motif hits, as a hit on the forward 
+**Note:** Scanning both DNA strands for motif hits (at $\alpha=0.001$) 
+can only yield an even number of motif hits, as a hit on the forward 
 strand is always coupled with a hit on the reverse strand. 
 Therefore, odd numbers of motif hits are associated 
 with a probability of (almost) zero.

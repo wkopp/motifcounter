@@ -18,11 +18,11 @@ This function computes the reverse complement of a given PFM.
 \examples{
 
 # Load motif
-motiffile=system.file("extdata","x1.tab", package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x1.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Reverse complement motif
-revcompmotif=motifcounter:::revcompMotif(motif)
+revcompmotif = motifcounter:::revcompMotif(motif)
 
 }
 

@@ -30,7 +30,7 @@
 #' this information can be retrieved using \code{\link{numMotifHits}}.
 #' @inheritParams overlapValid
 #' @param method String that defines which method shall be invoked: 'pape' or
-#' 'kopp' (see description). Default: method='kopp'.
+#' 'kopp' (see description). Default: method = 'kopp'.
 #'
 #' @return List containing
 #' \describe{
@@ -39,80 +39,99 @@
 #' @examples
 #'
 #' # Load sequences
-#' seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-#' seqs=Biostrings::readDNAStringSet(seqfile)
+#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seqs = Biostrings::readDNAStringSet(seqfile)
 #' 
 #' # Load motif
-#' motiffile=system.file("extdata","x31.tab", package="motifcounter")
-#' motif=t(as.matrix(read.table(motiffile)))
+#' motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
 #'
 #' # Load background model
-#' bg=readBackground(seqs,1)
+#' bg = readBackground(seqs, 1)
 #'
 #' # Use 100 individual sequences of length 150 bp each
-#' seqlen=rep(150,100)
+#' seqlen = rep(150, 100)
 #'
 #' # Compute overlapping probabilities
 #' # for scanning the forward DNA strand only
-#' op=motifcounter:::probOverlapHit(motif,bg,singlestranded=TRUE)
+#' op = motifcounter:::probOverlapHit(motif, bg, singlestranded = TRUE)
 #'
 #' # Computes  the compound Poisson distribution
-#' dist=motifcounter:::compoundPoissonDist(seqlen, op)
+#' dist = motifcounter:::compoundPoissonDist(seqlen, op)
 #' #plot(1:length(dist$dist)-1, dist$dist)
 #'
 #' # Compute overlapping probabilities
 #' # for scanning the forward DNA strand only
-#' op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
+#' op = motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
 #' 
 #' # Computes  the compound Poisson distribution
-#' dist=motifcounter:::compoundPoissonDist(seqlen, op)
+#' dist = motifcounter:::compoundPoissonDist(seqlen, op)
 #' #plot(1:length(dist$dist)-1, dist$dist)
 #'
 #' @seealso \code{\link{combinatorialDist}}
 #' @seealso \code{\link{probOverlapHit}}
 #' @seealso \code{\link{numMotifHits}}
-compoundPoissonDist=function(seqlen, overlap,method="kopp") {
+compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
     overlapValid(overlap)
-  
+    
     # Length must be at least as long as the motif
-    sl=sum(vapply(seqlen,function(sl, ml) { sl-ml +1},FUN.VALUE=0,
-        ml=length(overlap$beta)))
-    if (sl<=0) {
-        return (list(dist=1))
-    }
+    sl = sum(vapply(seqlen, function(sl, ml) {
+        sl - ml + 1
+    }, FUN.VALUE = 0,
+    ml = length(overlap$beta)))
 
+    if (sl <= 0) {
+        return (list(dist = 1))
+    }
+    
     # for all practical purposes, a maximal clump size of 60
     # should be enough
-    maxclumpsize=60
+    maxclumpsize = 60
     
     # determine the max number of hits automatically from the
     # given sequence length.
     # even though it is a little bit of computational overhead,
     # set the maxhits to the total sequence length
-    maxhits=sum(seqlen)
-    dist=numeric(maxhits+1)
-    if (method=="kopp") {
-        res=.C("motifcounter_compoundPoisson_useBeta", overlap$alpha,
-            overlap$beta, overlap$beta3p, overlap$beta5p,
-            as.numeric(dist), as.integer(length(seqlen)),
+    maxhits = sum(seqlen)
+    dist = numeric(maxhits + 1)
+    if (method == "kopp") {
+        res = .C(
+            "motifcounter_compoundPoisson_useBeta",
+            overlap$alpha,
+            overlap$beta,
+            overlap$beta3p,
+            overlap$beta5p,
+            as.numeric(dist),
+            as.integer(length(seqlen)),
             as.integer(seqlen),
-            as.integer(maxhits), as.integer(maxclumpsize),
+            as.integer(maxhits),
+            as.integer(maxclumpsize),
             length(overlap$beta),
-            as.integer(overlap$singlestranded),PACKAGE="motifcounter")
-        dist=res[[5]]
-    } else if (method=="pape") {
-        if (overlap$singlestranded==TRUE) {
-            stop("method = 'pape' only supports scanning both DNA strands.
-                Use method = 'kopp' instead.")
+            as.integer(overlap$singlestranded),
+            PACKAGE = "motifcounter"
+        )
+        dist = res[[5]]
+    } else if (method == "pape") {
+        if (overlap$singlestranded == TRUE) {
+            stop(
+                "method = 'pape' only supports scanning both DNA strands.
+                Use method = 'kopp' instead."
+            )
         }
-        res=.C("motifcounter_compoundPoissonPape_useGamma", overlap$gamma,
-            as.numeric(dist), as.integer(length(seqlen)), as.integer(seqlen),
-            as.integer(maxhits), as.integer(maxclumpsize),
+        res = .C(
+            "motifcounter_compoundPoissonPape_useGamma",
+            overlap$gamma,
+            as.numeric(dist),
+            as.integer(length(seqlen)),
+            as.integer(seqlen),
+            as.integer(maxhits),
+            as.integer(maxclumpsize),
             length(overlap$beta),
-            PACKAGE="motifcounter")
-        dist=res[[2]]
-    } else {
-        stop("The method must be 'kopp' or 'pape'")
-    }
-    return (list(dist=dist))
+            PACKAGE = "motifcounter"
+        )
+        dist = res[[2]]
+        } else {
+            stop("The method must be 'kopp' or 'pape'")
+        }
+    return (list(dist = dist))
 }

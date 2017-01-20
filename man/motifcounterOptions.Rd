@@ -8,13 +8,13 @@ motifcounterOptions(alpha = 0.001, gran = 0.1, ncores = 1)
 }
 \arguments{
 \item{alpha}{Numeric False positive probabililty for calling
-motif hits by chance. Default: alpha=0.001}
+motif hits by chance. Default: alpha = 0.001}
 
 \item{gran}{Numeric score granularity which is used
-for discretizing the score range. Default: gran=0.1}
+for discretizing the score range. Default: gran = 0.1}
 
 \item{ncores}{Interger number of cores used for parallel processing,
-if openMP is available. Default: ncores=1}
+if openMP is available. Default: ncores = 1}
 }
 \value{
 None
@@ -35,7 +35,7 @@ increase of the computational burden.
 \examples{
 
 # Prescribe motifcounter Options
-motifcounterOptions(alpha=0.001, gran=0.1, ncores=1)
+motifcounterOptions(alpha = 0.001, gran = 0.1, ncores = 1)
 
 }
 

@@ -39,28 +39,28 @@ This function is only used for benchmarking analysis.
 
 
 # Load sequences
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(seqfile)
 
 # Load background
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 # Load motif
-motiffile=system.file("extdata","x31.tab",package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Study the counts in one sequence of length 150 bp
-seqlen=rep(150,1)
+seqlen = rep(150, 1)
 
 # Compute empirical distribution of the number of motif hits
 # by scanning both strands using 100 samples
-simc=motifcounter:::simulateNumHitsDist(motif, bg,
-    seqlen, nsim=100,singlestranded=FALSE)
+simc = motifcounter:::simulateNumHitsDist(motif, bg,
+    seqlen, nsim = 100, singlestranded = FALSE)
 
 # Compute empirical distribution of the number of motif hits
 # by scanning a single strand using 100 samples
-simc=motifcounter:::simulateNumHitsDist(motif, bg,
-    seqlen, nsim=100,singlestranded=TRUE)
+simc = motifcounter:::simulateNumHitsDist(motif, bg,
+    seqlen, nsim = 100, singlestranded = TRUE)
 
 }
 \seealso{

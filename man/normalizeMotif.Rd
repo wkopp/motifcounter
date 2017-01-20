@@ -23,11 +23,11 @@ adds pseudo-evidence to each entry of the matrix.
 \examples{
 
 # Load motif
-motiffile=system.file("extdata","x1.tab", package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x1.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Normalize motif
-new_motif=normalizeMotif(motif)
+new_motif = normalizeMotif(motif)
 
 }
 

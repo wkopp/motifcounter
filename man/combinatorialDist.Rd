@@ -36,24 +36,24 @@ DNA strands are scanned for motif hits.
 \examples{
 
 # Load sequences
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(seqfile)
 
 # Load motif
-motiffile=system.file("extdata","x31.tab", package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Load background model
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 # Compute overlap probabilities
-op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
+op = motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
 
 # Use 2 sequences of length 100 bp each
-seqlen=rep(100,2) 
+seqlen = rep(100, 2) 
 
 # Computes the combinatorial distribution of the number of motif hits
-dist=motifcounter:::combinatorialDist(seqlen, op)
+dist = motifcounter:::combinatorialDist(seqlen, op)
 
 }
 \seealso{

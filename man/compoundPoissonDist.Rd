@@ -15,7 +15,7 @@ this information can be retrieved using \code{\link{numMotifHits}}.}
 \code{\link{probOverlapHit}}.}
 
 \item{method}{String that defines which method shall be invoked: 'pape' or
-'kopp' (see description). Default: method='kopp'.}
+'kopp' (see description). Default: method = 'kopp'.}
 }
 \value{
 List containing
@@ -52,33 +52,33 @@ a single DNA strand (see \code{\link{probOverlapHit}}).
 \examples{
 
 # Load sequences
-seqfile=system.file("extdata","seq.fasta", package="motifcounter")
-seqs=Biostrings::readDNAStringSet(seqfile)
+seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+seqs = Biostrings::readDNAStringSet(seqfile)
 
 # Load motif
-motiffile=system.file("extdata","x31.tab", package="motifcounter")
-motif=t(as.matrix(read.table(motiffile)))
+motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+motif = t(as.matrix(read.table(motiffile)))
 
 # Load background model
-bg=readBackground(seqs,1)
+bg = readBackground(seqs, 1)
 
 # Use 100 individual sequences of length 150 bp each
-seqlen=rep(150,100)
+seqlen = rep(150, 100)
 
 # Compute overlapping probabilities
 # for scanning the forward DNA strand only
-op=motifcounter:::probOverlapHit(motif,bg,singlestranded=TRUE)
+op = motifcounter:::probOverlapHit(motif, bg, singlestranded = TRUE)
 
 # Computes  the compound Poisson distribution
-dist=motifcounter:::compoundPoissonDist(seqlen, op)
+dist = motifcounter:::compoundPoissonDist(seqlen, op)
 #plot(1:length(dist$dist)-1, dist$dist)
 
 # Compute overlapping probabilities
 # for scanning the forward DNA strand only
-op=motifcounter:::probOverlapHit(motif,bg,singlestranded=FALSE)
+op = motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
 
 # Computes  the compound Poisson distribution
-dist=motifcounter:::compoundPoissonDist(seqlen, op)
+dist = motifcounter:::compoundPoissonDist(seqlen, op)
 #plot(1:length(dist$dist)-1, dist$dist)
 
 }

@@ -11,19 +11,19 @@
 #' @examples
 #' 
 #' # Load sequences
-#' file=system.file("extdata","seq.fasta", package="motifcounter")
-#' seqs=Biostrings::readDNAStringSet(file)
+#' file = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seqs = Biostrings::readDNAStringSet(file)
 #' 
 #' # Retrieve sequence lengths
 #' motifcounter:::lenSequences(seqs)
 #'
-lenSequences=function(seqs) {
-    stopifnot(class(seqs)=="DNAStringSet")
-
-    lseq=vapply(seqs, function(seq) {
-        return(.Call("motifcounter_slen",toString(seq),
-                PACKAGE="motifcounter"))
-    }, FUN.VALUE=integer(1))
+lenSequences = function(seqs) {
+    stopifnot(class(seqs) == "DNAStringSet")
+    
+    lseq = vapply(seqs, function(seq) {
+        return(.Call("motifcounter_slen", toString(seq),
+                    PACKAGE = "motifcounter"))
+    }, FUN.VALUE = integer(1))
 
     return(as.vector(lseq))
 }
