@@ -16,6 +16,30 @@ If it is of help for your analysis, please cite
     note = {R package version 0.99.0},
   }
 ```
+## Usage
+
+```
+# Estimate a background model on a set of sequences
+bg <- readBackground(sequences, order)
+
+# Normalize a given PFM
+new_motif <- normalizeMotif(motif)
+
+# Evaluate the scores along a given sequence
+scores <- scoreSequence(sequence, motif, bg)
+
+# Evaluate the motif hits along a given sequence
+scores <- motifHits(sequence, motif, bg)
+
+# Evaluate the average score profile
+scores <- scoreProfile(sequences, motif, bg)
+
+# Evaluate the average motif hit profile
+scores <- motifHitProfile(sequences, motif, bg)
+
+# Compute the motif hit enrichment
+scores <- motifEnrichment(sequences, motif, bg)
+```
 
 ## Hallmarks of `motifcounter`
 
@@ -25,45 +49,46 @@ It can be used to scan a set of DNA sequences for known motifs
 (e.g. from TRANSFAC or JASPAR) in order to determine the positions
 and enrichment of TFBSs in the sequences.
 
-A major part of the package addresses the improvement and development
-of novel algorithms for determining motif hit enrichment,
-which is based on two analytic approximations of the
-*distribution of the number of motif hits* that are expected
-in random DNA sequences:
+Therefore, an analysis with `motifcounter` requires as input
+1. a position frequency matrix (PFM) which represents the TF affinity towards the DNA
+2. a background model, which is estimated from a given DNA sequence and which
+serves as a reference for the statistical analysis.
+3. a desired false positive level, for identifying putative TFBSs in DNA sequences. For example, a reasonable choice would be to choose a false positive level such that only one in 1000 positions are called TFBSs falsely.
+4. a given DNA sequence, which is subject to the TFBS analysis.
+
+The package aims to improve motif hit enrichment analysis. To this end,
+the package offers a number of features:
+1. `motifcounter` supports the use of **higher-order Markov models**
+to account for the sequence composition in unbound DNA segments.
+This improves the reliability of the enrichment analysis, because higher-order
+sequence features occur commonly in natural DNA sequences (e.g. CpG islands).
+2. The package automatically accounts for **self-overlapping** motif
+structures<sup><a href="#fn1" id="ref1">1</a></sup>. This aspect is important
+for reducing the false positives obtained from the enrichment test, which is
+prevalent for repeat-like and palindromic motifs.
+`motifcounter` not only determines self-overlapping motif hit occurrences
+on a single DNA strand, but (by default)
+also with respect to the reverse strand.
+
+### Enrichment model
+`motifcounter` implements two analytic approximations of the
+*distribution of the number of motif hits*
+in random DNA sequences that can optionally be used for the
+enrichment test:
 
 1. A *compound Poisson approximation*
 2. A *combinatorial approximation*
 
-Both methods are threshold-based.
-That is, they require the user to chose a
- desired false positive probability for obtaining motif hits
-in random DNA sequences.
-
 Both approximations yield highly accurate results for stringent
-false positive levels, while, the novel *combinatorial approximation*
-also yields highly accurate results for rather relaxed false positive levels.
+false positive levels.
+Moreover, if you intend to analyse long DNA sequences or
+a large set of individual sequences (total sequence length >10kb),
+we recommend to use the *compound Poisson approximation*.
+On the other hand, we recommend the *combinatorial approximation*
+if a relaxed false positive level is prefered to identify TFBSs.
 
-Both approximations take higher-order sequence feature
- in the background model into account (e.g. as found in CpG islands).
-To this end, `motifcounter` supports the
-use of **order-*d* Markov models** for the background models, where
-the desired order *d* is prescribed by the user.
 
-Both approximations take the **self-overlapping structure**
-of the motifs into account<sup><a href="#fn1" id="ref1">1</a></sup>.
-Examples of which are repeat-like or palindromic
-motifs. This facilitates accurate *P-value* estimates
-for the enrichment test,
-regardless of the structure of the motif.
 
-Lastly,  both approxmiations can be used to determine the number
-of motif hits in both DNA strands, as they also take overlapping
-hits on the opposite strand into account.
-Optionally, the compound Poisson approximation can also be used
-to determine the distribution of the number of motif hits
-with respect to scanning only a single strand
-which might be useful for studying e.g motif hit enrichment in RNA sequences.
-This option will be available also for the combinatorial model in the future.
 
 ## Installation
 An easy way to install `motifcounter` is by facilitating
@@ -80,20 +105,22 @@ and installed via the `R CMD INSTALL` command.
 
 ## Getting started
 
-The `motifcounter` package provides a vignette that walks you through
-the analysis of some toy examples, including
-1. to determine position- and strand-specific TF motif binding sites,
-2. to analyse the profile of motif hit occurrences across a set of
+The `motifcounter` package contains a tutorial that illustrates:
+1. how to determine position- and strand-specific TF motif binding sites,
+2. how to analyse the profile of motif hit occurrences across a set of
 aligned sequences, and
-3. to test for motif enrichment in a given set of sequences.
+3. how to test for motif enrichment in a given set of sequences.
 
-The vignette can be found as follows:
+The tutorial can be found in the package-vignette:
 
 ```R
 library(motifcounter)
 vignette("motifcounter")
 ```
 
+## Acknowledgements
+Thanks to [matthuska](https://github.com/matthuska) for reviewing and commenting
+on the package.
 <hr></hr>
 <sup id="fn1">1: Self-overlapping motifs induce
 **clumps of motif hits** (that is, mutually
