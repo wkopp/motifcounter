@@ -97,10 +97,12 @@ the `devtools` R package.
 ```R
 #install.packages("devtools")
 library(devtools)
-install_github("wkopp/motifcounter")
+install_github("wkopp/motifcounter", build_vignettes=TRUE)
 ```
 
-Alternatively, the package can also be downloaded from this github-rep
+Alternatively, the package can also be cloned or 
+downloaded from this github-rep,
+built via `R CMD build`
 and installed via the `R CMD INSTALL` command.
 
 ## Getting started
