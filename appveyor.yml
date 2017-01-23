@@ -11,14 +11,6 @@ init:
 #  - ./travis-tool.sh install_r
 install:
   - ps: Bootstrap
-  - ./travis-tool.sh install_bioc BiocGenerics
-  - ./travis-tool.sh install_bioc S4Vectors
-  - ./travis-tool.sh install_bioc IRanges
-  - ./travis-tool.sh install_bioc XVector
-  - ./travis-tool.sh install_bioc rtracklayer
-  - ./travis-tool.sh install_bioc Biostrings
-  - ./travis-tool.sh install_bioc MotifDb
-  - ./travis-tool.sh install_bioc seqLogo
   - ./travis-tool.sh install_bioc_deps
   - ./travis-tool.sh install_deps
 
