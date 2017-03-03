@@ -115,8 +115,9 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
         if (overlap$singlestranded == TRUE) {
             stop(
                 paste(strwrap(
-                "method = 'pape' only supports scanning both DNA strands.
-                Use method = 'kopp' instead."), collapse = "\n")
+                "method = 'pape' does not support single stranded scanning
+                for motif hits.
+                Please use method = 'kopp' instead."), collapse = "\n")
             )
         }
         res = .C(
@@ -132,7 +133,8 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
         )
         dist = res[[2]]
         } else {
-            stop("The method must be 'kopp' or 'pape'")
+            stop(paste(strwrap("Invalid 'method': The 'method' must 
+                 be 'kopp' or 'pape'"), collapse = "\n"))
         }
     return (list(dist = dist))
 }

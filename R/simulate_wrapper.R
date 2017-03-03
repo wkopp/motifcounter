@@ -26,7 +26,6 @@ generateDNAString = function(len, bg) {
     stopifnot(is(bg, "Background"))
     validObject(bg)
     if (len < bg@order) {
-        warning(sprintf("len < %d: created empty sequence", bg@order))
         return(Biostrings::DNAString(""))
     }
     seq = paste(rep("N", len), collapse = "", sep = "")
@@ -186,7 +185,7 @@ scoreDistEmpirical = function(pfm, bg, seqlen, nsim) {
     motifAndBackgroundValid(pfm, bg)
     stopifnot(nsim > 0)
     if (seqlen < ncol(pfm)) {
-        warning("seqlen less than motif length")
+        warning("seqlen shorter than ncol(pfm). Scores will always be zero.")
     }
 
     seqs = generateDNAStringSet(rep(seqlen, nsim), bg)

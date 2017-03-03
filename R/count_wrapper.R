@@ -87,8 +87,9 @@ motifHitProfile = function(seqs, pfm, bg) {
     stopifnot(class(seqs) == "DNAStringSet")
 
     if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
-        stop(paste(strwrap("Sequences must be equally long.
-            Please trim the sequnces."), collapse = "\n"))
+        stop(paste(strwrap("All DNAStrings in 'seqs' must be of equal length.
+            Please trim the sequences such that they are equally long."), 
+            collapse = "\n"))
     }
     slen = lenSequences(seqs[1])
     if (slen <= ncol(pfm) - 1) {

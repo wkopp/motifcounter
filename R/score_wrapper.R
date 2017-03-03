@@ -269,8 +269,8 @@ scoreProfile = function(seqs, pfm, bg) {
     stopifnot (class(seqs) == "DNAStringSet")
     
     if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
-        stop(paste(strwrap("Sequences must be equally long.
-            Please trim the sequnces."), collapse = "\n"))
+        stop(paste(strwrap("All DNAStrings in 'seqs' must be of equal length.
+            Please trim the sequences accordingly."), collapse = "\n"))
     }
     slen = lenSequences(seqs[1])
 
@@ -459,8 +459,8 @@ scoreThreshold = function(pfm, bg) {
     ind = which(1 - cumsum(scoredist$dist) <= sigLevel())
     if (length(ind) <= 1) {
         stop(paste(strwrap(
-            "The significance level is too stringent for the given motif.
-            Motif hits are impossible to occur at that level.
+            "The significance level 'alpha' is too stringent for the given 'pfm',
+            which renders motif matches impossible to occur.
             Use 'motifcounterOptions' to prescribe a less stringent
             value for 'alpha'."), collapse = "\n"))
     }

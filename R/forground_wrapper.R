@@ -85,8 +85,9 @@ normalizeMotif = function(pfm, pseudo = 0.01) {
 #'
 motifAndBackgroundValid = function(pfm, bg) {
     if (ncol(pfm) < bg@order) {
-        stop(paste(strwrap("The motif must be at least as long
-            possible using 'readBackground'."), collapse = "\n"))
+        stop(paste(strwrap("ncol(pfm) must be at least as long
+            the background model order bg@order"),
+            collapse = "\n"))
     }
 }
 

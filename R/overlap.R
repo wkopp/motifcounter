@@ -139,14 +139,14 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
 #'
 overlapValid = function(overlap) {
     if (class(overlap) != "Overlap") {
-        stop(paste(strwrap("overlap must be an Overlap object.
-            Use probOverlapHit() to construct one."),
+        stop(paste(strwrap("'overlap' must be an Overlap object,
+            which can be constructed via probOverlapHit(.)."),
             collapse = "\n"))
     }
     if (length(overlap) != 6) {
         stop(paste(strwrap(
-            "Overlap object inconsistent.
-            overlap must contain 6 elements.
+            "Inconsistent Overlap object:
+            'overlap' must contain 6 elements.
             Use 'probOverlapHit' to construct overlap properly."),
             collapse = "\n"))
     }

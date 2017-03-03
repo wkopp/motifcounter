@@ -17,18 +17,18 @@ setValidity("Background", function(object) {
     }
     if (!length(msg) && length(object@trans) != 4 ^ (object@order + 1)) {
         msg <- paste(strwrap("Inconsistent Background object.
-            Use readBackground() to construct a Background object"),
+            Use readBackground() to construct a Background object."),
             collapse = "\n")
     }
     # check if slots are normalized
     if (!length(msg) && !isTRUE(all.equal(sum(object@station), 1))) {
         msg <- paste(strwrap("Inconsistent Background object.
-            Use readBackground() to construct a Background object"),
+            Use readBackground() to construct a Background object."),
             collapse = "\n")
     }
     if (!length(msg) && !isTRUE(all.equal(sum(object@trans), 4^object@order))) {
         msg <- paste(strwrap("Inconsistent Background object.
-            Use readBackground() to construct a Background object"),
+            Use readBackground() to construct a Background object."),
             collapse = "\n")
     }
     if (length(msg)) msg else TRUE

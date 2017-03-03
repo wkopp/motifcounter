@@ -75,7 +75,7 @@ motifEnrichment = function(seqs, pfm, bg, singlestranded = FALSE,
     } else if (method == "combinatorial") {
         dist = combinatorialDist(observations$lseq, overlap)
     } else {
-        stop("method must be 'compound' or 'combinatorial'")
+        stop("Invalid method: 'method' must be 'compound' or 'combinatorial'")
     }
     p = sum(dist$dist[(sum(observations$numofhits) + 1):length(dist$dist)])
 
