@@ -23,13 +23,11 @@ motifValid = function(pfm) {
 
     #check if all entries are positive
     if (!all(pfm > 0)) {
-        stop("pfm must be strictly positive.
-            Use 'normalizeMotif'.")
+        stop("pfm must be strictly positive. Use 'normalizeMotif'.")
     }
     #check if all columns sum to one
     if (!all(abs(1 - colSums(pfm)) < 0.0000001)) {
-        stop("Columns must sum to one.
-            Use 'normalizeMotif'.")
+        stop("Columns must sum to one. Use 'normalizeMotif'.")
     }
 }
 
@@ -87,8 +85,8 @@ normalizeMotif = function(pfm, pseudo = 0.01) {
 #'
 motifAndBackgroundValid = function(pfm, bg) {
     if (ncol(pfm) < bg$order) {
-        stop("The motif must be at least as long
-            possible using 'readBackground'.")
+        stop(paste(strwrap("The motif must be at least as long
+            possible using 'readBackground'."), collapse = "\n"))
     }
 }
 

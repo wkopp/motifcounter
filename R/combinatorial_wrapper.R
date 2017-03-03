@@ -55,26 +55,27 @@ combinatorialDist = function(seqlen, overlap) {
     # The remaining sequence must be of equal length!
     if (!all(seqlen == seqlen[1])) {
         stop(
-            "Fixed sequence length required!
-            Trim the sequences to equal length if necessary."
+            paste(strwrap("Fixed sequence length required!
+            Trim the sequences to equal length if necessary."), 
+            collapse = "\n")
         )
     }
     
     if (overlap$singlestranded == TRUE) {
         stop(
-            "The combinatorial model only supports scanning
+            paste(strwrap("The combinatorial model only supports scanning
             of both DNA strands. Set 'singlestranded = FALSE'
-            or use the compound Poisson approximation."
+            or use the compound Poisson approximation."), collapse = "\n")
         )
     }
     
     # Analysing too short sequences might result in biases
     # of the model
     if (seqlen[1] < 30) {
-        warning(
+        warning(paste(strwrap(
             "The sequence length too short.
             Be aware that this might cause biases in the analysis.
-            Use longer sequences if possible."
+            Use longer sequences if possible."), collapse="\n")
         )
     }
     
@@ -108,9 +109,10 @@ combinatorialDist = function(seqlen, overlap) {
         # In this case, the combinatorial model is pushed
         # to its limits
         stop(
-            "The combinatorial model experienced numerical issues,
+            paste(strwrap("The combinatorial model experienced numerical issues,
             please try to reduce the number or length of the DNA sequences
-            or try the 'compound Poisson approximation' instead."
+            or try the 'compound Poisson approximation' instead."), 
+            collapse = "\n")
         )
     }
     return(list(dist = ret[[5]]))

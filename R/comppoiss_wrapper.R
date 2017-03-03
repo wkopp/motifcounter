@@ -114,8 +114,9 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
     } else if (method == "pape") {
         if (overlap$singlestranded == TRUE) {
             stop(
+                paste(strwrap(
                 "method = 'pape' only supports scanning both DNA strands.
-                Use method = 'kopp' instead."
+                Use method = 'kopp' instead."), collapse = "\n")
             )
         }
         res = .C(

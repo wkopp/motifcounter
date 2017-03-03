@@ -264,8 +264,8 @@ scoreProfile = function(seqs, pfm, bg) {
     stopifnot (class(seqs) == "DNAStringSet")
     
     if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
-        stop("Sequences must be equally long.
-            Please trim the sequnces.")
+        stop(paste(strwrap("Sequences must be equally long.
+            Please trim the sequnces."), collapse = "\n"))
     }
     slen = lenSequences(seqs[1])
 
@@ -450,12 +450,11 @@ scoreThreshold = function(pfm, bg) {
     # find quantile
     ind = which(1 - cumsum(scoredist$dist) <= sigLevel())
     if (length(ind) <= 1) {
-        stop(
+        stop(paste(strwrap(
             "The significance level is too stringent for the given motif.
             Motif hits are impossible to occur at that level.
             Use 'motifcounterOptions' to prescribe a less stringent
-            value for 'alpha'."
-        )
+            value for 'alpha'."), collapse = "\n"))
     }
     ind = ind[2:length(ind)]
     alpha = sum(scoredist$dist[ind])

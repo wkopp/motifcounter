@@ -86,15 +86,15 @@ readBackground = function(seqs, order = 1) {
 #'
 backgroundValid = function(bg) {
     if (class(bg) != "Background") {
-        stop("bg must be a Background object.
-            Use readBackground() to construct bg.")
+        stop(paste(strwrap("bg must be a Background object.
+            Use readBackground() to construct bg."), collapse = "\n"))
     }
     if (length(bg) != 4) {
-        stop("bg must contain 4 elements.
-            Use readBackground() to construct bg.")
+        stop(paste(strwrap("bg must contain 4 elements.
+            Use readBackground() to construct bg."), collapse = "\n"))
     }
     if (length(bg$trans) != 4 ^ (bg$order + 1)) {
-        stop("Inconsistent Background object.
-            Use readBackground() to construct bg.")
+        stop(paste(strwrap("Inconsistent Background object.
+            Use readBackground() to construct bg."), collapse = "\n"))
     }
 }
