@@ -30,6 +30,7 @@
 #' @keywords PFM, MotifEnrichment
 #' @useDynLib motifcounter, .registration=TRUE
 #' @import Biostrings
+#' @import methods
 #' @examples
 #'
 #' # Load sequences

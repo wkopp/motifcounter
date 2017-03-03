@@ -54,7 +54,8 @@
 probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
     #check if pfm is a matrix
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
     alpha = numeric(1)
@@ -73,9 +74,9 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
             as.numeric(beta3p),
             as.numeric(beta5p),
             as.numeric(gamma),
-            as.numeric(bg$station),
-            as.numeric(bg$trans),
-            as.integer(bg$order),
+            as.numeric(bg@station),
+            as.numeric(bg@trans),
+            as.integer(bg@order),
             PACKAGE = "motifcounter"
         )
     } else {
@@ -89,9 +90,9 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
             as.numeric(beta3p),
             as.numeric(beta5p),
             as.numeric(gamma),
-            as.numeric(bg$station),
-            as.numeric(bg$trans),
-            as.integer(bg$order),
+            as.numeric(bg@station),
+            as.numeric(bg@trans),
+            as.integer(bg@order),
             PACKAGE = "motifcounter"
         )
     }

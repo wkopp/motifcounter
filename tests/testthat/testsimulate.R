@@ -11,7 +11,7 @@ test_that("generateDNAString", {
 
     # too short sequence
     expect_warning(expect_equal(length(generateDNAString(-1,bg)),0))
-    expect_warning(expect_equal(length(generateDNAString(bg$order-1,bg)),0))
+    expect_warning(expect_equal(length(generateDNAString(bg@order-1,bg)),0))
 
     # Normal sequence
     expect_equal(length(generateDNAString(10,bg)),10)
@@ -31,7 +31,7 @@ test_that("generateDNAStringSet", {
     #expect_warning(generateDNAStringSet(bg$order-1,bg))
     expect_warning(expect_equal(length(generateDNAStringSet(-1,bg)[[1]]),0))
     expect_warning(expect_equal(
-        length(generateDNAStringSet(bg$order-1,bg)[[1]]),0))
+        length(generateDNAStringSet(bg@order-1,bg)[[1]]),0))
 
     # Normal sequences
     expect_equal(length(generateDNAStringSet(10,bg)),1)

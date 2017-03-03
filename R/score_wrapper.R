@@ -5,7 +5,7 @@
 #' dynamic programming algorithm.
 #'
 #' @inheritParams motifValid
-#' @inheritParams backgroundValid
+#' @template templates
 #' @return List that contains
 #' \describe{
 #' \item{scores}{Vector of scores}
@@ -32,7 +32,8 @@
 #' @export
 scoreDist = function(pfm, bg) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
     scores = .Call(
@@ -40,9 +41,9 @@ scoreDist = function(pfm, bg) {
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
-        bg$station,
-        bg$trans,
-        as.integer(bg$order),
+        bg@station,
+        bg@trans,
+        as.integer(bg@order),
         PACKAGE = "motifcounter"
     )
 
@@ -51,9 +52,9 @@ scoreDist = function(pfm, bg) {
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
-        bg$station,
-        bg$trans,
-        as.integer(bg$order),
+        bg@station,
+        bg@trans,
+        as.integer(bg@order),
         PACKAGE = "motifcounter"
     )
     return(list(scores = scores, dist = dist))
@@ -98,7 +99,8 @@ scoreDist = function(pfm, bg) {
 #'
 scoreDistBf = function(pfm, bg) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
     scores = .Call(
@@ -106,9 +108,9 @@ scoreDistBf = function(pfm, bg) {
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
-        bg$station,
-        bg$trans,
-        as.integer(bg$order),
+        bg@station,
+        bg@trans,
+        as.integer(bg@order),
         PACKAGE = "motifcounter"
     )
 
@@ -117,9 +119,9 @@ scoreDistBf = function(pfm, bg) {
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
-        bg$station,
-        bg$trans,
-        as.integer(bg$order),
+        bg@station,
+        bg@trans,
+        as.integer(bg@order),
         PACKAGE = "motifcounter"
     )
     return(list(scores = scores, dist = dist))
@@ -160,7 +162,8 @@ scoreDistBf = function(pfm, bg) {
 #'
 scoreStrand = function(seq, pfm, bg) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
     # Check class
@@ -172,9 +175,9 @@ scoreStrand = function(seq, pfm, bg) {
         nrow(pfm),
         ncol(pfm),
         toString(seq),
-        bg$station,
-        bg$trans,
-        as.integer(bg$order),
+        bg@station,
+        bg@trans,
+        as.integer(bg@order),
         PACKAGE = "motifcounter"
     )
     return(as.numeric(scores))
@@ -213,7 +216,8 @@ scoreStrand = function(seq, pfm, bg) {
 #' @export
 scoreSequence = function(seq, pfm, bg) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
     # Check class
@@ -260,7 +264,8 @@ scoreSequence = function(seq, pfm, bg) {
 #' @export
 scoreProfile = function(seqs, pfm, bg) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     stopifnot (class(seqs) == "DNAStringSet")
     
     if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
@@ -324,7 +329,8 @@ scoreProfile = function(seqs, pfm, bg) {
 #'
 scoreHistogramSingleSeq = function(seq, pfm, bg) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     stopifnot(class(seq) == "DNAString")
     motifAndBackgroundValid(pfm, bg)
 
@@ -333,9 +339,9 @@ scoreHistogramSingleSeq = function(seq, pfm, bg) {
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
-        bg$station,
-        bg$trans,
-        as.integer(bg$order),
+        bg@station,
+        bg@trans,
+        as.integer(bg@order),
         PACKAGE = "motifcounter"
     )
 
@@ -345,9 +351,9 @@ scoreHistogramSingleSeq = function(seq, pfm, bg) {
         nrow(pfm),
         ncol(pfm),
         toString(seq),
-        bg$station,
-        bg$trans,
-        as.integer(bg$order),
+        bg@station,
+        bg@trans,
+        as.integer(bg@order),
         PACKAGE = "motifcounter"
     )
     result = list(scores = scores, dist = dist)
@@ -390,7 +396,8 @@ scoreHistogramSingleSeq = function(seq, pfm, bg) {
 #' @export
 scoreHistogram = function(seqs, pfm, bg) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     stopifnot(class(seqs) == "DNAStringSet")
 
     # First, extract the score range
@@ -443,7 +450,8 @@ scoreHistogram = function(seqs, pfm, bg) {
 #'
 scoreThreshold = function(pfm, bg) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     
     scoredist = scoreDist(pfm, bg)
     

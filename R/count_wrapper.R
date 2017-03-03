@@ -29,7 +29,8 @@
 #' @export
 motifHits = function(seq, pfm, bg) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
     sth = scoreThreshold(pfm, bg)
@@ -79,7 +80,8 @@ motifHits = function(seq, pfm, bg) {
 #' @export
 motifHitProfile = function(seqs, pfm, bg) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
     stopifnot(class(seqs) == "DNAStringSet")
@@ -149,7 +151,8 @@ motifHitProfile = function(seqs, pfm, bg) {
 #'
 numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
     stopifnot(class(seqs) == "DNAStringSet")

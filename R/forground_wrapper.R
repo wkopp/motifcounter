@@ -64,7 +64,7 @@ normalizeMotif = function(pfm, pseudo = 0.01) {
 #' The function throws an error if this is not the case.
 #'
 #' @inheritParams motifValid
-#' @inheritParams backgroundValid
+#' @template templates
 #' @return None
 #'
 #' @examples
@@ -84,7 +84,7 @@ normalizeMotif = function(pfm, pseudo = 0.01) {
 #' motifcounter:::motifAndBackgroundValid(motif, bg)
 #'
 motifAndBackgroundValid = function(pfm, bg) {
-    if (ncol(pfm) < bg$order) {
+    if (ncol(pfm) < bg@order) {
         stop(paste(strwrap("The motif must be at least as long
             possible using 'readBackground'."), collapse = "\n"))
     }

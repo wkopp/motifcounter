@@ -1,3 +1,40 @@
+.Background <- setClass("Background",
+    slots = c(
+                station = "numeric",
+                trans = "numeric",
+                counts = "integer",
+                order = "integer"
+            )
+)
+
+setValidity("Background", function(object) {
+    msg <- character(0)
+    # check slot dimensions
+    if (length(object@station) != max(4, 4 ^ (object@order))) {
+        msg <- paste(strwrap("Inconsistent Background object.
+            Use readBackground() to construct a Background object."),
+            collapse = "\n")
+    }
+    if (!length(msg) && length(object@trans) != 4 ^ (object@order + 1)) {
+        msg <- paste(strwrap("Inconsistent Background object.
+            Use readBackground() to construct a Background object"),
+            collapse = "\n")
+    }
+    # check if slots are normalized
+    if (!length(msg) && !isTRUE(all.equal(sum(object@station), 1))) {
+        msg <- paste(strwrap("Inconsistent Background object.
+            Use readBackground() to construct a Background object"),
+            collapse = "\n")
+    }
+    if (!length(msg) && !isTRUE(all.equal(sum(object@trans), 4^object@order))) {
+        msg <- paste(strwrap("Inconsistent Background object.
+            Use readBackground() to construct a Background object"),
+            collapse = "\n")
+    }
+    if (length(msg)) msg else TRUE
+})
+
+
 #' Estimates a background model from a set of DNA sequences
 #'
 #' Given a set of DNA sequences and an order, this function
@@ -54,47 +91,13 @@ readBackground = function(seqs, order = 1) {
         as.integer(order),
         PACKAGE = "motifcounter"
     )
-    background = list(
+    background = .Background(
         station = dummy[[2]],
         trans = dummy[[3]],
-        counts = dummy[[1]],
-        order = order
+        counts = as.integer(dummy[[1]]),
+        order = as.integer(order)
     )
-    class(background) = "Background"
     return (background)
 }
 
-#' Check valididity of Background model
-#'
-#' This function checks if the Background model is valid. The function throws
-#' an error if the object does not represent a Background model.
-#'
-#' @param bg A Background object
-#' @return None
-#'
-#' @examples
-#'
-#' # Load sequences
-#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
-#' seqs = Biostrings::readDNAStringSet(seqfile)
-#'
-#' # Load background
-#' bg = readBackground(seqs, 1)
-#'
-#' # Validate Background object
-#' motifcounter:::backgroundValid(bg)
-#'
-backgroundValid = function(bg) {
-    if (class(bg) != "Background") {
-        stop(paste(strwrap("bg must be a Background object.
-            Use readBackground() to construct bg."), collapse = "\n"))
-    }
-    if (length(bg) != 4) {
-        stop(paste(strwrap("bg must contain 4 elements.
-            Use readBackground() to construct bg."), collapse = "\n"))
-    }
-    if (length(bg$trans) != 4 ^ (bg$order + 1)) {
-        stop(paste(strwrap("Inconsistent Background object.
-            Use readBackground() to construct bg."), collapse = "\n"))
-    }
-}
+

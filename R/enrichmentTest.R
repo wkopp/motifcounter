@@ -61,7 +61,8 @@
 motifEnrichment = function(seqs, pfm, bg, singlestranded = FALSE, 
                             method = "compound") {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
     #compute overlapping hit probs

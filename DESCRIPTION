@@ -12,7 +12,8 @@ Suggests:
     seqLogo,
     prettydoc
 Imports:
-    Biostrings
+    Biostrings,
+    methods
 Depends:
     R(>= 3.0.0)
 Maintainer: Wolfgang Kopp <kopp@molgen.mpg.de>

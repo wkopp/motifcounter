@@ -4,7 +4,7 @@
 #' by sampling from the background model.
 #'
 #' @param len Integer length of the sequence
-#' @inheritParams backgroundValid
+#' @template templates
 #'
 #' @return A DNAString object
 #
@@ -23,9 +23,10 @@
 #' @seealso \code{\link{generateDNAStringSet}}
 generateDNAString = function(len, bg) {
     len = as.integer(len)
-    backgroundValid(bg)
-    if (len < bg$order) {
-        warning(sprintf("len < %d: created empty sequence", bg$order))
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
+    if (len < bg@order) {
+        warning(sprintf("len < %d: created empty sequence", bg@order))
         return(Biostrings::DNAString(""))
     }
     seq = paste(rep("N", len), collapse = "", sep = "")
@@ -33,9 +34,9 @@ generateDNAString = function(len, bg) {
         "motifcounter_generateRndSeq",
         as.character(seq),
         as.integer(len),
-        bg$station,
-        bg$trans,
-        as.integer(bg$order),
+        bg@station,
+        bg@trans,
+        as.integer(bg@order),
         PACKAGE = "motifcounter"
     )
     return(Biostrings::DNAString(ret[[1]]))
@@ -49,7 +50,7 @@ generateDNAString = function(len, bg) {
 #'
 #'
 #' @inheritParams compoundPoissonDist
-#' @inheritParams backgroundValid
+#' @template templates
 #'
 #' @return A DNAStringSet object
 #
@@ -67,7 +68,8 @@ generateDNAString = function(len, bg) {
 #'
 #' @seealso \code{\link{generateDNAStringSet}}
 generateDNAStringSet = function(seqlen, bg) {
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     seqs = c()
     for (i in 1:length(seqlen)) {
         seqs = c(seqs, generateDNAString(seqlen[i], bg))
@@ -122,7 +124,8 @@ generateDNAStringSet = function(seqlen, bg) {
 #' @seealso \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
 simulateNumHitsDist = function(pfm, bg, seqlen, nsim, singlestranded = FALSE) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
     stopifnot(nsim > 0)
 
@@ -178,7 +181,8 @@ simulateNumHitsDist = function(pfm, bg, seqlen, nsim, singlestranded = FALSE) {
 #' @seealso \code{\link{scoreDist}}
 scoreDistEmpirical = function(pfm, bg, seqlen, nsim) {
     motifValid(pfm)
-    backgroundValid(bg)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
     motifAndBackgroundValid(pfm, bg)
     stopifnot(nsim > 0)
     if (seqlen < ncol(pfm)) {

@@ -27,11 +27,11 @@ test_that("scoreDists", {
 
     # 1. test: with motif of length one
     # compute the score distribution for this case in R
-    s=round((log(motif[,1])-log(bg$station))*10)
+    s=round((log(motif[,1])-log(bg@station))*10)
     srange=seq(min(s),max(s))
     p=rep(0,length(srange))
     for (i in 1:length(srange)){
-        p[i]=sum(bg$station[which(s==srange[i])])
+        p[i]=sum(bg@station[which(s==srange[i])])
     }
 
     dp=scoreDist(as.matrix(motif[,1]),bg)
