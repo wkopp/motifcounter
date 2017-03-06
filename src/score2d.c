@@ -18,9 +18,6 @@
 
 void initScore2d(Score2d *s, int l) {
     s->y=Calloc(l*l,double);
-    if (s->y==NULL) {
-        error("Memory-allocation in initScore2d failed");
-    }
     s->end1=0;
     s->end2=0;
     s->start1=l;
@@ -34,9 +31,6 @@ int initScoreDistribution2d (DMatrix *theta, double *bg1,
     result->mlen=theta->nrow;
     result->ScoreBuffer1=Calloc(power(ALPHABETSIZE, order), Score2d);
     result->tmpScore=Calloc(power(ALPHABETSIZE, order+1), Score2d);
-    if (result->ScoreBuffer1==NULL||result->tmpScore==NULL) {
-        error("Memory-allocation in initScoreDistribution1d failed");
-    }
 
     for (i=0; i < power(ALPHABETSIZE, order); i++) {
         initScore2d(&result->ScoreBuffer1[i],result->meta.length);
@@ -328,33 +322,6 @@ int computeSeqenByBruteForce(int mlen1, int mlen2,
     return imin+1;
 }
 
-int computeTotalScoreDistribution2d(MotifScore2d *mscore, int order) {
-    int i;
-
-    mscore->cprob=0.0;
-
-    for (i=0; i<power(ALPHABETSIZE, order); i++) {
-        mscore->cprob+= mscore->ScoreBuffer1[i].y[0];
-    }
-    return 0;
-}
-void printProb(Score2d *s, int len) {
-#ifndef IN_R
-    double p=0.0;
-    int i=0, j=0;
-    for (i=s->start1;i<=s->end1;i++) {
-        for (j=s->start2;j<=s->end2; j++) {
-            p+=s->y[j*len+i];
-            if (s->y[j*len+i]>0.0) {
-                fprintf(stdout, "[%d,%d] ",i,j);
-            }
-        }
-    }
-    fprintf(stdout,"P=%f\n", p);
-#endif
-    return;
-}
-
 #define DEBUG
 #undef DEBUG
 int computeScoreDistribution2DDP_init(DMatrix *pwm1, DMatrix *pwm2,
@@ -370,18 +337,6 @@ int computeScoreDistribution2DDP_init(DMatrix *pwm1, DMatrix *pwm2,
     int score2[power(ALPHABETSIZE, order+1)];
 
     if(corder==0) (corder++);
-
-    if (init1d == NULL || init2d == NULL) {
-        error("DP:init1d and init2d must be supplied!\n");
-        return 1;
-    }
-    if (shift>nsubmotif) {
-        error("DP:shift>nsub: shift cannot be higher than submotif length.\n");
-    }
-    if (corder>nsubmotif) {
-        error("DP:order>nsub: nsubmotif shall be at "
-                "least as long as the order of the background model.");
-    }
 
     getScoresInitialIndex(pwm2->data,station, score2, &mscore->meta.dx, order);
 
@@ -518,14 +473,6 @@ int computeScoreDistribution2DDP(DMatrix *pwm1, DMatrix *pwm2,
 
     if(corder==0) (corder++);
 
-    if (shift>nsubmotif) {
-        error("DP:shift>nsub: shift cannot be higher than submotif length.\n");
-    }
-    if (order>nsubmotif) {
-        error("DP:order>nsub: nsubmotif shall be "
-                "at least as long as the order of the background model.");
-    }
-
     for (m=nsubmotif; m<pwm1->nrow+shift;m++) {
         for (i=0; i<power(ALPHABETSIZE, order); i++) {
             if (m<pwm1->nrow) {
@@ -656,23 +603,6 @@ int computeScoreDistribution2DBruteForce(
     int prefix, cletter=0, suffix, nextprefix;
     int corder=order, jointindex;
     if (corder==0) corder++;
-
-    if (nsubmotif>pwm1->nrow+shift) {
-        error("BF: nsubmotif cannot be longer than motiflen "
-                "+ shift for brute force version.\n");
-    }
-    if (shift >= pwm1->nrow || nsubmotif > shift+pwm1->nrow) {
-        error( "BF: no overlap given anymore\n");
-    }
-    if (shift>nsubmotif) { 
-        error("BF: shift>nsub: use the result "
-                "from the 1d dp computation instead\n");
-    }
-
-    if (nsubmotif<order) {
-        error("BF: nsub<order: choose nsubmotif "
-                "greater than order of the Markov chain\n");
-    }
 
     getScoresInitialIndex(pwm1->data,station, score1, &mscore->meta.dx, order);
     getScoresInitialIndex(pwm2->data,station, score2, &mscore->meta.dx, order);
@@ -996,9 +926,9 @@ void computeConditionalOverlappingProbabilities(DMatrix *pwm1,
         pwm1, pwm2, trans, station, &null, 
             &escore1, &escore2, shift, submotiflen, order);
 
+        #ifndef IN_R
         if(fout!=NULL) fprintf(fout, "%1.10f\n",
                 getMarginalProbability2d(&null,order));
-        #ifndef IN_R
         printf("%1.10f\n",getMarginalProbability2d(&null,order));
         #endif
         gamma[pwm1->nrow+shift]=getMarginalProbability2d(&null,order);
@@ -1031,9 +961,9 @@ void computeConditionalOverlappingProbabilities(DMatrix *pwm1,
         pwm2, pwm1, trans, station, &null, 
             &escore2, &escore1, shift, submotiflen, order);
 
+        #ifndef IN_R
         if (fout!=NULL) fprintf(fout, "%1.10f\n",
                 getMarginalProbability2d(&null,order));
-        #ifndef IN_R
         fprintf(stdout, "%1.10f\n",getMarginalProbability2d(&null,order));
         #endif
         gamma[pwm1->nrow*2+shift]=getMarginalProbability2d(&null,order);

@@ -52,11 +52,6 @@ int initExtremalScore(ExtremalScore *s, double dx, int length, int order) {
     s->minbackward=Calloc((length)*power(ALPHABETSIZE, order), int);
     s->intervalstart=Calloc((length)*power(ALPHABETSIZE, order), int);
     s->intervalend=Calloc((length)*power(ALPHABETSIZE, order), int);
-    if(s->maxforward==NULL||s->maxbackward==NULL||s->minforward==NULL||
-                    s->minbackward==NULL||
-                    s->intervalstart==NULL||s->intervalend==NULL) {
-        error("Memory-allocation in initExtremalScore failed");
-    }
 
     s->len=length;
     s->order=order;
@@ -119,10 +114,6 @@ void extremScoresPerPositionBack(int max, DMatrix *theta, double *trans,
     int s[ALPHABETSIZE];
     int k;
 
-    if (order>theta->nrow) {
-        error("Order is cannot be higher than the motif length!\n");
-        return;
-    }
     for (m1=0; m1<power(ALPHABETSIZE, order); m1++) {
         extrema[power(ALPHABETSIZE, order)*(theta->nrow-1)+m1]=0;
     }
@@ -173,17 +164,10 @@ void extremScoresPerPositionForward(int max, DMatrix *theta,
     // the results of the function are used to compute 
     // the actual memory requirements for the current 
     // motif, background, and chosen threshold
-    if (order>theta->nrow) {
-        error("Background order cannot be longer than the motif.\n");
-        return;
-    }
     if (order>1) {
         s=Calloc(power(ALPHABETSIZE,order), int);
     } else {
         s=Calloc(ALPHABETSIZE, int);
-    }
-    if(s==NULL) {
-        error("Memory-allocation in extremScoresPerPositionForward failed");
     }
 
     getScoresInitialIndex(&theta->data[0], station,s, dx, order );
@@ -330,24 +314,6 @@ int * getLastScoreLowerBound(ExtremalScore *escore) {
             escore->order)];
 }
 
-int * getScoreLowerBoundArray(ExtremalScore *escore, int pos) {
-    return &escore->intervalstart[pos*power(ALPHABETSIZE, escore->order)];
-}
-
-int * getScoreUpperBoundArray(ExtremalScore *escore, int pos) {
-    return &escore->intervalend[pos*power(ALPHABETSIZE, escore->order)];
-}
-
-int getScoreLowerBoundPos(ExtremalScore *escore, int pos) {
-    return getMin(&escore->intervalstart[pos*power(ALPHABETSIZE, 
-                escore->order)], power(ALPHABETSIZE, escore->order));
-}
-
-int getScoreUpperBoundPos(ExtremalScore *escore, int pos) {
-    return getMax(&escore->intervalend[pos*power(ALPHABETSIZE, escore->order)],
-        power(ALPHABETSIZE, escore->order));
-}
-
 int maxScoreIntervalSize(ExtremalScore *e) {
     return e->Smax;
 }
@@ -356,10 +322,6 @@ int maxScoreIntervalSize(ExtremalScore *e) {
 void loadMinMaxScores(DMatrix *pwm, double *station, 
         double *trans, ExtremalScore *e) {
     int min, max;
-    if (e->order>pwm->nrow) {
-        error("Background order cannot be longer than the motif.\n");
-        return;
-    }
     minScoresPerPositionForward(pwm,station, 
             trans,e->minforward, &e->dx, e->order);
     minScoresPerPositionBack(pwm,trans,

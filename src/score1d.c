@@ -35,21 +35,8 @@ int getQuantileIndex1d(Score1d *s, double pvalue) {
     return i+x;
 }
 
-double getProbWithIndex1d(MotifScore1d *s, int iquantile) {
-    int i;
-    double sum=0.0;
-
-    for (i=iquantile-s->meta.xmin; i<=s->totalScore.end; i++) {
-        sum+=s->totalScore.y[i];
-    }
-    return sum;
-}
-
 void initScore1d(Score1d *s, int l) {
     s->y=Calloc(l, double);
-    if (s->y==NULL) {
-        error("Memory-allocation in initScore1d failed");
-    }
     s->end=0;
     s->merged=0;
     s->start=l;
@@ -64,9 +51,6 @@ int initScoreDistribution1d (DMatrix *theta, double *bg1,
     result->mlen=theta->nrow;
     result->ScoreBuffer1=Calloc(power(ALPHABETSIZE, order)*theta->nrow, Score1d);
     result->tmpScore=Calloc(power(ALPHABETSIZE, order+1), Score1d);
-    if (result->ScoreBuffer1==NULL||result->tmpScore==NULL) {
-        error("Memory-allocation in initScoreDistribution1d failed");
-    }
 
     for (i=0; i < power(ALPHABETSIZE, order)*theta->nrow; i++) {
         initScore1d(&result->ScoreBuffer1[i], result->meta.length+1);
@@ -282,10 +266,6 @@ int computeScoreDistribution1d(DMatrix *pwm, double *trans,
     int i,m,j, ji, k, K, corder;
     int score[power(ALPHABETSIZE, order+1)];
 
-    if (order > pwm->nrow) {
-        error("Background order cannot be longer than the motif.\n");
-        return 1;
-    }
     corder=((order==0) ? (order+1) : order);
     getScoresInitialIndex(pwm->data,station, score, &mscore->meta.dx, order);
 
@@ -366,10 +346,6 @@ int computeMarginalScoreDistribution1dBruteForce(DMatrix *pwm, double *trans,
     int corder=order;
     if (corder==0) corder++;
 
-    if (order > pwm->nrow) {
-        error("Background order cannot be longer than the motif.\n");
-        return 1;
-    }
     getScoresInitialIndex(pwm->data,station, score, &mscore->meta.dx, order);
 
     for (i=0; i<power(ALPHABETSIZE,pwm->nrow); i++) {

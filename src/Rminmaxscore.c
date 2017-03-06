@@ -22,9 +22,7 @@ SEXP Rscorerange(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     DMatrix pfm;
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
-    if (pfm.data==NULL) {
-        error("Rscorerange: memory allocation failed");
-    }
+
     // Rcol and c-col are swapped
     pfm.ncol=nrow[0];
     pfm.nrow=ncol[0];

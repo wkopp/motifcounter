@@ -73,9 +73,6 @@ void markovchain(double *dist, double *a,
     // dist[3+M, ..., 3+M+M-2] ... p(n1'), ..., p(nL')
     //
     post=Calloc(2*motiflen+2, double);
-    if(post==NULL) {
-        error("Memory-allocation in markovchain failed");
-    }
     prior=dist;
     alphacond=a[0];
     memset(prior, 0, (2*motiflen+2)*sizeof(double));
@@ -141,9 +138,6 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
 
     if (!Rdist) {
         Rdist=Calloc(2*cgparams->motiflen+2, double);
-        if(Rdist==NULL) {
-            error("Memory-allocation in dmc failed");
-        }
     }
 
     epsilon=alphacond[0]/1000;
@@ -174,9 +168,6 @@ double minmc(int n, double *alpha, void *ex) {
 
     if (!Rdist) {
         Rdist=Calloc(2*cgparams->motiflen+2, double);
-        if(Rdist==NULL) {
-            error("Memory-allocation in minmc failed");
-        }
     }
 
     markovchain(Rdist, alpha, cgparams->beta,

@@ -29,20 +29,11 @@ int allocPosteriorProbability(PosteriorCount *p, int seqlen,
     p->mlen=mlen;
     p->maxhits=maxhits;
     p->value=Calloc(maxhits, double**);
-    if (p->value==NULL) {
-        error("Memory-allocation in allocPosteriorProbability failed");
-    }
 
     for (i=0; i<maxhits; i++) {
         p->value[i]=Calloc(seqlen, double*);
-        if (p->value[i]==NULL) { 
-            error("Memory-allocation in allocPosteriorProbability failed");
-        }
         for (j=0; j<seqlen; j++) {
             p->value[i][j]=Calloc(2*mlen, double);
-            if (p->value[i][j]==NULL) {
-                error("Memory-allocation in allocPosteriorProbability failed");
-            }
         }
     }
     return 0;
@@ -97,13 +88,7 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
     p->deltap=*deltap;
 
     _alpha=Calloc(p->seqlen, double);
-    if (_alpha==NULL) {
-        error("Memory-allocation in initPosteriorProbability failed");
-    }
     _omega=Calloc(p->seqlen, double);
-    if (_omega==NULL) {
-        error("Memory-allocation in initPosteriorProbability failed");
-    }
 
     m=(70>p->seqlen) ? p->seqlen : 70; 
 
@@ -423,9 +408,6 @@ void computeResultRecursive(double ** part, int nos, int klen) {
     Rprintf("merge l1=%d l2=%d\n", l1, l2);
     #endif
     part[nos-1]=Calloc(klen+1, double);
-    if (part[nos-1]==NULL)  {
-        error("Memory-allocation in computeResultRecursive failed");
-    }
     convolute(part[nos-1], part[l1-1], part[l2-1], klen);
     #ifdef DEBUG
     for (i=0, sum=0.0;i<=klen; i++) {
@@ -448,9 +430,6 @@ void multipleShortSequenceProbability(double *singledist,
     // allocate array of pointers to sub-aggregated distributions
     part_results=Calloc(numofseqs, double*);
     part_results[0]=Calloc(maxagghits+1, double);
-    if (part_results==NULL||part_results[0]==NULL) {
-        error("Memory-allocation in multipleShortSequenceProbability failed");
-    }
     // copy the distribution of a single sequence to part_results
     // this corresponds to the base case
     memcpy(part_results[0],singledist, (maxsinglehits+1)*sizeof(double));

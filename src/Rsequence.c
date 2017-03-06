@@ -48,9 +48,7 @@ SEXP Rscoresequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
     DMatrix pfm;
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
-    if (pfm.data==NULL) {
-        error("Rscoresequence: Memory allocation failed");
-    }
+
     // Rcol and c-col are swapped
     pfm.ncol=nrow[0];
     pfm.nrow=ncol[0];
@@ -91,9 +89,7 @@ SEXP RscoreHistogram(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     slen=strlen(seq);
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
-    if (pfm.data==NULL) {
-        error("RscoreHistogram: Memory allocation failed");
-    }
+
     // Rcol and c-col are swapped
     pfm.ncol=nrow[0];
     pfm.nrow=ncol[0];

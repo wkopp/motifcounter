@@ -33,12 +33,6 @@ void RPosteriorProbability(double *alpha, double *beta,
     CGParams cgparams;
 
 
-    if (!beta||!beta3p||!beta5p||!hitdistribution||
-                    !sseqlen||!smaxhits||!snos) {
-        error("parameters are null");
-        return;
-    }
-
     seqlen=sseqlen[0] - motiflen[0]+1;
     nos=snos[0];
     maxhits=smaxhits[0];
@@ -46,7 +40,6 @@ void RPosteriorProbability(double *alpha, double *beta,
 
     delta=Calloc(motiflen[0],double);
     deltap=Calloc(motiflen[0],double);
-    if (delta==NULL||deltap==NULL) error("failed to allocate delta");
 
     computeDeltas(delta, deltap, beta, beta3p,beta5p,motiflen[0]);
 
@@ -83,9 +76,6 @@ void RPosteriorProbability(double *alpha, double *beta,
     computePosteriorProbability(&prob);
 
     singlehitdistribution=Calloc(maxhits+1, double);
-    if (singlehitdistribution==NULL) {
-        error("Memory-allocation in RPosteriorProbability failed");
-    }
 
 #ifdef DEBUG
     Rprintf("omega=%e, alpha=%e\n", prob.omega, prob.alpha);

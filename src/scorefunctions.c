@@ -9,24 +9,10 @@
 #include "scorefunctions.h"
 #include "sequence.h"
 
-double ProbinitPWM (double b, double *f, int index, int order) {
-    double g=1;
-    int o, l;
-
-    for (o=0; o<order; o++) {
-        l=index/power(ALPHABETSIZE, order-o-1);
-        g*=f[o*ALPHABETSIZE+l];
-        index-=l*power(ALPHABETSIZE, order-o-1);
-    }
-    return g;
-}
 double ProbinitBg (double b, double *f, int ass, int order) {
     return b;
 }
 
-double ProbPWM (double b, double f) {
-    return f;
-}
 double ProbBg (double b, double f) {
     return b;
 }
@@ -75,10 +61,6 @@ int initScoreMetaInfo (int smin, int smax, int intervalsize,
     meta->dx=dx;
     meta->xmax=smax;
     meta->xmin=smin;
-    if (smax-smin>meta->length) {
-        error("score range length error, len=%d, xmax=%d, xmin=%d",
-                    intervalsize+1,smax,smin);
-    }
     meta->zero=0;
 
     meta->prob=&ProbBg;

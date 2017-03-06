@@ -35,16 +35,8 @@ int getStationaryDistribution(double *trans, double *station, int order) {
     int ass [order+1];
     int nextindex, previndex;
 
-    if (order <1) {
-        error("no stationary distribution needed");
-        return 1;
-    }
-
     tmp1=Calloc(power(ALPHABETSIZE, order), double);
     tmp2=Calloc(power(ALPHABETSIZE, order), double);
-    if (tmp1==NULL||tmp2==NULL) {
-        error("Memory-allocation in getStationarydistribution failed");
-    }
     tmpres=tmp1;
     tmpstart=tmp2;
 

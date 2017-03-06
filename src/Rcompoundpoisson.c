@@ -18,15 +18,6 @@ void RcompoundpoissonPape_useGamma(double *gamma,
     double lambda;
     double *theta, extention[3];
 
-    if (!gamma||!hitdistribution||!nseq||!lseq||!mhit||!mclump) {
-        error("parameters are null");
-        return;
-    }
-    if (Rgran==0.0 || Rsiglevel==0.0) {
-        error("call mdist.option  first");
-        return;
-    }
-
     seqlen=0;
     for (i=0; i<*nseq; i++) {
         if (lseq[i]-motiflen[0]+1 > 0) {
@@ -40,9 +31,6 @@ void RcompoundpoissonPape_useGamma(double *gamma,
     gamma[motiflen[0]]=(gamma[motiflen[0]]+EPSILON)/(1+2*EPSILON);
     computeExtentionFactorsPape(extention, gamma, motiflen[0]);
     theta=initTheta(maxclumpsize);
-    if (theta==NULL) {
-        error("Memory-allocation in initTheta failed");
-    }
 
     computeInitialClump(theta, gamma,motiflen[0]);
     computeTheta(maxclumpsize, theta, extention, motiflen[0]);
@@ -65,16 +53,6 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
     double *theta, extention[3];
     double *delta, *deltap;
 
-    if (!alpha||!beta||!beta3p||!beta5p||
-            !hitdistribution||!nseq||!lseq||!mhit||!mclump) {
-        error("parameters are null");
-        return;
-    }
-    if (Rgran==0.0 || Rsiglevel==0.0) {
-        error("call mdist.option  first");
-        return;
-    }
-
     //compute the total length of the sequence
     seqlen=0;
     for (i=0; i<*nseq; i++) {
@@ -88,9 +66,6 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
 
     delta=Calloc(motiflen[0],double);
     deltap=Calloc(motiflen[0],double);
-    if (delta==NULL||deltap==NULL) {
-        error("Memory-allocation in Rcompoundpoisson_useBeta failed");
-    }
 
     // initialize the extention factors
     memset(extention, 0, 3*sizeof(double));
@@ -100,9 +75,6 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
 
         computeExtentionFactorsKoppSingleStranded(extention, beta, motiflen[0]);
         theta=initThetaSingleStranded(maxclumpsize);
-        if (theta==NULL) {
-            error("Memory-allocation in initTheta failed");
-        }
 
         computeInitialClumpKoppSingleStranded(theta, delta, motiflen[0]);
         computeThetaSingleStranded(maxclumpsize, theta, extention, motiflen[0]);
@@ -120,9 +92,6 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
         computeExtentionFactorsKopp(extention, delta, deltap, beta,
                     beta3p, beta5p, motiflen[0]);
         theta=initTheta(maxclumpsize);
-        if (theta==NULL) {
-            error("Memory-allocation in initTheta failed");
-        }
 
         computeInitialClumpKopp(theta, beta3p,delta, deltap, motiflen[0]);
         computeTheta(maxclumpsize, theta, extention, motiflen[0]);

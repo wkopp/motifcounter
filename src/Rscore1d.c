@@ -21,12 +21,8 @@ SEXP Rscoredist(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     int i, intervalsize,maxs,mins;
     DMatrix pfm;
 
-    if (Rgran<=1e-10) { error("set granularity first! E.g. 0.1"); }
-
     pfm.data=Calloc(nrow[0]*ncol[0],double);
-    if (pfm.data==NULL) {
-        error("Rscoredist: Memory allocation failed");
-    }
+
     // Rcol and c-col are swapped
     pfm.ncol=nrow[0];
     pfm.nrow=ncol[0];
@@ -85,9 +81,7 @@ SEXP Rscoredist_bf(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     DMatrix pfm;
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
-    if (pfm.data==NULL) {
-        error("Rscoredist_bf: Memory allocation failed");
-    }
+
     // Rcol and c-col are swapped
     pfm.ncol=nrow[0];
     pfm.nrow=ncol[0];

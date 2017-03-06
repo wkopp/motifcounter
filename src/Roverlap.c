@@ -13,17 +13,9 @@ void Roverlap(double *pfm_, int *nrow, int *ncol,
     double dx, pvalue;
     DMatrix pfm, cpfm;
 
-    if (!beta||!beta3p||!beta5p) {
-        error("parameters are null");
-        return;
-    }
-    if (Rgran==0.0 || Rsiglevel==0.0) {
-        error("call mdist.option  first");
-        return;
-    }
-
     pfm.data=Calloc(nrow[0]*ncol[0],double);
     cpfm.data=Calloc(nrow[0]*ncol[0],double);
+
     // Rcol and c-col are swapped
     pfm.ncol=nrow[0];
     cpfm.ncol=nrow[0];
@@ -66,15 +58,6 @@ void RoverlapSingleStranded(double *pfm_, int *nrow, int *ncol,
     int i;
     double dx, pvalue;
     DMatrix pfm, cpfm;
-
-    if (!beta||!beta3p||!beta5p) {
-        error("parameters are null");
-        return;
-    }
-    if (Rgran==0.0 || Rsiglevel==0.0) {
-        error("call mdist.option  first");
-        return;
-    }
 
     pfm.data=Calloc(nrow[0]*ncol[0],double);
     cpfm.data=Calloc(nrow[0]*ncol[0],double);
