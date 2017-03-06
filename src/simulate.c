@@ -12,52 +12,52 @@
 #include "score1d.h"
 
 char sampleNucleotide(double *prob) {
-    double ip=unif_rand();
+    double ip = unif_rand();
     double p;
-    double cumprob=0.0;
+    double cumprob = 0.0;
     char n;
     int i;
 
-    p=(double)(ip);
-    for (i=0; i<ALPHABETSIZE; i++) {
-        cumprob+=prob[i];
-        if(p<=cumprob) {
+    p = (double)(ip);
+    for (i = 0; i < ALPHABETSIZE; i++) {
+        cumprob += prob[i];
+        if(p <= cumprob) {
             break;
         }
     }
-    if (i==4)
-        n= getNuc(i-1);
+    if (i == 4)
+        n = getNuc(i - 1);
     else
-        n= getNuc(i);
+        n = getNuc(i);
     return n;
 }
 
 void sampleInitialNucleotide(double *prob, char *seq, int order) {
-    double ip=unif_rand();
+    double ip = unif_rand();
     double p;
-    double cumprob=0.0;
+    double cumprob = 0.0;
     int i, ass[order];
 
-    p=(double)(ip);
-    for (i=0; i<power(ALPHABETSIZE, order); i++) {
-        cumprob+=prob[i];
-        if(p<=cumprob) {
+    p = (double)(ip);
+    for (i = 0; i < power(ALPHABETSIZE, order); i++) {
+        cumprob += prob[i];
+        if(p <= cumprob) {
             break;
         }
     }
     getAssignmentFromIndex(i, order, ass);
-    for(i=0;i<order; i++) {
-        seq[i]=getNuc(ass[i]);
+    for(i = 0; i < order; i++) {
+        seq[i] = getNuc(ass[i]);
     }
 }
 
 void generateRandomSequence(double *station, double *trans, char *seq,
-        int seqlen, int order) {
+                            int seqlen, int order) {
     int i, ind;
 
     sampleInitialNucleotide(station, seq, order);
-    for (i=order; i<seqlen; i++) {
-        ind=getIndexFromAssignment(&seq[i-order], order);
-        seq[i]=sampleNucleotide(&trans[ind*ALPHABETSIZE]);
+    for (i = order; i < seqlen; i++) {
+        ind = getIndexFromAssignment(&seq[i - order], order);
+        seq[i] = sampleNucleotide(&trans[ind * ALPHABETSIZE]);
     }
 }

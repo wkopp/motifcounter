@@ -7,12 +7,12 @@
 
 
 typedef struct {
-    int nrow,ncol;
+    int nrow, ncol;
     double *data;
 } DMatrix;
 
 typedef struct {
-    int nrow,ncol;
+    int nrow, ncol;
     int *data;
 } IMatrix;
 

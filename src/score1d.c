@@ -17,58 +17,61 @@
 #include "background.h"
 
 double getQuantileWithIndex1d(MotifScore1d *s, int qi) {
-    return (double)(s->meta.xmin + qi)*s->meta.dx;
+    return (double)(s->meta.xmin + qi) * s->meta.dx;
 }
 
 int getQuantileIndex1d(Score1d *s, double pvalue) {
-    int i, x=1;
-    double p=0;
-    for (i=s->end; i>=0; i--) {
-        p+=s->y[i];
-        if (pvalue<p) { break;}
-        if(s->y[i]==0.0) {
+    int i, x = 1;
+    double p = 0;
+    for (i = s->end; i >= 0; i--) {
+        p += s->y[i];
+        if (pvalue < p) {
+            break;
+        }
+        if(s->y[i] == 0.0) {
             x++;
         } else {
-            x=1;
+            x = 1;
         }
     }
-    return i+x;
+    return i + x;
 }
 
 void initScore1d(Score1d *s, int l) {
-    s->y=Calloc(l, double);
-    s->end=0;
-    s->merged=0;
-    s->start=l;
+    s->y = Calloc(l, double);
+    s->end = 0;
+    s->merged = 0;
+    s->start = l;
 }
 
-int initScoreDistribution1d (DMatrix *theta, double *bg1, 
-        MotifScore1d *result, int order) {
+int initScoreDistribution1d (DMatrix *theta, double *bg1,
+                             MotifScore1d *result, int order) {
     int i;
 
-    initScore1d(&result->totalScore, result->meta.length+1);
+    initScore1d(&result->totalScore, result->meta.length + 1);
 
-    result->mlen=theta->nrow;
-    result->ScoreBuffer1=Calloc(power(ALPHABETSIZE, order)*theta->nrow, Score1d);
-    result->tmpScore=Calloc(power(ALPHABETSIZE, order+1), Score1d);
+    result->mlen = theta->nrow;
+    result->ScoreBuffer1 = Calloc(power(ALPHABETSIZE, order) * theta->nrow,
+                                  Score1d);
+    result->tmpScore = Calloc(power(ALPHABETSIZE, order + 1), Score1d);
 
-    for (i=0; i < power(ALPHABETSIZE, order)*theta->nrow; i++) {
-        initScore1d(&result->ScoreBuffer1[i], result->meta.length+1);
+    for (i = 0; i < power(ALPHABETSIZE, order)*theta->nrow; i++) {
+        initScore1d(&result->ScoreBuffer1[i], result->meta.length + 1);
     }
 
-    for (i=0; i < power(ALPHABETSIZE, order+1); i++) {
-        initScore1d(&result->tmpScore[i], result->meta.length+1);
+    for (i = 0; i < power(ALPHABETSIZE, order + 1); i++) {
+        initScore1d(&result->tmpScore[i], result->meta.length + 1);
     }
-  return 0;
+    return 0;
 }
 
 int deleteScoreDistribution1d(MotifScore1d *m, int order) {
     int j;
 
-    for (j=0; j < power(ALPHABETSIZE, order)*m->mlen; j++) {
+    for (j = 0; j < power(ALPHABETSIZE, order)*m->mlen; j++) {
         Free(m->ScoreBuffer1[j].y);
     }
-    for (j=0; j < power(ALPHABETSIZE, order+1); j++) {
+    for (j = 0; j < power(ALPHABETSIZE, order + 1); j++) {
         Free(m->tmpScore[j].y);
     }
 
@@ -80,42 +83,42 @@ int deleteScoreDistribution1d(MotifScore1d *m, int order) {
 }
 
 void resetScore1d(Score1d *score, ScoreMetaInfo *meta) {
-    memset(score->y,0,(meta->length)*sizeof(double));
-    score->start=meta->length;
-    score->end=0;
+    memset(score->y, 0, (meta->length)*sizeof(double));
+    score->start = meta->length;
+    score->end = 0;
 }
 
 void addScore1d(Score1d *a, Score1d *b, ScoreMetaInfo *meta) {
     int i;
     if (b->start > b->end) return;
-    a->start=(a->start<b->start) ? a->start : b->start;
-    a->end=(a->end>b->end) ? a->end : b->end;
-    #ifdef _OPENMP
+    a->start = (a->start < b->start) ? a->start : b->start;
+    a->end = (a->end > b->end) ? a->end : b->end;
+#ifdef _OPENMP
     #pragma omp parallel for default(none) shared(a,b) private(i)
-    #endif
-    for (i=b->start; i<=b->end;i++) {
-        a->y[i]+=b->y[i];
+#endif
+    for (i = b->start; i <= b->end; i++) {
+        a->y[i] += b->y[i];
     }
 }
 
-static void ShiftMultiplyScoreIndex1d(Score1d *dest, Score1d *src, 
-  int *ds, double p, int lprev, int uprev, int lcur, int ucur) {
+static void ShiftMultiplyScoreIndex1d(Score1d *dest, Score1d *src,
+                                      int *ds, double p, int lprev, int uprev, int lcur, int ucur) {
     int i;
     int restinterval;
 
-    
+
     if (src->start > src->end) return;
     if (p == 0.0) return;
 
-    // lprev and lcur are used to reconstruct the absolute 
+    // lprev and lcur are used to reconstruct the absolute
     // index, since we are only
     // using relative indexes with src->start and src->end
     //
     // compute putative dest->start
-    // if dest->start < 0, set start to 0. probability 
+    // if dest->start < 0, set start to 0. probability
     // mass is dropped out then, because
     // it cannot reach the threshold anymore.
-    // if dest->end > intervalsize at this position, 
+    // if dest->end > intervalsize at this position,
     // set dest->end to lcur + intervalsize.
     // probability mass beyond that cannot deceed the threshold.
     // use memmove to copy the values between dest->start and dest->end.
@@ -123,58 +126,60 @@ static void ShiftMultiplyScoreIndex1d(Score1d *dest, Score1d *src,
     //
     // finally multiply all values in dest->y by p.
 
-    dest->start = src->start-lcur+lprev+*ds;
-    if (dest->start<0) {
-        src->start-=dest->start;
-        dest->start=0;
+    dest->start = src->start - lcur + lprev + *ds;
+    if (dest->start < 0) {
+        src->start -= dest->start;
+        dest->start = 0;
     }
 
-    dest->end = src->end-lcur+lprev+*ds;
-    if (dest->end > ucur -lcur) {
-        restinterval=dest->end- ucur+lcur;
-        dest->end=ucur -lcur;
+    dest->end = src->end - lcur + lprev + *ds;
+    if (dest->end > ucur - lcur) {
+        restinterval = dest->end - ucur + lcur;
+        dest->end = ucur - lcur;
     } else {
-        restinterval=0;
+        restinterval = 0;
     }
 
-    if (dest->start>dest->end) { return; }
+    if (dest->start > dest->end) {
+        return;
+    }
 
-    memmove(&dest->y[dest->start],&src->y[src->start], 
-            (dest->end-dest->start+1)*sizeof(double));
+    memmove(&dest->y[dest->start], &src->y[src->start],
+            (dest->end - dest->start + 1)*sizeof(double));
 
-    #ifdef _OPENMP
+#ifdef _OPENMP
     #pragma omp parallel for default(none) shared(p,dest) private(i)
-    #endif
-    for (i=dest->start; i<=dest->end;i++) {
-        dest->y[i]*=p;
+#endif
+    for (i = dest->start; i <= dest->end; i++) {
+        dest->y[i] *= p;
     }
-    for (i=0; i<restinterval;i++) {
-        dest->y[dest->end]+=src->y[src->start+dest->end-dest->start+1+i]*p;
+    for (i = 0; i < restinterval; i++) {
+        dest->y[dest->end] += src->y[src->start + dest->end - dest->start + 1 + i] * p;
     }
 }
 
-int computeTotalScoreDistribution1d(MotifScore1d *mscore, 
-        ExtremalScore *tm, int order) {
+int computeTotalScoreDistribution1d(MotifScore1d *mscore,
+                                    ExtremalScore *tm, int order) {
 
-    int i=0, k;
-    int lmin=getTotalScoreLowerBound(tm);
-    int *lbound=getLastScoreLowerBound(tm);
-    Score1d *a,*b;
-    a=&mscore->totalScore;
-    for (i=0; i<power(ALPHABETSIZE,order); i++) {
-        b=&mscore->ScoreBuffer1[power(ALPHABETSIZE,order)*(mscore->mlen-1) + i];
+    int i = 0, k;
+    int lmin = getTotalScoreLowerBound(tm);
+    int *lbound = getLastScoreLowerBound(tm);
+    Score1d *a, *b;
+    a = &mscore->totalScore;
+    for (i = 0; i < power(ALPHABETSIZE, order); i++) {
+        b = &mscore->ScoreBuffer1[power(ALPHABETSIZE, order) * (mscore->mlen - 1) + i];
 
-        if (b->start>b->end) return 0;
-        a->start=(a->start<b->start+lbound[i]-lmin) ? 
-                        a->start : b->start+lbound[i]-lmin;
-        a->end=(a->end>b->end+lbound[i]-lmin) ? 
-                        a->end : b->end+lbound[i]-lmin;
-        #ifdef _OPENMP
+        if (b->start > b->end) return 0;
+        a->start = (a->start < b->start + lbound[i] - lmin) ?
+                   a->start : b->start + lbound[i] - lmin;
+        a->end = (a->end > b->end + lbound[i] - lmin) ?
+                 a->end : b->end + lbound[i] - lmin;
+#ifdef _OPENMP
         #pragma omp parallel for default(none) \
-                    shared(a,b,lbound,lmin, i) private(k)
-        #endif
-        for (k=b->start; k<=b->end;k++) {
-            a->y[k+lbound[i]-lmin]+=b->y[k];
+        shared(a,b,lbound,lmin, i) private(k)
+#endif
+        for (k = b->start; k <= b->end; k++) {
+            a->y[k + lbound[i] - lmin] += b->y[k];
         }
     }
     return 0;
@@ -182,153 +187,157 @@ int computeTotalScoreDistribution1d(MotifScore1d *mscore,
 
 #define DEBUG
 #undef DEBUG
-void cutScoreRangeWithThreshold(MotifScore1d *mscore, 
-        ExtremalScore *tm, int order) {
+void cutScoreRangeWithThreshold(MotifScore1d *mscore,
+                                ExtremalScore *tm, int order) {
     int m, i, l;
     int start, end, rest;
-    if (order==0) {
-        m=0;
+    if (order == 0) {
+        m = 0;
     } else {
-        m=order-1;
+        m = order - 1;
     }
 
-    for (; m<tm->len;m++) {
-        for (i=0; i<power(ALPHABETSIZE, order); i++) {
-            if(getScoreUpperBoundUnconstrainted(tm,m,i)<
+    for (; m < tm->len; m++) {
+        for (i = 0; i < power(ALPHABETSIZE, order); i++) {
+            if(getScoreUpperBoundUnconstrainted(tm, m, i) <
                     getScoreLowerBound(tm, m, i)) {
-                memset(mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, 
-                            order) +i].y, 0,
-                mscore->meta.length*sizeof(double));
-                mscore->ScoreBuffer1[m*power(ALPHABETSIZE, order) +i].start=1;
-                mscore->ScoreBuffer1[m*power(ALPHABETSIZE, order) +i].end=0;
+                memset(mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE,
+                                                      order) + i].y, 0,
+                       mscore->meta.length * sizeof(double));
+                mscore->ScoreBuffer1[m * power(ALPHABETSIZE, order) + i].start = 1;
+                mscore->ScoreBuffer1[m * power(ALPHABETSIZE, order) + i].end = 0;
                 continue;
             }
-            start=getScoreLowerBound(tm, m, i)-
-                        getScoreLowerBoundUnconstrainted(tm,m,i);
-            end=getScoreUpperBound(tm, m, i)-
-                        getScoreLowerBoundUnconstrainted(tm,m,i);
-            rest=getScoreUpperBoundUnconstrainted(tm,m,i) - 
-                        getScoreUpperBound(tm, m, i);
-            if (start<0) {
-                start=0; end=0; rest=0;
+            start = getScoreLowerBound(tm, m, i) -
+                    getScoreLowerBoundUnconstrainted(tm, m, i);
+            end = getScoreUpperBound(tm, m, i) -
+                  getScoreLowerBoundUnconstrainted(tm, m, i);
+            rest = getScoreUpperBoundUnconstrainted(tm, m, i) -
+                   getScoreUpperBound(tm, m, i);
+            if (start < 0) {
+                start = 0;
+                end = 0;
+                rest = 0;
             }
 
-            mscore->ScoreBuffer1[m*power(ALPHABETSIZE, order) +i].start=0;
-            mscore->ScoreBuffer1[m*power(ALPHABETSIZE, order) +i].end=
-            getScoreUpperBound(tm,m,i)-getScoreLowerBound(tm, m, i);
+            mscore->ScoreBuffer1[m * power(ALPHABETSIZE, order) + i].start = 0;
+            mscore->ScoreBuffer1[m * power(ALPHABETSIZE, order) + i].end =
+                            getScoreUpperBound(tm, m, i) - getScoreLowerBound(tm, m, i);
 
-            if (start>0) {
-                if (mscore->meta.length>start) {
-                    memset(mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, 
-                        order) +i].y, 0, start*sizeof(double));
+            if (start > 0) {
+                if (mscore->meta.length > start) {
+                    memset(mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE,
+                                                          order) + i].y, 0, start * sizeof(double));
                 } else {
-                    memset(mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, 
-                        order) +i].y, 0, mscore->meta.length*sizeof(double));
+                    memset(mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE,
+                                                          order) + i].y, 0, mscore->meta.length * sizeof(double));
                 }
             }
-            for (l=0; l<=end-start; l++) {
-                mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, order) +i].y[l]=
-                mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, 
-                        order) +i].y[l+start];
-                if (start>0) {
-                    mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, 
-                            order) +i].y[l+start]=0;
+            for (l = 0; l <= end - start; l++) {
+                mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, order) + i].y[l] =
+                                mscore->ScoreBuffer1[(m) * power(ALPHABETSIZE,
+                                                     order) + i].y[l + start];
+                if (start > 0) {
+                    mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE,
+                                                   order) + i].y[l + start] = 0;
                 }
             }
-            for (l=0; l<rest; l++) {
-                mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, order) 
-                    +i].y[end-start]+= mscore->ScoreBuffer1[
-                         (m)*power(ALPHABETSIZE, order) +i].y[l+end+1];
-                mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, order) 
-                        +i].y[l+end+1]=0;
+            for (l = 0; l < rest; l++) {
+                mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, order)
+                                     + i].y[end - start] += mscore->ScoreBuffer1[
+                                             (m) * power(ALPHABETSIZE, order) + i].y[l + end + 1];
+                mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, order)
+                                     + i].y[l + end + 1] = 0;
             }
 #ifndef IN_R
 #ifdef DEBUG
-            fprintf(stdout, "m=%d, i=%d, [%d,%d]\n",m, i,
-                mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, order) +i].start,
-                mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, order) +i].end);
+            fprintf(stdout, "m=%d, i=%d, [%d,%d]\n", m, i,
+                    mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, order) + i].start,
+                    mscore->ScoreBuffer1[(m)*power(ALPHABETSIZE, order) + i].end);
 #endif
 #endif
         }
     }
     resetScore1d(&mscore->totalScore, &mscore->meta);
-    for (i=0; i<power(ALPHABETSIZE, order); i++) {
-        mscore->totalScore.y[0]+=mscore->ScoreBuffer1[
-            (tm->len-1)*power(ALPHABETSIZE, order) +i].y[0];
+    for (i = 0; i < power(ALPHABETSIZE, order); i++) {
+        mscore->totalScore.y[0] += mscore->ScoreBuffer1[
+                (tm->len - 1) * power(ALPHABETSIZE, order) + i].y[0];
     }
-    mscore->totalScore.start=0;
-    mscore->totalScore.end=0;
+    mscore->totalScore.start = 0;
+    mscore->totalScore.end = 0;
 }
 
-int computeScoreDistribution1d(DMatrix *pwm, double *trans, 
-  double *station, MotifScore1d *mscore, 
-  ExtremalScore *tm, int order) {
-    int i,m,j, ji, k, K, corder;
-    int score[power(ALPHABETSIZE, order+1)];
+int computeScoreDistribution1d(DMatrix *pwm, double *trans,
+                               double *station, MotifScore1d *mscore,
+                               ExtremalScore *tm, int order) {
+    int i, m, j, ji, k, K, corder;
+    int score[power(ALPHABETSIZE, order + 1)];
 
-    corder=((order==0) ? (order+1) : order);
-    getScoresInitialIndex(pwm->data,station, score, &mscore->meta.dx, order);
+    corder = ((order == 0) ? (order + 1) : order);
+    getScoresInitialIndex(pwm->data, station, score, &mscore->meta.dx, order);
 
 
-    for (i=0; i<power(ALPHABETSIZE, order); i++) {
+    for (i = 0; i < power(ALPHABETSIZE, order); i++) {
         resetScore1d(&mscore->ScoreBuffer1[i], &mscore->meta);
-        if (order==0) {
-            k=0;
-            K=ALPHABETSIZE;
+        if (order == 0) {
+            k = 0;
+            K = ALPHABETSIZE;
         } else {
-            k=i;
-            K=i+1;
+            k = i;
+            K = i + 1;
         }
-        mscore->ScoreBuffer1[(corder-1)*power(ALPHABETSIZE, order) +i].start=0;
-        mscore->ScoreBuffer1[(corder-1)*power(ALPHABETSIZE, order) +i].end=
-            getScoreUpperBound(tm,corder-1,i)-
-            getScoreLowerBound(tm, corder-1, i);
+        mscore->ScoreBuffer1[(corder - 1)*power(ALPHABETSIZE, order) + i].start = 0;
+        mscore->ScoreBuffer1[(corder - 1)*power(ALPHABETSIZE, order) + i].end =
+                        getScoreUpperBound(tm, corder - 1, i) -
+                        getScoreLowerBound(tm, corder - 1, i);
 
-        for (;k<K;k++) {
-            if (score[k]<getScoreLowerBound(tm, corder-1, i)) { continue; }
+        for (; k < K; k++) {
+            if (score[k] < getScoreLowerBound(tm, corder - 1, i)) {
+                continue;
+            }
 
-            mscore->ScoreBuffer1[(corder-1)*power(ALPHABETSIZE, order) +i].y[
-            score[k]-getScoreLowerBound(tm,corder-1,i)]+=
-            mscore->meta.probinit(station[k],pwm->data, k, corder);
+            mscore->ScoreBuffer1[(corder - 1)*power(ALPHABETSIZE, order) + i].y[
+                            score[k] - getScoreLowerBound(tm, corder - 1, i)] +=
+                                            mscore->meta.probinit(station[k], pwm->data, k, corder);
         }
     }
 
-    for (m=corder; m<pwm->nrow;m++) {
+    for (m = corder; m < pwm->nrow; m++) {
         R_CheckUserInterrupt();
-        for (i=0; i<power(ALPHABETSIZE, order); i++) {
-            getScoresIndex(&pwm->data[m*ALPHABETSIZE],&trans[i*ALPHABETSIZE], 
-                        score,&mscore->meta.dx);
+        for (i = 0; i < power(ALPHABETSIZE, order); i++) {
+            getScoresIndex(&pwm->data[m * ALPHABETSIZE], &trans[i * ALPHABETSIZE],
+                           score, &mscore->meta.dx);
 
-            for (j=0; j<ALPHABETSIZE; j++) {
+            for (j = 0; j < ALPHABETSIZE; j++) {
 
-                resetScore1d(&mscore->tmpScore[i*ALPHABETSIZE+j], 
-                        &mscore->meta);
-                if (order>0) {
-                    ji=i*ALPHABETSIZE + j;
-                    ji-=(ji/power(ALPHABETSIZE, order))*
-                        power(ALPHABETSIZE, order);
+                resetScore1d(&mscore->tmpScore[i * ALPHABETSIZE + j],
+                             &mscore->meta);
+                if (order > 0) {
+                    ji = i * ALPHABETSIZE + j;
+                    ji -= (ji / power(ALPHABETSIZE, order)) *
+                          power(ALPHABETSIZE, order);
                 } else {
-                    ji=0;
+                    ji = 0;
                 }
 
-                ShiftMultiplyScoreIndex1d(&mscore->tmpScore[i*ALPHABETSIZE+j], 
-                    &mscore->ScoreBuffer1[(m-1)*power(ALPHABETSIZE, order)+i], 
-                    &score[j],
-                    mscore->meta.prob(trans[i*ALPHABETSIZE+j], 
-                        pwm->data[m*ALPHABETSIZE +j]),
-                    getScoreLowerBound(tm, m-1, i),
-                    getScoreUpperBound(tm, m-1, i),
-                    getScoreLowerBound(tm, m, ji),
-                    getScoreUpperBound(tm, m, ji));
+                ShiftMultiplyScoreIndex1d(&mscore->tmpScore[i * ALPHABETSIZE + j],
+                                          &mscore->ScoreBuffer1[(m - 1)*power(ALPHABETSIZE, order) + i],
+                                          &score[j],
+                                          mscore->meta.prob(trans[i * ALPHABETSIZE + j],
+                                                  pwm->data[m * ALPHABETSIZE + j]),
+                                          getScoreLowerBound(tm, m - 1, i),
+                                          getScoreUpperBound(tm, m - 1, i),
+                                          getScoreLowerBound(tm, m, ji),
+                                          getScoreUpperBound(tm, m, ji));
 
             }
         }
-        for (i=0; i<power(ALPHABETSIZE, order); i++) {
-            for (j=0; j<ALPHABETSIZE; j++) {
-                addScore1d(&mscore->ScoreBuffer1[m*power(ALPHABETSIZE, 
-                            order) +i], 
-                &mscore->tmpScore[i +j*power(ALPHABETSIZE, 
-                    order)], &mscore->meta);
+        for (i = 0; i < power(ALPHABETSIZE, order); i++) {
+            for (j = 0; j < ALPHABETSIZE; j++) {
+                addScore1d(&mscore->ScoreBuffer1[m * power(ALPHABETSIZE,
+                                                   order) + i],
+                           &mscore->tmpScore[i + j * power(ALPHABETSIZE,
+                                               order)], &mscore->meta);
             }
         }
     }
@@ -337,51 +346,51 @@ int computeScoreDistribution1d(DMatrix *pwm, double *trans,
     return 0;
 }
 
-int computeMarginalScoreDistribution1dBruteForce(DMatrix *pwm, double *trans, 
-  double *station, MotifScore1d *mscore, int xmin, int order) {
+int computeMarginalScoreDistribution1dBruteForce(DMatrix *pwm, double *trans,
+        double *station, MotifScore1d *mscore, int xmin, int order) {
     int i, n, x, l1;
     int si, cletter, prefix, s;
-    int score[power(ALPHABETSIZE, order+1)];
+    int score[power(ALPHABETSIZE, order + 1)];
     double p;
-    int corder=order;
-    if (corder==0) corder++;
+    int corder = order;
+    if (corder == 0) corder++;
 
-    getScoresInitialIndex(pwm->data,station, score, &mscore->meta.dx, order);
+    getScoresInitialIndex(pwm->data, station, score, &mscore->meta.dx, order);
 
-    for (i=0; i<power(ALPHABETSIZE,pwm->nrow); i++) {
+    for (i = 0; i < power(ALPHABETSIZE, pwm->nrow); i++) {
 
-        prefix=i/power(ALPHABETSIZE, pwm->nrow-corder);
+        prefix = i / power(ALPHABETSIZE, pwm->nrow - corder);
 
-        si=score[prefix];
-        if (order>0) {
-            p=mscore->meta.probinit(station[prefix], pwm->data,prefix,order);
+        si = score[prefix];
+        if (order > 0) {
+            p = mscore->meta.probinit(station[prefix], pwm->data, prefix, order);
         } else {
-            p=mscore->meta.probinit(station[prefix], pwm->data,prefix,order+1);
+            p = mscore->meta.probinit(station[prefix], pwm->data, prefix, order + 1);
         }
 
-        l1=i-prefix*power(ALPHABETSIZE, pwm->nrow-corder);
+        l1 = i - prefix * power(ALPHABETSIZE, pwm->nrow - corder);
 
-        prefix=(order==0) ? 0 : prefix;
-        for (n=corder; n< pwm->nrow;n++) {
-            cletter=l1/power(ALPHABETSIZE, pwm->nrow-n-1);
+        prefix = (order == 0) ? 0 : prefix;
+        for (n = corder; n < pwm->nrow; n++) {
+            cletter = l1 / power(ALPHABETSIZE, pwm->nrow - n - 1);
 
-            l1-=cletter*power(ALPHABETSIZE, pwm->nrow-n-1);
-            s=getScoreIndex(pwm->data[n*ALPHABETSIZE+cletter],
-                trans[prefix*ALPHABETSIZE+ cletter], mscore->meta.dx);
-            p*=mscore->meta.prob(trans[prefix*ALPHABETSIZE + cletter], 
-            pwm->data[n*ALPHABETSIZE + cletter]);
+            l1 -= cletter * power(ALPHABETSIZE, pwm->nrow - n - 1);
+            s = getScoreIndex(pwm->data[n * ALPHABETSIZE + cletter],
+                              trans[prefix * ALPHABETSIZE + cletter], mscore->meta.dx);
+            p *= mscore->meta.prob(trans[prefix * ALPHABETSIZE + cletter],
+                                   pwm->data[n * ALPHABETSIZE + cletter]);
 
-            si+=s;
+            si += s;
 
-            x=prefix*ALPHABETSIZE+cletter;
-            x-=(x/power(ALPHABETSIZE, order))*power(ALPHABETSIZE, order);
-            prefix=x;
+            x = prefix * ALPHABETSIZE + cletter;
+            x -= (x / power(ALPHABETSIZE, order)) * power(ALPHABETSIZE, order);
+            prefix = x;
         }
-        mscore->totalScore.y[si-xmin]+=p;
+        mscore->totalScore.y[si - xmin] += p;
     }
 
-    mscore->totalScore.start=0;
-    mscore->totalScore.end=mscore->meta.xmax-mscore->meta.xmin;
+    mscore->totalScore.start = 0;
+    mscore->totalScore.end = mscore->meta.xmax - mscore->meta.xmin;
 
     return 0;
 }

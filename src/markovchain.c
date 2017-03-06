@@ -21,45 +21,45 @@
 
 double OverlapHit(int N, double *beta, double *betap) {
     int i;
-    double d=1.0, n=1.0;
+    double d = 1.0, n = 1.0;
 
     //if (N<0 || N>=Rpwm->nrow) error("wrong index, i=%d\n", N);
 
     // beta ... forward hit
     // betap .. reverse hit either 3p or 5p
     // compute denuminator
-    for (i=0; i<N; i++) {
-        d-=(beta[i]+betap[i]);
+    for (i = 0; i < N; i++) {
+        d -= (beta[i] + betap[i]);
     }
-    n=(beta[N]);
-    if (d<=0.0) return 0.0;
+    n = (beta[N]);
+    if (d <= 0.0) return 0.0;
 
-    return (n/d);
+    return (n / d);
 }
 
 double NoOverlapHit(int N, double *beta, double *betap) {
     int i;
-    double d=1.0, n=1.0;
+    double d = 1.0, n = 1.0;
 
     //if (N<0) error("wrong index, i=%d\n", N);
 
     // beta ... forward hit
     // betap .. reverse hit either 3p or 5p
     // compute denuminator
-    for (i=0; i<N; i++) {
-        d-=(beta[i]+betap[i]);
+    for (i = 0; i < N; i++) {
+        d -= (beta[i] + betap[i]);
     }
-    n=d-(beta[N]+betap[N]);
-    if (d<=0.0) return 0.0;
+    n = d - (beta[N] + betap[N]);
+    if (d <= 0.0) return 0.0;
 
-    return (n/d);
+    return (n / d);
 }
 
 #undef DEBUG
 #define DEBUG
-static double *Rdist=NULL;
+static double *Rdist = NULL;
 void markovchain(double *dist, double *a,
- double *beta, double *beta3p, double *beta5p, int slen, int motiflen) {
+                 double *beta, double *beta3p, double *beta5p, int slen, int motiflen) {
     int i, k;
     double *post, *prior;
     double alphacond;
@@ -72,56 +72,56 @@ void markovchain(double *dist, double *a,
     // dist[3 ... 3+M-1] ... p(n0), ... , p(nL)
     // dist[3+M, ..., 3+M+M-2] ... p(n1'), ..., p(nL')
     //
-    post=Calloc(2*motiflen+2, double);
-    prior=dist;
-    alphacond=a[0];
-    memset(prior, 0, (2*motiflen+2)*sizeof(double));
-    prior[0]=1.;
+    post = Calloc(2 * motiflen + 2, double);
+    prior = dist;
+    alphacond = a[0];
+    memset(prior, 0, (2 * motiflen + 2)*sizeof(double));
+    prior[0] = 1.;
 
-    for (k=0; k<slen; k++) {
+    for (k = 0; k < slen; k++) {
         // P(N)
-        post[0]=(1-alphacond*(2-beta3p[0]))*(prior[0]+prior[motiflen+2] +
-        prior[2*motiflen+1]);
+        post[0] = (1 - alphacond * (2 - beta3p[0])) * (prior[0] + prior[motiflen + 2] +
+                  prior[2 * motiflen + 1]);
 
         // P(Hf)
-        post[1]=alphacond*(prior[0]+prior[motiflen+2] +
-            prior[2*motiflen+1]);
+        post[1] = alphacond * (prior[0] + prior[motiflen + 2] +
+                               prior[2 * motiflen + 1]);
 
-        for (i=1;i<motiflen;i++) {
-            post[1]+=OverlapHit(i, beta, beta3p)*prior[3+i-1];
+        for (i = 1; i < motiflen; i++) {
+            post[1] += OverlapHit(i, beta, beta3p) * prior[3 + i - 1];
         }
-        for (i=2;i<motiflen;i++) {
-            post[1]+=OverlapHit(i, beta5p, beta)*prior[motiflen+3+i-2];
+        for (i = 2; i < motiflen; i++) {
+            post[1] += OverlapHit(i, beta5p, beta) * prior[motiflen + 3 + i - 2];
         }
-        post[1]+=beta5p[1]*prior[2];
+        post[1] += beta5p[1] * prior[2];
 
 
         // P(Hr)
-        post[2]=alphacond*(1-beta3p[0])*(prior[0]+prior[motiflen+2] +
-            prior[2*motiflen+1]);
-        for (i=2;i<motiflen;i++) {
-            post[2]+=OverlapHit(i, beta, beta5p)*prior[motiflen+3+i-2];
+        post[2] = alphacond * (1 - beta3p[0]) * (prior[0] + prior[motiflen + 2] +
+                  prior[2 * motiflen + 1]);
+        for (i = 2; i < motiflen; i++) {
+            post[2] += OverlapHit(i, beta, beta5p) * prior[motiflen + 3 + i - 2];
         }
-        for (i=1;i<motiflen;i++) {
-            post[2]+=OverlapHit(i, beta3p, beta)*prior[3+i-1];
+        for (i = 1; i < motiflen; i++) {
+            post[2] += OverlapHit(i, beta3p, beta) * prior[3 + i - 1];
         }
         // should i switch this line
-        post[2]+=beta3p[0]*prior[1];
-        post[2]+=beta[1]*prior[2];
+        post[2] += beta3p[0] * prior[1];
+        post[2] += beta[1] * prior[2];
 
         // P(n0)
-        post[3]=NoOverlapHit(0, beta, beta3p)*prior[1];
-        for (i=1;i<motiflen;i++) {
-            post[3+i]=NoOverlapHit(i, beta,beta3p)*prior[3+i-1];
+        post[3] = NoOverlapHit(0, beta, beta3p) * prior[1];
+        for (i = 1; i < motiflen; i++) {
+            post[3 + i] = NoOverlapHit(i, beta, beta3p) * prior[3 + i - 1];
         }
         // P(n1')
-        post[3+motiflen]=NoOverlapHit(1, beta, beta5p)*prior[2];
-        for (i=2;i<motiflen;i++) {
-            post[motiflen+3+i-1]=NoOverlapHit(i, beta,beta5p)*
-                prior[motiflen+3+i-2];
+        post[3 + motiflen] = NoOverlapHit(1, beta, beta5p) * prior[2];
+        for (i = 2; i < motiflen; i++) {
+            post[motiflen + 3 + i - 1] = NoOverlapHit(i, beta, beta5p) *
+                                         prior[motiflen + 3 + i - 2];
         }
-        memcpy(prior, post, (2*motiflen+2)*sizeof(double));
-        memset(post, 0, (2*motiflen+2)*sizeof(double));
+        memcpy(prior, post, (2 * motiflen + 2)*sizeof(double));
+        memset(post, 0, (2 * motiflen + 2)*sizeof(double));
     }
 
     Free(post);
@@ -130,54 +130,54 @@ void markovchain(double *dist, double *a,
 void dmc(int n, double *alphacond, double *gradient, void *ex) {
 
     double val;
-    CGParams *cgparams=(CGParams*)ex;
+    CGParams *cgparams = (CGParams *)ex;
     double epsilon;
-    double pa,ma;
+    double pa, ma;
 
 
 
     if (!Rdist) {
-        Rdist=Calloc(2*cgparams->motiflen+2, double);
+        Rdist = Calloc(2 * cgparams->motiflen + 2, double);
     }
 
-    epsilon=alphacond[0]/1000;
-    pa=*alphacond + epsilon;
-    ma=*alphacond - epsilon;
+    epsilon = alphacond[0] / 1000;
+    pa = *alphacond + epsilon;
+    ma = *alphacond - epsilon;
     markovchain(Rdist, &pa, cgparams->beta,
-            cgparams->beta3p, cgparams->beta5p,
-            cgparams->len,cgparams->motiflen);
+                cgparams->beta3p, cgparams->beta5p,
+                cgparams->len, cgparams->motiflen);
 
-    val=Rdist[1]+Rdist[2];
+    val = Rdist[1] + Rdist[2];
     markovchain(Rdist, &ma, cgparams->beta,
-            cgparams->beta3p, cgparams->beta5p,
-            cgparams->len,cgparams->motiflen);
+                cgparams->beta3p, cgparams->beta5p,
+                cgparams->len, cgparams->motiflen);
 
-    val-=(Rdist[1]+Rdist[2]);
-    val/=2*epsilon;
+    val -= (Rdist[1] + Rdist[2]);
+    val /= 2 * epsilon;
 
     markovchain(Rdist, alphacond, cgparams->beta,
-            cgparams->beta3p, cgparams->beta5p,
-            cgparams->len,cgparams->motiflen);
+                cgparams->beta3p, cgparams->beta5p,
+                cgparams->len, cgparams->motiflen);
 
-    *gradient=-2*(2*cgparams->alpha-Rdist[1]-Rdist[2])*val;
+    *gradient = -2 * (2 * cgparams->alpha - Rdist[1] - Rdist[2]) * val;
 }
 double minmc(int n, double *alpha, void *ex) {
 
     //double *extra=(double*)ex;
-    CGParams *cgparams=(CGParams*)ex;
+    CGParams *cgparams = (CGParams *)ex;
 
     if (!Rdist) {
-        Rdist=Calloc(2*cgparams->motiflen+2, double);
+        Rdist = Calloc(2 * cgparams->motiflen + 2, double);
     }
 
     markovchain(Rdist, alpha, cgparams->beta,
-            cgparams->beta3p, cgparams->beta5p,
-            cgparams->len,cgparams->motiflen);
+                cgparams->beta3p, cgparams->beta5p,
+                cgparams->len, cgparams->motiflen);
 
-    return R_pow_di(2*cgparams->alpha-Rdist[1]-Rdist[2], 2);
+    return R_pow_di(2 * cgparams->alpha - Rdist[1] - Rdist[2], 2);
 }
 
 void removeDist() {
     if(Rdist) Free(Rdist);
-    Rdist=NULL;
+    Rdist = NULL;
 }

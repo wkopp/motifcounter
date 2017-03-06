@@ -11,8 +11,8 @@
 
 
 void RgenRndSeq(char **seq, int *len, double *station,
-    double *trans, int *order) {
+                double *trans, int *order) {
 
     generateRandomSequence(station, trans, seq[0],
-        len[0], order[0]);
+                           len[0], order[0]);
 }

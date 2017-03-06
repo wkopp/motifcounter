@@ -7,7 +7,7 @@ typedef struct {
     int seqlen;
     int mlen;
     int maxhits;
-    double ***value;
+    double ** *value;
     double *beta;
     double *beta3p;
     double *beta5p;
@@ -22,14 +22,17 @@ typedef struct {
 } PosteriorCount;
 
 double dpower(double v, int exp);
-void testPosteriorProbability(char *bg, char *fpwm, char *output, char *sseqlen,
-  char *smaxhits,  char *spv, char *sth, char *snos, char *gran);
-int allocPosteriorProbability(PosteriorCount *p, int seqlen, int mlen, int maxhits);
+void testPosteriorProbability(char *bg, char *fpwm, char *output,
+                              char *sseqlen,
+                              char *smaxhits,  char *spv, char *sth, char *snos, char *gran);
+int allocPosteriorProbability(PosteriorCount *p, int seqlen, int mlen,
+                              int maxhits);
 void deletePosteriorProbability(PosteriorCount *p);
 void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
-  double **beta3p, double **beta5p, double **delta, double **deltap);
+                              double **beta3p, double **beta5p, double **delta, double **deltap);
 void computePosteriorProbability(PosteriorCount *prob);
-void finishPosteriorProbability(PosteriorCount *prob, double *final, int nhits);
-void multipleShortSequenceProbability(double *simple, double *aggregated, 
-     int maxsimplehits, int maxagghits, int numofseqs);
+void finishPosteriorProbability(PosteriorCount *prob, double *final,
+                                int nhits);
+void multipleShortSequenceProbability(double *simple, double *aggregated,
+                                      int maxsimplehits, int maxagghits, int numofseqs);
 #endif
