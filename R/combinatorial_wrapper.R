@@ -45,10 +45,10 @@
 #' dist = motifcounter:::combinatorialDist(seqlen, op)
 #'
 combinatorialDist = function(seqlen, overlap) {
-    overlapValid(overlap)
+    stopifnot(is(overlap, "Overlap"))
     
     # Length must be at least as long as the motif
-    if (seqlen[1] - length(overlap$beta) + 1 <= 0) {
+    if (seqlen[1] - length(overlap@beta) + 1 <= 0) {
         return (list(dist = 1))
     }
     
@@ -57,7 +57,7 @@ combinatorialDist = function(seqlen, overlap) {
         stop("All elements in 'seqlen' must be of equal length")
     }
     
-    if (overlap$singlestranded == TRUE) {
+    if (overlap@singlestranded == TRUE) {
         # This might change in the future though
         stop(
             paste(strwrap("The combinatorial model only supports scanning
@@ -87,16 +87,16 @@ combinatorialDist = function(seqlen, overlap) {
     
     ret = .C(
         "motifcounter_combinatorialDist",
-        overlap$alpha,
-        overlap$beta,
-        overlap$beta3p,
-        overlap$beta5p,
+        overlap@alpha,
+        overlap@beta,
+        overlap@beta3p,
+        overlap@beta5p,
         as.numeric(dist),
         as.integer(seqlen[1]),
         as.integer(maxhits),
         as.integer(length(seqlen)),
-        length(overlap$beta),
-        as.integer(overlap$singlestranded),
+        length(overlap@beta),
+        as.integer(overlap@singlestranded),
         PACKAGE = "motifcounter"
     )
     

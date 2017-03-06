@@ -1,3 +1,25 @@
+#' Overlap class definition
+#'
+#' Objects of this class serve as a container that holds
+#' parameters for the Overlap hit probabilities, including the
+#' scalar significance level alpha, vectors of principal
+#' overlapping hit probabilities (beta, beta3p and beta5p),
+#' a vector of marginal overlapping hit probabilities (gamma)
+#' and a logical-valued singlestranded flag to decide whether one
+#' or both strands are scanned for motif hits.
+#' An Overlap object is constructed via the probOverlapHit-constructor function 
+#' (see below).
+.Overlap <- setClass("Overlap",
+    slots = c(
+                alpha = "numeric",
+                beta = "numeric",
+                beta3p = "numeric",
+                beta5p = "numeric",
+                gamma = "numeric",
+                singlestranded = "logical"
+            )
+)
+
 #' Overlapping motif hit probabilities
 #'
 #' This function computes a set of self-overlapping probabilites for a
@@ -10,27 +32,7 @@
 #' that were corrected for intermediate hits.
 #' 
 #' @inheritParams numMotifHits
-#' @return A list containing various overlapping hit probabilities.
-#' The list contains the following entries
-#'     \describe{
-#'     \item{alpha}{False positive probability}
-#'     \item{beta}{Vector of overlapping hit probability for hits
-#'             occurring on the same strand. Each element corresponds to
-#'             relative distance of the starts of the two hits.}
-#'     \item{beta3p}{Vector of overlapping hit probability for a
-#'             forward strand hit that is followed by a reverse strand
-#'             hit. Each element corresponds to
-#'             relative distance of the starts of the two hits.}
-#'     \item{beta5p}{Vector of overlapping hit probability for a
-#'             reverse strand hit that is followed by a forward strand
-#'             hit. Each element corresponds to
-#'             relative distance of the starts of the two hits.}
-#'     \item{gamma}{Vector of overlapping hit probabilities across
-#'             all configurations. In contrast to beta, beta3p and beta5p,
-#'             gamma is not corrected for intermediate motif hit events.}
-#'     \item{singlestranded}{singlestranded flag that is prescribed 
-#'             as input argument.}
-#'     }
+#' @return An Overlap object
 #'
 #' @examples
 #'
@@ -96,7 +98,7 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
             PACKAGE = "motifcounter"
         )
     }
-    overlap = list(
+    overlap = .Overlap(
         alpha = res[[4]],
         beta = res[[5]],
         beta3p = res[[6]],
@@ -104,50 +106,7 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
         gamma = res[[8]],
         singlestranded = singlestranded
     )
-    class(overlap) = "Overlap"
     return (overlap)
 }
 
 
-#' Check validity of Overlap
-#'
-#' This function checks if the Overlap object is valid. The function throws
-#' an error if the object does not represent an Overlap object.
-#'
-#' @param overlap An Overlap object which is created by
-#' \code{\link{probOverlapHit}}.
-#' @return None
-#'
-#' @examples
-#' 
-#' # Load sequences
-#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
-#' seqs = Biostrings::readDNAStringSet(seqfile)
-#'
-#' # Load background
-#' bg = readBackground(seqs,1)
-#'
-#' # Load motif
-#' motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
-#' motif = t(as.matrix(read.table(motiffile)))
-#'
-#' # Compute overlapping hit probabilities for scanning both DNA strands
-#' op = motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
-#' 
-#' # Check valididity
-#' motifcounter:::overlapValid(op)
-#'
-overlapValid = function(overlap) {
-    if (class(overlap) != "Overlap") {
-        stop(paste(strwrap("'overlap' must be an Overlap object,
-            which can be constructed via probOverlapHit(.)."),
-            collapse = "\n"))
-    }
-    if (length(overlap) != 6) {
-        stop(paste(strwrap(
-            "Inconsistent Overlap object:
-            'overlap' must contain 6 elements.
-            Use 'probOverlapHit' to construct overlap properly."),
-            collapse = "\n"))
-    }
-}

@@ -39,7 +39,7 @@ test_that("compoundPoissonDist", {
         # check if the mean is correct
         dist=compoundPoissonDist(seqlen, op, method="kopp")$dist
         expect_equal(sum(dist*seq(0,length(dist)-1)),
-                     op$alpha*2*length(seqlen)*(seqlen[1]-ncol(motif)+1))
+                     op@alpha*2*length(seqlen)*(seqlen[1]-ncol(motif)+1))
 
         # check for single stranded scanning
         op=probOverlapHit(motif, bg,singlestranded=TRUE)
@@ -53,7 +53,7 @@ test_that("compoundPoissonDist", {
 
         # check if the mean is correct
         expect_equal(sum(dist*seq(0,length(dist)-1)),
-                     op$alpha*length(seqlen)*(seqlen[1]-ncol(motif)+1))
+                     op@alpha*length(seqlen)*(seqlen[1]-ncol(motif)+1))
     }
     
     # Check combinatorial sequence length
@@ -86,7 +86,7 @@ test_that("jaspar motif tests", {
         expect_equal(sum(dist),1)
         # check mean
         expect_equal(sum(dist*seq(0,length(dist)-1)),
-                     op$alpha*2*length(seqlen)*(seqlen[1]-ncol(motif)+1))
+                     op@alpha*2*length(seqlen)*(seqlen[1]-ncol(motif)+1))
 
         # check scanning a single strand
         op=probOverlapHit(motif, bg,singlestranded=TRUE)
@@ -95,7 +95,7 @@ test_that("jaspar motif tests", {
         expect_equal(sum(dist),1)
         # check mean
         expect_equal(sum(dist*seq(0,length(dist)-1)),
-                     op$alpha*length(seqlen)*(seqlen[1]-ncol(motif)+1))
+                     op@alpha*length(seqlen)*(seqlen[1]-ncol(motif)+1))
     }
 
 })

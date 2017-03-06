@@ -11,8 +11,7 @@ compoundPoissonDist(seqlen, overlap, method = "kopp")
 individual sequences. For a given DNAStringSet, 
 this information can be retrieved using \code{\link{numMotifHits}}.}
 
-\item{overlap}{An Overlap object which is created by
-\code{\link{probOverlapHit}}.}
+\item{overlap}{An Overlap object.}
 
 \item{method}{String that defines which method shall be invoked: 'pape' or
 'kopp' (see description). Default: method = 'kopp'.}

@@ -16,27 +16,7 @@ both strands shall be scanned for motif hits.
 Default: singlestranded = FALSE.}
 }
 \value{
-A list containing various overlapping hit probabilities.
-The list contains the following entries
-    \describe{
-    \item{alpha}{False positive probability}
-    \item{beta}{Vector of overlapping hit probability for hits
-            occurring on the same strand. Each element corresponds to
-            relative distance of the starts of the two hits.}
-    \item{beta3p}{Vector of overlapping hit probability for a
-            forward strand hit that is followed by a reverse strand
-            hit. Each element corresponds to
-            relative distance of the starts of the two hits.}
-    \item{beta5p}{Vector of overlapping hit probability for a
-            reverse strand hit that is followed by a forward strand
-            hit. Each element corresponds to
-            relative distance of the starts of the two hits.}
-    \item{gamma}{Vector of overlapping hit probabilities across
-            all configurations. In contrast to beta, beta3p and beta5p,
-            gamma is not corrected for intermediate motif hit events.}
-    \item{singlestranded}{singlestranded flag that is prescribed 
-            as input argument.}
-    }
+An Overlap object
 }
 \description{
 This function computes a set of self-overlapping probabilites for a

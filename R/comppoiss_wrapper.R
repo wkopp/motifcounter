@@ -28,7 +28,7 @@
 #' @param seqlen Integer-valued vector that defines the lengths of the
 #' individual sequences. For a given DNAStringSet, 
 #' this information can be retrieved using \code{\link{numMotifHits}}.
-#' @inheritParams overlapValid
+#' @param overlap An Overlap object.
 #' @param method String that defines which method shall be invoked: 'pape' or
 #' 'kopp' (see description). Default: method = 'kopp'.
 #'
@@ -72,13 +72,13 @@
 #' @seealso \code{\link{probOverlapHit}}
 #' @seealso \code{\link{numMotifHits}}
 compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
-    overlapValid(overlap)
+    stopifnot(is(overlap, "Overlap"))
     
     # Length must be at least as long as the motif
     sl = sum(vapply(seqlen, function(sl, ml) {
         sl - ml + 1
     }, FUN.VALUE = 0,
-    ml = length(overlap$beta)))
+    ml = length(overlap@beta)))
 
     if (sl <= 0) {
         return (list(dist = 1))
@@ -97,22 +97,22 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
     if (method == "kopp") {
         res = .C(
             "motifcounter_compoundPoisson_useBeta",
-            overlap$alpha,
-            overlap$beta,
-            overlap$beta3p,
-            overlap$beta5p,
+            overlap@alpha,
+            overlap@beta,
+            overlap@beta3p,
+            overlap@beta5p,
             as.numeric(dist),
             as.integer(length(seqlen)),
             as.integer(seqlen),
             as.integer(maxhits),
             as.integer(maxclumpsize),
-            length(overlap$beta),
-            as.integer(overlap$singlestranded),
+            length(overlap@beta),
+            as.integer(overlap@singlestranded),
             PACKAGE = "motifcounter"
         )
         dist = res[[5]]
     } else if (method == "pape") {
-        if (overlap$singlestranded == TRUE) {
+        if (overlap@singlestranded == TRUE) {
             stop(
                 paste(strwrap(
                 "method = 'pape' does not support single stranded scanning
@@ -122,13 +122,13 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
         }
         res = .C(
             "motifcounter_compoundPoissonPape_useGamma",
-            overlap$gamma,
+            overlap@gamma,
             as.numeric(dist),
             as.integer(length(seqlen)),
             as.integer(seqlen),
             as.integer(maxhits),
             as.integer(maxclumpsize),
-            length(overlap$beta),
+            length(overlap@beta),
             PACKAGE = "motifcounter"
         )
         dist = res[[2]]
