@@ -1,7 +1,7 @@
 ---
 title: "Introduction to the `motifcounter` package"
 author: "Wolfgang Kopp"
-date: "`r Sys.Date()`"
+date: "2017-03-06"
 output:
     prettydoc::html_pretty:
         toc: TRUE
@@ -197,7 +197,7 @@ In `motifcounter`, offers the opportunity to use
 order-$d$ Markov model with user-defined $d$.
 The background model is estimated on a set of user-provided
 DNA sequences which are supplied as 
-`DNAStringSet`-objects from the `Biostrings` bioconductor package.
+`DNAStringSet`-objects from the `Biostrings` Bioconductor package.
 
 The following code fragment illustrates how an order-$1$ 
 background model is estimated from a given set of DNA sequences:
@@ -226,7 +226,7 @@ As a compromise, we recommend to use orders $d=1$ or $d=2$.
 used to represent the binding affinity of transcription factors (TFs).
 
 A convenient source of known motifs is the `MotifDb` 
-bioconductor package [@motifdb],
+Bioconductor package [@motifdb],
 which shall be the basis for our tutorial.
 For example, we retrieve the motif for the human *Pou5f1* (or *Oct4*) 
 transcription factor as follows
@@ -456,3 +456,9 @@ desirable for your analysis (e.g $\alpha\geq 0.01$),
 we recommend the computationally more costly, but also more accurate
 **combinatorial approximation**.
 </div>
+
+# Session Info
+
+```{r sessionInfo}
+sessionInfo()
+```
