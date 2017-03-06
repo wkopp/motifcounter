@@ -18,7 +18,7 @@
 #' motifcounter:::lenSequences(seqs)
 #'
 lenSequences = function(seqs) {
-    stopifnot(class(seqs) == "DNAStringSet")
+    stopifnot(is(seqs, "DNAStringSet"))
     
     lseq = vapply(seqs, function(seq) {
         return(.Call("motifcounter_slen", toString(seq),

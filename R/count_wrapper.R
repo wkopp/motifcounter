@@ -84,7 +84,7 @@ motifHitProfile = function(seqs, pfm, bg) {
     validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
-    stopifnot(class(seqs) == "DNAStringSet")
+    stopifnot(is(seqs,"DNAStringSet"))
 
     if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
         stop(paste(strwrap("All DNAStrings in 'seqs' must be of equal length.
@@ -156,7 +156,7 @@ numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE) {
     validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
-    stopifnot(class(seqs) == "DNAStringSet")
+    stopifnot(is(seqs, "DNAStringSet"))
 
     # retrieve the number of motif hits
     noh = vapply(seqs, function(seq, pfm, bg, singlestranded) {

@@ -59,7 +59,7 @@ setValidity("Background", function(object) {
 #'
 #' @export
 readBackground = function(seqs, order = 1) {
-    stopifnot (class(seqs) == "DNAStringSet")
+    stopifnot (is(seqs, "DNAStringSet"))
     stopifnot (order >= 0)
     
     trans = numeric(4 ^ (order + 1))

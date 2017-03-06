@@ -167,7 +167,7 @@ scoreStrand = function(seq, pfm, bg) {
     motifAndBackgroundValid(pfm, bg)
 
     # Check class
-    stopifnot(class(seq) == "DNAString")
+    stopifnot(is(seq, "DNAString"))
 
     scores = .Call(
         "motifcounter_scoresequence",
@@ -221,7 +221,7 @@ scoreSequence = function(seq, pfm, bg) {
     motifAndBackgroundValid(pfm, bg)
 
     # Check class
-    stopifnot(class(seq) == "DNAString")
+    stopifnot(is(seq, "DNAString"))
 
     fscores = scoreStrand(seq, pfm, bg)
     rscores = scoreStrand(seq, revcompMotif(pfm), bg)
@@ -266,7 +266,7 @@ scoreProfile = function(seqs, pfm, bg) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
-    stopifnot (class(seqs) == "DNAStringSet")
+    stopifnot (is(seqs, "DNAStringSet"))
     
     if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
         stop(paste(strwrap("All DNAStrings in 'seqs' must be of equal length.
@@ -331,7 +331,7 @@ scoreHistogramSingleSeq = function(seq, pfm, bg) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
-    stopifnot(class(seq) == "DNAString")
+    stopifnot(is(seq, "DNAString"))
     motifAndBackgroundValid(pfm, bg)
 
     scores = .Call(
@@ -398,7 +398,7 @@ scoreHistogram = function(seqs, pfm, bg) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
-    stopifnot(class(seqs) == "DNAStringSet")
+    stopifnot(is(seqs, "DNAStringSet"))
 
     # First, extract the score range
     his = lapply(seqs[1], scoreHistogramSingleSeq, pfm, bg)
