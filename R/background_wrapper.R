@@ -1,38 +1,46 @@
+#' Background class definition
+#'
+#' Objects of this class serve as a container that holds
+#' parameters for the Background model, including the
+#' stationary distribution, the transition probabilities, 
+#' the observed k-mer counts and the order of the model.
+#' This model is constructed via a Background-constructor function (see below).
 .Background <- setClass("Background",
     slots = c(
                 station = "numeric",
                 trans = "numeric",
                 counts = "integer",
                 order = "integer"
-            )
+            ),
+    validity = function(object) {
+        msg <- character(0)
+        # check slot dimensions
+        if (length(object@station) != max(4, 4 ^ (object@order))) {
+            msg <- paste(strwrap("Inconsistent Background object.
+                Use readBackground() to construct a Background object."),
+                collapse = "\n")
+        }
+        if (!length(msg) && length(object@trans) != 4 ^ (object@order + 1)) {
+            msg <- paste(strwrap("Inconsistent Background object.
+                Use readBackground() to construct a Background object."),
+                collapse = "\n")
+        }
+        # check if slots are normalized
+        if (!length(msg) && !isTRUE(all.equal(sum(object@station), 1))) {
+            msg <- paste(strwrap("Inconsistent Background object.
+                Use readBackground() to construct a Background object."),
+                collapse = "\n")
+        }
+        if (!length(msg) && 
+            !isTRUE(all.equal(sum(object@trans), 4^object@order))) {
+            msg <- paste(strwrap("Inconsistent Background object.
+                Use readBackground() to construct a Background object."),
+                collapse = "\n")
+        }
+        if (length(msg)) msg else TRUE
+    }
 )
 
-setValidity("Background", function(object) {
-    msg <- character(0)
-    # check slot dimensions
-    if (length(object@station) != max(4, 4 ^ (object@order))) {
-        msg <- paste(strwrap("Inconsistent Background object.
-            Use readBackground() to construct a Background object."),
-            collapse = "\n")
-    }
-    if (!length(msg) && length(object@trans) != 4 ^ (object@order + 1)) {
-        msg <- paste(strwrap("Inconsistent Background object.
-            Use readBackground() to construct a Background object."),
-            collapse = "\n")
-    }
-    # check if slots are normalized
-    if (!length(msg) && !isTRUE(all.equal(sum(object@station), 1))) {
-        msg <- paste(strwrap("Inconsistent Background object.
-            Use readBackground() to construct a Background object."),
-            collapse = "\n")
-    }
-    if (!length(msg) && !isTRUE(all.equal(sum(object@trans), 4^object@order))) {
-        msg <- paste(strwrap("Inconsistent Background object.
-            Use readBackground() to construct a Background object."),
-            collapse = "\n")
-    }
-    if (length(msg)) msg else TRUE
-})
 
 
 #' Estimates a background model from a set of DNA sequences
