@@ -10,8 +10,8 @@ test_that("generateDNAString", {
     expect_error(generateDNAString(1,1))
 
     # too short sequence
-    expect_warning(expect_equal(length(generateDNAString(-1,bg)),0))
-    expect_warning(expect_equal(length(generateDNAString(bg@order-1,bg)),0))
+    expect_equal(length(generateDNAString(-1,bg)),0)
+    expect_equal(length(generateDNAString(bg@order-1,bg)),0)
 
     # Normal sequence
     expect_equal(length(generateDNAString(10,bg)),10)
@@ -29,9 +29,9 @@ test_that("generateDNAStringSet", {
     # too short sequence
     #expect_warning(generateDNAStringSet(-1,bg))
     #expect_warning(generateDNAStringSet(bg$order-1,bg))
-    expect_warning(expect_equal(length(generateDNAStringSet(-1,bg)[[1]]),0))
-    expect_warning(expect_equal(
-        length(generateDNAStringSet(bg@order-1,bg)[[1]]),0))
+    expect_equal(length(generateDNAStringSet(-1,bg)[[1]]),0)
+    expect_equal(
+        length(generateDNAStringSet(bg@order-1,bg)[[1]]),0)
 
     # Normal sequences
     expect_equal(length(generateDNAStringSet(10,bg)),1)
@@ -60,11 +60,9 @@ test_that("simulateNumHitsDist", {
         expect_equal(sum(ret$dist),1)
 
         # too short sequences
-        expect_warning({
-            ret=simulateNumHitsDist(motif,bg,0,nsim=100,singlestranded=ss)
-            expect_equal(sum(ret$dist),1)
-            expect_equal(ret$dist[1],1)
-        })
+        ret=simulateNumHitsDist(motif,bg,0,nsim=100,singlestranded=ss)
+        expect_equal(sum(ret$dist),1)
+        expect_equal(ret$dist[1],1)
 
         # too short sequences
         ret=simulateNumHitsDist(motif,bg,ncol(motif)-1,
