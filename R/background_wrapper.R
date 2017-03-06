@@ -1,10 +1,15 @@
 #' Background class definition
 #'
 #' Objects of this class serve as a container that holds
-#' parameters for the Background model, including the
-#' stationary distribution, the transition probabilities, 
-#' the observed k-mer counts and the order of the model.
-#' This model is constructed via a Background-constructor function (see below).
+#' parameters for the Background model.
+#'
+#' A Background model is constructed 
+#' via \code{\link{readBackground}}.
+#'
+#' @slot station Stationary probabilities
+#' @slot trans Transition probabilities
+#' @slot counts k-mer counts
+#' @slot order Background model order
 .Background <- setClass("Background",
     slots = c(
                 station = "numeric",

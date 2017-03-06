@@ -1,14 +1,20 @@
 #' Overlap class definition
 #'
 #' Objects of this class serve as a container that holds
-#' parameters for the Overlap hit probabilities, including the
-#' scalar significance level alpha, vectors of principal
-#' overlapping hit probabilities (beta, beta3p and beta5p),
-#' a vector of marginal overlapping hit probabilities (gamma)
-#' and a logical-valued singlestranded flag to decide whether one
-#' or both strands are scanned for motif hits.
-#' An Overlap object is constructed via the probOverlapHit-constructor function 
-#' (see below).
+#' parameters for the overlapping hit probabilities.
+#'
+#' An Overlap object is constructed via the \code{\link{probOverlapHit}}
+#'
+#' @slot alpha Scalar numeric significance level to call motif matches
+#' @slot beta Numeric vector of 
+#'              principal overlapping hit probabilities on the same strand.
+#' @slot beta3p Numeric vector of
+#'              principal overlapping hit probabilities with 3'-overlap.
+#' @slot beta5p Numeric vector of
+#'              principal overlapping hit probabilities with 5'-overlap.
+#' @slot gamma Numeric vector of marginal overlapping hit probabilities.
+#' @slot singlestranded logical flag to indicate whether one
+#'              or both strands are scanned for motif matches.
 .Overlap <- setClass("Overlap",
     slots = c(
                 alpha = "numeric",
