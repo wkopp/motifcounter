@@ -77,7 +77,9 @@ motifEnrichment = function(seqs, pfm, bg, singlestranded = FALSE,
     } else {
         stop("Invalid method: 'method' must be 'compound' or 'combinatorial'")
     }
-    p = sum(dist$dist[(sum(observations$numofhits) + 1):length(dist$dist)])
+    ind = seq_len(length(dist$dist))
+    ind = ind[ind >= (sum(observations$numofhits) + 1)]
+    p = sum(dist$dist[ind])
 
     return (list(
         pvalue = p,

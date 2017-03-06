@@ -464,7 +464,7 @@ scoreThreshold = function(pfm, bg) {
             Use 'motifcounterOptions' to prescribe a less stringent
             value for 'alpha'."), collapse = "\n"))
     }
-    ind = ind[2:length(ind)]
+    ind = tail(ind, -1)
     alpha = sum(scoredist$dist[ind])
     
     ind = min(ind)

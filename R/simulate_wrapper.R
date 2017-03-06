@@ -70,7 +70,7 @@ generateDNAStringSet = function(seqlen, bg) {
     stopifnot(is(bg, "Background"))
     validObject(bg)
     seqs = c()
-    for (i in 1:length(seqlen)) {
+    for (i in seq_len(length(seqlen))) {
         seqs = c(seqs, generateDNAString(seqlen[i], bg))
     }
 
@@ -129,7 +129,7 @@ simulateNumHitsDist = function(pfm, bg, seqlen, nsim, singlestranded = FALSE) {
     stopifnot(nsim > 0)
 
     freq = rep(0, 10)
-    for (i in 1:nsim) {
+    for (i in seq_len(nsim)) {
         seqs = generateDNAStringSet(seqlen, bg)
         nom = numMotifHits(seqs, pfm, bg, singlestranded)
         nom = sum(nom$numofhits)
