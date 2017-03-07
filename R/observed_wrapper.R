@@ -21,8 +21,7 @@ lenSequences = function(seqs) {
     stopifnot(is(seqs, "DNAStringSet"))
     
     lseq = vapply(seqs, function(seq) {
-        return(.Call("motifcounter_slen", toString(seq),
-                    PACKAGE = "motifcounter"))
+        return(.Call(motifcounter_slen, toString(seq)))
     }, FUN.VALUE = integer(1))
 
     return(as.vector(lseq))

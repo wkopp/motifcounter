@@ -30,13 +30,12 @@ generateDNAString = function(len, bg) {
     }
     seq = paste(rep("N", len), collapse = "", sep = "")
     ret = .C(
-        "motifcounter_generateRndSeq",
+        motifcounter_generateRndSeq,
         as.character(seq),
         as.integer(len),
         bg@station,
         bg@trans,
-        as.integer(bg@order),
-        PACKAGE = "motifcounter"
+        as.integer(bg@order)
     )
     return(Biostrings::DNAString(ret[[1]]))
 }

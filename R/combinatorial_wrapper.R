@@ -86,7 +86,7 @@ combinatorialDist = function(seqlen, overlap) {
     dist = numeric(totalmaxhits + 1)
     
     ret = .C(
-        "motifcounter_combinatorialDist",
+        motifcounter_combinatorialDist,
         overlap@alpha,
         overlap@beta,
         overlap@beta3p,
@@ -96,8 +96,7 @@ combinatorialDist = function(seqlen, overlap) {
         as.integer(maxhits),
         as.integer(length(seqlen)),
         length(overlap@beta),
-        as.integer(overlap@singlestranded),
-        PACKAGE = "motifcounter"
+        as.integer(overlap@singlestranded)
     )
     
     if (is.na(sum(ret[[5]]))) {

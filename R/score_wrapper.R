@@ -37,25 +37,23 @@ scoreDist = function(pfm, bg) {
     motifAndBackgroundValid(pfm, bg)
 
     scores = .Call(
-        "motifcounter_scorerange",
+        motifcounter_scorerange,
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
         bg@station,
         bg@trans,
-        as.integer(bg@order),
-        PACKAGE = "motifcounter"
+        as.integer(bg@order)
     )
 
     dist = .Call(
-        "motifcounter_scoredist",
+        motifcounter_scoredist,
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
         bg@station,
         bg@trans,
-        as.integer(bg@order),
-        PACKAGE = "motifcounter"
+        as.integer(bg@order)
     )
     return(list(scores = scores, dist = dist))
 }
@@ -104,25 +102,23 @@ scoreDistBf = function(pfm, bg) {
     motifAndBackgroundValid(pfm, bg)
 
     scores = .Call(
-        "motifcounter_scorerange",
+        motifcounter_scorerange,
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
         bg@station,
         bg@trans,
-        as.integer(bg@order),
-        PACKAGE = "motifcounter"
+        as.integer(bg@order)
     )
 
     dist = .Call(
-        "motifcounter_scoredist_bf",
+        motifcounter_scoredist_bf,
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
         bg@station,
         bg@trans,
-        as.integer(bg@order),
-        PACKAGE = "motifcounter"
+        as.integer(bg@order)
     )
     return(list(scores = scores, dist = dist))
 }
@@ -170,15 +166,14 @@ scoreStrand = function(seq, pfm, bg) {
     stopifnot(is(seq, "DNAString"))
 
     scores = .Call(
-        "motifcounter_scoresequence",
+        motifcounter_scoresequence,
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
         toString(seq),
         bg@station,
         bg@trans,
-        as.integer(bg@order),
-        PACKAGE = "motifcounter"
+        as.integer(bg@order)
     )
     return(as.numeric(scores))
 }
@@ -335,26 +330,24 @@ scoreHistogramSingleSeq = function(seq, pfm, bg) {
     motifAndBackgroundValid(pfm, bg)
 
     scores = .Call(
-        "motifcounter_scorerange",
+        motifcounter_scorerange,
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
         bg@station,
         bg@trans,
-        as.integer(bg@order),
-        PACKAGE = "motifcounter"
+        as.integer(bg@order)
     )
 
     dist = .Call(
-        "motifcounter_scorehistogram",
+        motifcounter_scorehistogram,
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
         toString(seq),
         bg@station,
         bg@trans,
-        as.integer(bg@order),
-        PACKAGE = "motifcounter"
+        as.integer(bg@order)
     )
     result = list(scores = scores, dist = dist)
     

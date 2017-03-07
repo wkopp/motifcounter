@@ -73,7 +73,7 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
     gamma = numeric(3 * ncol(pfm))
     if (singlestranded == TRUE) {
         res = .C(
-            "motifcounter_overlapSingleStranded",
+            motifcounter_overlapSingleStranded,
             as.numeric(pfm),
             nrow(pfm),
             ncol(pfm),
@@ -84,12 +84,11 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
             as.numeric(gamma),
             as.numeric(bg@station),
             as.numeric(bg@trans),
-            as.integer(bg@order),
-            PACKAGE = "motifcounter"
+            as.integer(bg@order)
         )
     } else {
         res = .C(
-            "motifcounter_overlap",
+            motifcounter_overlap,
             as.numeric(pfm),
             nrow(pfm),
             ncol(pfm),
@@ -100,8 +99,7 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
             as.numeric(gamma),
             as.numeric(bg@station),
             as.numeric(bg@trans),
-            as.integer(bg@order),
-            PACKAGE = "motifcounter"
+            as.integer(bg@order)
         )
     }
     overlap = .Overlap(

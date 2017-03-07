@@ -42,11 +42,10 @@ motifcounterOptions = function(alpha = 0.001, gran = 0.1, ncores = 1) {
             collapse = "\n"))
     }
     dummy = .C(
-        "motifcounter_option",
+        motifcounter_option,
         as.numeric(alpha),
         as.numeric(gran),
-        as.integer(ncores),
-        PACKAGE = "motifcounter"
+        as.integer(ncores)
     )
 }
 
@@ -67,6 +66,6 @@ motifcounterOptions = function(alpha = 0.001, gran = 0.1, ncores = 1) {
 #'
 sigLevel = function() {
     alpha = 0.0
-    ret = .C("motifcounter_siglevel", alpha)
+    ret = .C(motifcounter_siglevel, alpha)
     return(ret[[1]])
 }

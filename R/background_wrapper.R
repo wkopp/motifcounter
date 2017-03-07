@@ -81,12 +81,11 @@ readBackground = function(seqs, order = 1) {
     counts = vapply(seqs, function(seq, order, trans) {
         return(
             .C(
-                "motifcounter_countfreq",
+                motifcounter_countfreq,
                 toString(seq),
                 length(seq),
                 trans,
-                as.integer(order),
-                PACKAGE = "motifcounter"
+                as.integer(order)
             )[[3]]
         )
     }, FUN.VALUE = trans, order, trans)
@@ -97,12 +96,11 @@ readBackground = function(seqs, order = 1) {
         station = numeric(4 ^ order)
     }
     dummy = .C(
-        "motifcounter_bgfromfreq",
+        motifcounter_bgfromfreq,
         as.numeric(counts),
         as.numeric(station),
         as.numeric(trans),
-        as.integer(order),
-        PACKAGE = "motifcounter"
+        as.integer(order)
     )
     background = .Background(
         station = dummy[[2]],

@@ -28,7 +28,7 @@
 #'
 #' Maintainer: Wolfgang Kopp <kopp@@molgen.mpg.de>
 #' @keywords PFM, MotifEnrichment
-#' @useDynLib motifcounter, .registration=TRUE
+#' @useDynLib motifcounter, .registration=TRUE, .fixes = "motifcounter_"
 #' @import Biostrings
 #' @import methods
 #' @examples

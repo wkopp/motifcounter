@@ -96,7 +96,7 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
     dist = numeric(maxhits + 1)
     if (method == "kopp") {
         res = .C(
-            "motifcounter_compoundPoisson_useBeta",
+            motifcounter_compoundPoisson_useBeta,
             overlap@alpha,
             overlap@beta,
             overlap@beta3p,
@@ -107,8 +107,7 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
             as.integer(maxhits),
             as.integer(maxclumpsize),
             length(overlap@beta),
-            as.integer(overlap@singlestranded),
-            PACKAGE = "motifcounter"
+            as.integer(overlap@singlestranded)
         )
         dist = res[[5]]
     } else if (method == "pape") {
@@ -121,15 +120,14 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
             )
         }
         res = .C(
-            "motifcounter_compoundPoissonPape_useGamma",
+            motifcounter_compoundPoissonPape_useGamma,
             overlap@gamma,
             as.numeric(dist),
             as.integer(length(seqlen)),
             as.integer(seqlen),
             as.integer(maxhits),
             as.integer(maxclumpsize),
-            length(overlap@beta),
-            PACKAGE = "motifcounter"
+            length(overlap@beta)
         )
         dist = res[[2]]
         } else {
