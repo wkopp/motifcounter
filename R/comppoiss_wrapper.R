@@ -114,8 +114,8 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
         if (overlap@singlestranded == TRUE) {
             stop(
                 paste(strwrap(
-                "method = 'pape' does not support single stranded scanning
-                for motif hits.
+                "method = 'pape' does not 
+                support singlestranded = TRUE (see probOverlapHit).
                 Please use method = 'kopp' instead."), collapse = "\n")
             )
         }
@@ -131,8 +131,8 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
         )
         dist = res[[2]]
         } else {
-            stop(paste(strwrap("Invalid 'method': The 'method' must 
-                 be 'kopp' or 'pape'"), collapse = "\n"))
+            stop(
+                "Invalid 'method': The 'method' must be 'kopp' or 'pape'")
         }
     return (list(dist = dist))
 }

@@ -54,15 +54,15 @@ combinatorialDist = function(seqlen, overlap) {
     
     # The remaining sequence must be of equal length!
     if (!all(seqlen == seqlen[1])) {
-        stop("All elements in 'seqlen' must be of equal length")
+        stop("All elements in 'seqlen' must be equal.")
     }
     
     if (overlap@singlestranded == TRUE) {
         # This might change in the future though
         stop(
-            paste(strwrap("The combinatorial model only supports scanning
-            of both DNA strands. Set 'singlestranded = FALSE'
-            or use the compound Poisson approximation."), collapse = "\n")
+            paste(strwrap("The combinatorial model can only be used
+            with 'singlestranded = FALSE' (see probOverlapHit)."), 
+            collapse = "\n")
         )
     }
     
@@ -70,9 +70,9 @@ combinatorialDist = function(seqlen, overlap) {
     # of the model
     if (seqlen[1] < 30) {
         warning(paste(strwrap(
-            "The sequences are too short ( seqlen[1] < 30 bp),
-            which might bias the analysis.
-            If possible, use longer sequences (e.g. >= 100 bp)."), 
+            "seqlen[1] < 30 bp: Short sequences might incur
+            biases in the analysis.
+            If possible, use longer sequences (e.g. seqlen[1] >= 100)."), 
             collapse="\n")
         )
     }
@@ -109,9 +109,8 @@ combinatorialDist = function(seqlen, overlap) {
             paste(strwrap("Numerical issue detected.
             Please try to reduce the number (see 'length(seqlen)') and/or 
             length of sequences (see 'seqlen[1]'). Alternatively,
-            please try 
-            to use the 'compound Poisson approximation' instead of the
-            'combinatorial approximation'."), 
+            please try to use the 'compound Poisson approximation' 
+            instead of the 'combinatorial approximation'."), 
             collapse = "\n")
         )
     }

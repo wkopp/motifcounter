@@ -35,10 +35,10 @@ motifcounterOptions = function(alpha = 0.001, gran = 0.1, ncores = 1) {
     if (alpha > 0.05) {
         warning(paste(strwrap(
             "alpha is too chosen high. This might cause
-            biased and therefore misleading results
-            when using the 'motifEntrichent', 'compoundPoissonDist'
-            or 'combinatorialDist'.
-            If this was unintended please use 'motifcounterOptions()'."),
+            biases which could lead to false conclusions 
+            when using the 'motifEnrichment'.
+            Consider prescribing a smaller alpha with 
+            'motifcounterOptions()'."),
             collapse = "\n"))
     }
     dummy = .C(
