@@ -118,6 +118,7 @@ static R_CallMethodDef callMethods[]  = {
 
 void R_init_motifcounter(DllInfo *info) {
     R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
+    R_useDynamicSymbols(info, FALSE);
 }
 
 void R_unload_motifcounter(DllInfo *info) {}
