@@ -15,7 +15,7 @@ Imports:
     Biostrings,
     methods
 Depends:
-    R(>= 3.3)
+    R(>= 3.0)
 Maintainer: Wolfgang Kopp <kopp@molgen.mpg.de>
 Description: 'motifcounter' provides functionality
     to compute the statistics related with 
