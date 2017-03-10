@@ -1,7 +1,7 @@
 Package: motifcounter
 Type: Package
 Title: R package for analysing TFBSs in DNA sequences
-Version: 0.99.2
+Version: 0.99.3
 Date: 2016
 Author: Wolfgang Kopp [aut, cre]
 Suggests:
