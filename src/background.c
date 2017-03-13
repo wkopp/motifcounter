@@ -35,8 +35,8 @@ int getStationaryDistribution(double *trans, double *station, int order) {
     int ass [order + 1];
     int nextindex, previndex;
 
-    tmp1 = Calloc(power(ALPHABETSIZE, order), double);
-    tmp2 = Calloc(power(ALPHABETSIZE, order), double);
+    tmp1 = (double*)R_alloc((size_t)power(ALPHABETSIZE, order), sizeof(double));
+    tmp2 = (double*)R_alloc((size_t)power(ALPHABETSIZE, order), sizeof(double));
     tmpres = tmp1;
     tmpstart = tmp2;
 
@@ -71,8 +71,6 @@ int getStationaryDistribution(double *trans, double *station, int order) {
     }
 
     memmove(station, tmpstart, power(ALPHABETSIZE, order)* sizeof(double));
-    Free(tmp1);
-    Free(tmp2);
     return 0;
 }
 
