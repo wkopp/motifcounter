@@ -84,7 +84,7 @@ normalizeMotif = function(pfm, pseudo = 0.01) {
 #' motifcounter:::motifAndBackgroundValid(motif, bg)
 #'
 motifAndBackgroundValid = function(pfm, bg) {
-    if (ncol(pfm) < bg@order) {
+    if (ncol(pfm) < getOrder(bg)) {
         stop(paste(strwrap("ncol(pfm) must be greater or equal
             to the background model order (see order-slot of 
             the Background object)"),

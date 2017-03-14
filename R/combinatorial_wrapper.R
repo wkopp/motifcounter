@@ -48,7 +48,7 @@ combinatorialDist = function(seqlen, overlap) {
     stopifnot(is(overlap, "Overlap"))
     
     # Length must be at least as long as the motif
-    if (seqlen[1] - length(overlap@beta) + 1 <= 0) {
+    if (seqlen[1] - length(getBeta(overlap)) + 1 <= 0) {
         return (list(dist = 1))
     }
     
@@ -57,7 +57,7 @@ combinatorialDist = function(seqlen, overlap) {
         stop("All elements in 'seqlen' must be equal.")
     }
     
-    if (overlap@singlestranded == TRUE) {
+    if (getSinglestranded(overlap) == TRUE) {
         # This might change in the future though
         stop(
             paste(strwrap("The combinatorial model can only be used
@@ -87,16 +87,16 @@ combinatorialDist = function(seqlen, overlap) {
     
     ret = .C(
         motifcounter_combinatorialDist,
-        overlap@alpha,
-        overlap@beta,
-        overlap@beta3p,
-        overlap@beta5p,
+        getAlpha(overlap),
+        getBeta(overlap),
+        getBeta3p(overlap),
+        getBeta5p(overlap),
         as.numeric(dist),
         as.integer(seqlen[1]),
         as.integer(maxhits),
         as.integer(length(seqlen)),
-        length(overlap@beta),
-        as.integer(overlap@singlestranded)
+        length(getBeta(overlap)),
+        as.integer(getSinglestranded(overlap))
     )
     
     if (is.na(sum(ret[[5]]))) {

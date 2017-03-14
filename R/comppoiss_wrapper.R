@@ -78,7 +78,7 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
     sl = sum(vapply(seqlen, function(sl, ml) {
         sl - ml + 1
     }, FUN.VALUE = 0,
-    ml = length(overlap@beta)))
+    ml = length(getBeta(overlap))))
 
     if (sl <= 0) {
         return (list(dist = 1))
@@ -97,21 +97,21 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
     if (method == "kopp") {
         res = .C(
             motifcounter_compoundPoisson_useBeta,
-            overlap@alpha,
-            overlap@beta,
-            overlap@beta3p,
-            overlap@beta5p,
+            getAlpha(overlap),
+            getBeta(overlap),
+            getBeta3p(overlap),
+            getBeta5p(overlap),
             as.numeric(dist),
             as.integer(length(seqlen)),
             as.integer(seqlen),
             as.integer(maxhits),
             as.integer(maxclumpsize),
-            length(overlap@beta),
-            as.integer(overlap@singlestranded)
+            length(getBeta(overlap)),
+            as.integer(getSinglestranded(overlap))
         )
         dist = res[[5]]
     } else if (method == "pape") {
-        if (overlap@singlestranded == TRUE) {
+        if (getSinglestranded(overlap) == TRUE) {
             stop(
                 paste(strwrap(
                 "method = 'pape' does not 
@@ -121,13 +121,13 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
         }
         res = .C(
             motifcounter_compoundPoissonPape_useGamma,
-            overlap@gamma,
+            getGamma(overlap),
             as.numeric(dist),
             as.integer(length(seqlen)),
             as.integer(seqlen),
             as.integer(maxhits),
             as.integer(maxclumpsize),
-            length(overlap@beta)
+            length(getBeta(overlap))
         )
         dist = res[[2]]
         } else {

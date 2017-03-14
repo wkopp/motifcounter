@@ -46,7 +46,38 @@
     }
 )
 
-
+#' Accessor to slot station
+#'
+#' @param obj A Background object
+#'
+#' @return station slot
+getStation = function(obj) {
+    return(obj@station)
+}
+#' Accessor to slot trans
+#'
+#' @param obj A Background object
+#'
+#' @return trans slot
+getTrans = function(obj) {
+    return(obj@trans)
+}
+#' Accessor to slot counts
+#'
+#' @param obj A Background object
+#'
+#' @return counts slot
+getCounts = function(obj) {
+    return(obj@counts)
+}
+#' Accessor to slot order
+#'
+#' @param obj A Background object
+#'
+#' @return order slot
+getOrder = function(obj) {
+    return(obj@order)
+}
 
 #' Estimates a background model from a set of DNA sequences
 #'

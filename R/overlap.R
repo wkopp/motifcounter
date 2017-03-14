@@ -26,6 +26,60 @@
             )
 )
 
+#' Accessor to slot alpha
+#'
+#' @param obj An Overlap object
+#'
+#' @return alpha slot
+getAlpha = function(obj) {
+    return(obj@alpha)
+}
+
+#' Accessor to slot beta
+#'
+#' @param obj An Overlap object
+#'
+#' @return beta slot
+getBeta = function(obj) {
+    return(obj@beta)
+}
+
+#' Accessor to slot beta
+#'
+#' @param obj An Overlap object
+#'
+#' @return beta5p slot
+getBeta5p = function(obj) {
+    return(obj@beta5p)
+}
+
+#' Accessor to slot beta3p
+#'
+#' @param obj An Overlap object
+#'
+#' @return beta3p slot
+getBeta3p = function(obj) {
+    return(obj@beta3p)
+}
+
+#' Accessor to slot gamma
+#'
+#' @param obj An Overlap object
+#'
+#' @return gamma slot
+getGamma = function(obj) {
+    return(obj@gamma)
+}
+
+#' Accessor to slot singlestranded
+#'
+#' @param obj An Overlap object
+#'
+#' @return singlestranded slot
+getSinglestranded = function(obj) {
+    return(obj@singlestranded)
+}
+
 #' Overlapping motif hit probabilities
 #'
 #' This function computes a set of self-overlapping probabilites for a
@@ -82,9 +136,9 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
             as.numeric(beta3p),
             as.numeric(beta5p),
             as.numeric(gamma),
-            as.numeric(bg@station),
-            as.numeric(bg@trans),
-            as.integer(bg@order)
+            as.numeric(getStation(bg)),
+            as.numeric(getTrans(bg)),
+            as.integer(getOrder(bg))
         )
     } else {
         res = .C(
@@ -97,9 +151,9 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
             as.numeric(beta3p),
             as.numeric(beta5p),
             as.numeric(gamma),
-            as.numeric(bg@station),
-            as.numeric(bg@trans),
-            as.integer(bg@order)
+            as.numeric(getStation(bg)),
+            as.numeric(getTrans(bg)),
+            as.integer(getOrder(bg))
         )
     }
     overlap = .Overlap(

@@ -41,9 +41,9 @@ scoreDist = function(pfm, bg) {
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
-        bg@station,
-        bg@trans,
-        as.integer(bg@order)
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg))
     )
 
     dist = .Call(
@@ -51,9 +51,9 @@ scoreDist = function(pfm, bg) {
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
-        bg@station,
-        bg@trans,
-        as.integer(bg@order)
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg))
     )
     return(list(scores = scores, dist = dist))
 }
@@ -106,9 +106,9 @@ scoreDistBf = function(pfm, bg) {
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
-        bg@station,
-        bg@trans,
-        as.integer(bg@order)
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg))
     )
 
     dist = .Call(
@@ -116,9 +116,9 @@ scoreDistBf = function(pfm, bg) {
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
-        bg@station,
-        bg@trans,
-        as.integer(bg@order)
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg))
     )
     return(list(scores = scores, dist = dist))
 }
@@ -171,9 +171,9 @@ scoreStrand = function(seq, pfm, bg) {
         nrow(pfm),
         ncol(pfm),
         toString(seq),
-        bg@station,
-        bg@trans,
-        as.integer(bg@order)
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg))
     )
     return(as.numeric(scores))
 }
@@ -337,9 +337,9 @@ scoreHistogramSingleSeq = function(seq, pfm, bg) {
         as.numeric(pfm),
         nrow(pfm),
         ncol(pfm),
-        bg@station,
-        bg@trans,
-        as.integer(bg@order)
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg))
     )
 
     dist = .Call(
@@ -348,9 +348,9 @@ scoreHistogramSingleSeq = function(seq, pfm, bg) {
         nrow(pfm),
         ncol(pfm),
         toString(seq),
-        bg@station,
-        bg@trans,
-        as.integer(bg@order)
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg))
     )
     result = list(scores = scores, dist = dist)
     

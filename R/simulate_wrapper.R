@@ -33,9 +33,9 @@ generateDNAString = function(len, bg) {
         motifcounter_generateRndSeq,
         as.character(seq),
         as.integer(len),
-        bg@station,
-        bg@trans,
-        as.integer(bg@order)
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg))
     )
     return(Biostrings::DNAString(ret[[1]]))
 }
