@@ -138,7 +138,7 @@ static void ShiftMultiplyScoreIndex1d(Score1d *dest, Score1d *src,
             (dest->end - dest->start + 1)*sizeof(double));
 
 #ifdef _OPENMP
-    //#pragma omp parallel for default(none) shared(p,dest) private(i)
+    #pragma omp parallel for default(none) shared(p,dest) private(i)
 #endif
     for (i = dest->start; i <= dest->end; i++) {
         dest->y[i] *= p;
@@ -165,7 +165,7 @@ int computeTotalScoreDistribution1d(MotifScore1d *mscore,
         a->end = (a->end > b->end + lbound[i] - lmin) ?
                  a->end : b->end + lbound[i] - lmin;
 #ifdef _OPENMP
-        //#pragma omp parallel for default(none) \
+        #pragma omp parallel for default(none) \
         shared(a,b,lbound,lmin, i) private(k)
 #endif
         for (k = b->start; k <= b->end; k++) {
