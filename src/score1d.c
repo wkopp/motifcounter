@@ -38,7 +38,8 @@ int getQuantileIndex1d(Score1d *s, double pvalue) {
 }
 
 void initScore1d(Score1d *s, int l) {
-    s->y = Calloc(l, double);
+    s->y = (double*)R_alloc((size_t)l, sizeof(double));
+    memset(s->y, 0, l*sizeof(double));
     s->end = 0;
     s->merged = 0;
     s->start = l;
@@ -51,9 +52,15 @@ int initScoreDistribution1d (DMatrix *theta, double *bg1,
     initScore1d(&result->totalScore, result->meta.length + 1);
 
     result->mlen = theta->nrow;
-    result->ScoreBuffer1 = Calloc(power(ALPHABETSIZE, order) * theta->nrow,
-                                  Score1d);
-    result->tmpScore = Calloc(power(ALPHABETSIZE, order + 1), Score1d);
+    result->ScoreBuffer1 = (Score1d*)R_alloc(
+            (size_t)power(ALPHABETSIZE, order) * theta->nrow,
+            sizeof(Score1d));
+    result->tmpScore = (Score1d*)R_alloc(
+            (size_t)power(ALPHABETSIZE, order + 1), sizeof(Score1d));
+    memset(result->ScoreBuffer1, 0, 
+            (size_t)power(ALPHABETSIZE, order) * theta->nrow * sizeof(Score1d));
+    memset(result->tmpScore, 0, 
+            (size_t)power(ALPHABETSIZE, order + 1) * sizeof(Score1d));
 
     for (i = 0; i < power(ALPHABETSIZE, order)*theta->nrow; i++) {
         initScore1d(&result->ScoreBuffer1[i], result->meta.length + 1);
@@ -62,23 +69,6 @@ int initScoreDistribution1d (DMatrix *theta, double *bg1,
     for (i = 0; i < power(ALPHABETSIZE, order + 1); i++) {
         initScore1d(&result->tmpScore[i], result->meta.length + 1);
     }
-    return 0;
-}
-
-int deleteScoreDistribution1d(MotifScore1d *m, int order) {
-    int j;
-
-    for (j = 0; j < power(ALPHABETSIZE, order)*m->mlen; j++) {
-        Free(m->ScoreBuffer1[j].y);
-    }
-    for (j = 0; j < power(ALPHABETSIZE, order + 1); j++) {
-        Free(m->tmpScore[j].y);
-    }
-
-    Free(m->ScoreBuffer1);
-    Free(m->tmpScore);
-
-    Free(m->totalScore.y);
     return 0;
 }
 
@@ -148,7 +138,7 @@ static void ShiftMultiplyScoreIndex1d(Score1d *dest, Score1d *src,
             (dest->end - dest->start + 1)*sizeof(double));
 
 #ifdef _OPENMP
-    #pragma omp parallel for default(none) shared(p,dest) private(i)
+    //#pragma omp parallel for default(none) shared(p,dest) private(i)
 #endif
     for (i = dest->start; i <= dest->end; i++) {
         dest->y[i] *= p;
@@ -175,7 +165,7 @@ int computeTotalScoreDistribution1d(MotifScore1d *mscore,
         a->end = (a->end > b->end + lbound[i] - lmin) ?
                  a->end : b->end + lbound[i] - lmin;
 #ifdef _OPENMP
-        #pragma omp parallel for default(none) \
+        //#pragma omp parallel for default(none) \
         shared(a,b,lbound,lmin, i) private(k)
 #endif
         for (k = b->start; k <= b->end; k++) {

@@ -48,15 +48,17 @@ double computePoissonParameterSingleStranded(int seqlen, int mlen,
 
 // allocate the memory required to compute the clump size distribution
 double *initTheta(int maxclump) {
-    return Calloc(maxclump * DSTRANDED, double);
+    double *p;
+    p = (double*)R_alloc((size_t)maxclump * DSTRANDED, sizeof(double));
+    memset(p, 0, (size_t)maxclump * DSTRANDED* sizeof(double));
+    return p;
 }
 double *initThetaSingleStranded(int maxclump) {
-    return Calloc(maxclump, double);
-}
+    double *p;
 
-// free the memory required to compute the clump size distribution
-void deleteTheta(double *theta) {
-    Free(theta);
+    p = (double*)R_alloc((size_t)maxclump, sizeof(double));
+    memset(p, 0, (size_t)maxclump * sizeof(double));
+    return p;
 }
 
 // This is the Pape et al. version of having a 1-clump

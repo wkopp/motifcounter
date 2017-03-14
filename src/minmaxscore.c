@@ -46,25 +46,27 @@ int getExtrem(int *v, int N, int max) {
 int initExtremalScore(ExtremalScore *s, double dx, int length, int order) {
     s->dx = dx;
 
-    s->maxforward = Calloc((length) * power(ALPHABETSIZE, order), int);
-    s->maxbackward = Calloc((length) * power(ALPHABETSIZE, order), int);
-    s->minforward = Calloc((length) * power(ALPHABETSIZE, order), int);
-    s->minbackward = Calloc((length) * power(ALPHABETSIZE, order), int);
-    s->intervalstart = Calloc((length) * power(ALPHABETSIZE, order), int);
-    s->intervalend = Calloc((length) * power(ALPHABETSIZE, order), int);
+    s->maxforward = (int*)R_alloc((size_t)(length) * power(ALPHABETSIZE, order),
+        sizeof(int));
+    s->maxbackward = (int*)R_alloc((size_t)(length) * power(ALPHABETSIZE, order), 
+            sizeof(int));
+    s->minforward = (int*)R_alloc((size_t)(length) * power(ALPHABETSIZE, order), 
+            sizeof(int));
+    s->minbackward = (int*)R_alloc((size_t)(length) * power(ALPHABETSIZE, order), 
+            sizeof(int));
+    s->intervalstart = (int*)R_alloc((size_t)(length) * power(ALPHABETSIZE, order), 
+            sizeof(int));
+    s->intervalend = (int*)R_alloc((size_t)(length) * power(ALPHABETSIZE, order), 
+            sizeof(int));
 
+    memset(s->maxforward, 0, (length) * power(ALPHABETSIZE, order)*sizeof(int));
+    memset(s->maxbackward, 0, (length) * power(ALPHABETSIZE, order)*sizeof(int));
+    memset(s->minforward, 0, (length) * power(ALPHABETSIZE, order)*sizeof(int));
+    memset(s->minbackward, 0, (length) * power(ALPHABETSIZE, order)*sizeof(int));
+    memset(s->intervalstart, 0, (length) * power(ALPHABETSIZE, order)*sizeof(int));
+    memset(s->intervalend, 0, (length) * power(ALPHABETSIZE, order)*sizeof(int));
     s->len = length;
     s->order = order;
-    return 0;
-}
-
-int deleteExtremalScore(ExtremalScore *s) {
-    Free(s->maxforward);
-    Free(s->maxbackward);
-    Free(s->minforward);
-    Free(s->minbackward);
-    Free(s->intervalstart);
-    Free(s->intervalend);
     return 0;
 }
 
@@ -165,9 +167,11 @@ void extremScoresPerPositionForward(int max, DMatrix *theta,
     // the actual memory requirements for the current
     // motif, background, and chosen threshold
     if (order > 1) {
-        s = Calloc(power(ALPHABETSIZE, order), int);
+        s = (int*)R_alloc((size_t)power(ALPHABETSIZE, order), sizeof(int));
+        memset(s, 0, power(ALPHABETSIZE, order)*sizeof(int));
     } else {
-        s = Calloc(ALPHABETSIZE, int);
+        s = (int*)R_alloc((size_t)ALPHABETSIZE, sizeof(int));
+        memset(s, 0, ALPHABETSIZE*sizeof(int));
     }
 
     getScoresInitialIndex(&theta->data[0], station, s, dx, order );
@@ -214,7 +218,6 @@ void extremScoresPerPositionForward(int max, DMatrix *theta,
                             getExtrem(s, ALPHABETSIZE, max);
         }
     }
-    Free(s);
 }
 
 void maxScoresPerPositionForward(DMatrix *theta, double *station,

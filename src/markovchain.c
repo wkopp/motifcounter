@@ -57,7 +57,6 @@ double NoOverlapHit(int N, double *beta, double *betap) {
 
 #undef DEBUG
 #define DEBUG
-static double *Rdist = NULL;
 void markovchain(double *dist, double *a,
                  double *beta, double *beta3p, double *beta5p, int slen, int motiflen) {
     int i, k;
@@ -72,7 +71,8 @@ void markovchain(double *dist, double *a,
     // dist[3 ... 3+M-1] ... p(n0), ... , p(nL)
     // dist[3+M, ..., 3+M+M-2] ... p(n1'), ..., p(nL')
     //
-    post = Calloc(2 * motiflen + 2, double);
+    post = (double*)R_alloc((size_t)2 * motiflen + 2, sizeof(double));
+    memset(post, 0, (2 * motiflen + 2)*sizeof(double));
     prior = dist;
     alphacond = a[0];
     memset(prior, 0, (2 * motiflen + 2)*sizeof(double));
@@ -124,7 +124,6 @@ void markovchain(double *dist, double *a,
         memset(post, 0, (2 * motiflen + 2)*sizeof(double));
     }
 
-    Free(post);
 }
 
 void dmc(int n, double *alphacond, double *gradient, void *ex) {
@@ -136,48 +135,38 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
 
 
 
-    if (!Rdist) {
-        Rdist = Calloc(2 * cgparams->motiflen + 2, double);
-    }
-
     epsilon = alphacond[0] / 1000;
     pa = *alphacond + epsilon;
     ma = *alphacond - epsilon;
-    markovchain(Rdist, &pa, cgparams->beta,
+    markovchain(cgparams->dist, &pa, cgparams->beta,
                 cgparams->beta3p, cgparams->beta5p,
                 cgparams->len, cgparams->motiflen);
 
-    val = Rdist[1] + Rdist[2];
-    markovchain(Rdist, &ma, cgparams->beta,
+    val = cgparams->dist[1] + cgparams->dist[2];
+    markovchain(cgparams->dist, &ma, cgparams->beta,
                 cgparams->beta3p, cgparams->beta5p,
                 cgparams->len, cgparams->motiflen);
 
-    val -= (Rdist[1] + Rdist[2]);
+    val -= (cgparams->dist[1] + cgparams->dist[2]);
     val /= 2 * epsilon;
 
-    markovchain(Rdist, alphacond, cgparams->beta,
+    markovchain(cgparams->dist, alphacond, cgparams->beta,
                 cgparams->beta3p, cgparams->beta5p,
                 cgparams->len, cgparams->motiflen);
 
-    *gradient = -2 * (2 * cgparams->alpha - Rdist[1] - Rdist[2]) * val;
+    *gradient = -2 * (2 * cgparams->alpha - cgparams->dist[1] - 
+            cgparams->dist[2]) * val;
 }
 double minmc(int n, double *alpha, void *ex) {
 
     //double *extra=(double*)ex;
     CGParams *cgparams = (CGParams *)ex;
 
-    if (!Rdist) {
-        Rdist = Calloc(2 * cgparams->motiflen + 2, double);
-    }
-
-    markovchain(Rdist, alpha, cgparams->beta,
+    markovchain(cgparams->dist, alpha, cgparams->beta,
                 cgparams->beta3p, cgparams->beta5p,
                 cgparams->len, cgparams->motiflen);
 
-    return R_pow_di(2 * cgparams->alpha - Rdist[1] - Rdist[2], 2);
+    return R_pow_di(2 * cgparams->alpha - cgparams->dist[1] - 
+            cgparams->dist[2], 2);
 }
 
-void removeDist() {
-    if(Rdist) Free(Rdist);
-    Rdist = NULL;
-}

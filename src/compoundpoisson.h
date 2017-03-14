@@ -8,7 +8,6 @@ double computePoissonParameterSingleStranded(int seqlen, int mlen,
         int maxclump, double alpha, double *theta);
 double *initTheta(int maxclump);
 double *initThetaSingleStranded(int maxclump);
-void deleteTheta(double *theta);
 void computeTheta(int maxclump, double *theta, double *delta, int mlen);
 void computeThetaSingleStranded(int maxclump, double *theta, double *delta,
                                 int mlen);

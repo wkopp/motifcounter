@@ -13,8 +13,10 @@ void Roverlap(double *pfm_, int *nrow, int *ncol,
     double dx, pvalue;
     DMatrix pfm, cpfm;
 
-    pfm.data = Calloc(nrow[0] * ncol[0], double);
-    cpfm.data = Calloc(nrow[0] * ncol[0], double);
+    pfm.data = (double*)R_alloc((size_t)nrow[0] * ncol[0], sizeof(double));
+    cpfm.data = (double*)R_alloc((size_t)nrow[0] * ncol[0], sizeof(double));
+    memset(pfm.data, 0, nrow[0] * ncol[0]*sizeof(double));
+    memset(cpfm.data, 0, nrow[0] * ncol[0]*sizeof(double));
 
     // Rcol and c-col are swapped
     pfm.ncol = nrow[0];
@@ -46,8 +48,6 @@ void Roverlap(double *pfm_, int *nrow, int *ncol,
     computeBetas(beta, beta3p, beta5p, gamma, pfm.nrow, 0.0);
     *alpha = gamma[0];
 
-    Free(pfm.data);
-    Free(cpfm.data);
 }
 
 void RoverlapSingleStranded(double *pfm_, int *nrow, int *ncol,
@@ -59,8 +59,11 @@ void RoverlapSingleStranded(double *pfm_, int *nrow, int *ncol,
     double dx, pvalue;
     DMatrix pfm, cpfm;
 
-    pfm.data = Calloc(nrow[0] * ncol[0], double);
-    cpfm.data = Calloc(nrow[0] * ncol[0], double);
+    pfm.data = (double*)R_alloc((size_t)nrow[0] * ncol[0], sizeof(double));
+    cpfm.data = (double*)R_alloc((size_t)nrow[0] * ncol[0], sizeof(double));
+    memset(pfm.data, 0, nrow[0] * ncol[0]*sizeof(double));
+    memset(cpfm.data, 0, nrow[0] * ncol[0]*sizeof(double));
+
     // Rcol and c-col are swapped
     pfm.ncol = nrow[0];
     cpfm.ncol = nrow[0];
@@ -90,6 +93,4 @@ void RoverlapSingleStranded(double *pfm_, int *nrow, int *ncol,
     computeBetasSingleStranded(beta, gamma, pfm.nrow, 0.0);
     *alpha = gamma[0];
 
-    Free(pfm.data);
-    Free(cpfm.data);
 }

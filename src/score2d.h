@@ -27,11 +27,6 @@ typedef struct {
 int initScoreDistribution (DMatrix *theta, DMatrix *bg1, MotifScore2d *result,
                            int order);
 
-int deleteMotifScore(MotifScore2d *m, int order);
-
-// Compute the score distribution for the motif
-
-
 int computeScoreDistribution2D(DMatrix *pwm1, DMatrix *pwm2,
                                double *trans, double *station, MotifScore2d *mscore,
                                ExtremalScore *escore1, ExtremalScore *escore2,

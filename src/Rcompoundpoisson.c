@@ -39,7 +39,6 @@ void RcompoundpoissonPape_useGamma(double *gamma,
                                      maxclumpsize, gamma[0], theta);
     computeCompoundPoissonDistributionKemp(lambda, maxhits,
                                            maxclumpsize, theta, hitdistribution);
-    deleteTheta(theta);
 }
 
 void Rcompoundpoisson_useBeta(double *alpha, double *beta,
@@ -64,8 +63,11 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
     maxhits = (double)mhit[0];
     singlestranded = *sstrand;
 
-    delta = Calloc(motiflen[0], double);
-    deltap = Calloc(motiflen[0], double);
+    delta = (double*)R_alloc((size_t)motiflen[0], sizeof(double));
+    deltap = (double*)R_alloc((size_t)motiflen[0], sizeof(double));
+
+    memset(delta, 0, motiflen[0]*sizeof(double));
+    memset(deltap, 0, motiflen[0]*sizeof(double));
 
     // initialize the extention factors
     memset(extention, 0, 3 * sizeof(double));
@@ -105,7 +107,4 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
 
 
 
-    deleteTheta(theta);
-    Free(delta);
-    Free(deltap);
 }

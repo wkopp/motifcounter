@@ -21,7 +21,8 @@ SEXP Rscoredist(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     int i, intervalsize, maxs, mins;
     DMatrix pfm;
 
-    pfm.data = Calloc(nrow[0] * ncol[0], double);
+    pfm.data = (double*)R_alloc((size_t)nrow[0] * ncol[0], sizeof(double));
+    memset(pfm.data, 0, nrow[0] * ncol[0]*sizeof(double));
 
     // Rcol and c-col are swapped
     pfm.ncol = nrow[0];
@@ -54,10 +55,7 @@ SEXP Rscoredist(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     for (i = 0; i < null.meta.xmax - null.meta.xmin + 1; i++) {
         xdist[i] = null.totalScore.y[i];
     }
-    deleteExtremalScore(&fescore);
-    deleteScoreDistribution1d(&null, order[0]);
 
-    Free(pfm.data);
     UNPROTECT(1);
     return dist;
 }
@@ -80,7 +78,8 @@ SEXP Rscoredist_bf(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     SEXP dist;
     DMatrix pfm;
 
-    pfm.data = Calloc(nrow[0] * ncol[0], double);
+    pfm.data = (double*)R_alloc((size_t)nrow[0] * ncol[0], sizeof(double));
+    memset(pfm.data, 0, nrow[0] * ncol[0]*sizeof(double));
 
     // Rcol and c-col are swapped
     pfm.ncol = nrow[0];
@@ -114,10 +113,7 @@ SEXP Rscoredist_bf(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     for (i = 0; i < null.meta.xmax - null.meta.xmin + 1; i++) {
         xdist[i] = null.totalScore.y[i];
     }
-    deleteExtremalScore(&fescore);
-    deleteScoreDistribution1d(&null, order[0]);
 
-    Free(pfm.data);
     UNPROTECT(1);
     return dist;
 }

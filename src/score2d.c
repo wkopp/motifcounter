@@ -17,7 +17,8 @@
 #include "score2d.h"
 
 void initScore2d(Score2d *s, int l) {
-    s->y = Calloc(l * l, double);
+    s->y = (double*)R_alloc((size_t)l * l, sizeof(double));
+    memset(s->y, 0, (size_t)l * l * sizeof(double));
     s->end1 = 0;
     s->end2 = 0;
     s->start1 = l;
@@ -29,8 +30,12 @@ int initScoreDistribution2d (DMatrix *theta, double *bg1,
     int i;
 
     result->mlen = theta->nrow;
-    result->ScoreBuffer1 = Calloc(power(ALPHABETSIZE, order), Score2d);
-    result->tmpScore = Calloc(power(ALPHABETSIZE, order + 1), Score2d);
+    result->ScoreBuffer1 = (Score2d*)R_alloc((size_t)power(ALPHABETSIZE, order),
+            sizeof(Score2d));
+    result->tmpScore = (Score2d*)R_alloc((size_t)power(ALPHABETSIZE, order + 1),
+            sizeof(Score2d));
+    memset(result->ScoreBuffer1, 0, power(ALPHABETSIZE, order) * sizeof(Score2d));
+    memset(result->tmpScore, 0, power(ALPHABETSIZE, order+1) * sizeof(Score2d));
 
     for (i = 0; i < power(ALPHABETSIZE, order); i++) {
         initScore2d(&result->ScoreBuffer1[i], result->meta.length);
@@ -39,22 +44,6 @@ int initScoreDistribution2d (DMatrix *theta, double *bg1,
     for (i = 0; i < power(ALPHABETSIZE, order + 1); i++) {
         initScore2d(&result->tmpScore[i], result->meta.length);
     }
-    return 0;
-}
-
-int deleteScoreDistribution2d(MotifScore2d *m, int order) {
-    int j;
-
-    for (j = 0; j < power(ALPHABETSIZE, order); j++) {
-        Free(m->ScoreBuffer1[j].y);
-    }
-    for (j = 0; j < power(ALPHABETSIZE, order + 1); j++) {
-        Free(m->tmpScore[j].y);
-    }
-
-    Free(m->ScoreBuffer1);
-    Free(m->tmpScore);
-
     return 0;
 }
 
@@ -976,13 +965,5 @@ void computeConditionalOverlappingProbabilities(DMatrix *pwm1,
         gamma[pwm1->nrow * 2 + shift] = getMarginalProbability2d(&null, order);
     }
 
-    deleteExtremalScore(&escore1);
-    deleteExtremalScore(&escore2);
-    deleteExtremalScore(&uescore1);
-    deleteExtremalScore(&uescore2);
-    deleteScoreDistribution2d(&null, order);
-    deleteScoreDistribution2d(&init2d, order);
-    deleteScoreDistribution1d(&init1d1, order);
-    deleteScoreDistribution1d(&init1d2, order);
 }
 

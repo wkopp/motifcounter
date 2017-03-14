@@ -28,23 +28,18 @@ int allocPosteriorProbability(PosteriorCount *p, int seqlen,
     p->seqlen = seqlen;
     p->mlen = mlen;
     p->maxhits = maxhits;
-    p->value = Calloc(maxhits, double **);
+    p->value = (double***)R_alloc((size_t)maxhits, sizeof(double **));
+    memset(p->value, 0, maxhits * sizeof(double **));
 
     for (i = 0; i < maxhits; i++) {
-        p->value[i] = Calloc(seqlen, double *);
+        p->value[i] = (double**)R_alloc((size_t)seqlen, sizeof(double *));
+        memset(p->value[i], 0, seqlen * sizeof(double *));
         for (j = 0; j < seqlen; j++) {
-            p->value[i][j] = Calloc(2 * mlen, double);
+            p->value[i][j] = (double*)R_alloc(2 * mlen, sizeof(double));
+            memset(p->value[i][j], 0, 2 * mlen * sizeof(double));
         }
     }
     return 0;
-}
-void deletePosteriorProbability(PosteriorCount *p) {
-    int i, j;
-    for (i = 0; i < p->maxhits; i++) {
-        for (j = 0; j < p->seqlen; j++) Free(p->value[i][j]);
-        Free(p->value[i]);
-    }
-    Free(p->value);
 }
 
 double addomegas(double *omega, int start, int end) {
@@ -87,18 +82,13 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
     p->delta = *delta;
     p->deltap = *deltap;
 
-    _alpha = Calloc(p->seqlen, double);
-    _omega = Calloc(p->seqlen, double);
+    _alpha = (double*)R_alloc((size_t)p->seqlen, sizeof(double));
+    _omega = (double*)R_alloc((size_t)p->seqlen, sizeof(double));
+    memset(_alpha, 0, (size_t)p->seqlen*sizeof(double));
+    memset(_omega, 0, (size_t)p->seqlen*sizeof(double));
 
     m = (70 > p->seqlen) ? p->seqlen : 70;
 
-    /*
-       extra=Calloc(3*p->mlen+2, double);
-       if (extra==NULL) {
-       error("Memory-allocation in initPosteriorProbability failed");
-       }
-       extra[0]=alpha;
-       */
     a0 = alpha;
 
     cgparams.alpha = alpha;
@@ -107,6 +97,9 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
     cgparams.beta5p = p->beta5p;
     cgparams.len = 500;
     cgparams.motiflen = p->mlen;
+    cgparams.dist = (double*)R_alloc((size_t)2 * cgparams.motiflen + 2, 
+            sizeof(double));
+    memset(cgparams.dist, 0, (2 * cgparams.motiflen+2)*sizeof(double));
     /*
        for (i=0; i<p->mlen; i++) {
        extra[1+i]=p->beta[i];
@@ -138,9 +131,6 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
 
     p->alpha = aN;
     p->omega = 1 - 2 * p->alpha + p->alpha * p->beta3p[0];
-
-    // Free(extra);
-    removeDist();
 
 #ifdef DEBUG
 #ifdef IN_R
@@ -180,8 +170,6 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
         Rprintf( "\n");
 #endif
     }
-    Free(_alpha);
-    Free(_omega);
 }
 
 double ffTransProb(PosteriorCount *prob, int n) {
@@ -410,7 +398,8 @@ void computeResultRecursive(double **part, int nos, int klen) {
 #ifdef DEBUG
     Rprintf("merge l1=%d l2=%d\n", l1, l2);
 #endif
-    part[nos - 1] = Calloc(klen + 1, double);
+    part[nos - 1] = (double*)R_alloc((size_t)klen + 1, sizeof(double));
+    memset(part[nos - 1], 0, (klen + 1)*sizeof(double));
     convolute(part[nos - 1], part[l1 - 1], part[l2 - 1], klen);
 #ifdef DEBUG
     for (i = 0, sum = 0.0; i <= klen; i++) {
@@ -431,10 +420,16 @@ void multipleShortSequenceProbability(double *singledist,
     double **part_results;
 
     // allocate array of pointers to sub-aggregated distributions
-    part_results = Calloc(numofseqs, double *);
-    part_results[0] = Calloc(maxagghits + 1, double);
+    part_results = (double**)R_alloc((size_t)numofseqs, sizeof(double *));
+    memset(part_results, 0, numofseqs * sizeof(double *));
+
+    part_results[0] = (double*)R_alloc((size_t)maxagghits + 1, sizeof(double));
+
+    //memset(part_results[0], 0, (maxagghits + 1) * sizeof(double));
+
     // copy the distribution of a single sequence to part_results
     // this corresponds to the base case
+    memset(part_results[0], 0, (maxagghits+1) * sizeof(double));
     memcpy(part_results[0], singledist, (maxsinglehits + 1)*sizeof(double));
 
     // recursively determine the distribution in N i.i.d. sequences
@@ -443,15 +438,9 @@ void multipleShortSequenceProbability(double *singledist,
     // copy the final result into aggregated
     for (i = 0, sum = 0.0; i <= maxagghits; i++) {
         aggregateddist[i] = part_results[numofseqs - 1][i];
-        sum += aggregateddist[i];
     }
 #ifdef DEBUG
     Rprintf("P[%d]=%1.3e\n ", numofseqs, sum);
 #endif
-    // free the allocated memory
-    for (i = 0; i < numofseqs; i++) {
-        if (part_results[i]) Free(part_results[i]);
-    }
-    Free(part_results);
 }
 

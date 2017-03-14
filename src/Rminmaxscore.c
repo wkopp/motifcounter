@@ -21,7 +21,8 @@ SEXP Rscorerange(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     int i;
     DMatrix pfm;
 
-    pfm.data = Calloc(nrow[0] * ncol[0], double);
+    pfm.data = (double*)R_alloc((size_t)nrow[0] * ncol[0], sizeof(double));
+    memset(pfm.data, 0, nrow[0] * ncol[0]*sizeof(double));
 
     // Rcol and c-col are swapped
     pfm.ncol = nrow[0];
@@ -36,10 +37,6 @@ SEXP Rscorerange(SEXP rpfm_, SEXP rnrow, SEXP rncol,
 
     mins = getTotalScoreLowerBound(&fescore);
     maxs = getTotalScoreUpperBound(&fescore);
-
-    deleteExtremalScore(&fescore);
-
-    Free(pfm.data);
 
     scores = PROTECT(allocVector(REALSXP, maxs - mins + 1));
     xscores = REAL(scores);

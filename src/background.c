@@ -37,8 +37,11 @@ int getStationaryDistribution(double *trans, double *station, int order) {
 
     tmp1 = (double*)R_alloc((size_t)power(ALPHABETSIZE, order), sizeof(double));
     tmp2 = (double*)R_alloc((size_t)power(ALPHABETSIZE, order), sizeof(double));
+
     tmpres = tmp1;
     tmpstart = tmp2;
+    memset(tmpres, 0, power(ALPHABETSIZE, order)* sizeof(double));
+    memset(tmpstart, 0, power(ALPHABETSIZE, order)* sizeof(double));
 
     for (i = 0; i < power(ALPHABETSIZE, order); i++) {
         tmpstart[i] = 1.0 / (double)power(ALPHABETSIZE, order);

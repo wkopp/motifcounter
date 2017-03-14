@@ -19,7 +19,6 @@ typedef struct {
 int initExtremalScore(ExtremalScore *s, double, int length, int order);
 int min(int a, int b);
 int max(int a, int b);
-int deleteExtremalScore(ExtremalScore *s);
 
 void maxScoresPerPositionBack(DMatrix *theta, double *bg1, int *result,
                               double *dx, int order);

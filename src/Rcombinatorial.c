@@ -38,35 +38,27 @@ void RPosteriorProbability(double *alpha, double *beta,
     maxhits = smaxhits[0];
     totalmaxhits = maxhits * nos;
 
-    delta = Calloc(motiflen[0], double);
-    deltap = Calloc(motiflen[0], double);
+    delta = (double*)R_alloc((size_t)motiflen[0], sizeof(double));
+    deltap = (double*)R_alloc((size_t)motiflen[0], sizeof(double));
+    memset(delta, 0, motiflen[0]*sizeof(double));
+    memset(deltap, 0, motiflen[0]*sizeof(double));
 
     computeDeltas(delta, deltap, beta, beta3p, beta5p, motiflen[0]);
 
-    // correct bias of alpha by fitting
-    // markov model to the stationary distribution
-    //extra=Calloc(3*motiflen[0]+1, double);
-    //if (extra==NULL) {
-    //error("Memory-allocation in RPosteriorProbability failed");
-    //}
-    //extra[0]=alpha[0];
     a0 = alpha[0];
-    //for (i=0; i<motiflen[0]; i++) {
-    //extra[1+i]=beta[i];
-    //extra[motiflen[0]+1+i]=beta3p[i];
-    //extra[2*motiflen[0]+1+i]=beta5p[i];
-    //}
     cgparams.alpha = alpha[0];
     cgparams.beta = beta;
     cgparams.beta3p = beta3p;
     cgparams.beta5p = beta5p;
     cgparams.len = 500;
     cgparams.motiflen = motiflen[0];
+    cgparams.dist = (double*)R_alloc((size_t)2 * cgparams.motiflen + 2, 
+            sizeof(double));
+    memset(cgparams.dist, 0, (2 * cgparams.motiflen + 2)*sizeof(double));
+
 
     cgmin(1, &a0, &aN, &res, minmc, dmc, &fail, abstol, intol,
           (void *)&cgparams, type, trace, &fncount, &gncount, 100);
-
-    removeDist();
 
     allocPosteriorProbability(&prob, seqlen, motiflen[0], maxhits);
     initPosteriorProbability(&prob, alpha[0], &beta, &beta3p, &beta5p,
@@ -74,11 +66,13 @@ void RPosteriorProbability(double *alpha, double *beta,
 
     computePosteriorProbability(&prob);
 
-    singlehitdistribution = Calloc(maxhits + 1, double);
+    singlehitdistribution = (double*)R_alloc((size_t)(maxhits + 1), 
+            sizeof(double));
+    memset(singlehitdistribution, 0, (maxhits + 1)*sizeof(double));
 
-#ifdef DEBUG
+    #ifdef DEBUG
     Rprintf("omega=%e, alpha=%e\n", prob.omega, prob.alpha);
-#endif
+    #endif
 
 
     // renormalize the distribution so that it sums to one
@@ -95,16 +89,13 @@ void RPosteriorProbability(double *alpha, double *beta,
 
     // compute the distribution of the number of hits
     // across multiple independent DNA sequences
+    memset(hitdistribution, 0, totalmaxhits * sizeof(double));
     multipleShortSequenceProbability(singlehitdistribution, hitdistribution,
                                      maxhits, totalmaxhits, nos);
     for (k = 0, sum = 0.0; k <= totalmaxhits; k++) {
         sum += hitdistribution[k];
     }
-
-    deletePosteriorProbability(&prob);
-    Free(singlehitdistribution);
-    Free(delta);
-    Free(deltap);
+    
 
     return;
 }

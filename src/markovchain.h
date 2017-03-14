@@ -5,7 +5,6 @@ void markovchain(double *dist,
                  double *beta5p, int slen, int motiflen);
 double minmc(int n, double *par, void *extra);
 void dmc(int n, double *par, double *gradient, void *ex);
-void removeDist();
 
 typedef struct {
     double alpha;
@@ -14,5 +13,6 @@ typedef struct {
     double *beta5p;
     int len;
     int motiflen;
+    double * dist;
 } CGParams;
 #endif

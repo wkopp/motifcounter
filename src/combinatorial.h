@@ -27,7 +27,6 @@ void testPosteriorProbability(char *bg, char *fpwm, char *output,
                               char *smaxhits,  char *spv, char *sth, char *snos, char *gran);
 int allocPosteriorProbability(PosteriorCount *p, int seqlen, int mlen,
                               int maxhits);
-void deletePosteriorProbability(PosteriorCount *p);
 void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
                               double **beta3p, double **beta5p, double **delta, double **deltap);
 void computePosteriorProbability(PosteriorCount *prob);

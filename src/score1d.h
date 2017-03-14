@@ -29,7 +29,6 @@ double getQuantileWithIndex1d(MotifScore1d *s, int qi);
 int getQuantileIndex1d(Score1d *s, double pvalue);
 double getProbWithIndex1d(MotifScore1d *s, int iquantile);
 double getProb1d(MotifScore1d *s, double quantile);
-int deleteScoreDistribution1d(MotifScore1d *m, int order);
 
 
 int computeMarginalScoreDistribution1d(DMatrix *theta, double *bg1,

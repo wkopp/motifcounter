@@ -47,7 +47,8 @@ SEXP Rscoresequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
 
     DMatrix pfm;
 
-    pfm.data = Calloc(nrow[0] * ncol[0], double);
+    pfm.data = (double*)R_alloc((size_t)nrow[0] * ncol[0], sizeof(double));
+    memset(pfm.data, 0, nrow[0] * ncol[0]*sizeof(double));
 
     // Rcol and c-col are swapped
     pfm.ncol = nrow[0];
@@ -61,7 +62,6 @@ SEXP Rscoresequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
                   &pfm, seq, slen, xscores,
                   Rgran, order[0]);
 
-    Free(pfm.data);
     UNPROTECT(1);
     return scores;
 }
@@ -88,7 +88,8 @@ SEXP RscoreHistogram(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     seq = CHAR(STRING_ELT(rseq, 0));
     slen = strlen(seq);
 
-    pfm.data = Calloc(nrow[0] * ncol[0], double);
+    pfm.data = (double*)R_alloc((size_t)nrow[0] * ncol[0], sizeof(double));
+    memset(pfm.data, 0, nrow[0] * ncol[0]*sizeof(double));
 
     // Rcol and c-col are swapped
     pfm.ncol = nrow[0];
@@ -102,8 +103,6 @@ SEXP RscoreHistogram(SEXP rpfm_, SEXP rnrow, SEXP rncol,
 
     mins = getTotalScoreLowerBound(&fescore);
     maxs = getTotalScoreUpperBound(&fescore);
-
-    deleteExtremalScore(&fescore);
 
     dist = PROTECT(allocVector(REALSXP, maxs - mins + 1));
     xdist = REAL(dist);
@@ -121,8 +120,6 @@ SEXP RscoreHistogram(SEXP rpfm_, SEXP rnrow, SEXP rncol,
         scoreHistogram(station, trans,
                        &pfm, seq, slen, xdist, Rgran, mins, order[0]);
     }
-
-    Free(pfm.data);
 
     UNPROTECT(2);
     return dist;
