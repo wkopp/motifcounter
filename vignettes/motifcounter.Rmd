@@ -1,7 +1,7 @@
 ---
 title: "Introduction to the `motifcounter` package"
 author: "Wolfgang Kopp"
-date: "2017-03-06"
+date: "2017-03-22"
 output:
     prettydoc::html_pretty:
         toc: TRUE
@@ -59,19 +59,19 @@ scores <- scoreSequence(sequence, motif, bg)
 ```
 ```{r eval=FALSE}
 # Evaluate the motif hits along a given sequence
-scores <- motifHits(sequence, motif, bg)
+hits <- motifHits(sequence, motif, bg)
 ```
 ```{r eval=FALSE}
 # Evaluate the average score profile
-scores <- scoreProfile(sequences, motif, bg)
+average_scores <- scoreProfile(sequences, motif, bg)
 ```
 ```{r eval=FALSE}
 # Evaluate the average motif hit profile
-scores <- motifHitProfile(sequences, motif, bg)
+average_hits <- motifHitProfile(sequences, motif, bg)
 ```
 ```{r eval=FALSE}
 # Compute the motif hit enrichment
-scores <- motifEnrichment(sequences, motif, bg)
+enrichment_result <- motifEnrichment(sequences, motif, bg)
 ```
 
 # Introduction
