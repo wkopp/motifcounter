@@ -121,12 +121,12 @@ test_that("clump size distribution", {
 
     # test kopp clump size corretness
     dist = motifcounter:::clumpSizeDist(maxclump, op)$dist
-    expect_equal(length(dist), maxclump*2)
+    expect_equal(length(dist), maxclump)
     expect_equal(sum(dist),1)
 
     # test pape clump size corretness
     dist = motifcounter:::clumpSizeDist(maxclump, op, method = "pape")$dist
-    expect_equal(length(dist), maxclump*2)
+    expect_equal(length(dist), maxclump)
     expect_equal(sum(dist),1)
 
     dist = motifcounter:::simulateClumpSizeDist(motif, bg, 1000000, nsim = 1)$dist

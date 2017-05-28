@@ -54,6 +54,7 @@ double *initTheta(int maxclump) {
     memset(p, 0, (size_t)maxclump * DSTRANDED* sizeof(double));
     return p;
 }
+
 double *initThetaSingleStranded(int maxclump) {
     double *p;
 
@@ -188,14 +189,12 @@ void computeExtentionFactorsKoppSingleStranded(double *xi, double *beta,
 
 }
 
-#define DEBUG
 void computeTheta(int maxclump, double *theta,
                   double *extention, int mlen) {
     int i;
     double total = 0.0;
 
     total = theta[0] + theta[1];
-    Rprintf("maxclump=%d\n", maxclump);
     for (i = 1; i < maxclump; i++) {
         theta[i * DSTRANDED] =
                         extention[0] * theta[(i - 1) * DSTRANDED] +
@@ -205,23 +204,14 @@ void computeTheta(int maxclump, double *theta,
                         extention[0] * theta[(i - 1) * DSTRANDED + 1];
 
         total += (theta[i * DSTRANDED] + theta[i * DSTRANDED + 1]);
-#ifdef DEBUG
-        Rprintf("total=%e, theta=%e, theta'=%e\n", total, theta[i * DSTRANDED],
-                theta[i * DSTRANDED + 1]);
-#endif
+
     }
 
     for (i = 0; i < maxclump; i++) {
         theta[i * DSTRANDED] /= total;
         theta[i * DSTRANDED + 1] /= total;
-        //#define DEBUG
-#ifdef DEBUG
-        Rprintf( "theta%d=%e, theta%d'=%e\n", i + 1,
-                 theta[i * DSTRANDED], i + 1, theta[i * DSTRANDED + 1]);
-#endif
     }
 }
-#undef DEBUG
 
 void computeThetaSingleStranded(int maxclump, double *theta,
                                 double *extention, int mlen) {
@@ -239,7 +229,6 @@ void computeThetaSingleStranded(int maxclump, double *theta,
     // normalize the theta such that they sum up to one
     for (i = 0; i < maxclump; i++) {
         theta[i] /= total;
-        //    Rprintf("total=%e, theta=%e\n",total, theta[i]);
     }
 }
 

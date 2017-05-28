@@ -179,26 +179,20 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
 #' # Use 100 individual sequences of length 150 bp each
 #' seqlen = rep(150, 100)
 #'
-#' # Compute overlapping probabilities
-#' # for scanning the forward DNA strand only
-#' op = motifcounter:::probOverlapHit(motif, bg, singlestranded = TRUE)
-#'
-#' # Computes  the compound Poisson distribution
-#' dist = motifcounter:::clumpSizeDist(seqlen, op)
 #'
 #' # Compute overlapping probabilities
 #' # for scanning the forward DNA strand only
 #' op = motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
 #' 
 #' # Computes  the compound Poisson distribution
-#' dist = motifcounter:::clumpSizeDist(seqlen, op)
+#' dist = motifcounter:::clumpSizeDist(20, op)
 #'
 #' @seealso \code{\link{probOverlapHit}}
 clumpSizeDist = function(maxclump, overlap, method = "kopp") {
     stopifnot(is(overlap, "Overlap"))
     stopifnot(getSinglestranded(overlap) == FALSE)
     
-    dist = numeric(maxclump * 2)
+    dist = numeric(maxclump)
     if (method == "kopp") {
         res = .C(
             motifcounter_clumpsize_kopp,
@@ -209,7 +203,7 @@ clumpSizeDist = function(maxclump, overlap, method = "kopp") {
             as.integer(maxclump),
             length(getBeta(overlap))
         )
-        dist = res[[3]]
+        dist = res[[4]]
     } else if (method == "pape") {
         res = .C(
             motifcounter_clumpsize_pape,
