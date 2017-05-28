@@ -136,3 +136,92 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
         }
     return (list(dist = dist))
 }
+
+#' Clump size distribution
+#'
+#' This function approximates the distribution of the clump sizes.
+#' 
+#' The clump size distribution can be determined in two alternative ways:
+#' \enumerate{
+#' \item A re-implemented version of the algorithm that was
+#' described in Pape et al. \emph{Compound poisson approximation
+#' of the number of occurrences of a position
+#' frequency matrix (PFM) on both strands.} 2008
+#' can be invoked using method='pape'.
+#' \item An improved approximation of the clump size distribution 
+#' uses more appropriate statistical assumptions concerning
+#' overlapping motif hits and that can be used with order-d
+#' background models as well. The improved version is used by default
+#' with method='kopp'.
+#' }
+#'
+#'
+#' @inheritParams compoundPoissonDist
+#' @param maxclump Maximal clump size
+#'
+#' @return List containing
+#' \describe{
+#' \item{dist}{Distribution of the clump size}
+#' }
+#' @examples
+#'
+#' # Load sequences
+#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seqs = Biostrings::readDNAStringSet(seqfile)
+#' 
+#' # Load motif
+#' motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
+#'
+#' # Load background model
+#' bg = readBackground(seqs, 1)
+#'
+#' # Use 100 individual sequences of length 150 bp each
+#' seqlen = rep(150, 100)
+#'
+#' # Compute overlapping probabilities
+#' # for scanning the forward DNA strand only
+#' op = motifcounter:::probOverlapHit(motif, bg, singlestranded = TRUE)
+#'
+#' # Computes  the compound Poisson distribution
+#' dist = motifcounter:::clumpSizeDist(seqlen, op)
+#'
+#' # Compute overlapping probabilities
+#' # for scanning the forward DNA strand only
+#' op = motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
+#' 
+#' # Computes  the compound Poisson distribution
+#' dist = motifcounter:::clumpSizeDist(seqlen, op)
+#'
+#' @seealso \code{\link{probOverlapHit}}
+clumpSizeDist = function(maxclump, overlap, method = "kopp") {
+    stopifnot(is(overlap, "Overlap"))
+    stopifnot(getSinglestranded(overlap) == FALSE)
+    
+    dist = numeric(maxclump * 2)
+    if (method == "kopp") {
+        res = .C(
+            motifcounter_clumpsize_kopp,
+            getBeta(overlap),
+            getBeta3p(overlap),
+            getBeta5p(overlap),
+            as.numeric(dist),
+            as.integer(maxclump),
+            length(getBeta(overlap))
+        )
+        dist = res[[3]]
+    } else if (method == "pape") {
+        res = .C(
+            motifcounter_clumpsize_pape,
+            getGamma(overlap),
+            as.numeric(dist),
+            as.integer(maxclump),
+            length(getBeta(overlap))
+        )
+        dist = res[[2]]
+    } else {
+        stop(
+            "Invalid 'method': The 'method' must be 'kopp' or 'pape'")
+    }
+    return (list(dist = dist))
+}

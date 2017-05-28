@@ -144,6 +144,83 @@ simulateNumHitsDist = function(pfm, bg, seqlen, nsim, singlestranded = FALSE) {
     return(list(dist = freq))
 }
 
+#' Empirical clump size distribution
+#'
+#' This function repeatedly simulates random DNA sequences according to
+#' the background model and
+#' subsequently counts the number of k-clump occurrences, where
+#' denotes the clump size.
+#' This function is only used for benchmarking analysis.
+#'
+#' @inheritParams numMotifHits
+#' @inheritParams compoundPoissonDist
+#' @param nsim Integer number of random samples.
+#' @return A List that contains
+#' \describe{
+#' \item{dist}{Empirical distribution of the clump sizes}
+#' }
+#' @examples
+#'
+#'
+#' # Load sequences
+#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seqs = Biostrings::readDNAStringSet(seqfile)
+#'
+#' # Load background
+#' bg = readBackground(seqs, 1)
+#'
+#' # Load motif
+#' motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
+#'
+#' # Study the clump size frequencies in one sequence of length 1 Mb
+#' seqlen = 1000000
+#'
+#' # scan both strands
+#' simc = motifcounter:::simulateClumpSizeDist(motif, bg, seqlen)
+#'
+#' # scan a single strand
+#' simc = motifcounter:::simulateClumpSizeDist(motif, bg,
+#'     seqlen, singlestranded = TRUE)
+#'
+#' @seealso \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
+simulateClumpSizeDist = function(pfm, bg, seqlen, nsim=10, singlestranded = FALSE) {
+    motifValid(pfm)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
+    motifAndBackgroundValid(pfm, bg)
+    stopifnot (length(seqlen) == 1)
+
+    freq = rep(0, 20)
+    for (p in seq_len(nsim)) {
+        seq = generateDNAString(seqlen, bg)
+        hits = motifHits(seq, pfm, bg)
+
+        # determine the clump sizes
+        if (singlestranded == TRUE) {
+            h=hits$fhits
+        } else {
+            h=hits$fhits + hits$rhits
+        }
+
+        index_sequence = which(h>0)
+        previous_index = index_sequence[1]
+        cnt=h[previous_index]
+        for (i in 2:length(index_sequence)) {
+            if (index_sequence[i] < previous_index+ncol(pfm)) {
+                cnt = cnt + h[index_sequence[i]]
+            } else {
+                freq[cnt] = freq[cnt] + 1
+                cnt = h[index_sequence[i]]
+            }
+            previous_index = index_sequence[i]
+        }
+    }
+
+    freq = freq / sum(freq)
+    return(list(dist = freq))
+}
+
 #' Empirical score distribution
 #'
 #' This function estimates the empirical score distribution

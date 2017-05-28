@@ -99,3 +99,36 @@ test_that("jaspar motif tests", {
     }
 
 })
+
+test_that("clump size distribution", {
+    #  init
+    motifcounterOptions()
+
+    # Obtain background
+    seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+    seqs=Biostrings::readDNAStringSet(seqfile)
+    bg=readBackground(seqs,1)
+
+    motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+    motif = t(as.matrix(read.table(motiffile)))
+    maxclump = 20
+
+    op = motifcounter:::probOverlapHit(motif, bg, singlestranded = TRUE)
+    # single stranded not supported yet
+    expect_error(motifcounter:::clumpSizeDist(maxclump, op))
+
+    op = motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
+
+    # test kopp clump size corretness
+    dist = motifcounter:::clumpSizeDist(maxclump, op)$dist
+    expect_equal(length(dist), maxclump*2)
+    expect_equal(sum(dist),1)
+
+    # test pape clump size corretness
+    dist = motifcounter:::clumpSizeDist(maxclump, op, method = "pape")$dist
+    expect_equal(length(dist), maxclump*2)
+    expect_equal(sum(dist),1)
+
+    dist = motifcounter:::simulateClumpSizeDist(motif, bg, 1000000, nsim = 1)$dist
+    expect_equal(sum(dist), 1)
+})
