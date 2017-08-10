@@ -1,7 +1,6 @@
 # motifcounter - R package for analysing TFBSs in DNA sequences.
 
 [![Travis-CI Build Status](https://travis-ci.org/wkopp/motifcounter.svg?branch=master)](https://travis-ci.org/wkopp/motifcounter)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/wkopp/motifcounter?branch=master&svg=true)](https://ci.appveyor.com/project/wkopp/motifcounter)
 [![Coverage Status](https://img.shields.io/codecov/c/github/wkopp/motifcounter/master.svg)](https://codecov.io/github/wkopp/motifcounter?branch=master)
 
 This software package grew out of the work that I did to obtain my PhD.
@@ -29,16 +28,16 @@ new_motif <- normalizeMotif(motif)
 scores <- scoreSequence(sequence, motif, bg)
 
 # Evaluate the motif hits along a given sequence
-scores <- motifHits(sequence, motif, bg)
+hits <- motifHits(sequence, motif, bg)
 
 # Evaluate the average score profile
-scores <- scoreProfile(sequences, motif, bg)
+score_profile <- scoreProfile(sequences, motif, bg)
 
 # Evaluate the average motif hit profile
-scores <- motifHitProfile(sequences, motif, bg)
+hit_profile <- motifHitProfile(sequences, motif, bg)
 
 # Compute the motif hit enrichment
-scores <- motifEnrichment(sequences, motif, bg)
+enrichment <- motifEnrichment(sequences, motif, bg)
 ```
 
 ## Hallmarks of `motifcounter`
