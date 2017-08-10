@@ -65,7 +65,17 @@ static R_NativePrimitiveArgType siglevel_t[] = {
     REALSXP
 };
 
+void RclumpsizeBeta(double *beta, double *beta3p, double *beta5p,
+                        double *dist, int *maxclump, int *motiflen);
 
+static R_NativePrimitiveArgType clumpsize_beta_t[] = {
+    REALSXP, REALSXP, REALSXP, REALSXP, INTSXP, INTSXP
+};
+
+void RclumpsizeGamma(double *gamma, double *dist, int *maxclump, int *motiflen);
+static R_NativePrimitiveArgType clumpsize_gamma_t[] = {
+    REALSXP, REALSXP, INTSXP, INTSXP
+};
 
 static R_CMethodDef cMethods[] = {
     {"motifcounter_countfreq", (DL_FUNC) &Rcountfreq, 4, countfreq_t},
@@ -90,6 +100,8 @@ static R_CMethodDef cMethods[] = {
     {"motifcounter_generateRndSeq", (DL_FUNC) &RgenRndSeq, 5, num_seqs_t},
     {"motifcounter_option", (DL_FUNC) &Roption, 3, option_t},
     {"motifcounter_siglevel", (DL_FUNC) &Rfsiglevel, 1, siglevel_t},
+    {"motifcounter_clumpsize_kopp", (DL_FUNC) &RclumpsizeBeta, 6, clumpsize_beta_t},
+    {"motifcounter_clumpsize_pape", (DL_FUNC) &RclumpsizeGamma, 4, clumpsize_gamma_t},
     {NULL, NULL, 0}
 };
 

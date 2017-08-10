@@ -34,4 +34,9 @@ void compoundpoisson_kopp(char *bgfile, char *pwmfile,
                           char *output_dist, char *slen, char *mhit, char *mclump, char *pv, char *sth,
                           char *gr);
 
+void clumpsizeGamma(double *gamma, double *dist, int *maxclump, int *motiflen);
+void clumpsizeBeta_singlestranded(double *beta,
+                        double *dist, int *maxclump, int *motiflen);
+void clumpsizeBeta(double *beta, double *beta3p, double *beta5p,
+                        double *dist, int *maxclump, int *motiflen);
 #endif

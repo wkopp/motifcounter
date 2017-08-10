@@ -12,6 +12,7 @@
 #include "overlap.h"
 
 #define DSTRANDED 2
+#define EPSILON 1e-10
 // This function determines the Poisson parameter
 // for scanning both strands of the DNA sequence
 //
@@ -53,6 +54,7 @@ double *initTheta(int maxclump) {
     memset(p, 0, (size_t)maxclump * DSTRANDED* sizeof(double));
     return p;
 }
+
 double *initThetaSingleStranded(int maxclump) {
     double *p;
 
@@ -202,23 +204,14 @@ void computeTheta(int maxclump, double *theta,
                         extention[0] * theta[(i - 1) * DSTRANDED + 1];
 
         total += (theta[i * DSTRANDED] + theta[i * DSTRANDED + 1]);
-#ifdef DEBUG
-        Rprintf("total=%e, theta=%e, theta'=%e\n", total, theta[i * DSTRANDED],
-                theta[i * DSTRANDED + 1]);
-#endif
+
     }
 
     for (i = 0; i < maxclump; i++) {
         theta[i * DSTRANDED] /= total;
         theta[i * DSTRANDED + 1] /= total;
-        //#define DEBUG
-#ifdef DEBUG
-        Rprintf( "theta%d=%e, theta%d'=%e\n", i + 1,
-                 theta[i * DSTRANDED], i + 1, theta[i * DSTRANDED + 1]);
-#endif
     }
 }
-
 
 void computeThetaSingleStranded(int maxclump, double *theta,
                                 double *extention, int mlen) {
@@ -236,7 +229,6 @@ void computeThetaSingleStranded(int maxclump, double *theta,
     // normalize the theta such that they sum up to one
     for (i = 0; i < maxclump; i++) {
         theta[i] /= total;
-        //    Rprintf("total=%e, theta=%e\n",total, theta[i]);
     }
 }
 
@@ -339,3 +331,79 @@ void computeCompoundPoissonDistributionKempSingleStranded(double lambda,
     for (i = 0; i <= maxhit; i++) cp[i] /= normalize;
 }
 
+// This function computes the clump size distribution
+// according to Kopp et al. for both DNA strands
+void clumpsizeBeta(double *beta, double *beta3p, double *beta5p,
+                        double *dist, int *maxclump, int *motiflen) {
+
+    double *theta, extention[3];
+    double *delta, *deltap;
+
+    delta = (double*)R_alloc((size_t)motiflen[0], sizeof(double));
+    deltap = (double*)R_alloc((size_t)motiflen[0], sizeof(double));
+
+    memset(delta, 0, motiflen[0]*sizeof(double));
+    memset(deltap, 0, motiflen[0]*sizeof(double));
+
+    // initialize the extention factors
+    memset(extention, 0, 3 * sizeof(double));
+
+    beta3p[0] = (beta3p[0] + EPSILON) / (1 + 2 * EPSILON);
+    computeDeltas(delta, deltap, beta, beta3p, beta5p, motiflen[0]);
+
+    computeExtentionFactorsKopp(extention, delta, deltap, beta,
+                                beta3p, beta5p, motiflen[0]);
+    //theta = dist;
+
+    computeInitialClumpKopp(dist, beta3p, delta, deltap, motiflen[0]);
+    computeTheta(maxclump[0], dist, extention, motiflen[0]);
+
+}
+
+// This function computes the clump size distribution
+// according to Kopp et al. for both DNA strands
+void clumpsizeBeta_singlestranded(double *beta,
+                        double *dist, int *maxclump, int *motiflen) {
+
+    double *theta, extention;
+    double *delta;
+
+    delta = (double*)R_alloc((size_t)motiflen[0], sizeof(double));
+
+    memset(delta, 0, motiflen[0]*sizeof(double));
+
+    // initialize the extention factors
+    extention = 0.0;
+
+    //computeDeltas(delta, deltap, beta, beta3p, beta5p, motiflen[0]);
+    computeDeltasSingleStranded(delta, beta, motiflen[0]);
+
+    //computeExtentionFactorsKopp(extention, delta, deltap, beta,
+                                //beta3p, beta5p, motiflen[0]);
+    computeExtentionFactorsKoppSingleStranded(&extention, beta, motiflen[0]);
+    //theta = dist;
+        //theta = initThetaSingleStranded(maxclumpsize);
+
+    //computeInitialClumpKopp(theta, beta3p, delta, deltap, motiflen[0]);
+    computeInitialClumpKoppSingleStranded(dist, delta, motiflen[0]);
+    //computeTheta(maxclumpsize, theta, extention, motiflen[0]);
+    computeThetaSingleStranded(*maxclump, dist, &extention, motiflen[0]);
+
+}
+
+// This function computes the clump size distribution
+// according to Pape et al. for both DNA strands
+void clumpsizeGamma(double *gamma, double *dist, int *maxclump, int *motiflen) {
+
+    double *theta, extention[3];
+
+    // initialize the extention factors
+    memset(extention, 0, 3 * sizeof(double));
+    gamma[motiflen[0]] = (gamma[motiflen[0]] + EPSILON) / (1 + 2 * EPSILON);
+    computeExtentionFactorsPape(extention, gamma, motiflen[0]);
+
+    //theta = dist;
+
+    computeInitialClump(dist, gamma, motiflen[0]);
+    computeTheta(*maxclump, dist, extention, motiflen[0]);
+}
