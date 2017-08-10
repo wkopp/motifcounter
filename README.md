@@ -6,14 +6,14 @@
 
 This software package grew out of the work that I did to obtain my PhD.
 
-If it is of help for your analysis, please cite
+If it is of help for your analysis, please cite the above stated zenodo DOI.
 
 ```
   @Manual{,
     title = {motifcounter: R package for analysing TFBSs in DNA sequences},
     author = {Wolfgang Kopp},
-    year = {2016},
-    note = {R package version 0.99.0},
+    year = {2016-2017},
+    doi = {10.5281/zenodo.841352}
   }
 ```
 ## Usage
