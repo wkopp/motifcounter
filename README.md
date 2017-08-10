@@ -2,6 +2,7 @@
 
 [![Travis-CI Build Status](https://travis-ci.org/wkopp/motifcounter.svg?branch=master)](https://travis-ci.org/wkopp/motifcounter)
 [![Coverage Status](https://img.shields.io/codecov/c/github/wkopp/motifcounter/master.svg)](https://codecov.io/github/wkopp/motifcounter?branch=master)
+[![DOI](https://zenodo.org/badge/74741086.svg)](https://zenodo.org/badge/latestdoi/74741086)
 
 This software package grew out of the work that I did to obtain my PhD.
 
