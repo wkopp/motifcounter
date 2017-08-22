@@ -191,7 +191,8 @@ simulateClumpSizeDist = function(pfm, bg, seqlen, nsim=10, singlestranded = FALS
     motifAndBackgroundValid(pfm, bg)
     stopifnot (length(seqlen) == 1)
 
-    freq = rep(0, 20)
+    # 
+    freq = rep(0, 5)
     for (p in seq_len(nsim)) {
         seq = generateDNAString(seqlen, bg)
         hits = motifHits(seq, pfm, bg)
@@ -206,10 +207,15 @@ simulateClumpSizeDist = function(pfm, bg, seqlen, nsim=10, singlestranded = FALS
         index_sequence = which(h>0)
         previous_index = index_sequence[1]
         cnt=h[previous_index]
-        for (i in 2:length(index_sequence)) {
+        for (i in tail(seq_len(length(index_sequence)),-1)) {
             if (index_sequence[i] < previous_index+ncol(pfm)) {
                 cnt = cnt + h[index_sequence[i]]
             } else {
+                if (length(freq) < cnt) {
+                    x = rep(0, cnt)
+                    x[1:length(freq)] = freq
+                    freq = x
+                }
                 freq[cnt] = freq[cnt] + 1
                 cnt = h[index_sequence[i]]
             }
