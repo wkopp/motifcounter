@@ -1,7 +1,7 @@
 Package: motifcounter
 Type: Package
 Title: R package for analysing TFBSs in DNA sequences
-Version: 1.1.5
+Version: 1.1.6
 Date: 2016
 Author: Wolfgang Kopp [aut, cre]
 Suggests: knitr, rmarkdown, testthat, MotifDb, seqLogo, prettydoc
@@ -40,6 +40,6 @@ VignetteBuilder: knitr
 NeedsCompilation: yes
 Collate: 'background_wrapper.R' 'comppoiss_wrapper.R'
         'combinatorial_wrapper.R' 'score_wrapper.R' 'count_wrapper.R'
-        'enrichmentTest.R' 'forground_wrapper.R'
+        'enrichmentTest.R' 'forground_wrapper.R' 'markovmodel.R'
         'motifcounter-package.R' 'observed_wrapper.R' 'option.R'
         'overlap.R' 'simulate_wrapper.R' 'wrapper.R'
