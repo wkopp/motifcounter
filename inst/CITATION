@@ -5,6 +5,5 @@ bibentry(bibtype = "Manual",
          title = "motifcounter: R package for analysing TFBSs in DNA sequences",
          author = c(person("Wolfgang", "Kopp")),
          year = year,
-#         url = "https://CRAN.R-project.org/package=nlme",
-         doi = "10.5281/zenodo.841352"
+         doi = "10.18129/B9.bioc.motifcounter"
 )

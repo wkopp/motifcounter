@@ -2,7 +2,6 @@
 
 [![Travis-CI Build Status](https://travis-ci.org/wkopp/motifcounter.svg?branch=master)](https://travis-ci.org/wkopp/motifcounter)
 [![Coverage Status](https://img.shields.io/codecov/c/github/wkopp/motifcounter/master.svg)](https://codecov.io/github/wkopp/motifcounter?branch=master)
-[![DOI](https://zenodo.org/badge/74741086.svg)](https://zenodo.org/badge/latestdoi/74741086)
 
 This software package grew out of the work that I did to obtain my PhD.
 
@@ -13,7 +12,7 @@ If it is of help for your analysis, please cite the above stated zenodo DOI.
     title = {motifcounter: R package for analysing TFBSs in DNA sequences},
     author = {Wolfgang Kopp},
     year = {2016-2017},
-    doi = {10.5281/zenodo.841352}
+    doi = {10.18129/B9.bioc.motifcounter}
   }
 ```
 ## Usage
