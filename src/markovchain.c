@@ -9,6 +9,7 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <Rmath.h>
+#include <R_ext/Applic.h>
 #endif
 
 #include "background.h"
@@ -57,9 +58,11 @@ double NoOverlapHit(int N, double *beta, double *betap) {
 
 #undef DEBUG
 #define DEBUG
-void markovchain(double *dist, double *a,
-                 double *beta, double *beta3p, double *beta5p, int slen, int motiflen) {
+void markovchain(double *dist, double *tau,
+                 double *beta, double *beta3p, double *beta5p, int *slen_, int *motiflen_) {
     int i, k;
+    int slen = *slen_;
+    int motiflen = *motiflen_;
     double *post, *prior;
     double alphacond;
 
@@ -74,7 +77,7 @@ void markovchain(double *dist, double *a,
     post = (double*)R_alloc((size_t)2 * motiflen + 2, sizeof(double));
     memset(post, 0, (2 * motiflen + 2)*sizeof(double));
     prior = dist;
-    alphacond = a[0];
+    alphacond = tau[0];
     memset(prior, 0, (2 * motiflen + 2)*sizeof(double));
     prior[0] = 1.;
 
@@ -126,7 +129,24 @@ void markovchain(double *dist, double *a,
 
 }
 
-void dmc(int n, double *alphacond, double *gradient, void *ex) {
+
+static double minmc(int n, double *tau, void *ex) {
+
+    //double *extra=(double*)ex;
+
+    CGParams *cgparams = (CGParams *)ex;
+
+    markovchain(cgparams->dist, tau, cgparams->beta,
+                cgparams->beta3p, cgparams->beta5p,
+                &cgparams->len, &cgparams->motiflen);
+
+    return -(2 * cgparams->alpha) *
+            log(cgparams->dist[1] + cgparams->dist[2]) -
+        (1. - 2 * cgparams->alpha) *
+            log(1. - cgparams->dist[1] - cgparams->dist[2]);
+}
+
+static void dmc(int n, double *tau, double *gradient, void *ex) {
 
     double val;
     CGParams *cgparams = (CGParams *)ex;
@@ -134,39 +154,56 @@ void dmc(int n, double *alphacond, double *gradient, void *ex) {
     double pa, ma;
 
 
+    epsilon = tau[0] / 1000;
+    pa = *tau + epsilon;
+    ma = *tau - epsilon;
+    val = (minmc(n, &pa, ex) - minmc(n, &ma, ex)) / (2 * epsilon);
 
-    epsilon = alphacond[0] / 1000;
-    pa = *alphacond + epsilon;
-    ma = *alphacond - epsilon;
-    markovchain(cgparams->dist, &pa, cgparams->beta,
-                cgparams->beta3p, cgparams->beta5p,
-                cgparams->len, cgparams->motiflen);
-
-    val = cgparams->dist[1] + cgparams->dist[2];
-    markovchain(cgparams->dist, &ma, cgparams->beta,
-                cgparams->beta3p, cgparams->beta5p,
-                cgparams->len, cgparams->motiflen);
-
-    val -= (cgparams->dist[1] + cgparams->dist[2]);
-    val /= 2 * epsilon;
-
-    markovchain(cgparams->dist, alphacond, cgparams->beta,
-                cgparams->beta3p, cgparams->beta5p,
-                cgparams->len, cgparams->motiflen);
-
-    *gradient = -2 * (2 * cgparams->alpha - cgparams->dist[1] - 
-            cgparams->dist[2]) * val;
-}
-double minmc(int n, double *alpha, void *ex) {
-
-    //double *extra=(double*)ex;
-    CGParams *cgparams = (CGParams *)ex;
-
-    markovchain(cgparams->dist, alpha, cgparams->beta,
-                cgparams->beta3p, cgparams->beta5p,
-                cgparams->len, cgparams->motiflen);
-
-    return R_pow_di(2 * cgparams->alpha - cgparams->dist[1] - 
-            cgparams->dist[2], 2);
+    *gradient = val;
 }
 
+
+// Returns the clump start probabilíty for the given markov model
+double getOptimalTauMCDS(double *alpha, double *beta, double *beta3p,
+    double *beta5p, int *motiflen) {
+
+
+
+    double a0, aN;
+    double abstol = 1e-30, intol = 1e-30;
+    int trace = 0, fail, fncount, type = 2, gncount;
+    double res;
+    CGParams cgparams;
+
+    a0 = alpha[0];
+    cgparams.alpha = alpha[0];
+    cgparams.beta = beta;
+    cgparams.beta3p = beta3p;
+    cgparams.beta5p = beta5p;
+    cgparams.len = 500;
+    cgparams.motiflen = motiflen[0];
+    cgparams.dist = (double*)R_alloc((size_t) 2*cgparams.motiflen + 2,
+            sizeof(double));
+    memset(cgparams.dist, 0, (2*cgparams.motiflen + 2)*sizeof(double));
+
+    cgmin(1, &a0, &aN, &res, minmc, dmc, &fail, abstol, intol,
+          (void *)&cgparams, type, trace, &fncount, &gncount, 100);
+
+    return a0;
+}
+
+SEXP mcds_check_optimal(SEXP alpha_, SEXP beta_, SEXP beta3p_,
+    SEXP beta5p_, SEXP motiflen_) {
+
+    double *alpha = REAL(alpha_);
+    double *beta = REAL(beta_);
+    double *beta3p = REAL(beta3p_);
+    double *beta5p = REAL(beta5p_);
+    int *motiflen = INTEGER(motiflen_);
+
+    double tau;
+
+    tau = getOptimalTauMCDS(alpha, beta, beta3p, beta5p, motiflen);
+
+    return ScalarReal(tau);
+}
