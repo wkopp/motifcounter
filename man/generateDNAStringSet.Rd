@@ -37,4 +37,3 @@ motifcounter:::generateDNAStringSet(10:50, bg)
 \seealso{
 \code{\link{generateDNAStringSet}}
 }
-

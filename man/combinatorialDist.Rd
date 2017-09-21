@@ -62,4 +62,3 @@ dist = motifcounter:::combinatorialDist(seqlen, op)
 
 \code{\link{probOverlapHit}}
 }
-

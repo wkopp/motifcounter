@@ -52,4 +52,3 @@ motifcounter:::scoreDistEmpirical(motif, bg, seqlen = 1000, nsim = 1000)
 \seealso{
 \code{\link{scoreDist}}
 }
-

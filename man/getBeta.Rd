@@ -15,4 +15,3 @@ beta slot
 \description{
 Accessor to slot beta
 }
-

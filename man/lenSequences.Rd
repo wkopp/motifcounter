@@ -28,4 +28,3 @@ seqs = Biostrings::readDNAStringSet(file)
 motifcounter:::lenSequences(seqs)
 
 }
-

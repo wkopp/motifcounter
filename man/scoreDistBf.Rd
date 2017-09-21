@@ -50,4 +50,3 @@ dp = motifcounter:::scoreDistBf(motif, bg)
 \seealso{
 \code{\link{scoreDist}}
 }
-

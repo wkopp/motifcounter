@@ -66,4 +66,3 @@ dist = motifcounter:::clumpSizeDist(20, op)
 \seealso{
 \code{\link{probOverlapHit}}
 }
-

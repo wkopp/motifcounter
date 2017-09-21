@@ -41,4 +41,3 @@ motif = t(as.matrix(read.table(motiffile)))
 dp = scoreDist(motif, bg)
 
 }
-

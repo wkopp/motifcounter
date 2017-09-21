@@ -15,4 +15,3 @@ gamma slot
 \description{
 Accessor to slot gamma
 }
-

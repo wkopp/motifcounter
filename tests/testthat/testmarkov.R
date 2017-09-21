@@ -48,7 +48,7 @@ test_that("markovModel", {
 
 })
 
-test_that("markovModelCheckOptimalSingleStranded", {
+test_that("clumpStartProbSingleStranded", {
     # inital settings
 
     alpha=0.01
@@ -67,7 +67,7 @@ test_that("markovModelCheckOptimalSingleStranded", {
 
     # overlapping hit probs
     op=probOverlapHit(motif,bg, singlestranded = TRUE)
-    expect_true(checkMarkovModelOptimal(op)<getAlpha(op))
+    expect_true(computeClumpStartProb(op)<getAlpha(op))
 
     pwmname="x21.tab" # A-repeat
     motiffile=system.file("extdata",pwmname, package="motifcounter")
@@ -75,7 +75,7 @@ test_that("markovModelCheckOptimalSingleStranded", {
 
     # overlapping hit probs
     op=probOverlapHit(motif,bg, singlestranded = TRUE)
-    expect_true(checkMarkovModelOptimal(op)<getAlpha(op))
+    expect_true(computeClumpStartProb(op)<getAlpha(op))
 
     pwmname="x1.tab" # Non-self-overlapping
     motiffile=system.file("extdata",pwmname, package="motifcounter")
@@ -83,7 +83,7 @@ test_that("markovModelCheckOptimalSingleStranded", {
 
     # overlapping hit probs
     op=probOverlapHit(motif,bg, singlestranded = TRUE)
-    expect_true(checkMarkovModelOptimal(op)>getAlpha(op))
+    expect_true(computeClumpStartProb(op)>getAlpha(op))
 
     pwmnames = c("x32.tab", "x21.tab", "x1.tab")
 
@@ -94,8 +94,8 @@ test_that("markovModelCheckOptimalSingleStranded", {
         # overlapping hit probs
         op=probOverlapHit(motif,bg, singlestranded = TRUE)
         alpha = getAlpha(op)
-        #print(checkMarkovModelOptimal(op))
-        op@alpha = checkMarkovModelOptimal(op)
+        #print(computeClumpStartProb(op))
+        op@alpha = computeClumpStartProb(op)
         expect_equal(markovModel(op, 100)$dist[2], alpha)
     }
 
@@ -103,7 +103,7 @@ test_that("markovModelCheckOptimalSingleStranded", {
 })
 
 
-test_that("markovModelCheckOptimalDoubleStranded", {
+test_that("clumpStartProbDoubleStranded", {
     # inital settings
 
     alpha=0.01
@@ -122,7 +122,7 @@ test_that("markovModelCheckOptimalDoubleStranded", {
 
     # overlapping hit probs
     op=probOverlapHit(motif,bg, singlestranded = FALSE)
-    expect_true(checkMarkovModelOptimal(op)<getAlpha(op))
+    expect_true(computeClumpStartProb(op)<getAlpha(op))
 
     pwmname="x21.tab" # A-repeat
     motiffile=system.file("extdata",pwmname, package="motifcounter")
@@ -130,7 +130,7 @@ test_that("markovModelCheckOptimalDoubleStranded", {
 
     # overlapping hit probs
     op=probOverlapHit(motif,bg, singlestranded = FALSE)
-    expect_true(checkMarkovModelOptimal(op)<getAlpha(op))
+    expect_true(computeClumpStartProb(op)<getAlpha(op))
 
     pwmnames = c("x32.tab", "x21.tab", "x1.tab")
 
@@ -141,8 +141,8 @@ test_that("markovModelCheckOptimalDoubleStranded", {
         # overlapping hit probs
         op=probOverlapHit(motif,bg, singlestranded = FALSE)
         alpha = getAlpha(op)
-        #print(checkMarkovModelOptimal(op))
-        op@alpha = checkMarkovModelOptimal(op)
+        #print(computeClumpStartProb(op))
+        op@alpha = computeClumpStartProb(op)
         dist = markovModel(op, 100)$dist
         expect_equal(dist[2] + dist[3], 2*alpha)
     }

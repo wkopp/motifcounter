@@ -42,4 +42,3 @@ motif = t(as.matrix(read.table(motiffile)))
 scoreSequence(seqs[[1]], motif, bg)
 
 }
-

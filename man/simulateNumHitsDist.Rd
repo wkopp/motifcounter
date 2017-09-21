@@ -66,4 +66,3 @@ simc = motifcounter:::simulateNumHitsDist(motif, bg,
 \seealso{
 \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
 }
-

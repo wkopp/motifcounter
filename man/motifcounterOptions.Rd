@@ -38,4 +38,3 @@ increase of the computational burden.
 motifcounterOptions(alpha = 0.001, gran = 0.1, ncores = 1)
 
 }
-

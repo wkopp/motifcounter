@@ -2,8 +2,8 @@
 % Please edit documentation in R/overlap.R
 \docType{class}
 \name{Overlap-class}
-\alias{.Overlap}
 \alias{Overlap-class}
+\alias{.Overlap}
 \title{Overlap class definition}
 \description{
 Objects of this class serve as a container that holds

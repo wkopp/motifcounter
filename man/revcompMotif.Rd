@@ -25,4 +25,3 @@ motif = t(as.matrix(read.table(motiffile)))
 revcompmotif = motifcounter:::revcompMotif(motif)
 
 }
-

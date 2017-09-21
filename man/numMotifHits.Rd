@@ -55,4 +55,3 @@ noc = motifcounter:::numMotifHits(seqs, motif, bg, singlestranded = TRUE)
 noc$numofhits
 
 }
-

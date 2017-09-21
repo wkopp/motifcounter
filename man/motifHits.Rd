@@ -41,4 +41,3 @@ motif = t(as.matrix(read.table(motiffile)))
 motifHits(seq[[1]], motif, bg)
 
 }
-
