@@ -15,7 +15,7 @@ void RcompoundpoissonPape_useGamma(double *gamma,
     int seqlen, i;
     int maxclumpsize, maxhits;
     double lambda;
-    double *theta, extention[3];
+    double *theta;
 
     seqlen = 0;
     for (i = 0; i < *nseq; i++) {
@@ -43,8 +43,7 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
     int seqlen, i;
     int maxclumpsize, maxhits, singlestranded;
     double lambda;
-    double *theta, extention[3];
-    double *delta, *deltap;
+    double *theta;
 
     seqlen = 0;
     for (i = 0; i < *nseq; i++) {

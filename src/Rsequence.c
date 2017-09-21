@@ -25,7 +25,6 @@ SEXP Rslen(SEXP rseq) {
 
 SEXP Rscoresequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
                     SEXP rstation, SEXP rtrans, SEXP rorder) {
-    int i;
     double *pfm_ = REAL(rpfm_);
     double *station = REAL(rstation);
     double *trans = REAL(rtrans);

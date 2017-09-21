@@ -429,7 +429,6 @@ void multipleShortSequenceProbability(double *singledist,
                                       double *aggregateddist,
                                       int maxsinglehits, int maxagghits, int numofseqs) {
     int i;
-    double sum;
     double **part_results;
 
     // allocate array of pointers to sub-aggregated distributions
@@ -449,10 +448,7 @@ void multipleShortSequenceProbability(double *singledist,
     computeResultRecursive(part_results, numofseqs, maxagghits);
 
     // copy the final result into aggregated
-    for (i = 0, sum = 0.0; i <= maxagghits; i++) {
+    for (i = 0; i <= maxagghits; i++) {
         aggregateddist[i] = part_results[numofseqs - 1][i];
     }
-#ifdef DEBUG
-    Rprintf("P[%d]=%1.3e\n ", numofseqs, sum);
-#endif
 }
