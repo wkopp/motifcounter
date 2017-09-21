@@ -75,6 +75,7 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
     CGParams cgparams;
     double a0, aN;
     double *_alpha, *_omega;
+    double tau;
 
     p->beta = *beta;
     p->beta3p = *beta3p;
@@ -89,6 +90,8 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
 
     m = (70 > p->seqlen) ? p->seqlen : 70;
 
+
+    #ifdef WKO
     a0 = alpha;
 
     cgparams.alpha = alpha;
@@ -97,7 +100,7 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
     cgparams.beta5p = p->beta5p;
     cgparams.len = 500;
     cgparams.motiflen = p->mlen;
-    cgparams.dist = (double*)R_alloc((size_t)2 * cgparams.motiflen + 2, 
+    cgparams.dist = (double*)R_alloc((size_t)2 * cgparams.motiflen + 2,
             sizeof(double));
     memset(cgparams.dist, 0, (2 * cgparams.motiflen+2)*sizeof(double));
     /*
@@ -116,9 +119,19 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
         cgmin(1, &a0, &aN, &res, minmc, dmc, &fail, abstol, intol,
               (void *)&cgparams, type, trace, &fncount, &gncount, 100);
 
-        _alpha[i] = aN;
+        _alpha[i] = tau;
         a0 = aN;
     }
+    #else
+
+    tau = getOptimalTauMCDS(&alpha, p->beta, p->beta3p, p->beta5p, &p->mlen);
+
+    m = 1;
+    for (i = 0; i < m; i++) {
+        _alpha[i] = tau;
+    }
+
+    #endif
 
     for (i = m; i < p->seqlen; i++) {
         _alpha[i] = _alpha[m - 1];
@@ -129,7 +142,7 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
     p->probzerohits = addomegas(_omega, 0, p->seqlen - 1);
 
 
-    p->alpha = aN;
+    p->alpha = tau;
     p->omega = 1 - 2 * p->alpha + p->alpha * p->beta3p[0];
 
 #ifdef DEBUG
@@ -416,7 +429,6 @@ void multipleShortSequenceProbability(double *singledist,
                                       double *aggregateddist,
                                       int maxsinglehits, int maxagghits, int numofseqs) {
     int i;
-    double sum;
     double **part_results;
 
     // allocate array of pointers to sub-aggregated distributions
@@ -436,11 +448,7 @@ void multipleShortSequenceProbability(double *singledist,
     computeResultRecursive(part_results, numofseqs, maxagghits);
 
     // copy the final result into aggregated
-    for (i = 0, sum = 0.0; i <= maxagghits; i++) {
+    for (i = 0; i <= maxagghits; i++) {
         aggregateddist[i] = part_results[numofseqs - 1][i];
     }
-#ifdef DEBUG
-    Rprintf("P[%d]=%1.3e\n ", numofseqs, sum);
-#endif
 }
-

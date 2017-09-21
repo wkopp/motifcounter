@@ -15,4 +15,3 @@ counts slot
 \description{
 Accessor to slot counts
 }
-

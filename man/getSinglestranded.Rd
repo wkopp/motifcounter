@@ -15,4 +15,3 @@ singlestranded slot
 \description{
 Accessor to slot singlestranded
 }
-

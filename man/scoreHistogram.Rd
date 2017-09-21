@@ -48,4 +48,3 @@ scoreHistogram(seqs, motif, bg)
 \seealso{
 \code{\link{scoreDist}}
 }
-

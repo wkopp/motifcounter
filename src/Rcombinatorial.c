@@ -26,7 +26,7 @@ void RPosteriorProbability(double *alpha, double *beta,
     double Zpartition;
     double *singlehitdistribution;
     double *delta, *deltap;
-    double a0, aN;
+    double tau;
     double abstol = 1e-30, intol = 1e-30;
     int trace = 0, fail, fncount, type = 2, gncount;
     double sum, res;
@@ -45,28 +45,14 @@ void RPosteriorProbability(double *alpha, double *beta,
 
     computeDeltas(delta, deltap, beta, beta3p, beta5p, motiflen[0]);
 
-    a0 = alpha[0];
-    cgparams.alpha = alpha[0];
-    cgparams.beta = beta;
-    cgparams.beta3p = beta3p;
-    cgparams.beta5p = beta5p;
-    cgparams.len = 500;
-    cgparams.motiflen = motiflen[0];
-    cgparams.dist = (double*)R_alloc((size_t)2 * cgparams.motiflen + 2, 
-            sizeof(double));
-    memset(cgparams.dist, 0, (2 * cgparams.motiflen + 2)*sizeof(double));
-
-
-    cgmin(1, &a0, &aN, &res, minmc, dmc, &fail, abstol, intol,
-          (void *)&cgparams, type, trace, &fncount, &gncount, 100);
-
     allocPosteriorProbability(&prob, seqlen, motiflen[0], maxhits);
+
     initPosteriorProbability(&prob, alpha[0], &beta, &beta3p, &beta5p,
                              &delta, &deltap);
 
     computePosteriorProbability(&prob);
 
-    singlehitdistribution = (double*)R_alloc((size_t)(maxhits + 1), 
+    singlehitdistribution = (double*)R_alloc((size_t)(maxhits + 1),
             sizeof(double));
     memset(singlehitdistribution, 0, (maxhits + 1)*sizeof(double));
 
@@ -95,7 +81,7 @@ void RPosteriorProbability(double *alpha, double *beta,
     for (k = 0, sum = 0.0; k <= totalmaxhits; k++) {
         sum += hitdistribution[k];
     }
-    
+
 
     return;
 }

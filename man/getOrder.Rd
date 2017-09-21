@@ -15,4 +15,3 @@ order slot
 \description{
 Accessor to slot order
 }
-

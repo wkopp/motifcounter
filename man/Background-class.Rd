@@ -2,8 +2,8 @@
 % Please edit documentation in R/background_wrapper.R
 \docType{class}
 \name{Background-class}
-\alias{.Background}
 \alias{Background-class}
+\alias{.Background}
 \title{Background class definition}
 \description{
 Objects of this class serve as a container that holds

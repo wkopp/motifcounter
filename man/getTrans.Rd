@@ -15,4 +15,3 @@ trans slot
 \description{
 Accessor to slot trans
 }
-

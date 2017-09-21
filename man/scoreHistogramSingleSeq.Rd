@@ -42,4 +42,3 @@ motif = t(as.matrix(read.table(motiffile)))
 motifcounter:::scoreHistogramSingleSeq(seqs[[1]], motif, bg)
 
 }
-

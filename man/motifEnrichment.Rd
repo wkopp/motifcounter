@@ -79,4 +79,3 @@ result = motifEnrichment(seqs, motif, bg, singlestranded = FALSE,
 \seealso{
 \code{\link{compoundPoissonDist}}, \code{\link{combinatorialDist}}
 }
-

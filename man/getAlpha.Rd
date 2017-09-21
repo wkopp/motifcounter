@@ -15,4 +15,3 @@ alpha slot
 \description{
 Accessor to slot alpha
 }
-

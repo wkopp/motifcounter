@@ -35,4 +35,3 @@ motif = t(as.matrix(read.table(motiffile)))
 motifcounter:::motifAndBackgroundValid(motif, bg)
 
 }
-

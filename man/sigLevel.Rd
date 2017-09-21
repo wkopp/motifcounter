@@ -22,4 +22,3 @@ of the discrete nature of sequences.
 motifcounter:::sigLevel()
 
 }
-

@@ -15,4 +15,3 @@ station slot
 \description{
 Accessor to slot station
 }
-

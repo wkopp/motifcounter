@@ -34,4 +34,3 @@ motifcounter:::generateDNAString(1000, bg)
 \seealso{
 \code{\link{generateDNAStringSet}}
 }
-

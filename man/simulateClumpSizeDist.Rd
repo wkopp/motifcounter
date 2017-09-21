@@ -62,4 +62,3 @@ simc = motifcounter:::simulateClumpSizeDist(motif, bg,
 \seealso{
 \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
 }
-

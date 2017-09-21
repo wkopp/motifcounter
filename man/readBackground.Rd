@@ -30,4 +30,3 @@ seqs = Biostrings::readDNAStringSet(file)
 bg = readBackground(seqs, 1)
 
 }
-

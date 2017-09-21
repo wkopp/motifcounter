@@ -45,4 +45,3 @@ motif = t(as.matrix(read.table(motiffile)))
 motifcounter:::scoreStrand(seqs[[1]], motif, bg)
 
 }
-

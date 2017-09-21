@@ -77,9 +77,26 @@ static R_NativePrimitiveArgType clumpsize_gamma_t[] = {
     REALSXP, REALSXP, INTSXP, INTSXP
 };
 
+void markovchain_ss(double *dist, double *alpha, double *beta,
+        int *steps, int *motiflen);
+static R_NativePrimitiveArgType mcss_t[] = {
+    REALSXP, REALSXP, REALSXP, INTSXP, INTSXP
+};
+
+void markovchain(double *dist, double *alpha, double *beta,
+        double *beta3p, double *beta5p, int *steps, int *motiflen);
+static R_NativePrimitiveArgType mcds_t[] = {
+    REALSXP, REALSXP, REALSXP, REALSXP, REALSXP, INTSXP, INTSXP
+};
+
+
+
 static R_CMethodDef cMethods[] = {
     {"motifcounter_countfreq", (DL_FUNC) &Rcountfreq, 4, countfreq_t},
     {"motifcounter_bgfromfreq", (DL_FUNC) &Rbgfromfreq, 4, bgfromfreq_t},
+    {"motifcounter_markovmodel_ss", (DL_FUNC) &markovchain_ss, 5, mcss_t},
+    {"motifcounter_markovmodel_ds", (DL_FUNC) &markovchain, 7, mcds_t},
+
     {
         "motifcounter_combinatorialDist",
         (DL_FUNC) &RPosteriorProbability, 10, combinatorial_t
@@ -117,6 +134,10 @@ SEXP RscoreHistogram(SEXP rpfm_, SEXP rnrow, SEXP rncol,
                      SEXP rseq, SEXP rstation, SEXP rtrans, SEXP rorder);
 SEXP Rslen(SEXP rseq);
 
+SEXP mcss_check_optimal(SEXP alpha_, SEXP beta_, SEXP motiflen_);
+SEXP mcds_check_optimal(SEXP alpha_, SEXP beta_, SEXP beta3p_,
+    SEXP beta5p_, SEXP motiflen_);
+
 static R_CallMethodDef callMethods[]  = {
     {"motifcounter_slen", (DL_FUNC) &Rslen, 1},
     {"motifcounter_scoresequence", (DL_FUNC) &Rscoresequence, 7},
@@ -124,6 +145,8 @@ static R_CallMethodDef callMethods[]  = {
     {"motifcounter_scoredist", (DL_FUNC) &Rscoredist, 6},
     {"motifcounter_scoredist_bf", (DL_FUNC) &Rscoredist_bf, 6},
     {"motifcounter_scorehistogram", (DL_FUNC) &RscoreHistogram, 7},
+    {"motifcounter_mcss_check_optimal", (DL_FUNC) &mcss_check_optimal, 3},
+    {"motifcounter_mcds_check_optimal", (DL_FUNC) &mcds_check_optimal, 5},
     {NULL, NULL, 0}
 };
 

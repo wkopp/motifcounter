@@ -44,4 +44,3 @@ motif = t(as.matrix(read.table(motiffile)))
 scoreProfile(seqs, motif, bg)
 
 }
-

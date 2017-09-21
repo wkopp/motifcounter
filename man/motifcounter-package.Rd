@@ -2,8 +2,8 @@
 % Please edit documentation in R/motifcounter-package.R
 \docType{package}
 \name{motifcounter-package}
-\alias{motifcounter}
 \alias{motifcounter-package}
+\alias{motifcounter}
 \title{TFBSs analysis in DNA sequences}
 \description{
 The package provides functions for determining the positions
@@ -98,4 +98,3 @@ Maintainer: Wolfgang Kopp <kopp@molgen.mpg.de>
 }
 \keyword{MotifEnrichment}
 \keyword{PFM,}
-

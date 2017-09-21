@@ -88,4 +88,3 @@ dist = motifcounter:::compoundPoissonDist(seqlen, op)
 
 \code{\link{numMotifHits}}
 }
-

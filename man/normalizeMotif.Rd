@@ -30,4 +30,3 @@ motif = t(as.matrix(read.table(motiffile)))
 new_motif = normalizeMotif(motif)
 
 }
-

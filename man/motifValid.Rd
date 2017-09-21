@@ -26,4 +26,3 @@ motif = t(as.matrix(read.table(motiffile)))
 motifcounter:::motifValid(motif)
 
 }
-

@@ -49,4 +49,3 @@ op = motifcounter:::probOverlapHit(motif, bg, singlestranded = FALSE)
 op = motifcounter:::probOverlapHit(motif, bg, singlestranded = TRUE)
 
 }
-
