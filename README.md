@@ -5,16 +5,31 @@
 
 This software package grew out of the work that I did to obtain my PhD.
 
-If it is of help for your analysis, please cite the above stated zenodo DOI.
+If it is of help for your analysis, please cite 
 
 ```
   @Manual{,
     title = {motifcounter: R package for analysing TFBSs in DNA sequences},
     author = {Wolfgang Kopp},
-    year = {2016-2017},
+    year = {2017},
     doi = {10.18129/B9.bioc.motifcounter}
   }
 ```
+
+A detailed description of the compound Poisson model
+is available in
+```
+@article{improvedcompound,
+  title={An improved compound Poisson model for the number of motif hits in DNA sequences},
+  author={Kopp, Wolfgang and Vingron, Martin},
+  journal={Bioinformatics},
+  pages={btx539},
+  year={2017},
+  publisher={Oxford University Press}
+}
+
+```
+
 ## Usage
 
 ```
