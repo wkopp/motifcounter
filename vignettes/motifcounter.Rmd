@@ -1,7 +1,7 @@
 ---
 title: "Introduction to the `motifcounter` package"
 author: "Wolfgang Kopp"
-date: "2017-03-22"
+date: "2017-10-06"
 output:
     prettydoc::html_pretty:
         toc: TRUE
@@ -44,7 +44,7 @@ If it is of help for your analysis, please cite
 }
 ```
 
-Further information about the compound Poisson model is available under
+Details about the compound Poisson model are available under
 ```
 @article{improvedcompound,
   title={An improved compound Poisson model for the number of motif hits in DNA sequences},
@@ -121,8 +121,7 @@ the **background model** defines the properties of unbound DNA sequences.
 **order-$d$ Markov model**, where $d$ is prescribed by the user.
 The advantage of using higher-order background models is that they
 are able to capture higher-order sequence features which is crucial
-for studying naturally occurring DNA sequences that are rich in
-such features (e.g. in CpGs islands).
+for studying naturally occurring DNA sequences (e.g. CpGs islands).
 
 Using the PFM and the background model, `motifcounter` computes
 the **motif score** for a given DNA sequence,
@@ -143,7 +142,7 @@ automatically based on 1) the
 **score distribution** and 2) the user-prescribed false positive level $\alpha$.
 To this end, the score distribution is determined by
 an efficient dynamic programming algorithm for general order-$d$
-background models, similar as described in [@rahmann, @rsat1].
+background models. Details of the algorithm are described our paper (see above).
 
 Testing for **motif hit enrichment** in `motifcounter` is based
 on the **number of motif hits** that are observed in a set of DNA sequences.
@@ -152,20 +151,18 @@ In order to be able to judge significance of the observed number of hits
 the package approximates the  **distribution of the number of motif hits** 
 in random DNA sequences with matched lengths.
 
-Accordingly, `motifcounter` provides two fast, accurate alternatives
+Accordingly, `motifcounter` provides two fast and accurate alternatives
 for approximating this distribution:
 
-1. A compound Poisson approximation
-2. a combinatorial model
+1. A compound Poisson approximation (see Kopp and Vingron (2017) Bioinformatics.)
+2. A combinatorial model (manuskript in preparation)
 
-Both of those methods support higher-order background models and
-account for the **self-overlapping** structure of the motif, which
-could lead to mutually **overlapping motif hits**, which  
+Both of these methods support higher-order background models and
+account for the **self-overlapping** structure of the motif.
+For example, a repeat-like word, e.g. 'AAAA', likely gives rise to a string of mutually overlapping hits which  
 are referred to as **clumps** [@reinert, @pape]^[
-This is in contrast to the simple binomial approximation which was suggested
-in several publications [@rsat1,@rahmann]].
-**Clumping** is characteristic for self-overlapping motifs,
-including repeat-like motifs or palindromic motifs. 
+By contrast, a simple binomial approximation  [@rsat1,@rahmann] 
+does not account for self-overlapping matches.].
 `motifcounter` not only account for overlapping motif hits
 with respect to a single DNA strand, but also 
 for overlapping reverse complementary hits,
@@ -176,24 +173,7 @@ of the number of motif hits and thereby the motif hit enrichment test.
 Ignoring this effect could cause misleading statistical conclusions.
 
 
-The compound Poisson model in `motifcounter` is based
-on an improvement upon [@pape], which was extended to support order-$d$
-background models and uses a refined way to 
-determine the clump size distribution.
 
-On the other hand,
-the combinatorial model is based on summing over all permutations of
-placing the $k$ hits in a finite-length sequence, which employs
-an efficient dynamic programming algorithm, related
-to the approach proposed by [@zhang]^[By contrast, `motifcounter` 
-does not seek to enumerate all compatible words that give rise to
-motif hits, of which there might be exponentially many 
-depending on the motif length,
-but is it rather based on a fast approximation
-of overlapping hit probabilities. 
-This makes the combinatorial approximation
-applicable for arbitrary motif lengths, motif structures and
-choices of $\alpha$].
 
 
 # Getting started
@@ -205,7 +185,7 @@ plays a role as a reference
 for identifying putative TFBSs as well as for judging
 motif hit enrichment.
 
-In `motifcounter`, offers the opportunity to use
+`motifcounter` offers the opportunity to use
 order-$d$ Markov model with user-defined $d$.
 The background model is estimated on a set of user-provided
 DNA sequences which are supplied as 
@@ -227,10 +207,11 @@ as the sequences that are latter analysed (e.g. for motif hit enrichment).
 </div>
 <br>
 <div class="hint">
-**Hint:** While, higher-order models tend to be more 
-accurate for representing the 
-naturally occurring DNA sequence, they come at a higher computational cost.
-As a compromise, we recommend to use orders $d=1$ or $d=2$.
+**Hint:** For the purpose of motif enrichment testing, 
+we recommend to use orders $d=1$ or $d=2$. Using a background with 
+very high order $d$ might be very costly to compute and, more importantly,
+due to its increased flexibility, might capture relevant TFBS signals.
+In that case, enriched motifs might not be recovered.
 </div>
 ### Acquire a motif
 `motifcounter` handles motifs in terms of 
@@ -280,8 +261,7 @@ alpha <- 0.01
 motifcounterOptions(alpha)
 ```
 
-For other global options of `motifcounter`, 
-please consult `?motifcounterOptions` for more information.
+For other options consult `?motifcounterOptions`.
 
 
 
@@ -289,7 +269,7 @@ please consult `?motifcounterOptions` for more information.
 
 For the following example, we explore the DNA sequences of 
 a set of *Oct4*-ChIP-seq peaks that were obtained in human *hESC* by 
-the ENCODE project [@encode2012]. The peak regions were trimmed to 200 bps.
+the ENCODE project [@encode2012]. The peak regions were trimmed to 200 bps centered around the midpoint.
 
 ```{r}
 file <- system.file("extdata", "oct4_chipseq.fa", package = "motifcounter")
@@ -331,11 +311,11 @@ plot(sd$dist, sd$scores, type = "l", xlab = "probability", ylab = "")
 ```
 
 To obtain the predicted TFBSs positions and strands, `motifcounter` provides
-the function `motifHits`. This function, applies a score 
-threshold^[The threshold is obtained for a user-defined false 
-positive level $\alpha$ (e.g. $\alpha=0.001$), which is determined
-from the theoretical score distribution.] for
-calling the motif hits based on the observed scores.
+the function `motifHits`. This function calls motif hits
+if the observed score exceeds a pre-determined score 
+threshold^[The threshold is determined for a user-defined false 
+positive level $\alpha$ (e.g. $\alpha=0.001$) based on 
+the theoretical score distribution.].
 
 ```{r}
 # Call putative TFBSs
@@ -439,12 +419,11 @@ That is, it represents a measure of the effect size.
 
 <div class="hint">
 **Hint:** In case, very long or many DNA sequences are scanned for
-TFBSs, the underlying distribution of the number of motif hits, which
-is the basis for the *P-value*-estimate, will be very narrow.
+TFBSs, the distribution of the number of motif hits becomes very narrow.
 In that case, the tiniest differences between the observed and the 
-expected number of hits are prone to cause very low *P-values*.
-In that case, check it the fold-enrichment points to an reasonable
-effect size.
+expected number of hits give rise to very small *P-values*.
+In this case, the fold-enrichment should be consulted to reveal
+if the effect size is of biological relevance.
 </div>
 <br>
 <div class="hint">
@@ -463,10 +442,13 @@ and 2) by a **combinatorial approximation** (see `?motifEnrichment`).
 As a rule of thumb, we recommend the use 
 compound Poisson model for studying long (or many ) DNA sequences with
 a fairly stringent $\alpha$ (e.g. 0.001 or smaller).
-On the other hand, a relaxed $\alpha$ is more 
-desirable for your analysis (e.g $\alpha\geq 0.01$),
-we recommend the computationally more costly, but also more accurate
-**combinatorial approximation**.
+On the other hand, if a relaxed $\alpha$ is 
+desired for your analysis (e.g $\alpha\geq 0.01$),
+the **combinatorial approximation** is likely to give more accurate results.
+</div>
+<div class="hint">
+**Hint:** We recommend against using too relaxed choices for $\alpha$ (e.g $\alpha\geq 0.05$), as this violates some of the assumptions on which
+the models are based on. The consequence might be significant biases of the results.
 </div>
 
 # Session Info
