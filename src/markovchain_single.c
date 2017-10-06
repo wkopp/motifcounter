@@ -118,7 +118,6 @@ static double minmc_ss(int n, double *tau, void *ex) {
 static void dmc_ss(int n, double *tau, double *gradient, void *ex) {
 
     double val;
-    CGParams *cgparams = (CGParams *)ex;
     double epsilon;
     double pa, ma;
 

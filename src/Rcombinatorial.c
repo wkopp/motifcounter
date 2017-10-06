@@ -26,11 +26,7 @@ void RPosteriorProbability(double *alpha, double *beta,
     double Zpartition;
     double *singlehitdistribution;
     double *delta, *deltap;
-    double tau;
-    double abstol = 1e-30, intol = 1e-30;
-    int trace = 0, fail, fncount, type = 2, gncount;
-    double sum, res;
-    CGParams cgparams;
+    double sum;
 
 
     seqlen = sseqlen[0] - motiflen[0] + 1;

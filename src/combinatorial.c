@@ -69,11 +69,6 @@ void initPosteriorProbability(PosteriorCount *p, double alpha, double **beta,
     //double *extra;
     int i, j;
     int m;
-    double abstol = 1e-30, intol = 1e-30;
-    double res;
-    int trace = 0, fail, fncount, type = 2, gncount;
-    CGParams cgparams;
-    double a0, aN;
     double *_alpha, *_omega;
     double tau;
 
