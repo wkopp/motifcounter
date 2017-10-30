@@ -1,7 +1,7 @@
 Package: motifcounter
 Type: Package
 Title: R package for analysing TFBSs in DNA sequences
-Version: 1.2.0
+Version: 1.3.0
 Date: 2017
 Author: Wolfgang Kopp [aut, cre]
 Suggests: knitr, rmarkdown, testthat, MotifDb, seqLogo, prettydoc
