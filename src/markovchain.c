@@ -65,6 +65,7 @@ void markovchain(double *dist, double *tau,
     int motiflen = *motiflen_;
     double *post, *prior;
     double alphacond;
+    double norm;
 
 
     // the states are
@@ -125,6 +126,16 @@ void markovchain(double *dist, double *tau,
         }
         memcpy(prior, post, (2 * motiflen + 2)*sizeof(double));
         memset(post, 0, (2 * motiflen + 2)*sizeof(double));
+
+        for (i = 0, norm = 0.0; i < 2 * motiflen + 2; i++) {
+          // in rare occations there seem to be numerical issues
+          // to solve this, we renormalize prior
+          if (prior[i] < 0.0) prior[i] = 0.0;
+          norm += prior[i];
+        }
+        for (i = 0; i < 2 * motiflen + 2; i++) {
+          prior[i] /= norm;
+        }
     }
 
 }
