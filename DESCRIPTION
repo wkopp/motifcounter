@@ -1,13 +1,13 @@
 Package: motifcounter
 Type: Package
 Title: R package for analysing TFBSs in DNA sequences
-Version: 1.3.1
+Version: 1.3.2
 Date: 2017
 Author: Wolfgang Kopp [aut, cre]
 Suggests: knitr, rmarkdown, testthat, MotifDb, seqLogo, prettydoc
 Imports: Biostrings, methods
 Depends: R(>= 3.0)
-Maintainer: Wolfgang Kopp <kopp@molgen.mpg.de>
+Maintainer: Wolfgang Kopp <wolfgang.kopp@mdc-berlin.de>
 Description: 'motifcounter' provides functionality to compute the
         statistics related with motif matching and counting of motif
         matches in DNA sequences. As an input, 'motifcounter' requires
