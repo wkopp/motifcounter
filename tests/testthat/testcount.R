@@ -34,7 +34,8 @@ test_that("motifHits", {
     # Reload background
     seqfile=system.file("extdata","test2.fa", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
-    bg=readBackground(seqs,1)
+    # only use the first two sequences without N's to retain the current testing behaviour
+    bg=readBackground(seqs[1:2],1)
 
     # Test correct hit positions
     mh=motifHits(seqs[[1]], motif,bg)
@@ -81,7 +82,7 @@ test_that("motifHitProfile", {
     seqs=Biostrings::readDNAStringSet(seqfile)
 
     # Load Background
-    bg=readBackground(seqs,1)
+    bg=readBackground(seqs[1:2],1)
     
     # palindrom
     name="x3.tab"
@@ -107,7 +108,7 @@ test_that("motifHitProfile", {
     expect_error(motifHitProfile(seqs,as.matrix(motif[, 1]),bg)[[1]])
 
     # Reload background
-    bg=readBackground(seqs,1)
+    bg=readBackground(seqs[1:2],1)
 
     # Test correct hit positions
     mh=motifHitProfile(seqs[1], motif,bg)
@@ -155,7 +156,7 @@ test_that("numMotifHits", {
     seqs=Biostrings::readDNAStringSet(seqfile)
 
     # Load Background
-    bg=readBackground(seqs,1)
+    bg=readBackground(seqs[1:2],1)
     
     # palindrom
     name="x3.tab"

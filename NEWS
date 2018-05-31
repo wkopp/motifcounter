@@ -1,3 +1,8 @@
+CHANGES IN VERSION 1.5.1
+-------------------------
+o Background can be computed with
+  sequences that contain N's.
+
 CHANGES IN VERSION 1.3.2
 -------------------------
 o Changed contact information

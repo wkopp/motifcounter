@@ -60,18 +60,18 @@ test_that("readBackground", {
     seqs = Biostrings::readDNAStringSet(seqfile)
     bg = readBackground(seqs, 0)
     #c+g=21
-    #a+t=9
-    correct = c(12, 21, 21, 12) / (66)
-    expect_equal(bg@counts, c(12, 21, 21, 12) * 2)
-    expect_true(all(bg@station == correct))
+    #a+t=15
+    correct = c(30, 56, 56, 30)
+    expect_equal(bg@counts, c(30, 56, 56, 30))
+    expect_true(all(bg@station == correct/172))
     
     # Check order-1 background for another toy sequence
     bg = readBackground(seqs, 1)
     
     #the correct number of observations
     
-    expect_equal(bg@counts, c(8, 6, 7, 2, 6, 12, 14, 7, 7, 14, 12, 6, 2, 7, 6, 8))
-    correct = matrix(c(8, 6, 7, 2, 6, 12, 14, 7, 7, 14, 12, 6, 2, 7, 6, 8), 4, 4)
+    expect_equal(bg@counts, c(8,  9,  9,  2,  9, 14, 18,  9,  9, 18, 14,  9,  2,  9,  9,  8))
+    correct = matrix(c(8,  9,  9,  2,  9, 14, 18,  9,  9, 18, 14,  9,  2,  9,  9,  8), 4, 4)
     correct = correct / apply(correct, 1, sum)
     expect_that(all(t(matrix(bg@trans, 4, 4)) == correct), is_true())
     
