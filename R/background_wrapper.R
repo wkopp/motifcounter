@@ -103,6 +103,10 @@ getOrder = function(obj) {
 #'
 #' @export
 readBackground = function(seqs, order = 1) {
+    if (is(seqs, "DNAString")) {
+      # wrap the sequence up as sequence set
+      seqs = DNAStringSet(seqs)
+    }
     stopifnot (is(seqs, "DNAStringSet"))
     stopifnot (order >= 0)
     

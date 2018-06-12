@@ -7,10 +7,13 @@ test_that("readBackground", {
     seqfile = system.file("extdata", "seq1.fasta", package = "motifcounter")
     seqs = Biostrings::readDNAStringSet(seqfile)
     
+    # check if it also works with a DNAString
+    bg = readBackground(seqs[[1]], 1)
     
     # Check if all background models are plausible
     # all must represent probabilities
     for (m in 0:3) {
+        
         bg = readBackground(seqs, m)
         validObject(bg)
         # check if background slot dimensions are correctly checked
