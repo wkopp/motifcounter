@@ -17,7 +17,7 @@ void getNucleotideFrequencyFromSequence(char *seq, int slen,
     for (j = order; j < slen; j++) {
         // compute background even for sequences with N's
         // but jump over those positions that are N's
-        if (getSequenceLength(&seq[j - order], order + 1) < 0) {
+        if (hasN(&seq[j - order], order + 1) > 0) {
             continue;
         }
         counts[getIndexFromAssignment(&seq[j - order], order + 1)] += 1.0;

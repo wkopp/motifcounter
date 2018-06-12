@@ -127,13 +127,17 @@ int getIndexFromReverseComplementaryAssignment(const char *ass, int length) {
 }
 
 int getSequenceLength(const char *seq, int slen) {
-    int j;
-
-    for (j = 0; j < slen; j++) {
-        // if the sequence contains any N's, do not process the scores
-        if (getNucIndex(seq[j]) < 0) {
-            return -1;
-        }
-    }
     return slen;
+}
+
+int hasN(const char *seq, int slen) {
+  int j;
+  
+  for (j = 0; j < slen; j++) {
+    // if the sequence contains any N's, do not process the scores
+    if (getNucIndex(seq[j]) < 0) {
+      return 1;
+    }
+  }
+  return 0;
 }

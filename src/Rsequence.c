@@ -107,18 +107,10 @@ SEXP RscoreHistogram(SEXP rpfm_, SEXP rnrow, SEXP rncol,
     xdist = REAL(dist);
     for (i = 0; i < maxs - mins + 1; i++) xdist[i] = 0.0;
 
+    // otherwise, compute the histogram
+    scoreHistogram(station, trans,
+                   &pfm, seq, slen, xdist, Rgran, mins, order[0]);
 
-    noscores = 0;
-    if (getSequenceLength(seq, slen) < 0) {
-        noscores = 1;
-    }
-
-    // if there is a non-nucleotide, just return the empty histogram
-    if (noscores == 0) {
-        // otherwise, compute the histogram
-        scoreHistogram(station, trans,
-                       &pfm, seq, slen, xdist, Rgran, mins, order[0]);
-    }
 
     UNPROTECT(2);
     return dist;

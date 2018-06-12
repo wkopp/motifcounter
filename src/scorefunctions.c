@@ -75,15 +75,18 @@ void scoreSequence(double *station, double *trans,
     int i, j;
     int s, index;
     int score[power(ALPHABETSIZE, order + 1)];
-
     // if the sequence contains any N's, do not process the scores
     if (getSequenceLength(seq, seqlen) < 0) {
-        return;
+       return;
     }
 
     for (i = 0; i < seqlen - pwm->nrow + 1; i++) {
         R_CheckUserInterrupt();
         index = 0;
+        if (hasN(&seq[i], pwm->nrow) > 0) {
+            scores[i] = NAN;
+            continue;
+        }
 
         if (order > 0) {
             getScoresInitialIndex(pwm->data, station,
@@ -114,14 +117,13 @@ void scoreHistogram(double *station, double *trans,
     int s, index;
     int score[power(ALPHABETSIZE, order + 1)];
 
-    // if the sequence contains any N's, do not process the scores
-    if (getSequenceLength(seq, seqlen) < 0) {
-        return;
-    }
-
     for (i = 0; i < seqlen - pwm->nrow + 1; i++) {
         R_CheckUserInterrupt();
         index = 0;
+        if (hasN(&seq[i], pwm->nrow) > 0) {
+            continue;
+        }
+
 
         if (order > 0) {
             getScoresInitialIndex(pwm->data, station,

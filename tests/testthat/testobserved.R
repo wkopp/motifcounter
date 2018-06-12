@@ -5,5 +5,5 @@ test_that("lenSequences", {
 
     # check sequence length
     seqs=Biostrings::DNAStringSet(c("aaa","aNa","aR"))
-    expect_equal(lenSequences(seqs),c(3,0,0))
+    expect_equal(lenSequences(seqs),c(3,3,2))
 })

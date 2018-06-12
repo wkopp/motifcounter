@@ -35,12 +35,14 @@ motifHits = function(seq, pfm, bg) {
 
     sth = scoreThreshold(pfm, bg)
     scores = scoreSequence(seq, pfm, bg)
-    fhits = integer(length(scores$fscores))
-    rhits = integer(length(scores$rscores))
-    fhits[scores$fscores >= sth$threshold] = 1
-    rhits[scores$rscores >= sth$threshold] = 1
+    
+    fhits = numeric(length(scores$fscores))
+    rhits = numeric(length(scores$rscores))
+    
+    fhits[scores$fscores >= sth$threshold] = 1.
+    rhits[scores$rscores >= sth$threshold] = 1.
 
-    return(list(fhits = as.integer(fhits), rhits = as.integer(rhits)))
+    return(list(fhits = fhits, rhits = rhits))
 }
 
 #' Motif hit profile across multiple sequences
@@ -95,18 +97,18 @@ motifHitProfile = function(seqs, pfm, bg) {
     }
     slen = lenSequences(seqs[1])
     if (slen <= ncol(pfm) - 1) {
-        return (list(fhits = integer(0), rhits = integer(0)))
+        return (list(fhits = numeric(0), rhits = numeric(0)))
     }
 
     fhits = vapply(seqs, function(seq, pfm, bg) {
         return(motifHits(seq, pfm, bg)$fhits)
-    }, FUN.VALUE = integer(slen - ncol(pfm) + 1), pfm, bg)
+    }, FUN.VALUE = numeric(slen - ncol(pfm) + 1), pfm, bg)
 
     fhits = rowMeans(as.matrix(fhits))
 
     rhits = vapply(seqs, function(seq, pfm, bg) {
         mh = motifHits(seq, pfm, bg)$rhits
-    }, FUN.VALUE = integer(slen - ncol(pfm) + 1), pfm, bg)
+    }, FUN.VALUE = numeric(slen - ncol(pfm) + 1), pfm, bg)
 
     rhits = rowMeans(as.matrix(rhits))
     return (list(fhits = as.vector(fhits), rhits = as.vector(rhits)))
@@ -164,14 +166,12 @@ numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE) {
     noh = vapply(seqs, function(seq, pfm, bg, singlestranded) {
         ret = motifHits(seq, pfm, bg)
         if (singlestranded == FALSE) {
-            return(sum(ret[[1]] + ret[[2]]))
+            return(sum(ret[[1]] + ret[[2]], na.rm = TRUE))
         } else {
-            return(sum(ret[[1]]))
+            return(sum(ret[[1]], na.rm = TRUE))
         }
-    }, integer(1), pfm, bg, singlestranded)
+    }, numeric(1), pfm, bg, singlestranded)
 
-    # retrieve the individual sequence lengths
-    # sequences containing "N" or "n" are assigned length zero
     lseq = lenSequences(seqs)
 
     nseq = length(seqs)

@@ -174,8 +174,8 @@ test_that("scoreSequence", {
     seq=Biostrings::replaceLetterAt(seq,3,"N")
     scores=scoreSequence(seq,motif,bg)
     expect_equal(scores$fscores,scores$rscores) # both should be equal 
-    expect_equal(length(scores$fscores),0) # length=0
-    expect_equal(length(scores$rscores),0) # length=0
+    expect_equal(length(scores$fscores),3) # length=3
+    expect_equal(length(scores$rscores),3) # length=3
 })
 
 test_that("scoreProfile", {
@@ -234,7 +234,7 @@ test_that("scoreProfile", {
 
     # zero length sequence, due to 'N'
     mh=scoreProfile(seqs[3], motif,bg)
-    expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(0,0))
+    expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(10,10))
 
     # Check with aaa repeat motif
     name="x8.tab"

@@ -54,7 +54,7 @@ test_that("motifHits", {
 
     # zero length sequence, due to 'N'
     mh=motifHits(seqs[[3]], motif,bg)
-    expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(0,0))
+    expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(10,10))
 
     # Check with aaa repeat motif
     name="x8.tab"
@@ -127,7 +127,7 @@ test_that("motifHitProfile", {
 
     # zero length sequence, due to 'N'
     mh=motifHitProfile(seqs[3], motif,bg)
-    expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(0,0))
+    expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(10,10))
 
     # Check with aaa repeat motif
     name="x8.tab"
@@ -192,12 +192,12 @@ test_that("numMotifHits", {
     # there is a hit in the first sequence
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,0))
+    expect_equal(as.vector(nom$lseq),c(23,10,13))
     expect_equal(as.vector(nom$numofhits),c(1,0,0))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,0))
+    expect_equal(as.vector(nom$lseq),c(23,10,13))
     expect_equal(as.vector(nom$numofhits),c(2,0,0))
 
 
@@ -209,12 +209,12 @@ test_that("numMotifHits", {
     # there is a hit in the second sequence
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,0))
+    expect_equal(as.vector(nom$lseq),c(23,10,13))
     expect_equal(as.vector(nom$numofhits),c(0,1,0))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,0))
+    expect_equal(as.vector(nom$lseq),c(23,10,13))
     expect_equal(as.vector(nom$numofhits),c(0,1,0))
 
 })
