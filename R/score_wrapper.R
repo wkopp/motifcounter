@@ -288,7 +288,7 @@ scoreProfile = function(seqs, pfm, bg) {
     },
     FUN.VALUE = numeric(slen - ncol(pfm) + 1),
     pfm, bg)
-    rscores = rowMeans(as.matrix(rscores))
+    rscores = rowMeans(as.matrix(rscores), na.rm = TRUE)
     return (list(
         fscores = as.vector(fscores),
         rscores = as.vector(rscores)

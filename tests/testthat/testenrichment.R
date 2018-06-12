@@ -63,4 +63,15 @@ test_that("motifEnrichment", {
     # not supported
     expect_error(motifEnrichment(seqs,motif,bg,singlestranded=TRUE,
                     method="combinatorial"))
+
+    seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+    seqs2=Biostrings::readDNAStringSet(seqfile)
+    bg=readBackground(seqs2,2)
+    seqfile=system.file("extdata","test2.fa", package="motifcounter")
+    seqs=Biostrings::readDNAStringSet(seqfile)
+    
+    
+    expect_error(motifEnrichment(seqs,motif,bg))
+    expect_equal(motifEnrichment(seqs[1:2],motif,bg)$pvalue, 0.1293926, tolerance=0.000001)
+    
 })

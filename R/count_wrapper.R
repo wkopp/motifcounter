@@ -41,6 +41,9 @@ motifHits = function(seq, pfm, bg) {
     
     fhits[scores$fscores >= sth$threshold] = 1.
     rhits[scores$rscores >= sth$threshold] = 1.
+    
+    fhits[is.nan(scores$fscores)] = NaN
+    rhits[is.nan(scores$rscores)] = NaN
 
     return(list(fhits = fhits, rhits = rhits))
 }
@@ -89,10 +92,8 @@ motifHitProfile = function(seqs, pfm, bg) {
     stopifnot(is(seqs,"DNAStringSet"))
 
     if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
-        stop(paste(strwrap("All DNAStrings in 'seqs' must be of equal length
-            and must not contain 'N's. Please remove sequences that contain
-            'N's from 'seqs' and/or trim
-            trim the sequences such that they are equally long."), 
+        stop(paste(strwrap("All DNAStrings in 'seqs' must be of equal length. 
+            Please trim the sequences such that they are equally long."), 
             collapse = "\n"))
     }
     slen = lenSequences(seqs[1])
@@ -104,13 +105,13 @@ motifHitProfile = function(seqs, pfm, bg) {
         return(motifHits(seq, pfm, bg)$fhits)
     }, FUN.VALUE = numeric(slen - ncol(pfm) + 1), pfm, bg)
 
-    fhits = rowMeans(as.matrix(fhits))
+    fhits = rowMeans(as.matrix(fhits), na.rm = TRUE)
 
     rhits = vapply(seqs, function(seq, pfm, bg) {
         mh = motifHits(seq, pfm, bg)$rhits
     }, FUN.VALUE = numeric(slen - ncol(pfm) + 1), pfm, bg)
 
-    rhits = rowMeans(as.matrix(rhits))
+    rhits = rowMeans(as.matrix(rhits), na.rm = TRUE)
     return (list(fhits = as.vector(fhits), rhits = as.vector(rhits)))
 }
 
@@ -166,9 +167,9 @@ numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE) {
     noh = vapply(seqs, function(seq, pfm, bg, singlestranded) {
         ret = motifHits(seq, pfm, bg)
         if (singlestranded == FALSE) {
-            return(sum(ret[[1]] + ret[[2]], na.rm = TRUE))
+            return(sum(ret[[1]] + ret[[2]], na.rm = FALSE))
         } else {
-            return(sum(ret[[1]], na.rm = TRUE))
+            return(sum(ret[[1]], na.rm = FALSE))
         }
     }, numeric(1), pfm, bg, singlestranded)
 

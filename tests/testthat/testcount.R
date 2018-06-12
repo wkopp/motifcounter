@@ -55,6 +55,7 @@ test_that("motifHits", {
     # zero length sequence, due to 'N'
     mh=motifHits(seqs[[3]], motif,bg)
     expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(10,10))
+    expect_equal(mh$fhits, c(0, NaN, NaN, NaN, NaN, NaN, NaN, 0, 0, 0))
 
     # Check with aaa repeat motif
     name="x8.tab"
@@ -128,7 +129,13 @@ test_that("motifHitProfile", {
     # zero length sequence, due to 'N'
     mh=motifHitProfile(seqs[3], motif,bg)
     expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(10,10))
-
+    expect_equal(mh$fhits, c(0, NaN, NaN, NaN, NaN, NaN, NaN, 0, 0, 0))
+    
+    seqs2=seqs
+    seqs2[[1]] = seqs2[[1]][1:10]
+    seqs2[[3]] = seqs2[[3]][1:10]
+    mh=motifHitProfile(seqs2, motif,bg)
+    
     # Check with aaa repeat motif
     name="x8.tab"
     file=system.file("extdata",name, package="motifcounter")
@@ -193,12 +200,12 @@ test_that("numMotifHits", {
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
     expect_equal(nom$nseq,3)
     expect_equal(as.vector(nom$lseq),c(23,10,13))
-    expect_equal(as.vector(nom$numofhits),c(1,0,0))
+    expect_equal(as.vector(nom$numofhits),c(1,0,NaN))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
     expect_equal(nom$nseq,3)
     expect_equal(as.vector(nom$lseq),c(23,10,13))
-    expect_equal(as.vector(nom$numofhits),c(2,0,0))
+    expect_equal(as.vector(nom$numofhits),c(2,0,NaN))
 
 
     # test with repeat motif
@@ -210,12 +217,12 @@ test_that("numMotifHits", {
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
     expect_equal(nom$nseq,3)
     expect_equal(as.vector(nom$lseq),c(23,10,13))
-    expect_equal(as.vector(nom$numofhits),c(0,1,0))
+    expect_equal(as.vector(nom$numofhits),c(0,1,NaN))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
     expect_equal(nom$nseq,3)
     expect_equal(as.vector(nom$lseq),c(23,10,13))
-    expect_equal(as.vector(nom$numofhits),c(0,1,0))
+    expect_equal(as.vector(nom$numofhits),c(0,1,NaN))
 
 })
 

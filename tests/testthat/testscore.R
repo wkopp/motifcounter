@@ -170,10 +170,11 @@ test_that("scoreSequence", {
     # and length is Nscores= Nseq-Nmotif+1
     expect_equal(length(scores$fscores),10-ncol(motif)+1)
 
-    # If sequence contains 'N', set scores should be empty vectors
+    # If sequence contains 'N', the respective scores should be NaN
     seq=Biostrings::replaceLetterAt(seq,3,"N")
     scores=scoreSequence(seq,motif,bg)
-    expect_equal(scores$fscores,scores$rscores) # both should be equal 
+    expect_equal(scores$fscores,scores$rscores) # both should be equal
+    expect_equal(scores$fscores, rep(NaN, 3))
     expect_equal(length(scores$fscores),3) # length=3
     expect_equal(length(scores$rscores),3) # length=3
 })
@@ -232,9 +233,10 @@ test_that("scoreProfile", {
     expect_equal(mh[[1]],mh[[2]])
     expect_equal(length(mh[[1]]),length(seqs[[2]])-ncol(motif)+1)
 
-    # zero length sequence, due to 'N'
+    # NaN due to 'N'
     mh=scoreProfile(seqs[3], motif,bg)
     expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(10,10))
+    expect_equal(mh[[1]],c(-23.0, NaN,NaN,NaN,NaN,NaN,NaN,-14.7,-21.3,-14.8))
 
     # Check with aaa repeat motif
     name="x8.tab"

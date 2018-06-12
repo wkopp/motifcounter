@@ -70,6 +70,10 @@ motifEnrichment = function(seqs, pfm, bg, singlestranded = FALSE,
 
     # detemine the number of motif hits
     observations = numMotifHits(seqs, pfm, bg, singlestranded)
+    if (is.nan(sum(observations$numofhits))) {
+      stop("Number of motif hits is NaN. This is likely due to N's in the sequence.
+           Please remove sequence containing N's.")
+    }
     if (method == "compound") {
         dist = compoundPoissonDist(observations$lseq, overlap)
     } else if (method == "combinatorial") {
