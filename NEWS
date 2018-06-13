@@ -1,3 +1,15 @@
+CHANGES IN VERSION 1.5.2
+-------------------------
+o scoreSequence, 
+  scoreHistogram, scoreProfile
+  motifHits, motifHitProfile can
+  be used with N-containing sequences.
+  Positions at which the motif overlaps
+  with N's will be NaN.
+o Background can be computed from
+  a DNAString in addition to a DNAStringSet
+  object.
+
 CHANGES IN VERSION 1.5.1
 -------------------------
 o Background can be computed with
