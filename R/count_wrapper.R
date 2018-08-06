@@ -3,6 +3,8 @@
 #' This function determines per-position motif hits in a given DNA sequence.
 #' @include score_wrapper.R
 #' @inheritParams scoreSequence
+#' @params threshold Score threshold for calling motif matches. If NULL,
+#' the threshold will determined from alpha.
 #' @return List containing
 #' \describe{
 #' \item{fhits}{Per-position motif hits on the forward strand}
@@ -27,21 +29,24 @@
 #' motifHits(seq[[1]], motif, bg)
 #'
 #' @export
-motifHits = function(seq, pfm, bg) {
+motifHits = function(seq, pfm, bg, threshold=NULL) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
-    sth = scoreThreshold(pfm, bg)
+    if (is.null(threshold)) {
+      threshold = scoreThreshold(pfm, bg)$threshold
+    }
+
     scores = scoreSequence(seq, pfm, bg)
-    
+
     fhits = numeric(length(scores$fscores))
     rhits = numeric(length(scores$rscores))
-    
-    fhits[scores$fscores >= sth$threshold] = 1.
-    rhits[scores$rscores >= sth$threshold] = 1.
-    
+
+    fhits[scores$fscores >= threshold] = 1.
+    rhits[scores$rscores >= threshold] = 1.
+
     fhits[is.nan(scores$fscores)] = NaN
     rhits[is.nan(scores$rscores)] = NaN
 
@@ -91,6 +96,8 @@ motifHitProfile = function(seqs, pfm, bg) {
 
     stopifnot(is(seqs,"DNAStringSet"))
 
+    sth = scoreThreshold(pfm, bg)
+
     if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
         stop(paste(strwrap("All DNAStrings in 'seqs' must be of equal length. 
             Please trim the sequences such that they are equally long."), 
@@ -101,15 +108,17 @@ motifHitProfile = function(seqs, pfm, bg) {
         return (list(fhits = numeric(0), rhits = numeric(0)))
     }
 
-    fhits = vapply(seqs, function(seq, pfm, bg) {
-        return(motifHits(seq, pfm, bg)$fhits)
-    }, FUN.VALUE = numeric(slen - ncol(pfm) + 1), pfm, bg)
+    fhits = vapply(seqs, function(seq, pfm, bg, th) {
+        return(motifHits(seq, pfm, bg, th)$fhits)
+    }, FUN.VALUE = numeric(slen - ncol(pfm) + 1), pfm, bg,
+    sth$threshold)
 
     fhits = rowMeans(as.matrix(fhits), na.rm = TRUE)
 
-    rhits = vapply(seqs, function(seq, pfm, bg) {
-        mh = motifHits(seq, pfm, bg)$rhits
-    }, FUN.VALUE = numeric(slen - ncol(pfm) + 1), pfm, bg)
+    rhits = vapply(seqs, function(seq, pfm, bg, th) {
+        mh = motifHits(seq, pfm, bg, th)$rhits
+    }, FUN.VALUE = numeric(slen - ncol(pfm) + 1), pfm, bg,
+    sth$threshold)
 
     rhits = rowMeans(as.matrix(rhits), na.rm = TRUE)
     return (list(fhits = as.vector(fhits), rhits = as.vector(rhits)))
@@ -163,15 +172,17 @@ numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE) {
 
     stopifnot(is(seqs, "DNAStringSet"))
 
+    sth = scoreThreshold(pfm, bg)
+
     # retrieve the number of motif hits
-    noh = vapply(seqs, function(seq, pfm, bg, singlestranded) {
-        ret = motifHits(seq, pfm, bg)
+    noh = vapply(seqs, function(seq, pfm, bg, singlestranded, th) {
+        ret = motifHits(seq, pfm, bg, th)
         if (singlestranded == FALSE) {
             return(sum(ret[[1]] + ret[[2]], na.rm = FALSE))
         } else {
             return(sum(ret[[1]], na.rm = FALSE))
         }
-    }, numeric(1), pfm, bg, singlestranded)
+    }, numeric(1), pfm, bg, singlestranded, sth$threshold)
 
     lseq = lenSequences(seqs)
 
