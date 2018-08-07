@@ -68,47 +68,80 @@ int initScoreMetaInfo (int smin, int smax, int intervalsize,
     return 0;
 }
 
+// getPositionWeights
+//
+// This function takes a PFM and a background model and determines
+// the per position log-likelihood values discretized the integer
+// representation.
+// Therefore the result is an integer matrix of dimensions
+// motif length times alphabetsize.
+//
+// The purpose of this function is to compute the scores once, which
+// includes using the log function. Afterwards, when scanning a sequence.
+// the derived scores can be looked up in the matrix.
+void getPositionWeights(double *station, double *trans, DMatrix *pfm, IMatrix *pwm,
+                        double granularity, int order) {
+    int j, i, index, cindex, ds;
+    int initscore[power(ALPHABETSIZE, order)];
+    
+    memset(initscore, 0, power(ALPHABETSIZE, order)*sizeof(int));
+    
+    if (order > 0) {
+        
+        // Initialize with stationary distribution
+        // for higher order models
+        getScoresInitialIndex(pfm->data, station,
+                              initscore, &granularity, order);
 
-void scoreSequence(double *station, double *trans,
-                   DMatrix *pwm, const char *seq, int seqlen, double *scores,
+    }
+
+    for (j = 0; j < pfm->nrow - order; j++) {
+        for (index = 0; index < power(ALPHABETSIZE, order + 1); index++) {
+            if (j == 0) {
+                i = index / ALPHABETSIZE;
+                pwm->data[index] = initscore[i];
+            }
+            
+            i = index % ALPHABETSIZE;
+            ds =  getScoreIndex(pfm->data[(j + order) * ALPHABETSIZE + i],
+                                trans[index], granularity);
+
+            pwm->data[j*power(ALPHABETSIZE, order + 1) + index] += ds;
+               
+        }
+    }
+}
+
+void scoreSequence(IMatrix *pwm, const char *seq, int seqlen, double *scores,
                    double granularity, int order) {
     int i, j;
-    int s, index;
-    int score[power(ALPHABETSIZE, order + 1)];
+    int s, index, cindex;
+
     // if the sequence contains any N's, do not process the scores
     if (getSequenceLength(seq, seqlen) < 0) {
        return;
     }
 
-    for (i = 0; i < seqlen - pwm->nrow + 1; i++) {
+    for (i = 0; i < seqlen - pwm->nrow + 1 - order; i++) {
         R_CheckUserInterrupt();
-        index = 0;
-        if (hasN(&seq[i], pwm->nrow) > 0) {
+        if (hasN(&seq[i], pwm->nrow + order) > 0) {
             scores[i] = NAN;
             continue;
         }
-
-        if (order > 0) {
-            getScoresInitialIndex(pwm->data, station,
-                                  score, &granularity, order);
-            index = getIndexFromAssignment(&seq[i], order);
-            s = score[index];
-        } else {
-            s = 0;
-        }
-
-        for (j = order; j < pwm->nrow; j++) {
-
+        for (j = 0, index = 0; j < order; j++) {
             index = index * ALPHABETSIZE + getNucIndex(seq[i + j]);
+        }
+        for (j = 0, s = 0; j < pwm->nrow; j++) {
+            index = index * ALPHABETSIZE + getNucIndex(seq[i + j + order]);
 
-            s += getScoreIndex(pwm->data[j * ALPHABETSIZE + getNucIndex(seq[i + j])],
-                               trans[index], granularity);
-
+            s += pwm->data[j*power(ALPHABETSIZE, order + 1) + index];
             index -= (index / power(ALPHABETSIZE, order)) * power(ALPHABETSIZE, order);
+            
         }
         scores[i] = (double)(s * granularity);
     }
 }
+
 
 void scoreHistogram(double *station, double *trans,
                     DMatrix *pwm, const char *seq, int seqlen,

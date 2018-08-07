@@ -45,6 +45,7 @@ SEXP Rscoresequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
     }
 
     DMatrix pfm;
+    IMatrix pwm;
 
     pfm.data = (double*)R_alloc((size_t)nrow[0] * ncol[0], sizeof(double));
     memset(pfm.data, 0, nrow[0] * ncol[0]*sizeof(double));
@@ -54,11 +55,19 @@ SEXP Rscoresequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
     pfm.nrow = ncol[0];
     memcpy(pfm.data, pfm_, nrow[0]*ncol[0]*sizeof(double));
 
+
+    pwm.nrow = pfm.nrow - order[0];
+    pwm.ncol = power(ALPHABETSIZE, order[0] + 1);
+    pwm.data = (int*)R_alloc((size_t) pwm.nrow * pwm.ncol, sizeof(int));
+    memset(pwm.data, 0, pwm.nrow * pwm.ncol * sizeof(int));
+
+    // from the PFM and background, produce a PWM
+    getPositionWeights(station, trans, &pfm, &pwm, Rgran, order[0]);
+
     scores = PROTECT(allocVector(REALSXP, slen - pfm.nrow + 1));
     xscores = REAL(scores);
 
-    scoreSequence(station, trans,
-                  &pfm, seq, slen, xscores,
+    scoreSequence(&pwm, seq, slen, xscores,
                   Rgran, order[0]);
 
     UNPROTECT(1);

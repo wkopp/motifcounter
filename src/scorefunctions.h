@@ -28,8 +28,9 @@ double ProbinitPWM (double p, double *b, int, int);
 int getScoreIndex(double P, double Q, double dx);
 void getScoresInitialIndex(double *P, double *Q, int *score, double *dx,
                            int order);
-void scoreSequence(double *station, double *trans,
-                   DMatrix *pwm, const char *seq, int seqlen, double *scores,
+void getPositionWeights(double *station, double *trans, DMatrix *pfm, IMatrix *pwm,
+                        double granularity, int order);
+void scoreSequence(IMatrix *pwm, const char *seq, int seqlen, double *scores,
                    double granularity, int order);
 void scoreHistogram(double *station, double *trans,
                     DMatrix *pwm, const char *seq, int seqlen,
