@@ -3,7 +3,7 @@
 #' This function determines per-position motif hits in a given DNA sequence.
 #' @include score_wrapper.R
 #' @inheritParams scoreSequence
-#' @params threshold Score threshold for calling motif matches. If NULL,
+#' @param threshold Score threshold for calling motif matches. If NULL,
 #' the threshold will determined from alpha.
 #' @return List containing
 #' \describe{

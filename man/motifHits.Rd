@@ -4,7 +4,7 @@
 \alias{motifHits}
 \title{Motif hit observations}
 \usage{
-motifHits(seq, pfm, bg)
+motifHits(seq, pfm, bg, threshold = NULL)
 }
 \arguments{
 \item{seq}{A DNAString object}
@@ -12,6 +12,9 @@ motifHits(seq, pfm, bg)
 \item{pfm}{An R matrix that represents a position frequency matrix}
 
 \item{bg}{A Background object}
+
+\item{threshold}{Score threshold for calling motif matches. If NULL,
+the threshold will determined from alpha.}
 }
 \value{
 List containing
