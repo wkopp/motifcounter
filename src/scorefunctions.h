@@ -32,6 +32,8 @@ void getPositionWeights(double *station, double *trans, DMatrix *pfm, IMatrix *p
                         double granularity, int order);
 void scoreSequence(IMatrix *pwm, const char *seq, int seqlen, double *scores,
                    double granularity, int order);
+void hitSequence(IMatrix *pwm, const char *seq, int seqlen, double *hits,
+                 double granularity, int order, double threshold, ExtremalScore *escore);
 void scoreHistogram(double *station, double *trans,
                     DMatrix *pwm, const char *seq, int seqlen,
                     double *dist, double granularity, int smin, int order);

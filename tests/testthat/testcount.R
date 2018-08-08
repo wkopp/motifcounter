@@ -1,4 +1,48 @@
 context("Count")
+library(MotifDb)
+
+test_that("oct4_vignette_example_alpha0001", {
+  library(MotifDb)
+  alpha=0.001
+  gran=0.1
+  motifcounterOptions(alpha, gran)
+  
+  oct4 <- as.list(query(query(query(MotifDb, "hsapiens"), 
+                              "pou5f1"), "jolma2013"))[[1]]
+  motif <- oct4
+  
+  mhits <- motifHits(oct4peaks[[1]], motif, bg)
+  
+  # Inspect the result
+  fhitpos <- which(mhits$fhits == 1)
+  rhitpos <- which(mhits$rhits == 1)
+  expect_equal(length(fhitpos), 0)
+  expect_equal(length(rhitpos), 1)
+  expect_equal(rhitpos, 94)
+
+})
+
+test_that("oct4_vignette_example_alpha001", {
+  library(MotifDb)
+  alpha=0.01
+  gran=0.1
+  motifcounterOptions(alpha, gran)
+  
+  oct4 <- as.list(query(query(query(MotifDb, "hsapiens"), 
+                              "pou5f1"), "jolma2013"))[[1]]
+  motif <- oct4
+  
+  mhits <- motifHits(oct4peaks[[1]], motif, bg)
+  
+  # Inspect the result
+  fhitpos <- which(mhits$fhits == 1)
+  rhitpos <- which(mhits$rhits == 1)
+  expect_equal(length(fhitpos), 4)
+  expect_equal(length(rhitpos), 4)
+  expect_equal(fhitpos, c(54, 87, 93, 112))
+  expect_equal(rhitpos, c(55, 94, 111, 118))
+  
+})
 
 test_that("motifHits", {
     # init 

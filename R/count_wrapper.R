@@ -39,19 +39,71 @@ motifHits = function(seq, pfm, bg, threshold=NULL) {
       threshold = scoreThreshold(pfm, bg)$threshold
     }
 
-    scores = scoreSequence(seq, pfm, bg)
-
-    fhits = numeric(length(scores$fscores))
-    rhits = numeric(length(scores$rscores))
-
-    fhits[scores$fscores >= threshold] = 1.
-    rhits[scores$rscores >= threshold] = 1.
-
-    fhits[is.nan(scores$fscores)] = NaN
-    rhits[is.nan(scores$rscores)] = NaN
-
+    fhits = hitStrand(seq, pfm, bg, threshold)
+    rhits = hitStrand(seq, revcompMotif(pfm), bg, threshold)
+   
     return(list(fhits = fhits, rhits = rhits))
 }
+
+#' Hit strand
+#'
+#' This function computes the per-position
+#' motif matches in a given DNA strand.
+#'
+#' The function returns the per-position scores
+#' for the given strand. If the sequence is too short,
+#' it contains an empty vector.
+#'
+#' @inheritParams motifHits
+#' @return
+#' \describe{
+#' \item{hits}{Vector of motif hits on the given strand}
+#' }
+#'
+#' @examples
+#'
+#'
+#' # Load sequences
+#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seqs = Biostrings::readDNAStringSet(seqfile)
+#'
+#' # Load background
+#' bg = readBackground(seqs, 1)
+#'
+#' # Load motif
+#' motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
+#'
+#' # Compute the per-position and per-strand scores
+#' motifcounter:::hitStrand(seqs[[1]], motif, bg)
+#'
+hitStrand = function(seq, pfm, bg, threshold=NULL) {
+  motifValid(pfm)
+  stopifnot(is(bg, "Background"))
+  validObject(bg)
+  motifAndBackgroundValid(pfm, bg)
+  
+  # Check class
+  stopifnot(is(seq, "DNAString"))
+  
+  if (is.null(threshold)) {
+    threshold = scoreThreshold(pfm, bg)$threshold
+  }
+  
+  hits = .Call(
+    motifcounter_hitsequence,
+    as.numeric(pfm),
+    nrow(pfm),
+    ncol(pfm),
+    toString(seq),
+    getStation(bg),
+    getTrans(bg),
+    as.integer(getOrder(bg)),
+    as.numeric(threshold)
+  )
+  return(as.numeric(hits))
+}
+
 
 #' Motif hit profile across multiple sequences
 #'
