@@ -6,13 +6,21 @@ test_that("oct4_vignette_example_alpha0001", {
   alpha=0.001
   gran=0.1
   motifcounterOptions(alpha, gran)
-  
-  oct4 <- as.list(query(query(query(MotifDb, "hsapiens"), 
+
+  order <- 1
+  file <- system.file("extdata", "seq.fasta", package = "motifcounter")
+  seqs <- Biostrings::readDNAStringSet(file)
+  bg <- readBackground(seqs, order)
+
+  file <- system.file("extdata", "oct4_chipseq.fa", package = "motifcounter")
+  oct4peaks <- Biostrings::readDNAStringSet(file)
+
+  oct4 <- as.list(query(query(query(MotifDb, "hsapiens"),
                               "pou5f1"), "jolma2013"))[[1]]
   motif <- oct4
-  
+
   mhits <- motifHits(oct4peaks[[1]], motif, bg)
-  
+
   # Inspect the result
   fhitpos <- which(mhits$fhits == 1)
   rhitpos <- which(mhits$rhits == 1)
@@ -27,13 +35,21 @@ test_that("oct4_vignette_example_alpha001", {
   alpha=0.01
   gran=0.1
   motifcounterOptions(alpha, gran)
-  
-  oct4 <- as.list(query(query(query(MotifDb, "hsapiens"), 
+
+  order <- 1
+  file <- system.file("extdata", "seq.fasta", package = "motifcounter")
+  seqs <- Biostrings::readDNAStringSet(file)
+  bg <- readBackground(seqs, order)
+
+  file <- system.file("extdata", "oct4_chipseq.fa", package = "motifcounter")
+  oct4peaks <- Biostrings::readDNAStringSet(file)
+
+  oct4 <- as.list(query(query(query(MotifDb, "hsapiens"),
                               "pou5f1"), "jolma2013"))[[1]]
   motif <- oct4
-  
+
   mhits <- motifHits(oct4peaks[[1]], motif, bg)
-  
+
   # Inspect the result
   fhitpos <- which(mhits$fhits == 1)
   rhitpos <- which(mhits$rhits == 1)
