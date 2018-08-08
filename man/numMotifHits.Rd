@@ -7,7 +7,7 @@
 numMotifHits(seqs, pfm, bg, singlestranded = FALSE)
 }
 \arguments{
-\item{seqs}{A DNAStringSet object}
+\item{seqs}{A DNAStringSet or DNAString object}
 
 \item{pfm}{An R matrix that represents a position frequency matrix}
 

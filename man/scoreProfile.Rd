@@ -7,7 +7,7 @@
 scoreProfile(seqs, pfm, bg)
 }
 \arguments{
-\item{seqs}{A DNAStringSet object}
+\item{seqs}{A DNAStringSet or DNAString object}
 
 \item{pfm}{An R matrix that represents a position frequency matrix}
 

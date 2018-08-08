@@ -57,11 +57,11 @@ test_that("oct4_vignette_example_alpha001", {
   expect_equal(length(rhitpos), 4)
   expect_equal(fhitpos, c(54, 87, 93, 112))
   expect_equal(rhitpos, c(55, 94, 111, 118))
-  
+
 })
 
 test_that("motifHits", {
-    # init 
+    # init
     alpha=0.01
     gran=0.1
     motifcounterOptions(alpha, gran)
@@ -103,9 +103,9 @@ test_that("motifHits", {
     expect_equal(mh[[1]],mh[[2]])
     # there must be a hit at position 13
     x=rep(0,20)
-    x[13]=1  
+    x[13]=1
     expect_equal(mh[[1]],x)
-    
+
     # no hit in the second sequence
     mh=motifHits(seqs[[2]], motif,bg)
     expect_equal(mh[[1]],mh[[2]])
@@ -144,14 +144,16 @@ test_that("motifHitProfile", {
 
     # Load Background
     bg=readBackground(seqs[1:2],1)
-    
+
     # palindrom
     name="x3.tab"
     file=system.file("extdata",name, package="motifcounter")
     motif=t(as.matrix(read.table(file)))
 
     # error because it is no DNAStringSet
-    expect_error(motifHitProfile(seqs[[1]],motif,bg)) 
+    # This was updated. It used to only accept DNAStringSet,
+    # but now, DNAStringSet and DNAString is accepted.
+    motifHitProfile(seqs[[1]],motif,bg)
 
     # error because unequal sequence length
     expect_error(motifHitProfile(seqs[1:2],motif,bg))
@@ -177,9 +179,9 @@ test_that("motifHitProfile", {
     expect_equal(mh[[1]],mh[[2]])
     # there must be a hit at position 13
     x=rep(0,20)
-    x[13]=1  
+    x[13]=1
     expect_equal(mh[[1]],x)
-    
+
     # no hit in the second sequence
     mh=motifHitProfile(seqs[2], motif,bg)
     expect_equal(mh[[1]],mh[[2]])
@@ -190,12 +192,12 @@ test_that("motifHitProfile", {
     mh=motifHitProfile(seqs[3], motif,bg)
     expect_equal(c(length(mh[[1]]),length(mh[[2]])),c(10,10))
     expect_equal(mh$fhits, c(0, NaN, NaN, NaN, NaN, NaN, NaN, 0, 0, 0))
-    
+
     seqs2=seqs
     seqs2[[1]] = seqs2[[1]][1:10]
     seqs2[[3]] = seqs2[[3]][1:10]
     mh=motifHitProfile(seqs2, motif,bg)
-    
+
     # Check with aaa repeat motif
     name="x8.tab"
     file=system.file("extdata",name, package="motifcounter")
@@ -224,7 +226,7 @@ test_that("numMotifHits", {
 
     # Load Background
     bg=readBackground(seqs[1:2],1)
-    
+
     # palindrom
     name="x3.tab"
     file=system.file("extdata",name, package="motifcounter")
@@ -250,7 +252,7 @@ test_that("numMotifHits", {
     }
 
 
-    
+
     # test with palindromic motif
     name="x3.tab"
     file=system.file("extdata",name, package="motifcounter")
@@ -285,4 +287,3 @@ test_that("numMotifHits", {
     expect_equal(as.vector(nom$numofhits),c(0,1,NaN))
 
 })
-

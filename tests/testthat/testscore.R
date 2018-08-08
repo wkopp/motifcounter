@@ -5,14 +5,14 @@ test_that("scoreDists", {
 
     alpha=0.01
     motifcounterOptions(alpha)
-    
+
     # Load sequences
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
-    
+
     # Load background
     bg=readBackground(seqs, 0)
-    
+
     # Load motif
     motifname="x1.tab"
     motiffile=system.file("extdata",motifname, package="motifcounter")
@@ -122,7 +122,7 @@ test_that("further scoreDist checks with jaspar motifs", {
 
 test_that("scoreSequence", {
     # This implicitly tests scoreStrand as well,
-    # so no separate tests are available 
+    # so no separate tests are available
 
     # Set the significance level and granularity for the score computation
     motifcounterOptions(alpha=0.01,gran=0.1)
@@ -137,7 +137,7 @@ test_that("scoreSequence", {
     # Load motif
     motiffile=system.file("extdata","x31.tab",package="motifcounter")
     motif=t(as.matrix(read.table(motiffile)))
-    
+
     # no motif, not background object, no DNAString
     expect_error(scoreSequence(seqs,motif,1))
     expect_error(scoreSequence(seqs,1,bg))
@@ -159,10 +159,10 @@ test_that("scoreSequence", {
     bg=readBackground(seqs,1)
 
     seq=generateDNAString(10,bg)
-    
+
     # Compute score sequence
     scores=scoreSequence(seq,motif,bg)
-    
+
     # same number of positions on both strands
     scores=scoreSequence(seq,motif,bg)
     expect_equal(length(scores$fscores),length(scores$rscores))
@@ -191,14 +191,16 @@ test_that("scoreProfile", {
 
     # Load Background
     bg=readBackground(seqs,1)
-    
+
     # palindrom
     name="x3.tab"
     file=system.file("extdata",name, package="motifcounter")
     motif=t(as.matrix(read.table(file)))
 
     # error because it is no DNAStringSet
-    expect_error(scoreProfile(seqs[[1]],motif,bg)) 
+    # This was updated. It used to only accept DNAStringSet,
+    # but now, DNAStringSet and DNAString is accepted.
+    scoreProfile(seqs[[1]],motif,bg)
 
     # error because unequal sequence length
     expect_error(scoreProfile(seqs[1:2],motif,bg))
@@ -227,7 +229,7 @@ test_that("scoreProfile", {
     # because it is a palindrome
     expect_equal(mh[[1]],mh[[2]])
     expect_equal(which(mh[[1]]==max(mh[[1]])),13)
-    
+
     # no hit in the second sequence
     mh=scoreProfile(seqs[2], motif,bg)
     expect_equal(mh[[1]],mh[[2]])
@@ -260,7 +262,7 @@ test_that("scoreHistogram", {
     # Load sequences
     seqfile=system.file("extdata","seq.fasta", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
-    
+
     # Load background
     bg=readBackground(seqs,1)
 
@@ -271,7 +273,11 @@ test_that("scoreHistogram", {
 
     # Provoke an error
     expect_error(scoreHistogram(seqfile,motif,bg)) # not a DNAStringSet
-    expect_error(scoreHistogram(seqs[[1]],motif,bg)) # not a DNAStringSet
+
+    # error because it is no DNAStringSet
+    # This was updated. It used to only accept DNAStringSet,
+    # but now, DNAStringSet and DNAString is accepted.
+    scoreHistogram(seqs[[1]],motif,bg)
 
     # check motif shorter than bg order
     bg=readBackground(seqs,2)
@@ -351,13 +357,12 @@ test_that("scoreThreshold", {
     name="x8.tab"
     file=system.file("extdata",name, package="motifcounter")
     motif=t(as.matrix(read.table(file)))
-    
+
     # try too stringent
     motifcounterOptions(alpha=0.001,gran=0.1)
-    expect_error(scoreThreshold(motif,bg)) 
-    
+    expect_error(scoreThreshold(motif,bg))
+
     # retry with stringent threshold
     motifcounterOptions(alpha=0.01,gran=0.1)
     scoreThreshold(motif,bg)
 })
-

@@ -5,21 +5,27 @@
 #' containing 'N' or 'n' are skipped from the analysis and are
 #' set to length zero.
 #'
-#' @param seqs A DNAStringSet object
+#' @param seqs A DNAStringSet or DNAString object
 #' @return A vector containing the lengths of each individual sequences
 #'
 #' @examples
-#' 
+#'
 #' # Load sequences
 #' file = system.file("extdata", "seq.fasta", package = "motifcounter")
 #' seqs = Biostrings::readDNAStringSet(file)
-#' 
+#'
 #' # Retrieve sequence lengths
 #' motifcounter:::lenSequences(seqs)
 #'
 lenSequences = function(seqs) {
-    stopifnot(is(seqs, "DNAStringSet"))
+
+    if (is(seqs, "DNAString")) {
+        # wrap the sequence up as sequence set
+        seqs = DNAStringSet(seqs)
+    }
     
+    stopifnot(is(seqs, "DNAStringSet"))
+
     lseq = vapply(seqs, function(seq) {
         return(.Call(motifcounter_slen, toString(seq)))
     }, FUN.VALUE = integer(1))

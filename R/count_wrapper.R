@@ -41,7 +41,7 @@ motifHits = function(seq, pfm, bg, threshold=NULL) {
 
     fhits = hitStrand(seq, pfm, bg, threshold)
     rhits = hitStrand(seq, revcompMotif(pfm), bg, threshold)
-   
+
     return(list(fhits = fhits, rhits = rhits))
 }
 
@@ -82,14 +82,14 @@ hitStrand = function(seq, pfm, bg, threshold=NULL) {
   stopifnot(is(bg, "Background"))
   validObject(bg)
   motifAndBackgroundValid(pfm, bg)
-  
+
   # Check class
   stopifnot(is(seq, "DNAString"))
-  
+
   if (is.null(threshold)) {
     threshold = scoreThreshold(pfm, bg)$threshold
   }
-  
+
   hits = .Call(
     motifcounter_hitsequence,
     as.numeric(pfm),
@@ -146,13 +146,18 @@ motifHitProfile = function(seqs, pfm, bg) {
     validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
+    if (is(seqs, "DNAString")) {
+      # wrap the sequence up as sequence set
+      seqs = DNAStringSet(seqs)
+    }
+
     stopifnot(is(seqs,"DNAStringSet"))
 
     sth = scoreThreshold(pfm, bg)
 
     if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
-        stop(paste(strwrap("All DNAStrings in 'seqs' must be of equal length. 
-            Please trim the sequences such that they are equally long."), 
+        stop(paste(strwrap("All DNAStrings in 'seqs' must be of equal length.
+            Please trim the sequences such that they are equally long."),
             collapse = "\n"))
     }
     slen = lenSequences(seqs[1])
@@ -221,6 +226,11 @@ numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE) {
     stopifnot(is(bg, "Background"))
     validObject(bg)
     motifAndBackgroundValid(pfm, bg)
+
+    if (is(seqs, "DNAString")) {
+      # wrap the sequence up as sequence set
+      seqs = DNAStringSet(seqs)
+    }
 
     stopifnot(is(seqs, "DNAStringSet"))
 

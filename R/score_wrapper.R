@@ -231,7 +231,7 @@ scoreSequence = function(seq, pfm, bg) {
 #' of TFBSs.
 #'
 #' @inheritParams scoreDist
-#' @param seqs A DNAStringSet object
+#' @param seqs A DNAStringSet or DNAString object
 #'
 #' @return List containing
 #' \describe{
@@ -261,13 +261,19 @@ scoreProfile = function(seqs, pfm, bg) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
+
+    if (is(seqs, "DNAString")) {
+        # wrap the sequence up as sequence set
+        seqs = DNAStringSet(seqs)
+    }
+
     stopifnot (is(seqs, "DNAStringSet"))
-    
+
     if (any(lenSequences(seqs) != lenSequences(seqs)[1])) {
         stop(paste(strwrap("All DNAStrings in 'seqs' must be of equal length
             and must not contain 'N's. Please remove sequences that contain
             'N's from 'seqs' and/or trim
-            trim the sequences such that they are equally long."), 
+            trim the sequences such that they are equally long."),
             collapse = "\n"))
     }
     slen = lenSequences(seqs[1])
@@ -353,7 +359,7 @@ scoreHistogramSingleSeq = function(seq, pfm, bg) {
         as.integer(getOrder(bg))
     )
     result = list(scores = scores, dist = dist)
-    
+
     return(result)
 }
 
@@ -394,6 +400,12 @@ scoreHistogram = function(seqs, pfm, bg) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
+
+    if (is(seqs, "DNAString")) {
+        # wrap the sequence up as sequence set
+        seqs = DNAStringSet(seqs)
+    }
+
     stopifnot(is(seqs, "DNAStringSet"))
 
     # First, extract the score range
@@ -405,10 +417,10 @@ scoreHistogram = function(seqs, pfm, bg) {
     his = vapply(seqs, function(seq, pfm, bg) {
         scoreHistogramSingleSeq(seq, pfm, bg)$dist
     }, FUN.VALUE = numeric(length(scores)), pfm, bg)
-    
+
     freq = rowSums(his)
     result = list(scores = scores, dist = freq)
-    
+
     return(result)
 }
 
@@ -448,24 +460,22 @@ scoreThreshold = function(pfm, bg) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
-    
+
     scoredist = scoreDist(pfm, bg)
-    
+
     # find quantile
     ind = which(1 - cumsum(scoredist$dist) <= sigLevel())
     if (length(ind) <= 1) {
         stop(paste(strwrap(
-            "The significance level 'alpha' is too stringent 
+            "The significance level 'alpha' is too stringent
             for the given 'pfm'. Motif matches are impossible.
             Increase 'alpha' using 'motifcounterOptions()'."), collapse = "\n"))
     }
     ind = tail(ind, -1)
     alpha = sum(scoredist$dist[ind])
-    
+
     ind = min(ind)
     threshold = scoredist$scores[ind]
-    
+
     return(list(threshold = threshold, alpha = alpha))
 }
-
-
