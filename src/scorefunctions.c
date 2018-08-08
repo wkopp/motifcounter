@@ -83,11 +83,11 @@ void getPositionWeights(double *station, double *trans, DMatrix *pfm, IMatrix *p
                         double granularity, int order) {
     int j, i, index, cindex, ds;
     int initscore[power(ALPHABETSIZE, order)];
-    
+
     memset(initscore, 0, power(ALPHABETSIZE, order)*sizeof(int));
-    
+
     if (order > 0) {
-        
+
         // Initialize with stationary distribution
         // for higher order models
         getScoresInitialIndex(pfm->data, station,
@@ -101,13 +101,13 @@ void getPositionWeights(double *station, double *trans, DMatrix *pfm, IMatrix *p
                 i = index / ALPHABETSIZE;
                 pwm->data[index] = initscore[i];
             }
-            
+
             i = index % ALPHABETSIZE;
             ds =  getScoreIndex(pfm->data[(j + order) * ALPHABETSIZE + i],
                                 trans[index], granularity);
 
             pwm->data[j*power(ALPHABETSIZE, order + 1) + index] += ds;
-               
+
         }
     }
 }
@@ -117,20 +117,12 @@ void hitSequence(IMatrix *pwm, const char *seq, int seqlen, double *hits,
                    double granularity, int order, double threshold, ExtremalScore *escore) {
   int i, j;
   int s, index, cindex;
-  
-/*  for (j=0; j < (pwm->nrow+order); j++) {
-    for (i =0; i< power(ALPHABETSIZE, order); i++) {
-      Rprintf("j=%d, i=%d: %d\n", j, i, escore->maxbackward[(j)*power(ALPHABETSIZE, order) + i]);
-    }
-}*/
 
- // Rprintf("matching with %f\n", threshold);
-  
   // if the sequence contains any N's, do not process the scores
   if (getSequenceLength(seq, seqlen) < 0) {
     return;
   }
-  
+
   for (i = 0; i < seqlen - pwm->nrow + 1 - order; i++) {
     R_CheckUserInterrupt();
     if (hasN(&seq[i], pwm->nrow + order) > 0) {
@@ -142,19 +134,18 @@ void hitSequence(IMatrix *pwm, const char *seq, int seqlen, double *hits,
     }
     for (j = 0, s = 0; j < pwm->nrow; j++) {
       index = index * ALPHABETSIZE + getNucIndex(seq[i + j + order]);
-      
+
       s += pwm->data[j*power(ALPHABETSIZE, order + 1) + index];
       index -= (index / power(ALPHABETSIZE, order)) * power(ALPHABETSIZE, order);
-      
+
       if ((double)(s + escore->maxbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity < threshold) {
-        //Rprintf("j=%d: s=%d + maxs=%d < 10 x %f\n", j, s, escore->maxforward[(j+order)*power(ALPHABETSIZE, order) + index], threshold);
         hits[i] = 0;
         break;
-      } 
- /*     if ((double)(s + escore->minbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity >= threshold) {
+      }
+      if ((double)(s + escore->minbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity >= threshold) {
         hits[i] = 1;
         break;
- }*/
+      }
     }
     if ((double)(s*granularity) >= (double)(threshold)) hits[i] = 1.;
 
@@ -187,7 +178,7 @@ void scoreSequence(IMatrix *pwm, const char *seq, int seqlen, double *scores,
 
             s += pwm->data[j*power(ALPHABETSIZE, order + 1) + index];
             index -= (index / power(ALPHABETSIZE, order)) * power(ALPHABETSIZE, order);
-            
+
         }
         scores[i] = (double)(s * granularity);
     }
