@@ -55,6 +55,16 @@ Details about the compound Poisson model are available under
   publisher={Oxford University Press}
 }
 ```
+Detail on the dynamic programming method are available under
+```
+@article{withoutpoisson,
+  title={DNA Motif Match Statistics Without Poisson Approximation},
+  author={Kopp, Wolfgang and Vingron, Martin},
+  journal={Journal of Computational Biology},
+  year={2019},
+  publisher={Mary Ann Liebert, Inc., publishers}
+}
+```
 # Usage examples
 
 ```{r eval=FALSE}

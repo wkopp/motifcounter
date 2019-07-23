@@ -30,6 +30,20 @@ is available in
 
 ```
 
+A detailed description of dynamic programming based
+approach
+is available in
+```
+@article{withoutpoisson,
+  title={DNA Motif Match Statistics Without Poisson Approximation},
+  author={Kopp, Wolfgang and Vingron, Martin},
+  journal={Journal of Computational Biology},
+  year={2019},
+  publisher={Mary Ann Liebert, Inc.}
+}
+
+```
+
 ## Usage
 
 ```
