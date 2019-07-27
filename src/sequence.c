@@ -1,56 +1,19 @@
 #include <stdio.h>
+#include <ctype.h>
 #include <R.h>
 #include "sequence.h"
 #include "matrix.h"
 
+extern int Rnucmap[], Rrevcomp[];
+
 int getNucIndex(char c) {
-    int r = -1;
-    switch (c) {
-    case 'a':
-    case 'A':
-        r = 0;
-        break;
-    case 'c':
-    case 'C':
-        r = 1;
-        break;
-    case 'g':
-    case 'G':
-        r = 2;
-        break;
-    case 't':
-    case 'T':
-        r = 3;
-        break;
-    }
-    return r;
+    int l = toupper(c) - 'A';
+    return Rnucmap[l];
 }
 
 int getComplementNucIndex(char c) {
-    int r = -1;
-    switch (c) {
-    case 'a':
-    case 'A':
-        r = 3;
-        break;
-    case 'c':
-    case 'C':
-        r = 2;
-        break;
-    case 'g':
-    case 'G':
-        r = 1;
-        break;
-    case 't':
-    case 'T':
-        r = 0;
-        break;
-    case 'n':
-    case 'N':
-        r = -1;
-        break;
-    }
-    return r;
+    int l = toupper(c) - 'A';
+    return Rrevcomp[Rnucmap[l]];
 }
 
 char getNuc(int i) {
