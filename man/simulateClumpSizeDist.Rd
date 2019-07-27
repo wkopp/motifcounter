@@ -4,7 +4,8 @@
 \alias{simulateClumpSizeDist}
 \title{Empirical clump size distribution}
 \usage{
-simulateClumpSizeDist(pfm, bg, seqlen, nsim = 10, singlestranded = FALSE)
+simulateClumpSizeDist(pfm, bg, seqlen, nsim = 10,
+  singlestranded = FALSE)
 }
 \arguments{
 \item{pfm}{An R matrix that represents a position frequency matrix}

@@ -27,7 +27,7 @@ Description: 'motifcounter' provides motif matching, motif counting
         a set of observed motif matches.
 License: GPL-2
 biocViews: Transcription,MotifAnnotation,SequenceMatching,Software
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 NeedsCompilation: yes
 Collate: 'background_wrapper.R' 'comppoiss_wrapper.R'

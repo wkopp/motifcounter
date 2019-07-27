@@ -4,7 +4,8 @@
 \alias{motifEnrichment}
 \title{Enrichment of motif hits}
 \usage{
-motifEnrichment(seqs, pfm, bg, singlestranded = FALSE, method = "compound")
+motifEnrichment(seqs, pfm, bg, singlestranded = FALSE,
+  method = "compound")
 }
 \arguments{
 \item{seqs}{A DNAStringSet or DNAString object}

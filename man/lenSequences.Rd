@@ -7,7 +7,7 @@
 lenSequences(seqs)
 }
 \arguments{
-\item{seqs}{A DNAStringSet object}
+\item{seqs}{A DNAStringSet or DNAString object}
 }
 \value{
 A vector containing the lengths of each individual sequences
