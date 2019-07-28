@@ -43,7 +43,6 @@ test_that("position weight matrix",
     bg = readBackground(seqs, 0)
     pwm = getPositionWeights(motif, bg)
 
-    print(pwm)
     expect_equal(dim(pwm), dim(motif))
 
     expect_equal(pwm, matrix(c(-55, -55, -55, 14,
@@ -56,7 +55,6 @@ test_that("position weight matrix",
     bg = readBackground(seqs, 1)
     pwm = getPositionWeights(motif, bg)
 
-    print(pwm)
     expect_equal(dim(pwm), c(16, ncol(motif) -1))
 
     expect_equal(pwm[1,1], -111)
