@@ -121,6 +121,8 @@ static R_CMethodDef cMethods[] = {
     {NULL, NULL, 0}
 };
 
+SEXP RgetPositionWeights(SEXP rpfm_, SEXP rnrow, SEXP rncol, 
+                    SEXP rstation, SEXP rtrans, SEXP rorder);
 SEXP Rscoresequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
                     SEXP rstation, SEXP rtrans, SEXP rorder);
 SEXP Rhitsequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
@@ -141,6 +143,7 @@ SEXP mcds_check_optimal(SEXP alpha_, SEXP beta_, SEXP beta3p_,
 
 static R_CallMethodDef callMethods[]  = {
     {"motifcounter_slen", (DL_FUNC) &Rslen, 1},
+    {"motifcounter_getpositionweights", (DL_FUNC) &RgetPositionWeights, 6},
     {"motifcounter_scoresequence", (DL_FUNC) &Rscoresequence, 7},
     {"motifcounter_hitsequence", (DL_FUNC) &Rhitsequence, 8},
     {"motifcounter_scorerange", (DL_FUNC) &Rscorerange, 6},

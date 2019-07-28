@@ -76,6 +76,39 @@ SEXP Rscoresequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
 }
 
 
+SEXP RgetPositionWeights(SEXP rpfm_, SEXP rnrow, SEXP rncol,
+                    SEXP rstation, SEXP rtrans, SEXP rorder) {
+    double *pfm_ = REAL(rpfm_);
+    double *station = REAL(rstation);
+    double *trans = REAL(rtrans);
+    int *nrow = INTEGER(rnrow);
+    int *ncol = INTEGER(rncol);
+    int *order = INTEGER(rorder);
+    SEXP pwm;
+
+    DMatrix pfm;
+    IMatrix pwm_intern;
+
+    // Rcol and c-col are swapped
+    pfm.ncol = nrow[0];
+    pfm.nrow = ncol[0];
+    pfm.data = pfm_;
+
+    pwm_intern.nrow = pfm.nrow - order[0];
+    pwm_intern.ncol = power(ALPHABETSIZE, order[0] + 1);
+
+    // from the PFM and background, produce a PWM
+    pwm = PROTECT(allocMatrix(INTSXP, pwm_intern.ncol, pwm_intern.nrow));
+
+    pwm_intern.data = INTEGER(pwm);
+    memset(pwm_intern.data, 0, pwm_intern.nrow * pwm_intern.ncol * sizeof(int));
+
+    getPositionWeights(station, trans, &pfm, &pwm_intern, Rgran, order[0]);
+
+    UNPROTECT(1);
+    return pwm;
+}
+
 SEXP Rhitsequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
                   SEXP rstation, SEXP rtrans, SEXP rorder, SEXP rthreshold) {
     double *pfm_ = REAL(rpfm_);

@@ -114,3 +114,52 @@ revcompMotif = function(pfm) {
     cpfm = matrix(rev(as.vector(pfm)), nrow = nrows, ncol = ncols)
     return(cpfm)
 }
+
+#' Create position weight representation
+#'
+#' This function computes the position weight representation for a given
+#' PFM and a background model which corresponds to the log-likelihood
+#' ratio for each position. For order=0, this corresponds to the
+#' commonly used (4 x M) position weight matrix where M denotes
+#' the motif length.
+#' For higher order background, we obtain a pow(4, order+1) x (M - order + 1)
+#' dimensional matrix.
+#'
+#' @inheritParams motifAndBackgroundValid
+#' @return Position weight representation
+#'
+#' @examples
+#'
+#' # Load sequences
+#' seqfile = system.file("extdata", "seq.fasta", package = "motifcounter")
+#' seqs = Biostrings::readDNAStringSet(seqfile)
+#'
+#' # Load background
+#' bg = readBackground(seqs, 1)
+#'
+#' # Load motif
+#' motiffile = system.file("extdata", "x1.tab", package = "motifcounter")
+#' motif = t(as.matrix(read.table(motiffile)))
+#'
+#' # Reverse complement motif
+#' pwm = motifcounter:::getPositionWeights(motif, bg)
+#'
+getPositionWeights = function(pfm, bg) {
+    motifValid(pfm)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
+    motifAndBackgroundValid(pfm, bg)
+
+    pwm = .Call(
+        motifcounter_getpositionweights,
+        as.numeric(pfm),
+        nrow(pfm),
+        ncol(pfm),
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg))
+    )
+    return(matrix(pwm,
+                  nrow=4^(getOrder(bg) + 1),
+                  ncol=ncol(pfm) - getOrder(bg)))
+}
