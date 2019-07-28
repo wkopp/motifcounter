@@ -76,7 +76,7 @@ test_that("readBackground", {
     expect_equal(bg@counts, c(8,  9,  9,  2,  9, 14, 18,  9,  9, 18, 14,  9,  2,  9,  9,  8))
     correct = matrix(c(8,  9,  9,  2,  9, 14, 18,  9,  9, 18, 14,  9,  2,  9,  9,  8), 4, 4)
     correct = correct / apply(correct, 1, sum)
-    expect_that(all(t(matrix(bg@trans, 4, 4)) == correct), is_true())
+    expect_true(all(t(matrix(bg@trans, 4, 4)) == correct))
     
 })
 
