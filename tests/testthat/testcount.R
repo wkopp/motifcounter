@@ -259,15 +259,25 @@ test_that("numMotifHits", {
     motif=t(as.matrix(read.table(file)))
 
     # there is a hit in the first sequence
-    nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
+    nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE, ignore_ns=FALSE)
     expect_equal(nom$nseq,3)
     expect_equal(as.vector(nom$lseq),c(23,10,13))
     expect_equal(as.vector(nom$numofhits),c(1,0,NaN))
+
+    nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE, ignore_ns=TRUE)
+    expect_equal(nom$nseq,3)
+    expect_equal(as.vector(nom$lseq),c(23,10,13))
+    expect_equal(as.vector(nom$numofhits),c(1,0,0))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
     expect_equal(nom$nseq,3)
     expect_equal(as.vector(nom$lseq),c(23,10,13))
     expect_equal(as.vector(nom$numofhits),c(2,0,NaN))
+
+    nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE, ignore_ns=TRUE)
+    expect_equal(nom$nseq,3)
+    expect_equal(as.vector(nom$lseq),c(23,10,13))
+    expect_equal(as.vector(nom$numofhits),c(2,0,0))
 
 
     # test with repeat motif
@@ -286,4 +296,13 @@ test_that("numMotifHits", {
     expect_equal(as.vector(nom$lseq),c(23,10,13))
     expect_equal(as.vector(nom$numofhits),c(0,1,NaN))
 
+    nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE, ignore_ns=TRUE)
+    expect_equal(nom$nseq,3)
+    expect_equal(as.vector(nom$lseq),c(23,10,13))
+    expect_equal(as.vector(nom$numofhits),c(0,1,0))
+
+    nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE, ignore_ns=TRUE)
+    expect_equal(nom$nseq,3)
+    expect_equal(as.vector(nom$lseq),c(23,10,13))
+    expect_equal(as.vector(nom$numofhits),c(0,1,0))
 })

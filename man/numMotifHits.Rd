@@ -4,7 +4,7 @@
 \alias{numMotifHits}
 \title{Number of motif hits in a set of DNA sequences}
 \usage{
-numMotifHits(seqs, pfm, bg, singlestranded = FALSE)
+numMotifHits(seqs, pfm, bg, singlestranded = FALSE, ignore_ns = FALSE)
 }
 \arguments{
 \item{seqs}{A DNAStringSet or DNAString object}
@@ -16,6 +16,9 @@ numMotifHits(seqs, pfm, bg, singlestranded = FALSE)
 \item{singlestranded}{Boolean that indicates whether a single strand or
 both strands shall be scanned for motif hits.
 Default: singlestranded = FALSE.}
+
+\item{ignore_ns}{Ignore Ns in the sequence and treat them as zero counts.
+If FALSE, positions with Ns will evaluate to NaN.}
 }
 \value{
 A list containing

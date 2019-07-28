@@ -5,7 +5,7 @@
 \title{Enrichment of motif hits}
 \usage{
 motifEnrichment(seqs, pfm, bg, singlestranded = FALSE,
-  method = "compound")
+  method = "compound", ignore_ns = FALSE)
 }
 \arguments{
 \item{seqs}{A DNAStringSet or DNAString object}
@@ -21,6 +21,9 @@ Default: singlestranded = FALSE.}
 \item{method}{String that defines whether to use
 the 'compound' Poisson approximation' or the 'combinatorial' model.
 Default: method='compound'.}
+
+\item{ignore_ns}{Ignore Ns in the sequence and treat them as zero counts.
+If FALSE, positions with Ns will evaluate to NaN.}
 }
 \value{
 List that contains

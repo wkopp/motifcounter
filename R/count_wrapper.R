@@ -194,6 +194,8 @@ motifHitProfile = function(seqs, pfm, bg) {
 #' @param singlestranded Boolean that indicates whether a single strand or
 #' both strands shall be scanned for motif hits.
 #' Default: singlestranded = FALSE.
+#' @param ignore_ns Ignore Ns in the sequence and treat them as zero counts.
+#' If FALSE, positions with Ns will evaluate to NaN.
 #' @return A list containing
 #' \describe{
 #' \item{nseq}{Number of individual sequences}
@@ -221,7 +223,7 @@ motifHitProfile = function(seqs, pfm, bg) {
 #' noc = motifcounter:::numMotifHits(seqs, motif, bg, singlestranded = TRUE)
 #' noc$numofhits
 #'
-numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE) {
+numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE, ignore_ns = FALSE) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
@@ -236,15 +238,20 @@ numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE) {
 
     sth = scoreThreshold(pfm, bg)
 
-    # retrieve the number of motif hits
-    noh = vapply(seqs, function(seq, pfm, bg, singlestranded, th) {
-        ret = motifHits(seq, pfm, bg, th)
-        if (singlestranded == FALSE) {
-            return(sum(ret[[1]] + ret[[2]], na.rm = FALSE))
-        } else {
-            return(sum(ret[[1]], na.rm = FALSE))
-        }
-    }, numeric(1), pfm, bg, singlestranded, sth$threshold)
+    # retrieve the number of motif hits on the forward strand.
+    noh = vapply(seqs, function(seq, pfm, bg,  th, ignore_ns) {
+        ret = hitStrand(seq, pfm, bg, threshold=th)
+        return(sum(ret, na.rm = ignore_ns))
+    }, numeric(1), pfm, bg, sth$threshold, ignore_ns)
+
+    if (singlestranded == FALSE) {
+        # retrieve the number of motif hits on the reverse strand
+        noh_ = vapply(seqs, function(seq, pfm, bg,  th, ignore_ns) {
+            ret = hitStrand(seq, revcompMotif(pfm), bg, threshold=th)
+            return(sum(ret, na.rm = ignore_ns))
+        }, numeric(1), pfm, bg, sth$threshold, ignore_ns)
+        noh = noh + noh_
+    }
 
     lseq = lenSequences(seqs)
 

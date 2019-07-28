@@ -59,7 +59,7 @@
 #' @seealso \code{\link{compoundPoissonDist}}, \code{\link{combinatorialDist}}
 #' @export
 motifEnrichment = function(seqs, pfm, bg, singlestranded = FALSE, 
-                            method = "compound") {
+                            method = "compound", ignore_ns = FALSE) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
@@ -69,7 +69,7 @@ motifEnrichment = function(seqs, pfm, bg, singlestranded = FALSE,
     overlap = probOverlapHit(pfm, bg, singlestranded)
 
     # detemine the number of motif hits
-    observations = numMotifHits(seqs, pfm, bg, singlestranded)
+    observations = numMotifHits(seqs, pfm, bg, singlestranded, ignore_ns)
     if (is.nan(sum(observations$numofhits))) {
       stop("Number of motif hits is NaN. This is likely due to N's in the sequence.
            Please remove sequence containing N's.")
