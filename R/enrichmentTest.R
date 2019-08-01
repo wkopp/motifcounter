@@ -88,6 +88,8 @@ motifEnrichment = function(seqs, pfm, bg, singlestranded = FALSE,
     return (list(
         pvalue = p,
         fold = sum(observations$numofhits) /
-            sum(dist$dist * seq(0, length(dist$dist) - 1))
+            sum(dist$dist * seq(0, length(dist$dist) - 1)),
+        logfold = log(sum(observations$numofhits) /
+            sum(dist$dist * seq(0, length(dist$dist) - 1)))
     ))
 }
