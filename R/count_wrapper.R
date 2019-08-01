@@ -236,20 +236,41 @@ numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE, ignore_ns = FALSE
 
     stopifnot(is(seqs, "DNAStringSet"))
 
-    sth = scoreThreshold(pfm, bg)
+    threshold = scoreThreshold(pfm, bg)
+    if (ignore_ns) {
+      ig_ = 1
+    } else {
+      ig_ = 0
+    }
 
-    # retrieve the number of motif hits on the forward strand.
-    noh = vapply(seqs, function(seq, pfm, bg,  th, ignore_ns) {
-        ret = hitStrand(seq, pfm, bg, threshold=th)
-        return(sum(ret, na.rm = ignore_ns))
-    }, numeric(1), pfm, bg, sth$threshold, ignore_ns)
+    noh = .Call(
+      motifcounter_matchcount,
+      as.numeric(pfm),
+      nrow(pfm),
+      ncol(pfm),
+      lapply(seqs, toString),
+      getStation(bg),
+      getTrans(bg),
+      as.integer(getOrder(bg)),
+      as.numeric(threshold),
+      as.integer(ig_)
+    )
 
     if (singlestranded == FALSE) {
         # retrieve the number of motif hits on the reverse strand
-        noh_ = vapply(seqs, function(seq, pfm, bg,  th, ignore_ns) {
-            ret = hitStrand(seq, revcompMotif(pfm), bg, threshold=th)
-            return(sum(ret, na.rm = ignore_ns))
-        }, numeric(1), pfm, bg, sth$threshold, ignore_ns)
+        noh_ = .Call(
+          motifcounter_matchcount,
+          as.numeric(revcompMotif(pfm)),
+          nrow(pfm),
+          ncol(pfm),
+          lapply(seqs, toString),
+          getStation(bg),
+          getTrans(bg),
+          as.integer(getOrder(bg)),
+          as.numeric(threshold),
+          as.integer(ig_)
+        )
+
         noh = noh + noh_
     }
 

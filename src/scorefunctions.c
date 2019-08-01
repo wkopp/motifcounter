@@ -81,7 +81,7 @@ int initScoreMetaInfo (int smin, int smax, int intervalsize,
 // the derived scores can be looked up in the matrix.
 void getPositionWeights(double *station, double *trans, DMatrix *pfm, IMatrix *pwm,
                         double granularity, int order) {
-    int j, i, index, cindex, ds;
+    int j, i, index, ds;
     int initscore[power(ALPHABETSIZE, order)];
 
     memset(initscore, 0, power(ALPHABETSIZE, order)*sizeof(int));
@@ -116,7 +116,7 @@ void getPositionWeights(double *station, double *trans, DMatrix *pfm, IMatrix *p
 void hitSequence(IMatrix *pwm, const char *seq, int seqlen, double *hits,
                    double granularity, int order, double threshold, ExtremalScore *escore) {
   int i, j;
-  int s, index, cindex;
+  int s, index;
 
   // if the sequence contains any N's, do not process the scores
   if (getSequenceLength(seq, seqlen) < 0) {
@@ -153,10 +153,54 @@ void hitSequence(IMatrix *pwm, const char *seq, int seqlen, double *hits,
 }
 
 
+void matchCount(IMatrix *pwm, const char *seq, int seqlen, double *nhits,
+                 double granularity, int order,
+                 double threshold, ExtremalScore *escore,
+                 int ignore_ns) {
+  int i, j;
+  int s, index;
+
+  // if the sequence contains any N's, do not process the scores
+  if (getSequenceLength(seq, seqlen) < 0) {
+    return;
+  }
+
+  for (i = 0; i < seqlen - pwm->nrow + 1 - order; i++) {
+    R_CheckUserInterrupt();
+    if (hasN(&seq[i], pwm->nrow + order) > 0) {
+      if (ignore_ns == 0) {
+         nhits[0] = NAN;
+         break;
+      }
+      continue;
+    }
+    for (j = 0, index = 0; j < order; j++) {
+      index = index * ALPHABETSIZE + getNucIndex(seq[i + j]);
+    }
+    for (j = 0, s = 0; j < pwm->nrow; j++) {
+      index = index * ALPHABETSIZE + getNucIndex(seq[i + j + order]);
+
+      s += pwm->data[j*power(ALPHABETSIZE, order + 1) + index];
+      index -= (index / power(ALPHABETSIZE, order)) * power(ALPHABETSIZE, order);
+
+      if ((double)(s + escore->maxbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity < threshold) {
+        break;
+      }
+      if ((double)(s + escore->minbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity >= threshold) {
+        nhits[0] += 1;
+        break;
+      }
+    }
+    if ((double)(s*granularity) >= (double)(threshold)) nhits[0] = 1.;
+
+  }
+}
+
+
 void scoreSequence(IMatrix *pwm, const char *seq, int seqlen, double *scores,
                    double granularity, int order) {
     int i, j;
-    int s, index, cindex;
+    int s, index;
 
     // if the sequence contains any N's, do not process the scores
     if (getSequenceLength(seq, seqlen) < 0) {
