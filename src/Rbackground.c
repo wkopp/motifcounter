@@ -6,8 +6,34 @@
 #include "matrix.h"
 
 
-void Rcountfreq(char **seq, int *slen, double *counts, int *order) {
-    getNucleotideFrequencyFromSequence(seq[0], slen[0], counts, order[0]);
+SEXP Rcountfreq(SEXP rseqs, SEXP rorder) {
+    int nseqs;
+    const char *seq;
+    int slen;
+    int i;
+    int *order = INTEGER(rorder);
+    SEXP counts;
+    double *xcounts;
+
+    if (!isNewList(rseqs)) {
+        Rprintf("Not a list. A list of sequence must be supplied.");
+        return R_NilValue;
+    }
+
+    nseqs = length(rseqs);
+
+    counts = PROTECT(allocVector(REALSXP, power(ALPHABETSIZE, order[0] + 1)));
+
+    xcounts = REAL(counts);
+    memset(xcounts, 0, (power(ALPHABETSIZE, order[0] + 1))*sizeof(double));
+
+    for (i=0; i<nseqs; i++) {
+      seq = CHAR(STRING_ELT(VECTOR_ELT(rseqs, i), 0));
+      slen = strlen(seq);
+      getNucleotideFrequencyFromSequence(seq, slen, xcounts, order[0]);
+    }
+    UNPROTECT(1);
+    return counts;
 }
 
 void Rbgfromfreq(double *counts, double *station, double *trans, int *order) {

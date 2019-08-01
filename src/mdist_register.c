@@ -4,11 +4,9 @@
 #include <R_ext/Rdynload.h>
 
 
-void Rcountfreq(char **seq, int *slen, double *counts, int *order);
+
 void Rbgfromfreq(double *counts, double *station, double *trans, int *order);
-static R_NativePrimitiveArgType countfreq_t[] = {
-    STRSXP, INTSXP, REALSXP, INTSXP
-};
+
 static R_NativePrimitiveArgType bgfromfreq_t[] = {
     REALSXP, REALSXP, REALSXP, INTSXP
 };
@@ -91,7 +89,7 @@ static R_NativePrimitiveArgType mcds_t[] = {
 
 
 static R_CMethodDef cMethods[] = {
-    {"motifcounter_countfreq", (DL_FUNC) &Rcountfreq, 4, countfreq_t},
+
     {"motifcounter_bgfromfreq", (DL_FUNC) &Rbgfromfreq, 4, bgfromfreq_t},
     {"motifcounter_markovmodel_ss", (DL_FUNC) &markovchain_ss, 5, mcss_t},
     {"motifcounter_markovmodel_ds", (DL_FUNC) &markovchain, 7, mcds_t},
@@ -121,6 +119,7 @@ static R_CMethodDef cMethods[] = {
     {NULL, NULL, 0}
 };
 
+SEXP Rcountfreq(SEXP seqs, SEXP order);
 SEXP RgetPositionWeights(SEXP rpfm_, SEXP rnrow, SEXP rncol,
                     SEXP rstation, SEXP rtrans, SEXP rorder);
 SEXP Rscoresequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
@@ -146,6 +145,7 @@ SEXP Rmatchcount(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP seqlist,
                  SEXP rignore_ns);
 
 static R_CallMethodDef callMethods[]  = {
+    {"motifcounter_countfreq", (DL_FUNC) &Rcountfreq, 2},
     {"motifcounter_slen", (DL_FUNC) &Rslen, 1},
     {"motifcounter_getpositionweights", (DL_FUNC) &RgetPositionWeights, 6},
     {"motifcounter_scoresequence", (DL_FUNC) &Rscoresequence, 7},

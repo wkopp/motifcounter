@@ -3,7 +3,7 @@
 #' Objects of this class serve as a container that holds
 #' parameters for the Background model.
 #'
-#' A Background model is constructed 
+#' A Background model is constructed
 #' via \code{\link{readBackground}}.
 #'
 #' @slot station Stationary probabilities
@@ -36,7 +36,7 @@
                 Use readBackground() to construct a Background object."),
                 collapse = "\n")
         }
-        if (!length(msg) && 
+        if (!length(msg) &&
             !isTRUE(all.equal(sum(object@trans), 4^object@order))) {
             msg <- paste(strwrap("Inconsistent Background object.
                 Use readBackground() to construct a Background object."),
@@ -109,22 +109,14 @@ readBackground = function(seqs, order = 1) {
     }
     stopifnot (is(seqs, "DNAStringSet"))
     stopifnot (order >= 0)
-    
+
     trans = numeric(4 ^ (order + 1))
-    
+
     # collect k-mer frequencies from each individual sequence
-    counts = vapply(seqs, function(seq, order, trans) {
-        return(
-            .C(
-                motifcounter_countfreq,
-                toString(seq),
-                length(seq),
-                trans,
-                as.integer(order)
-            )[[3]]
-        )
-    }, FUN.VALUE = trans, order, trans)
-    counts = rowSums(counts)
+    counts = .Call(motifcounter_countfreq,
+                  lapply(seqs, toString),
+                  as.integer(order))
+
     if (order == 0) {
         station = numeric(4)
     } else {
@@ -145,5 +137,3 @@ readBackground = function(seqs, order = 1) {
     )
     return (background)
 }
-
-

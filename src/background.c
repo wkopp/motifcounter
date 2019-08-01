@@ -10,7 +10,7 @@
 #include "sequence.h"
 #include "matrix.h"
 
-void getNucleotideFrequencyFromSequence(char *seq, int slen,
+void getNucleotideFrequencyFromSequence(const char *seq, int slen,
                                         double *counts, int order) {
     int j;
 
