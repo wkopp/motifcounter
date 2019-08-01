@@ -1,6 +1,9 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 #include "sequence.h"
 #include "matrix.h"
 #include "scorefunctions.h"
@@ -190,6 +193,7 @@ SEXP Rmatchcount(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP seqlist,
     SEXP hits;
 
     if (!isNewList(seqlist)) {
+        Rprintf("Not a list. A list of sequence must be supplied.");
         return R_NilValue;
     }
 
@@ -224,7 +228,19 @@ SEXP Rmatchcount(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP seqlist,
     xhits = REAL(hits);
     memset(xhits, 0, (nseqs)*sizeof(double));
 
+    #ifdef _OPENMP
+        #pragma omp parallel for schedule(static, 1000) \
+         shared(nseqs, seqlist, ncol, xhits, Rgran, \
+                order, threshold, escore, ignore_ns, pwm) \
+         private(i, seq, slen)
+    #endif
     for (i=0; i<nseqs; i++) {
+        if (omp_get_num_threads() < 2) {
+            // When using multiple threads, the code crashes.
+            // Apparently, R_CheckUserInterrupt is not compatible with
+            // multithreading.
+            R_CheckUserInterrupt();
+        }
 
         seq = CHAR(STRING_ELT(VECTOR_ELT(seqlist, i), 0));
         slen = strlen(seq);

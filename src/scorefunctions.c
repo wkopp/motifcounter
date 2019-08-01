@@ -166,7 +166,7 @@ void matchCount(IMatrix *pwm, const char *seq, int seqlen, double *nhits,
   }
 
   for (i = 0; i < seqlen - pwm->nrow + 1 - order; i++) {
-    R_CheckUserInterrupt();
+
     if (hasN(&seq[i], pwm->nrow + order) > 0) {
       if (ignore_ns == 0) {
          nhits[0] = NAN;
