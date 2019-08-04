@@ -135,7 +135,7 @@ simulateNumHitsDist = function(pfm, bg, seqlen, nsim, singlestranded = FALSE) {
         if (nom >= length(freq)) {
             #expand freq
             new_freq = rep(0, nom + 1)
-            new_freq[1:length(freq)] = freq
+            new_freq[seq_len(length(freq))] = freq
             freq = new_freq
         }
         freq[nom + 1] = freq[nom + 1] + 1
@@ -213,7 +213,7 @@ simulateClumpSizeDist = function(pfm, bg, seqlen, nsim=10, singlestranded = FALS
             } else {
                 if (length(freq) < cnt) {
                     x = rep(0, cnt)
-                    x[1:length(freq)] = freq
+                    x[seq_len(length(freq))] = freq
                     freq = x
                 }
                 freq[cnt] = freq[cnt] + 1
