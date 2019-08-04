@@ -1,4 +1,4 @@
-year <- "2017"
+year <- "2017-2019"
 note <- sprintf("R package version %s", meta$Version)
 
 bibentry(bibtype = "Manual",
