@@ -10,7 +10,6 @@ int Rnucmap[26];
 int Rrevcomp[4];
 
 void Roption(double *siglevel, double *gran, int *ncores) {
-    int i;
     Rsiglevel = siglevel[0];
     Rgran = gran[0];
 
@@ -24,7 +23,7 @@ void Roption(double *siglevel, double *gran, int *ncores) {
     Rrevcomp[1] = 2;
     Rrevcomp[2] = 1;
     Rrevcomp[3] = 0;
-    
+
 #ifdef _OPENMP
     omp_set_num_threads(*ncores);
 #endif
