@@ -172,6 +172,16 @@ SEXP Rhitsequence(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP rseq,
     return hits;
 }
 
+int max(int a, int b) {
+
+  if (a > b) return a;
+  else return b;
+}
+int min(int a, int b) {
+
+  if (a < b) return a;
+  else return b;
+}
 SEXP Rmatchcount(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP seqlist,
                  SEXP rstation, SEXP rtrans, SEXP rorder, SEXP rthreshold,
                  SEXP rignore_ns) {
@@ -187,6 +197,7 @@ SEXP Rmatchcount(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP seqlist,
     double *threshold = REAL(rthreshold);
     const char *seq;
     int slen;
+    int nchunks, chunksize = 10000, k;
     int nseqs;
     ExtremalScore escore;
 
@@ -228,29 +239,37 @@ SEXP Rmatchcount(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP seqlist,
     xhits = REAL(hits);
     memset(xhits, 0, (nseqs)*sizeof(double));
 
+    nchunks = nseqs/chunksize;
+    if (nseqs % chunksize) {
+      nchunks++;
+    }
+
     #ifdef _OPENMP
-        #pragma omp parallel for schedule(static, 1000) \
+        #pragma omp parallel for schedule(static, 1) \
          shared(nseqs, seqlist, ncol, xhits, Rgran, \
-                order, threshold, escore, ignore_ns, pwm) \
-         private(i, seq, slen)
+                order, threshold, escore, ignore_ns, pwm, \
+              nchunks, chunksize) \
+         private(k, seq, slen, i)
     #endif
-    for (i=0; i<nseqs; i++) {
-        if (omp_get_num_threads() < 2) {
-            // When using multiple threads, the code crashes.
-            // Apparently, R_CheckUserInterrupt is not compatible with
-            // multithreading.
-            R_CheckUserInterrupt();
-        }
+    for (k=0; k<nchunks; k++) {
+      for (i=k*chunksize; i<min((k+1)*chunksize, nseqs); i++) {
+          if (omp_get_num_threads() < 2) {
+              // When using multiple threads, the code crashes.
+              // Apparently, R_CheckUserInterrupt is not compatible with
+              // multithreading.
+              R_CheckUserInterrupt();
+          }
 
-        seq = CHAR(STRING_ELT(VECTOR_ELT(seqlist, i), 0));
-        slen = strlen(seq);
-        if (getSequenceLength(seq, slen) < ncol[0]) {
-           continue;
-        }
+          seq = CHAR(STRING_ELT(VECTOR_ELT(seqlist, i), 0));
+          slen = strlen(seq);
+          if (getSequenceLength(seq, slen) < ncol[0]) {
+             continue;
+          }
 
-        matchCount(&pwm, seq, slen, &xhits[i],
-                 Rgran, order[0], threshold[0], &escore,
-                 ignore_ns[0]);
+          matchCount(&pwm, seq, slen, &xhits[i],
+                   Rgran, order[0], threshold[0], &escore,
+                   ignore_ns[0]);
+      }
     }
 
     UNPROTECT(1);
