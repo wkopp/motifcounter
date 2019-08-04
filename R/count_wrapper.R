@@ -36,7 +36,7 @@ motifHits = function(seq, pfm, bg, threshold=NULL) {
     motifAndBackgroundValid(pfm, bg)
 
     if (is.null(threshold)) {
-      threshold = scoreThreshold(pfm, bg)$threshold
+        threshold = scoreThreshold(pfm, bg)$threshold
     }
 
     fhits = hitStrand(seq, pfm, bg, threshold)
@@ -78,30 +78,30 @@ motifHits = function(seq, pfm, bg, threshold=NULL) {
 #' motifcounter:::hitStrand(seqs[[1]], motif, bg)
 #'
 hitStrand = function(seq, pfm, bg, threshold=NULL) {
-  motifValid(pfm)
-  stopifnot(is(bg, "Background"))
-  validObject(bg)
-  motifAndBackgroundValid(pfm, bg)
+    motifValid(pfm)
+    stopifnot(is(bg, "Background"))
+    validObject(bg)
+    motifAndBackgroundValid(pfm, bg)
 
-  # Check class
-  stopifnot(is(seq, "DNAString"))
+    # Check class
+    stopifnot(is(seq, "DNAString"))
 
-  if (is.null(threshold)) {
-    threshold = scoreThreshold(pfm, bg)$threshold
-  }
+    if (is.null(threshold)) {
+        threshold = scoreThreshold(pfm, bg)$threshold
+    }
 
-  hits = .Call(
-    motifcounter_hitsequence,
-    as.numeric(pfm),
-    nrow(pfm),
-    ncol(pfm),
-    toString(seq),
-    getStation(bg),
-    getTrans(bg),
-    as.integer(getOrder(bg)),
-    as.numeric(threshold)
-  )
-  return(as.numeric(hits))
+    hits = .Call(
+        motifcounter_hitsequence,
+        as.numeric(pfm),
+        nrow(pfm),
+        ncol(pfm),
+        toString(seq),
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg)),
+        as.numeric(threshold)
+    )
+    return(as.numeric(hits))
 }
 
 
@@ -147,8 +147,8 @@ motifHitProfile = function(seqs, pfm, bg) {
     motifAndBackgroundValid(pfm, bg)
 
     if (is(seqs, "DNAString")) {
-      # wrap the sequence up as sequence set
-      seqs = DNAStringSet(seqs)
+        # wrap the sequence up as sequence set
+        seqs = DNAStringSet(seqs)
     }
 
     stopifnot(is(seqs,"DNAStringSet"))
@@ -223,52 +223,53 @@ motifHitProfile = function(seqs, pfm, bg) {
 #' noc = motifcounter:::numMotifHits(seqs, motif, bg, singlestranded = TRUE)
 #' noc$numofhits
 #'
-numMotifHits = function(seqs, pfm, bg, singlestranded = FALSE, ignore_ns = FALSE) {
+numMotifHits = function(seqs, pfm, bg,
+                        singlestranded = FALSE, ignore_ns = FALSE) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
     motifAndBackgroundValid(pfm, bg)
 
     if (is(seqs, "DNAString")) {
-      # wrap the sequence up as sequence set
-      seqs = DNAStringSet(seqs)
+        # wrap the sequence up as sequence set
+        seqs = DNAStringSet(seqs)
     }
 
     stopifnot(is(seqs, "DNAStringSet"))
 
     threshold = scoreThreshold(pfm, bg)
     if (ignore_ns) {
-      ig_ = 1
+        ig_ = 1
     } else {
-      ig_ = 0
+        ig_ = 0
     }
 
     noh = .Call(
-      motifcounter_matchcount,
-      as.numeric(pfm),
-      nrow(pfm),
-      ncol(pfm),
-      lapply(seqs, toString),
-      getStation(bg),
-      getTrans(bg),
-      as.integer(getOrder(bg)),
-      as.numeric(threshold),
-      as.integer(ig_)
+        motifcounter_matchcount,
+        as.numeric(pfm),
+        nrow(pfm),
+        ncol(pfm),
+        lapply(seqs, toString),
+        getStation(bg),
+        getTrans(bg),
+        as.integer(getOrder(bg)),
+        as.numeric(threshold),
+        as.integer(ig_)
     )
 
     if (singlestranded == FALSE) {
         # retrieve the number of motif hits on the reverse strand
         noh_ = .Call(
-          motifcounter_matchcount,
-          as.numeric(revcompMotif(pfm)),
-          nrow(pfm),
-          ncol(pfm),
-          lapply(seqs, toString),
-          getStation(bg),
-          getTrans(bg),
-          as.integer(getOrder(bg)),
-          as.numeric(threshold),
-          as.integer(ig_)
+            motifcounter_matchcount,
+            as.numeric(revcompMotif(pfm)),
+            nrow(pfm),
+            ncol(pfm),
+            lapply(seqs, toString),
+            getStation(bg),
+            getTrans(bg),
+            as.integer(getOrder(bg)),
+            as.numeric(threshold),
+            as.integer(ig_)
         )
 
         noh = noh + noh_

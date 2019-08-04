@@ -104,8 +104,8 @@ getOrder = function(obj) {
 #' @export
 readBackground = function(seqs, order = 1) {
     if (is(seqs, "DNAString")) {
-      # wrap the sequence up as sequence set
-      seqs = DNAStringSet(seqs)
+        # wrap the sequence up as sequence set
+        seqs = DNAStringSet(seqs)
     }
     stopifnot (is(seqs, "DNAStringSet"))
     stopifnot (order >= 0)
@@ -114,8 +114,8 @@ readBackground = function(seqs, order = 1) {
 
     # collect k-mer frequencies from each individual sequence
     counts = .Call(motifcounter_countfreq,
-                  lapply(seqs, toString),
-                  as.integer(order))
+                lapply(seqs, toString),
+                as.integer(order))
 
     if (order == 0) {
         station = numeric(4)

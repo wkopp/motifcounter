@@ -160,6 +160,6 @@ getPositionWeights = function(pfm, bg) {
         as.integer(getOrder(bg))
     )
     return(matrix(pwm,
-                  nrow=4^(getOrder(bg) + 1),
-                  ncol=ncol(pfm) - getOrder(bg)))
+                nrow=4^(getOrder(bg) + 1),
+                ncol=ncol(pfm) - getOrder(bg)))
 }

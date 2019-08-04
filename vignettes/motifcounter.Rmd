@@ -47,7 +47,8 @@ If it is of help for your analysis, please cite
 Details about the compound Poisson model are available under
 ```
 @article{improvedcompound,
-  title={An improved compound Poisson model for the number of motif hits in DNA sequences},
+  title={An improved compound Poisson model for
+         the number of motif hits in DNA sequences},
   author={Kopp, Wolfgang and Vingron, Martin},
   journal={Bioinformatics},
   pages={btx539},
@@ -164,12 +165,13 @@ in random DNA sequences with matched lengths.
 Accordingly, `motifcounter` provides two fast and accurate alternatives
 for approximating this distribution:
 
-1. A compound Poisson approximation (see Kopp and Vingron (2017) Bioinformatics.)
-2. A combinatorial model (manuskript in preparation)
+1. A compound Poisson approximation (see Kopp and Vingron (2017))
+2. A combinatorial model (see Kopp and Vingron (2019))
 
 Both of these methods support higher-order background models and
 account for the **self-overlapping** structure of the motif.
-For example, a repeat-like word, e.g. 'AAAA', likely gives rise to a string of mutually overlapping hits which  
+For example, a repeat-like word, e.g. 'AAAA',
+likely gives rise to a string of mutually overlapping hits which  
 are referred to as **clumps** [@reinert, @pape]^[
 By contrast, a simple binomial approximation  [@rsat1,@rahmann] 
 does not account for self-overlapping matches.].
@@ -279,7 +281,8 @@ For other options consult `?motifcounterOptions`.
 
 For the following example, we explore the DNA sequences of 
 a set of *Oct4*-ChIP-seq peaks that were obtained in human *hESC* by 
-the ENCODE project [@encode2012]. The peak regions were trimmed to 200 bps centered around the midpoint.
+the ENCODE project [@encode2012].
+The peak regions were trimmed to 200 bps centered around the midpoint.
 
 ```{r}
 file <- system.file("extdata", "oct4_chipseq.fa", package = "motifcounter")
@@ -457,8 +460,10 @@ desired for your analysis (e.g $\alpha\geq 0.01$),
 the **combinatorial approximation** is likely to give more accurate results.
 </div>
 <div class="hint">
-**Hint:** We recommend against using too relaxed choices for $\alpha$ (e.g $\alpha\geq 0.05$), as this violates some of the assumptions on which
-the models are based on. The consequence might be significant biases of the results.
+**Hint:** We recommend against using too
+relaxed choices for $\alpha$ (e.g $\alpha\geq 0.05$),
+as this violates some of the assumptions on which the models are based on.
+The consequence might be significant biases of the results.
 </div>
 
 # Session Info

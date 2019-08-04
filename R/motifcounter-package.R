@@ -4,9 +4,9 @@
 #' of motif hits as well as motif hit
 #' enrichment for a given position frequency matrix (PFM)
 #' in a DNA sequence of interest.
-#' The following examples guides you through the main 
-#' functions of the `motifcounter` package. 
-#' 
+#' The following examples guides you through the main
+#' functions of the `motifcounter` package.
+#'
 #' For an analysis with `motifcounter`,
 #' the user is required to provide 1) a PFM,
 #' 2) a DNA sequence which is used to estimate
@@ -36,15 +36,15 @@
 #' # Load sequences
 #' file = system.file("extdata", "seq.fasta", package = "motifcounter")
 #' seqs = Biostrings::readDNAStringSet(file)
-#' 
+#'
 #' # Estimate an order-1 background model
 #' order = 1
 #' bg = readBackground(seqs, order)
-#' 
+#'
 #' # Load motif
 #' motiffile = system.file("extdata", "x31.tab", package = "motifcounter")
 #' motif = t(as.matrix(read.table(motiffile)))
-#' 
+#'
 #' # Normalize the motif
 #' # Normalization is sometimes necessary to prevent zeros in
 #' # the motif
@@ -55,7 +55,7 @@
 #'
 #' # Optionally, set the false positive probability
 #' #alpha=0.001 # is also the default
-#' #motifcounterOptions(alpha) 
+#' #motifcounterOptions(alpha)
 #'
 #' # Investigate the per-position and per-strand scores in a given sequence
 #' scores = scoreSequence(seqs[[1]], motif, bg)
@@ -71,11 +71,11 @@
 #'
 #' # Determine the empirical score distribution
 #' scoreHistogram(seqs, motif, bg)
-#' 
+#'
 #' # Determine the theoretical score distribution in random sequences
 #' scoreDist(motif, bg)
-#' 
-#' 
+#'
+#'
 #' # Determine the motif hit enrichment in a set of DNA sequences
 #' # 1. Use the compound Poisson approximation
 #' #    and scan only a single strand for motif hits
@@ -93,5 +93,5 @@
 #' #    and scan both strands for motif hits
 #' result = motifEnrichment(seqs, motif, bg, singlestranded = FALSE,
 #'             method = "combinatorial")
-#' 
+#'
 NULL

@@ -184,7 +184,8 @@ simulateNumHitsDist = function(pfm, bg, seqlen, nsim, singlestranded = FALSE) {
 #'     seqlen, singlestranded = TRUE)
 #'
 #' @seealso \code{\link{compoundPoissonDist}},\code{\link{combinatorialDist}}
-simulateClumpSizeDist = function(pfm, bg, seqlen, nsim=10, singlestranded = FALSE) {
+simulateClumpSizeDist = function(pfm, bg, seqlen,
+                                nsim=10, singlestranded = FALSE) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
