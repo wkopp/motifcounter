@@ -10,7 +10,7 @@ The package provides functions for determining the positions
 of motif hits as well as motif hit
 enrichment for a given position frequency matrix (PFM)
 in a DNA sequence of interest.
-The following examples guides you through the main 
+The following examples guides you through the main
 functions of the `motifcounter` package.
 }
 \details{
@@ -51,7 +51,7 @@ seqs = seqs[1:10]
 
 # Optionally, set the false positive probability
 #alpha=0.001 # is also the default
-#motifcounterOptions(alpha) 
+#motifcounterOptions(alpha)
 
 # Investigate the per-position and per-strand scores in a given sequence
 scores = scoreSequence(seqs[[1]], motif, bg)

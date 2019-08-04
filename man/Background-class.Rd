@@ -10,7 +10,7 @@ Objects of this class serve as a container that holds
 parameters for the Background model.
 }
 \details{
-A Background model is constructed 
+A Background model is constructed
 via \code{\link{readBackground}}.
 }
 \section{Slots}{
