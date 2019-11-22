@@ -153,6 +153,22 @@ void hitSequence(IMatrix *pwm, const char *seq, int seqlen, double *hits,
 }
 
 
+void possibleMatchCount(int motiflength, const char *seq, int seqlen, double *nhits,
+                 int order) {
+  int i, j;
+  int s, index;
+
+  nhits[0] = 0.;
+  for (i = 0; i < seqlen - motiflength + 1; i++) {
+
+    if (hasN(&seq[i], motiflength) > 0) {
+      continue;
+    }
+    nhits[0] += 1.;
+  }
+}
+
+
 void matchCount(IMatrix *pwm, const char *seq, int seqlen, double *nhits,
                  double granularity, int order,
                  double threshold, ExtremalScore *escore,
@@ -160,18 +176,9 @@ void matchCount(IMatrix *pwm, const char *seq, int seqlen, double *nhits,
   int i, j;
   int s, index;
 
-  // if the sequence contains any N's, do not process the scores
-  if (getSequenceLength(seq, seqlen) < 0) {
-    return;
-  }
-
   for (i = 0; i < seqlen - pwm->nrow + 1 - order; i++) {
 
     if (hasN(&seq[i], pwm->nrow + order) > 0) {
-      if (ignore_ns == 0) {
-         nhits[0] = NAN;
-         break;
-      }
       continue;
     }
     for (j = 0, index = 0; j < order; j++) {

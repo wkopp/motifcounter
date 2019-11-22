@@ -143,6 +143,8 @@ SEXP mcds_check_optimal(SEXP alpha_, SEXP beta_, SEXP beta3p_,
 SEXP Rmatchcount(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP seqlist,
                  SEXP rstation, SEXP rtrans, SEXP rorder, SEXP rthreshold,
                  SEXP rignore_ns);
+SEXP Rpossiblematchcount(SEXP rmotiflen, SEXP seqlist,
+                         SEXP rorder);
 
 static R_CallMethodDef callMethods[]  = {
     {"motifcounter_countfreq", (DL_FUNC) &Rcountfreq, 2},
@@ -151,6 +153,7 @@ static R_CallMethodDef callMethods[]  = {
     {"motifcounter_scoresequence", (DL_FUNC) &Rscoresequence, 7},
     {"motifcounter_hitsequence", (DL_FUNC) &Rhitsequence, 8},
     {"motifcounter_matchcount", (DL_FUNC) &Rmatchcount, 9},
+    {"motifcounter_possiblematchcount", (DL_FUNC) &Rpossiblematchcount, 3},
     {"motifcounter_scorerange", (DL_FUNC) &Rscorerange, 6},
     {"motifcounter_scoredist", (DL_FUNC) &Rscoredist, 6},
     {"motifcounter_scoredist_bf", (DL_FUNC) &Rscoredist_bf, 6},

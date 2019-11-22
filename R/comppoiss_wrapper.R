@@ -75,10 +75,7 @@ compoundPoissonDist = function(seqlen, overlap, method = "kopp") {
     stopifnot(is(overlap, "Overlap"))
     
     # Length must be at least as long as the motif
-    sl = sum(vapply(seqlen, function(sl, ml) {
-        sl - ml + 1
-    }, FUN.VALUE = 0,
-    ml = length(getBeta(overlap))))
+    sl = sum(seqlen)
 
     if (sl <= 0) {
         return (list(dist = 1))

@@ -19,8 +19,8 @@ void RcompoundpoissonPape_useGamma(double *gamma,
 
     seqlen = 0;
     for (i = 0; i < *nseq; i++) {
-        if (lseq[i] - motiflen[0] + 1 > 0) {
-            seqlen += lseq[i] - motiflen[0] + 1;
+        if (lseq[i] > 0) {
+            seqlen += lseq[i];
         }
     }
     maxclumpsize = (double)mclump[0];
@@ -47,7 +47,7 @@ void Rcompoundpoisson_useBeta(double *alpha, double *beta,
 
     seqlen = 0;
     for (i = 0; i < *nseq; i++) {
-        seqlen += lseq[i] - motiflen[0] + 1;
+        seqlen += lseq[i];
     }
 
     maxclumpsize = (double)mclump[0];

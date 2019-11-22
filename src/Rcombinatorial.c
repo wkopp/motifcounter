@@ -29,7 +29,7 @@ void RPosteriorProbability(double *alpha, double *beta,
     double sum;
 
 
-    seqlen = sseqlen[0] - motiflen[0] + 1;
+    seqlen = sseqlen[0];
     nos = snos[0];
     maxhits = smaxhits[0];
     totalmaxhits = maxhits * nos;

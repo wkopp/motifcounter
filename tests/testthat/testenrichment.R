@@ -79,14 +79,15 @@ test_that("motifEnrichment", {
     bg=readBackground(seqs2,2)
     seqfile=system.file("extdata","test2.fa", package="motifcounter")
     seqs=Biostrings::readDNAStringSet(seqfile)
-    
-    
-    expect_error(motifEnrichment(seqs,motif,bg))
+
+    # this error will not be raised anymore.
+    # for sequences with N's, the possible match positions is determined now.
+    #expect_error(motifEnrichment(seqs,motif,bg))
 
     # DNAStringSet,motif
-    expect_equivalent(motifEnrichment(seqs[1:2],motif,bg)$pvalue, 
+    expect_equivalent(motifEnrichment(seqs[1:2],motif,bg)$pvalue,
                  0.1293926, tolerance=0.000001)
-    
+
     # DNAStringSet,list
     ret <- motifEnrichment(seqs[1:2],
                  list(motif, motif),bg)$pvalue

@@ -246,7 +246,7 @@ test_that("numMotifHits", {
         expect_equal(numMotifHits(
                 generateDNAStringSet(ncol(motif)-1,bg),motif,bg)[[1]],1)
         expect_equal(numMotifHits(
-                generateDNAStringSet(ncol(motif)-1,bg),motif,bg)[[2]],ncol(motif)-1)
+                generateDNAStringSet(ncol(motif)-1,bg),motif,bg)[[2]], 0)
         expect_equal(numMotifHits(
                 generateDNAStringSet(ncol(motif)-1,bg),motif,bg)[[3]],0)
     }
@@ -261,22 +261,22 @@ test_that("numMotifHits", {
     # there is a hit in the first sequence
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE, ignore_ns=FALSE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,13))
-    expect_equal(as.vector(nom$numofhits),c(1,0,NaN))
+    expect_equal(as.vector(nom$lseq),c(20, 7, 4))
+    expect_equal(as.vector(nom$numofhits),c(1,0,0))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE, ignore_ns=TRUE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,13))
+    expect_equal(as.vector(nom$lseq),c(20, 7, 4))
     expect_equal(as.vector(nom$numofhits),c(1,0,0))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,13))
-    expect_equal(as.vector(nom$numofhits),c(2,0,NaN))
+    expect_equal(as.vector(nom$lseq),c(20, 7, 4))
+    expect_equal(as.vector(nom$numofhits),c(2,0,0))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE, ignore_ns=TRUE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,13))
+    expect_equal(as.vector(nom$lseq),c(20, 7, 4))
     expect_equal(as.vector(nom$numofhits),c(2,0,0))
 
 
@@ -288,21 +288,21 @@ test_that("numMotifHits", {
     # there is a hit in the second sequence
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,13))
-    expect_equal(as.vector(nom$numofhits),c(0,1,NaN))
+    expect_equal(as.vector(nom$lseq),c(20, 7, 4))
+    expect_equal(as.vector(nom$numofhits),c(0,1,0))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,13))
-    expect_equal(as.vector(nom$numofhits),c(0,1,NaN))
+    expect_equal(as.vector(nom$lseq),c(20, 7, 4))
+    expect_equal(as.vector(nom$numofhits),c(0,1,0))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=TRUE, ignore_ns=TRUE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,13))
+    expect_equal(as.vector(nom$lseq),c(20, 7, 4))
     expect_equal(as.vector(nom$numofhits),c(0,1,0))
 
     nom=numMotifHits(seqs,motif,bg,singlestranded=FALSE, ignore_ns=TRUE)
     expect_equal(nom$nseq,3)
-    expect_equal(as.vector(nom$lseq),c(23,10,13))
-    expect_equal(as.vector(nom$numofhits),c(0,1,0))
+    expect_equal(as.vector(nom$lseq),c(20, 7, 4))
+    expect_equal(as.vector(nom$numofhits),c(0, 1, 0))
 })

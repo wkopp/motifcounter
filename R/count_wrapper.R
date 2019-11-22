@@ -244,6 +244,13 @@ numMotifHits = function(seqs, pfm, bg,
         ig_ = 0
     }
 
+    npossiblematches = .Call(
+        motifcounter_possiblematchcount,
+        nrow(pfm),
+        lapply(seqs, toString),
+        as.integer(getOrder(bg))
+    )
+
     noh = .Call(
         motifcounter_matchcount,
         as.numeric(pfm),
@@ -256,6 +263,8 @@ numMotifHits = function(seqs, pfm, bg,
         as.numeric(threshold),
         as.integer(ig_)
     )
+
+    lseq = npossiblematches
 
     if (singlestranded == FALSE) {
         # retrieve the number of motif hits on the reverse strand
