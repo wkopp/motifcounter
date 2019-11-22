@@ -69,7 +69,8 @@ motifEnrichment_ = function(seqs, pfm, bg, singlestranded = FALSE,
         fold = sum(observations$numofhits) /
             sum(dist$dist * seq(0, length(dist$dist) - 1)),
         logfold = log(sum(observations$numofhits) /
-            sum(dist$dist * seq(0, length(dist$dist) - 1)))
+            sum(dist$dist * seq(0, length(dist$dist) - 1))),
+        meanhits = sum(observations$numofhits) / sum(observations$lseq)
     ))
 }
 
@@ -394,10 +395,10 @@ collapseListRegions <- function(res, nregions, regionnames) {
     # this function collates results in a list(list(scalar))
     # to list(vector).
     # the result summarizes the results for a single motif over
-    # multiple regions. 
+    # multiple regions.
 
     if (is(res, "list") && length(intersect(c("numofhits",
-        "pvalue", "fold", "logfold"), names(res)))==4) {
+        "pvalue", "fold", "logfold", "meanhits"), names(res)))==5) {
         return (res)
     }
 
@@ -406,7 +407,8 @@ collapseListRegions <- function(res, nregions, regionnames) {
     newres = list(numofhits=matrix(0, nrow=1, ncol=nregions, dimnames=dnames),
                 pvalue=matrix(0, nrow=1, ncol=nregions, dimnames=dnames),
                 fold=matrix(0, nrow=1, ncol=nregions, dimnames=dnames),
-                logfold=matrix(0, nrow=1, ncol=nregions, dimnames=dnames))
+                logfold=matrix(0, nrow=1, ncol=nregions, dimnames=dnames),
+                meanhits=matrix(0, nrow=1, ncol=nregions, dimnames=dnames))
 
     # regions are always first collected in the inner loop
     # that is from the scalar values we obtain a vector
@@ -427,7 +429,7 @@ collapseListMotifs <- function(res, nmotifs, motifnames) {
 
     #print("collapseListMotifs")
     if (is(res, "list") && length(intersect(c("numofhits",
-        "pvalue", "fold", "logfold"), names(res)))==4) {
+        "pvalue", "fold", "logfold", "meanhits"), names(res)))==5) {
         return (res)
     }
 
@@ -440,7 +442,8 @@ collapseListMotifs <- function(res, nmotifs, motifnames) {
             ncol=nregions, dimnames=dnames),
         pvalue=matrix(0, nrow=nmotifs, ncol=nregions, dimnames=dnames),
         fold=matrix(0, nrow=nmotifs, ncol=nregions, dimnames=dnames),
-        logfold=matrix(0, nrow=nmotifs, ncol=nregions, dimnames=dnames))
+        logfold=matrix(0, nrow=nmotifs, ncol=nregions, dimnames=dnames),
+        meanhits=matrix(0, nrow=nmotifs, ncol=nregions, dimnames=dnames))
 
     for (k in seq_len(length(newres))) {
         for (j in seq_len(nmotifs)) {
@@ -450,4 +453,3 @@ collapseListMotifs <- function(res, nmotifs, motifnames) {
 
     return(newres)
 }
-

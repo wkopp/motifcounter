@@ -23,9 +23,9 @@ test_that("compoundPoissonDist", {
         # check short sequences
         expect_equal(compoundPoissonDist(0,op)$dist[1],1) # too short sequence
         expect_equal(compoundPoissonDist(-1,op)$dist[1],1) # too short sequence
-        expect_equal(compoundPoissonDist(ncol(motif)-1,op)$dist[1],1) # too short sequence
+        expect_equal(compoundPoissonDist(1,op)$dist[1],1) # too short sequence
 
-        # check wrong method 
+        # check wrong method
         expect_error(compoundPoissonDist(100, op, method=0))
 
         # check wrong overlap

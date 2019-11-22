@@ -284,8 +284,6 @@ numMotifHits = function(seqs, pfm, bg,
         noh = noh + noh_
     }
 
-    lseq = lenSequences(seqs)
-
     nseq = length(seqs)
 
     return (list(
