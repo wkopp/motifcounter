@@ -443,3 +443,73 @@ collapseListMotifs <- function(res, nmotifs, motifnames) {
 
     return(newres)
 }
+
+#' Extract top matches per region
+#'
+#' This function assembles a concise summary of the enrichment results.
+#' It enables to extract the top matching motifs and visualize them.
+#'
+#' @param menr Motif enrichment results obtained by calling motifEnrichment().
+#' @param top_n Number of top matching motifs to extract. Default: 3.
+#' @param doplot Whether to plot the results. Default: FALSE
+#'
+#' @examples
+#'
+#' regions1 = system.file("extdata",
+#'                        "example_jund.bed", package = "motifcounter")
+#' regions2 = system.file("extdata",
+#'                        "example_arid3a.bed", package = "motifcounter")
+#' regions = GenomicRanges::GRangesList(
+#'            "jund"=genomation::readBed(regions1),
+#'            "arid3a"=genomation::readBed(regions2))
+#'
+#' genome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+#'
+#' query <- MotifDb::query
+#' motifs1 = as.list(query(query(MotifDb::MotifDb, "hsapiens"), c("arid3a")))
+#' motifs2 = as.list(query(query(MotifDb::MotifDb, "hsapiens"), c("jund")))
+#' motifs = c(motifs1[1], motifs2[1])
+#'
+#' result = motifEnrichment(regions, motifs, bg, genome=genome)
+#' topMotifs(result)
+#'
+#' @return result table
+#'
+#' @export
+#' @importFrom magrittr "%>%"
+#' @importFrom dplyr group_by
+#' @importFrom dplyr top_n
+#' @import reshape2
+#' @importFrom rlang .data
+topMotifs = function(menr, top_n=3, doplot=FALSE) {
+  lf = as.data.frame(menr$logfold)
+  lf$motif = rownames(lf)
+  mlf = melt(lf, id="motif")
+  colnames(mlf) = c("motif", "region", "logfold")
+
+  pv = as.data.frame(menr$pvalue)
+  pv$motif = rownames(pv)
+  mpv = melt(pv, id="motif")
+  colnames(mpv) = c("motif", "region", "pvalue")
+  mlf$pvalue = mpv$pvalue
+
+  resmlf = mlf %>% group_by(.data$region) %>% top_n(2, .data$logfold)
+
+  if (doplot) {
+    return(.plotTopMotifs((resmlf)))
+  }
+  return(resmlf)
+}
+
+#' @importFrom rlang .data
+#' @import ggplot2
+#' @importFrom stats reorder
+.plotTopMotifs = function(results) {
+  suppressWarnings({
+    g = ggplot(results, aes(x=.data$logfold, y=reorder(.data$region, .data$motif), color=.data$motif)) 
+    g = g + geom_point() + ylab("Regions") + xlab("Log-fold")
+    g
+  })
+
+  return(g)
+}
