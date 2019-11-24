@@ -5,7 +5,7 @@
 \title{Internal logic Enrichment of motif hits}
 \usage{
 motifEnrichment_(seqs, pfm, bg, singlestranded = FALSE,
-  method = "compound", ignore_ns = FALSE, ...)
+  method = "compound", ...)
 }
 \arguments{
 \item{seqs}{A DNAStringSet or DNAString object}
@@ -21,9 +21,6 @@ Default: singlestranded = FALSE.}
 \item{method}{String that defines whether to use
 the 'compound' Poisson approximation' or the 'combinatorial' model.
 Default: method='compound'.}
-
-\item{ignore_ns}{Ignore Ns in the sequence and treat them as zero counts.
-If FALSE, positions with Ns will evaluate to NaN.}
 
 \item{...}{externally supplied overlap object}
 }

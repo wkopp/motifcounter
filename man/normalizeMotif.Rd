@@ -4,7 +4,7 @@
 \alias{normalizeMotif}
 \title{Normalizes a PFM}
 \usage{
-normalizeMotif(pfm, pseudo = 0.01)
+normalizeMotif(pfm, pseudo = 1e-07)
 }
 \arguments{
 \item{pfm}{An R matrix that represents a position frequency matrix}

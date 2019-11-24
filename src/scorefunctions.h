@@ -39,8 +39,7 @@ void scoreHistogram(double *station, double *trans,
                     double *dist, double granularity, int smin, int order);
 void matchCount(IMatrix *pwm, const char *seq, int seqlen, double *nhits,
                  double granularity, int order,
-                 double threshold, ExtremalScore *escore,
-                 int ignore_ns);
+                 double threshold, ExtremalScore *escore);
 void possibleMatchCount(int motiflen, const char *seq, int seqlen, double *nhits,
                   int order);
 #endif

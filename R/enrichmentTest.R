@@ -31,7 +31,7 @@
 #' }
 #' @seealso \code{\link{compoundPoissonDist}}, \code{\link{combinatorialDist}}
 motifEnrichment_ = function(seqs, pfm, bg, singlestranded = FALSE,
-                            method = "compound", ignore_ns = FALSE, ...) {
+                            method = "compound", ...) {
 
     #print("motifEnrichment_")
     stopifnot(is(bg, "Background"))
@@ -40,7 +40,6 @@ motifEnrichment_ = function(seqs, pfm, bg, singlestranded = FALSE,
     validObject(bg)
     motifAndBackgroundValid(pfm, bg)
     stopifnot(is.logical(singlestranded))
-    stopifnot(is.logical(ignore_ns))
 
     #compute overlapping hit probs
     if ("overlap" %in% names(list(...))) {
@@ -50,7 +49,7 @@ motifEnrichment_ = function(seqs, pfm, bg, singlestranded = FALSE,
     }
 
     # detemine the number of motif hits
-    observations = numMotifHits(seqs, pfm, bg, singlestranded, ignore_ns)
+    observations = numMotifHits(seqs, pfm, bg, singlestranded)
 
     if (method == "compound") {
         dist = compoundPoissonDist(observations$lseq, overlap)
@@ -190,18 +189,17 @@ setGeneric(
 setMethod("motifEnrichment",
     signature(seqs_or_regions="DNAStringSet", pfms="matrix"),
     function(seqs_or_regions, pfms, bg, genome = NULL, singlestranded = FALSE,
-            method = "compound", ignore_ns = FALSE,
+            method = "compound",
             normalize_pfm=TRUE) {
         #print("DNAStringSet,matrix")
         stopifnot(is.null(genome))
         stopifnot(is.logical(singlestranded))
-        stopifnot(is.logical(ignore_ns))
         stopifnot(is.logical(normalize_pfm))
 
         # with motifEnrichment_: returns list(scalar)
         return(motifEnrichment(DNAStringSetList(seqs_or_regions), pfms, bg,
             singlestranded=singlestranded,
-            method=method, ignore_ns=ignore_ns,
+            method=method,
             normalize_pfm=normalize_pfm))
     }
 )
@@ -212,12 +210,11 @@ setMethod("motifEnrichment",
 setMethod("motifEnrichment",
     signature(seqs_or_regions="DNAStringSetList", pfms="matrix"),
     function(seqs_or_regions, pfms, bg, genome=NULL, singlestranded = FALSE,
-            method = "compound", ignore_ns = FALSE,
+            method = "compound",
             normalize_pfm=TRUE) {
         #print("DNAStringSetList,matrix")
         stopifnot(is.null(genome))
         stopifnot(is.logical(singlestranded))
-        stopifnot(is.logical(ignore_ns))
         stopifnot(is.logical(normalize_pfm))
 
         if (normalize_pfm) {
@@ -227,14 +224,13 @@ setMethod("motifEnrichment",
         overlap = probOverlapHit(pfms, bg, singlestranded)
 
         res = lapply(seqs_or_regions, function(seqs, pfms, bg, singlestranded,
-                    method, ignore_ns,
+                    method,
                     normalize_pfm, overlap)
                 motifEnrichment_(seqs, pfms, bg, genome=NULL,
                     singlestranded=singlestranded,
                     method=method,
-                    ignore_ns=ignore_ns,
                     overlap=overlap),
-                pfms, bg, singlestranded, method, ignore_ns, normalize_pfm,
+                pfms, bg, singlestranded, method, normalize_pfm,
                 overlap)
 
         # with DNAStringSet,matrix: list(vector)
@@ -252,13 +248,12 @@ setMethod("motifEnrichment",
 setMethod("motifEnrichment",
     signature(seqs_or_regions="GRanges", pfms="matrix"),
     function(seqs_or_regions, pfms, bg, genome=NULL, singlestranded = FALSE,
-            method = "compound", ignore_ns = FALSE,
+            method = "compound",
             normalize_pfm=TRUE) {
         #print("GRanges,matrix")
 
         stopifnot(is(genome, "BSgenome"))
         stopifnot(is.logical(singlestranded))
-        stopifnot(is.logical(ignore_ns))
         stopifnot(is.logical(normalize_pfm))
 
         #seqs = getSeq(genome, seqs_or_regions)
@@ -267,7 +262,7 @@ setMethod("motifEnrichment",
         return(motifEnrichment(GRangesList(seqs_or_regions), pfms, bg,
                             genome=genome,
                             singlestranded=singlestranded,
-                            method=method, ignore_ns=ignore_ns,
+                            method=method,
                             normalize_pfm=normalize_pfm))
     }
 )
@@ -280,13 +275,12 @@ setMethod("motifEnrichment",
 setMethod("motifEnrichment",
     signature(seqs_or_regions="GRangesList", pfms="matrix"),
     function(seqs_or_regions, pfms, bg, genome=NULL, singlestranded = FALSE,
-            method = "compound", ignore_ns = FALSE,
+            method = "compound",
             normalize_pfm=TRUE) {
 
         #print("GRangesList,matrix")
         stopifnot(is(genome, "BSgenome"))
         stopifnot(is.logical(singlestranded))
-        stopifnot(is.logical(ignore_ns))
         stopifnot(is.logical(normalize_pfm))
 
         seqslist = DNAStringSetList(lapply(seqs_or_regions,
@@ -297,7 +291,7 @@ setMethod("motifEnrichment",
 
         res = motifEnrichment(seqslist, pfms, bg, genome=NULL,
                 singlestranded=singlestranded,
-                method=method, ignore_ns=ignore_ns,
+                method=method,
                 normalize_pfm=normalize_pfm)
         # with DNAStringSetList,matrix: list(vector)
         return(collapseListRegions(res, length(res), names(seqslist)))
@@ -313,18 +307,17 @@ setMethod("motifEnrichment",
 setMethod("motifEnrichment",
     signature(seqs_or_regions="character", pfms="matrix"),
     function(seqs_or_regions, pfms, bg, genome=NULL, singlestranded = FALSE,
-            method = "compound", ignore_ns = FALSE,
+            method = "compound",
             normalize_pfm=TRUE) {
         #print("character,matrix")
         stopifnot(is(genome, "BSgenome"))
         stopifnot(is.logical(singlestranded))
-        stopifnot(is.logical(ignore_ns))
         stopifnot(is.logical(normalize_pfm))
 
         # with list,matrix: returns list(vector)
         res = motifEnrichment(list(seqs_or_regions), pfms, bg,
             genome=genome, singlestranded=singlestranded,
-            method=method, ignore_ns=ignore_ns,
+            method=method,
             normalize_pfm=normalize_pfm)
         return(collapseListRegions(res, length(res), NULL))
     }
@@ -337,13 +330,12 @@ setMethod("motifEnrichment",
 setMethod("motifEnrichment",
     signature(seqs_or_regions="list", pfms="matrix"),
     function(seqs_or_regions, pfms, bg, genome=NULL, singlestranded = FALSE,
-            method = "compound", ignore_ns = FALSE,
+            method = "compound",
             normalize_pfm=TRUE) {
         #print("list,matrix")
 
         stopifnot(is(genome, "BSgenome"))
         stopifnot(is.logical(singlestranded))
-        stopifnot(is.logical(ignore_ns))
         stopifnot(is.logical(normalize_pfm))
         stopifnot(all(file.exists(unlist(seqs_or_regions))))
 
@@ -353,7 +345,7 @@ setMethod("motifEnrichment",
         # with GRangesList,matrix: returns list(vector)
         res = motifEnrichment(regions, pfms, bg, genome=genome,
             singlestranded=singlestranded,
-            method=method, ignore_ns=ignore_ns,
+            method=method,
             normalize_pfm=normalize_pfm)
         return(collapseListRegions(res, length(res), names(regions)))
     }
@@ -366,24 +358,22 @@ setMethod("motifEnrichment",
 setMethod("motifEnrichment",
     signature(pfms="list"),
     function(seqs_or_regions, pfms, bg, genome=NULL, singlestranded = FALSE,
-            method = "compound", ignore_ns = FALSE,
+            method = "compound",
             normalize_pfm=TRUE) {
         #print("*,list")
         stopifnot(is.logical(singlestranded))
-        stopifnot(is.logical(ignore_ns))
         stopifnot(is.logical(normalize_pfm))
 
         res = lapply(pfms, function(motif, seqs_or_regions, bg, genome,
                                     singlestranded,
-                                    method, ignore_ns, normalize_pfm)
+                                    method, normalize_pfm)
                                     motifEnrichment(seqs_or_regions, motif, bg,
                                         genome=genome,
                                         singlestranded=singlestranded,
                                         method=method,
-                                        ignore_ns=ignore_ns,
                                         normalize_pfm=normalize_pfm),
                                 seqs_or_regions, bg, genome, singlestranded,
-                                method, ignore_ns, normalize_pfm)
+                                method, normalize_pfm)
 
         # with any,matrix: returns list(matrix)
         return(collapseListMotifs(res, length(pfms), names(pfms)))

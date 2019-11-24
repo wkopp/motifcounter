@@ -171,8 +171,7 @@ void possibleMatchCount(int motiflength, const char *seq, int seqlen, double *nh
 
 void matchCount(IMatrix *pwm, const char *seq, int seqlen, double *nhits,
                  double granularity, int order,
-                 double threshold, ExtremalScore *escore,
-                 int ignore_ns) {
+                 double threshold, ExtremalScore *escore) {
   int i, j;
   int s, index;
 

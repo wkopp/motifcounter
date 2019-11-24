@@ -249,15 +249,13 @@ SEXP Rpossiblematchcount(SEXP rnrow, SEXP seqlist,
 }
 
 SEXP Rmatchcount(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP seqlist,
-                 SEXP rstation, SEXP rtrans, SEXP rorder, SEXP rthreshold,
-                 SEXP rignore_ns) {
+                 SEXP rstation, SEXP rtrans, SEXP rorder, SEXP rthreshold) {
     double *pfm_ = REAL(rpfm_);
     double *station = REAL(rstation);
     double *trans = REAL(rtrans);
     int *nrow = INTEGER(rnrow);
     int *ncol = INTEGER(rncol);
     int *order = INTEGER(rorder);
-    int *ignore_ns = INTEGER(rignore_ns);
     double *xhits;
     int i;
     double *threshold = REAL(rthreshold);
@@ -313,7 +311,7 @@ SEXP Rmatchcount(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP seqlist,
     #ifdef _OPENMP
         #pragma omp parallel for schedule(static, 1) \
          shared(nseqs, seqlist, ncol, xhits, Rgran, \
-                order, threshold, escore, ignore_ns, pwm, \
+                order, threshold, escore, pwm, \
               nchunks, chunksize) \
          private(k, seq, slen, i)
     #endif
@@ -333,8 +331,7 @@ SEXP Rmatchcount(SEXP rpfm_, SEXP rnrow, SEXP rncol, SEXP seqlist,
           }
 
           matchCount(&pwm, seq, slen, &xhits[i],
-                   Rgran, order[0], threshold[0], &escore,
-                   ignore_ns[0]);
+                   Rgran, order[0], threshold[0], &escore);
       }
     }
 

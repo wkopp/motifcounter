@@ -194,8 +194,6 @@ motifHitProfile = function(seqs, pfm, bg) {
 #' @param singlestranded Boolean that indicates whether a single strand or
 #' both strands shall be scanned for motif hits.
 #' Default: singlestranded = FALSE.
-#' @param ignore_ns Ignore Ns in the sequence and treat them as zero counts.
-#' If FALSE, positions with Ns will evaluate to NaN.
 #' @return A list containing
 #' \describe{
 #' \item{nseq}{Number of individual sequences}
@@ -224,7 +222,7 @@ motifHitProfile = function(seqs, pfm, bg) {
 #' noc$numofhits
 #'
 numMotifHits = function(seqs, pfm, bg,
-                        singlestranded = FALSE, ignore_ns = FALSE) {
+                        singlestranded = FALSE) {
     motifValid(pfm)
     stopifnot(is(bg, "Background"))
     validObject(bg)
@@ -238,11 +236,6 @@ numMotifHits = function(seqs, pfm, bg,
     stopifnot(is(seqs, "DNAStringSet"))
 
     threshold = scoreThreshold(pfm, bg)
-    if (ignore_ns) {
-        ig_ = 1
-    } else {
-        ig_ = 0
-    }
 
     npossiblematches = .Call(
         motifcounter_possiblematchcount,
@@ -260,8 +253,7 @@ numMotifHits = function(seqs, pfm, bg,
         getStation(bg),
         getTrans(bg),
         as.integer(getOrder(bg)),
-        as.numeric(threshold),
-        as.integer(ig_)
+        as.numeric(threshold)
     )
 
     lseq = npossiblematches
@@ -277,8 +269,7 @@ numMotifHits = function(seqs, pfm, bg,
             getStation(bg),
             getTrans(bg),
             as.integer(getOrder(bg)),
-            as.numeric(threshold),
-            as.integer(ig_)
+            as.numeric(threshold)
         )
 
         noh = noh + noh_

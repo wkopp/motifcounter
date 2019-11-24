@@ -16,31 +16,31 @@ motifEnrichment(seqs_or_regions, pfms, ...)
 
 \S4method{motifEnrichment}{DNAStringSet,matrix}(seqs_or_regions, pfms, bg,
   genome = NULL, singlestranded = FALSE, method = "compound",
-  ignore_ns = FALSE, normalize_pfm = TRUE)
+  normalize_pfm = TRUE)
 
 \S4method{motifEnrichment}{DNAStringSetList,matrix}(seqs_or_regions, pfms,
   bg, genome = NULL, singlestranded = FALSE, method = "compound",
-  ignore_ns = FALSE, normalize_pfm = TRUE)
+  normalize_pfm = TRUE)
 
 \S4method{motifEnrichment}{GRanges,matrix}(seqs_or_regions, pfms, bg,
   genome = NULL, singlestranded = FALSE, method = "compound",
-  ignore_ns = FALSE, normalize_pfm = TRUE)
+  normalize_pfm = TRUE)
 
 \S4method{motifEnrichment}{GRangesList,matrix}(seqs_or_regions, pfms, bg,
   genome = NULL, singlestranded = FALSE, method = "compound",
-  ignore_ns = FALSE, normalize_pfm = TRUE)
+  normalize_pfm = TRUE)
 
 \S4method{motifEnrichment}{character,matrix}(seqs_or_regions, pfms, bg,
   genome = NULL, singlestranded = FALSE, method = "compound",
-  ignore_ns = FALSE, normalize_pfm = TRUE)
+  normalize_pfm = TRUE)
 
 \S4method{motifEnrichment}{list,matrix}(seqs_or_regions, pfms, bg,
   genome = NULL, singlestranded = FALSE, method = "compound",
-  ignore_ns = FALSE, normalize_pfm = TRUE)
+  normalize_pfm = TRUE)
 
 \S4method{motifEnrichment}{ANY,list}(seqs_or_regions, pfms, bg,
   genome = NULL, singlestranded = FALSE, method = "compound",
-  ignore_ns = FALSE, normalize_pfm = TRUE)
+  normalize_pfm = TRUE)
 }
 \arguments{
 \item{seqs_or_regions}{DNAStringSet, DNAStringSetList,
@@ -65,9 +65,6 @@ Default: singlestranded = FALSE.}
 \item{method}{String that defines whether to use
 the 'compound' Poisson approximation' or the 'combinatorial' model.
 Default: method='compound'.}
-
-\item{ignore_ns}{Ignore Ns in the sequence and treat them as zero counts.
-If FALSE, positions with Ns will evaluate to NaN.}
 
 \item{normalize_pfm}{If TRUE, normalization of the PFM is performed
 to avoid zero-entries. Default: FALSE}
