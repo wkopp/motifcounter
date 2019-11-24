@@ -1,7 +1,7 @@
 ---
 title: "Introduction to the `motifcounter` package"
 author: "Wolfgang Kopp"
-date: "2017-10-06"
+date: "`r Sys.Date()`"
 output:
     prettydoc::html_pretty:
         toc: TRUE
@@ -29,11 +29,11 @@ knit_hooks$set(plot = function(x, options) {
 library(motifcounter)
 library(MotifDb)
 library(seqLogo)
+library(BSgenome.Hsapiens.UCSC.hg38)
 opts_chunk$set(fig.path="fig/")
 ```
 
 
-This software package grew out of the work that I did to obtain my PhD.
 If it is of help for your analysis, please cite
 ```
 @Manual{,
@@ -94,7 +94,7 @@ average_hits <- motifHitProfile(sequences, motif, bg)
 ```
 ```{r eval=FALSE}
 # Compute the motif hit enrichment
-enrichment_result <- motifEnrichment(sequences, motif, bg)
+enrichment_result <- motifEnrichment(sequences_or_regions, motif, bg)
 ```
 
 # Introduction
@@ -331,6 +331,7 @@ positive level $\alpha$ (e.g. $\alpha=0.001$) based on
 the theoretical score distribution.].
 
 ```{r}
+motifcounterOptions(0.001)
 # Call putative TFBSs
 mhits <- motifHits(oct4peaks[[1]], motif, bg)
 
@@ -413,8 +414,8 @@ A central feature of `motifcounter` represents a sophisticated
 novel approach for identifying motif hit enrichment in DNA sequences.
 
 To this end, the package contains the method `motifEnrichment`,
-which evaluates the *P-value* associated with the number of motif hits
-that are found in the observed sequence, compared to the background model.
+which evaluates the *P-value* associated with the observed number of motif hits
+compared to the background model.
 
 ```{r}
 # Enrichment of Oct4 in Oct4-ChIP-seq peaks
@@ -422,13 +423,11 @@ result <- motifEnrichment(oct4peaks[1:10], motif, bg)
 result
 ```
 
-The method returns a list that contains
-`pvalue` as well as `fold`. While, the `pvalue` represents
-the probability that more or equally many hits are produced in 
-random DNA sequences, `fold` represents the fold-enrichment of 
-motif hits relative the 
-expected number of hits in random DNA sequences.
-That is, it represents a measure of the effect size.
+The method returns the results of the motif enrichment,
+including the number of motif matches, the (log-) fold enrichment (compared to
+the background) and the number of matches normalized by sequence length.
+`fold` (and `logfold`) represents a measure of the effect size while
+the `pvalue` represents a measure for significance.
 
 <div class="hint">
 **Hint:** In case, very long or many DNA sequences are scanned for
@@ -465,6 +464,116 @@ relaxed choices for $\alpha$ (e.g $\alpha\geq 0.05$),
 as this violates some of the assumptions on which the models are based on.
 The consequence might be significant biases of the results.
 </div>
+
+# Use case
+
+Next we determine motif enrichment peak regions for CTCF, MAFK and several randomly selected regions from the human genome (hg38).
+
+First we load some sample peak regions and the random regions into a GRangesList object:
+```{r loadpeaks}
+library(genomation)
+library(BSgenome.Hsapiens.UCSC.hg38)
+
+genome <- BSgenome.Hsapiens.UCSC.hg38
+
+suppressMessages({
+
+ctcf <- readBed(system.file("extdata", "peaks", "ctcf.bed", package = "motifcounter"))[1:1000]
+mafk <- readBed(system.file("extdata", "peaks", "mafk.bed", package = "motifcounter"))[1:1000]
+
+random1 <- readBed(system.file("extdata", "peaks", "random1.bed", package = "motifcounter"))
+#random2 <- readBed(system.file("extdata", "peaks", "random2.bed", package = "motifcounter"))
+#random3 <- readBed(system.file("extdata", "peaks", "random3.bed", package = "motifcounter"))
+#random4 <- readBed(system.file("extdata", "peaks", "random4.bed", package = "motifcounter"))
+
+})
+
+regions <- GRangesList('CTCF peaks'=ctcf,
+                       'MAFK peaks'=mafk,
+                       'random regions'=random1)
+                      # 'rand2'=random2,
+                      # 'rand3'=random3,
+                      # 'rand4'=random4)
+```
+
+Then we obtain some motifs, e.g. from MotifDb:
+
+```{r}
+library(MotifDb)
+
+ctcfmotif = as.list(query(query(query(MotifDb, "hsapiens"), "ctcf"),
+                  "JASPAR2018"))
+
+mafkmotif = as.list(query(query(query(MotifDb, "hsapiens"), "mafk"),
+                  "JASPAR2018"))
+
+motifs = c(ctcfmotif, mafkmotif)
+```
+
+For simplicity we determine an order-$3$ background model on a subset of chromosome 1:
+```{r background}
+
+
+#lgenome = list()
+#for (i in seq_len(length(genome))) {
+# lgenome[seqnames(genome)[i]] = genome[[i]]
+#}
+bg = readBackground(DNAStringSet(genome[[1]]), 3)
+
+```
+
+Then we evaluate motif enrichment using a p-value of $1e-5$ to determine the score threshold:
+```{r motifenrichment}
+motifcounterOptions(alpha=1e-5, gran=0.01)
+menr = motifEnrichment(regions, motifs, bg, genome=genome)
+```
+The results returned by motifEnrichment can be subjected to further analysis.
+
+For example, the effect size (excess of motif abundance relative to background) can be visualized
+by plotting the log-fold enrichment relative to background as a heatmap:
+
+```{r fig.show=TRUE, fig.cap="Explore the Log-folds for motif and regions sets"}
+library(ComplexHeatmap)
+library(circlize)
+col_fun = colorRamp2(c(-3, 0, 3), c("blue", "white", "red"))
+hm = Heatmap(menr$logfold, name="Log-fold", 
+             heatmap_legend_param = list(direction = "horizontal"), 
+             col = col_fun,
+             width = unit(4, "cm"), height = unit(4, "cm"))
+draw(hm, heatmap_legend_side="bottom")
+```
+Since the dynamic ranges between motifs may differ, in some cases it may be advantageous to visualize 
+the meanhits (number of matches normalized by sequence length) and by subsequently z-score normalizing these scores. This can be done as follows
+
+```{r fig.show=TRUE, fig.cap="Explore the Z-score for motif and regions sets"}
+hm = Heatmap(t(scale(t(menr$meanhits))), name="Z-score", 
+             heatmap_legend_param = list(direction = "horizontal"), 
+            # col = col_fun,
+             width = unit(6, "cm"), height = unit(6, "cm"))
+draw(hm, heatmap_legend_side="bottom")
+```
+
+We also provide a function to list a table of top matching motifs per sequence set:
+```{r topmotifs}
+topMotifs(menr)
+```
+
+```{r plottopmotifs}
+topMotifs(menr, doplot=TRUE)
+```
+
+Comparison with simulated sequence from the background model.
+Lets generate four random sequence sets from the background:
+```{r}
+rndseqs = lapply(1:4, function(x) motifcounter:::generateDNAStringSet(rep(320, 1000), bg))
+names(rndseqs) = paste("simulated", 1:4)
+rndseqs = DNAStringSetList(rndseqs)
+```
+
+```{r}
+smenr = motifEnrichment(rndseqs, motifs,bg)
+topMotifs(smenr, doplot=TRUE)
+```
 
 # Session Info
 
