@@ -16,5 +16,6 @@ dist: trusty
 
 r_packages:
   - covr
+r_build_args: --no-build-vignettes
 after_success:
   - Rscript -e 'covr::codecov()'
