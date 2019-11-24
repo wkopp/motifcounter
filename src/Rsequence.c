@@ -183,10 +183,10 @@ int min(int a, int b) {
   else return b;
 }
 
-SEXP Rpossiblematchcount(SEXP rnrow, SEXP seqlist,
+SEXP Rpossiblematchcount(SEXP rmlen, SEXP seqlist,
                  SEXP rorder) {
 
-    int *nrow = INTEGER(rnrow);
+    int *mlen = INTEGER(rmlen);
 
     int *order = INTEGER(rorder);
     double *xhits;
@@ -208,7 +208,7 @@ SEXP Rpossiblematchcount(SEXP rnrow, SEXP seqlist,
     nseqs = length(seqlist);
 
 
-    motiflength = nrow[0];
+    motiflength = mlen[0];
 
     hits = PROTECT(allocVector(REALSXP, nseqs));
 

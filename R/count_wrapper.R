@@ -239,7 +239,7 @@ numMotifHits = function(seqs, pfm, bg,
 
     npossiblematches = .Call(
         motifcounter_possiblematchcount,
-        nrow(pfm),
+        ncol(pfm),
         lapply(seqs, toString),
         as.integer(getOrder(bg))
     )
