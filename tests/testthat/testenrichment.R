@@ -175,3 +175,31 @@ test_that("motifEnrichment_w_ranges", {
     expect_equivalent(result1$pvalue[1,1], result8$pvalue)
     
 })
+
+test_that("check_counts_for_enrichment", {
+
+  motifcounterOptions(alpha=0.001, gran=.1)
+  # Load Sequences
+  seqfile=system.file("extdata","seq.fasta", package="motifcounter")
+  seqs=Biostrings::readDNAStringSet(seqfile)
+
+  # Load background
+  bg=readBackground(seqs,1)
+
+  rndseqs = motifcounter:::generateDNAStringSet(rep(320, 1000), bg)
+  library(MotifDb)
+  motifs=as.list(query(query(MotifDb,"hsapiens"), "JASPAR_CORE"))
+
+  for (motif in motifs[1:10]) {
+
+    sd = motifcounter::scoreHistogram(rndseqs, normalizeMotif(motif, 1e-7), bg)
+    threshold = motifcounter:::scoreThreshold(normalizeMotif(motif, 1e-7), bg)$threshold
+
+    s1 = sum(sd$dist[which(sd$scores>=threshold)])
+
+    s2 = sum(motifcounter:::numMotifHits(rndseqs, normalizeMotif(motif, 1e-7), bg, singlestranded = T)$numofhits)
+    s3 = sum(motifEnrichment(rndseqs, normalizeMotif(motif, 1e-7),bg, singlestranded = T, normalize_pfm=F)$numofhits)
+    expect_equal(s1, s2)
+    expect_equal(s1, s3)
+  }
+})
