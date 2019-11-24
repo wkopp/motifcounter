@@ -189,15 +189,15 @@ void matchCount(IMatrix *pwm, const char *seq, int seqlen, double *nhits,
       s += pwm->data[j*power(ALPHABETSIZE, order + 1) + index];
       index -= (index / power(ALPHABETSIZE, order)) * power(ALPHABETSIZE, order);
 
-      if ((double)(s + escore->maxbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity < threshold) {
-        break;
-      }
-      if ((double)(s + escore->minbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity >= threshold) {
-        nhits[0] += 1;
-        break;
-      }
+//      if ((double)(s + escore->maxbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity < threshold) {
+//        break;
+//      }
+//      if ((double)(s + escore->minbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity >= threshold) {
+//        nhits[0] += 1;
+//        break;
+//      }
     }
-    if ((double)(s*granularity) >= (double)(threshold)) nhits[0] = 1.;
+    if ((double)(s*granularity) >= (double)(threshold)) nhits[0] += 1.;
 
   }
 }
