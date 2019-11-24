@@ -6,7 +6,8 @@ Date: 2017
 Author: Wolfgang Kopp [aut, cre]
 Suggests: knitr, rmarkdown, testthat, MotifDb, seqLogo, prettydoc,
         BSgenome.Hsapiens.UCSC.hg38
-Imports: Biostrings, methods, GenomicRanges, BSgenome, genomation
+Imports: Biostrings, methods, GenomicRanges, BSgenome, genomation,
+        dplyr, ggplot2, magrittr, reshape2, rlang, stats, ComplexHeatmap, circlize
 Depends: R(>= 3.0)
 Maintainer: Wolfgang Kopp <wolfgang.kopp@mdc-berlin.de>
 Description: 'motifcounter' provides motif matching, motif counting
