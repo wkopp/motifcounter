@@ -52,7 +52,7 @@ motifValid = function(pfm) {
 #' new_motif = normalizeMotif(motif)
 #'
 #' @export
-normalizeMotif = function(pfm, pseudo = 0.01) {
+normalizeMotif = function(pfm, pseudo = 1e-7) {
     pfm = pfm + pseudo
     pfm = t(t(pfm) / colSums(pfm))
     return(pfm)
