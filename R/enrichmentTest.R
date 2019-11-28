@@ -17,7 +17,8 @@
 #'
 #' @inheritParams numMotifHits
 #' @param method String that defines whether to use
-#' the 'compound' Poisson approximation' or the 'combinatorial' model.
+#' the 'compound' Poisson approximation', the 'combinatorial' model
+#' or whether to skip P-value evaluation ('nopval').
 #' Default: method='compound'.
 #' @param ... externally supplied overlap object
 #'
@@ -41,34 +42,51 @@ motifEnrichment_ = function(seqs, pfm, bg, singlestranded = FALSE,
     motifAndBackgroundValid(pfm, bg)
     stopifnot(is.logical(singlestranded))
 
-    #compute overlapping hit probs
-    if ("overlap" %in% names(list(...))) {
-        overlap <- list(...)$overlap
-    } else {
-        overlap = probOverlapHit(pfm, bg, singlestranded)
-    }
-
     # detemine the number of motif hits
     observations = numMotifHits(seqs, pfm, bg, singlestranded)
+
+    #compute overlapping hit probs
+    if (method %in% c("compound", "combinatorial")) {
+        if ("overlap" %in% names(list(...))) {
+            overlap <- list(...)$overlap
+        } else {
+            overlap = probOverlapHit(pfm, bg, singlestranded)
+        }
+    } else {
+        if ("overlap" %in% names(list(...))) {
+            overlap <- list(...)$overlap
+        } else {
+            overlap = .Overlap()
+            overlap@alpha = scoreThreshold(pfms, bg)$alpha
+        }
+    }
+
+    expected_counts = sum(observations$lseq) * getAlpha(overlap)
+    if (!singlestranded) {
+        expected_counts = 2*expected_counts
+    }
 
     if (method == "compound") {
         dist = compoundPoissonDist(observations$lseq, overlap)
     } else if (method == "combinatorial") {
         dist = combinatorialDist(observations$lseq, overlap)
+    } else if (method == "nopval") {
+        p = NA
     } else {
         stop("Invalid method: 'method' must be 'compound' or 'combinatorial'")
     }
-    ind = seq_len(length(dist$dist))
-    ind = ind[ind >= (sum(observations$numofhits) + 1)]
-    p = sum(dist$dist[ind])
-
+    if (method != "nopval") {
+        ind = seq_len(length(dist$dist))
+        ind = ind[ind >= (sum(observations$numofhits) + 1)]
+        p = sum(dist$dist[ind])
+    }
     return (list(
         numofhits = sum(observations$numofhits),
         pvalue = p,
         fold = (sum(observations$numofhits) +1)/
-            (sum(dist$dist * seq(0, length(dist$dist) - 1)) + 1),
+            (expected_counts + 1),
         logfold = log((sum(observations$numofhits) + 1) /
-            (sum(dist$dist * seq(0, length(dist$dist) - 1))+1)),
+            (expected_counts+1)),
         meanhits = sum(observations$numofhits) / sum(observations$lseq)
     ))
 }
@@ -221,7 +239,12 @@ setMethod("motifEnrichment",
             pfms = normalizeMotif(pfms)
         }
 
-        overlap = probOverlapHit(pfms, bg, singlestranded)
+        if (method %in% c("compound", "combinatorial")) {
+            overlap = probOverlapHit(pfms, bg, singlestranded)
+        } else {
+            overlap = .Overlap()
+            overlap@alpha = scoreThreshold(pfms, bg)$alpha
+        }
 
         res = lapply(seqs_or_regions, function(seqs, pfms, bg, singlestranded,
                     method,

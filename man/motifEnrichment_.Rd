@@ -19,7 +19,8 @@ both strands shall be scanned for motif hits.
 Default: singlestranded = FALSE.}
 
 \item{method}{String that defines whether to use
-the 'compound' Poisson approximation' or the 'combinatorial' model.
+the 'compound' Poisson approximation', the 'combinatorial' model
+or whether to skip P-value evaluation ('nopval').
 Default: method='compound'.}
 
 \item{...}{externally supplied overlap object}
