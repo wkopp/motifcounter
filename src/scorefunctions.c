@@ -173,7 +173,7 @@ void matchCount(IMatrix *pwm, const char *seq, int seqlen, double *nhits,
                  double granularity, int order,
                  double threshold, ExtremalScore *escore) {
   int i, j;
-  int s, index;
+  int s, index, match;
 
   for (i = 0; i < seqlen - pwm->nrow + 1 - order; i++) {
 
@@ -183,21 +183,22 @@ void matchCount(IMatrix *pwm, const char *seq, int seqlen, double *nhits,
     for (j = 0, index = 0; j < order; j++) {
       index = index * ALPHABETSIZE + getNucIndex(seq[i + j]);
     }
-    for (j = 0, s = 0; j < pwm->nrow; j++) {
+    for (j = 0, s = 0, match=0; j < pwm->nrow; j++) {
       index = index * ALPHABETSIZE + getNucIndex(seq[i + j + order]);
 
       s += pwm->data[j*power(ALPHABETSIZE, order + 1) + index];
       index -= (index / power(ALPHABETSIZE, order)) * power(ALPHABETSIZE, order);
 
-//      if ((double)(s + escore->maxbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity < threshold) {
-//        break;
-//      }
-//      if ((double)(s + escore->minbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity >= threshold) {
-//        nhits[0] += 1;
-//        break;
-//      }
+      if ((double)(s + escore->maxbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity < threshold) {
+        break;
+      }
+      if ((double)(s + escore->minbackward[(j+order)*power(ALPHABETSIZE, order) + index])*granularity >= threshold) {
+        nhits[0] += 1;
+        match = 1;
+        break;
+      }
     }
-    if ((double)(s*granularity) >= (double)(threshold)) nhits[0] += 1.;
+    if (match!=1 && (double)(s*granularity) >= (double)(threshold)) nhits[0] += 1.;
 
   }
 }
