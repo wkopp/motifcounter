@@ -20,3 +20,24 @@ result table
 This function assembles a concise summary of the enrichment results.
 It enables to extract the top matching motifs and visualize them.
 }
+\examples{
+
+regions1 = system.file("extdata",
+                       "example_jund.bed", package = "motifcounter")
+regions2 = system.file("extdata",
+                       "example_arid3a.bed", package = "motifcounter")
+regions = GenomicRanges::GRangesList(
+           "jund"=genomation::readBed(regions1),
+           "arid3a"=genomation::readBed(regions2))
+
+genome <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
+
+query <- MotifDb::query
+motifs1 = as.list(query(query(MotifDb::MotifDb, "hsapiens"), c("arid3a")))
+motifs2 = as.list(query(query(MotifDb::MotifDb, "hsapiens"), c("jund")))
+motifs = c(motifs1[1], motifs2[1])
+
+result = motifEnrichment(regions, motifs, bg, genome=genome)
+topMotifs(result)
+
+}
