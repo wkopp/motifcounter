@@ -125,6 +125,8 @@ probOverlapHit = function(pfm, bg, singlestranded = FALSE) {
     beta3p = numeric(ncol(pfm))
     beta5p = numeric(ncol(pfm))
     gamma = numeric(3 * ncol(pfm))
+    scorethreshold = scoreThreshold(pfm, bg)
+
     if (singlestranded == TRUE) {
         res = .C(
             motifcounter_overlapSingleStranded,
