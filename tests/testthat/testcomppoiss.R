@@ -41,8 +41,12 @@ test_that("compoundPoissonDist", {
         expect_equal(sum(dist*seq(0,length(dist)-1)),
                      op@alpha*2*length(seqlen)*(seqlen[1]))
 
+        th = scoreThreshold(motif, bg)
+
         # check for single stranded scanning
         op=probOverlapHit(motif, bg,singlestranded=TRUE)
+
+        expect_equal(th$alpha, op@alpha)
 
         # pape not supported
         expect_error(compoundPoissonDist(seqlen, op,method="pape"))
@@ -88,8 +92,13 @@ test_that("jaspar motif tests", {
         expect_equal(sum(dist*seq(0,length(dist)-1)),
                      op@alpha*2*length(seqlen)*(seqlen[1]))
 
+        th = scoreThreshold(motif, bg)
+
         # check scanning a single strand
         op=probOverlapHit(motif, bg,singlestranded=TRUE)
+
+        expect_equal(th$alpha, op@alpha)
+
         dist=compoundPoissonDist(seqlen, op, method="kopp")$dist
         # normalization
         expect_equal(sum(dist),1)

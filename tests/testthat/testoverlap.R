@@ -15,8 +15,10 @@ test_that("probOverlaphit", {
     motiffile=system.file("extdata","x31.tab", package="motifcounter")
     motif=t(as.matrix(read.table(motiffile)))
 
+    th = scoreThreshold(motif, bg)
 
     op=probOverlapHit(motif,bg,singlestranded=FALSE)
+    expect_equal(op@alpha,th$alpha,tolerance=1e-7)
     expect_equal(op@alpha,0.0008473007,tolerance=1e-7)
     expect_equal(op@alpha, op@gamma[1])
     expect_equal(op@beta[1],0.0)
@@ -24,6 +26,7 @@ test_that("probOverlaphit", {
     expect_equal(op@beta5p[5],3.940588e-02)
 
     op=probOverlapHit(motif,bg,singlestranded=TRUE)
+    expect_equal(op@alpha,th$alpha,tolerance=1e-7)
     expect_equal(op@alpha,0.0008473007,tolerance=1e-7)
     expect_equal(op@alpha, op@gamma[1])
     expect_equal(op@beta[1],0.0)
