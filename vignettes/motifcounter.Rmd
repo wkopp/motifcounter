@@ -510,7 +510,7 @@ mafkmotif = as.list(query(query(query(MotifDb, "hsapiens"), "mafk"),
 motifs = c(ctcfmotif, mafkmotif)
 ```
 
-For simplicity we determine an order-$3$ background model on a subset of chromosome 1:
+For simplicity we determine an order-$3$ background model on chromosome 1.
 ```{r background}
 
 
@@ -525,7 +525,7 @@ bg = readBackground(DNAStringSet(genome[[1]]), 3)
 Then we evaluate motif enrichment using a p-value of $1e-5$ to determine the score threshold:
 ```{r motifenrichment}
 motifcounterOptions(alpha=1e-5, gran=0.01)
-menr = motifEnrichment(regions, motifs, bg, genome=genome)
+menr = motifEnrichment(regions, motifs, bg, genome=genome, method="nopval")
 ```
 The results returned by motifEnrichment can be subjected to further analysis.
 
@@ -560,19 +560,6 @@ topMotifs(menr)
 
 ```{r plottopmotifs}
 topMotifs(menr, doplot=TRUE)
-```
-
-Comparison with simulated sequence from the background model.
-Lets generate four random sequence sets from the background:
-```{r}
-rndseqs = lapply(1:4, function(x) motifcounter:::generateDNAStringSet(rep(320, 1000), bg))
-names(rndseqs) = paste("simulated", 1:4)
-rndseqs = DNAStringSetList(rndseqs)
-```
-
-```{r}
-smenr = motifEnrichment(rndseqs, motifs,bg)
-topMotifs(smenr, doplot=TRUE)
 ```
 
 # Session Info
